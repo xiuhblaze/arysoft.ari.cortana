@@ -1,6 +1,8 @@
-import { faGear, faGlobe, faHome, faLandmark, faMoneyBill, faSearch, faTimes, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faGlobe, faHome, faLandmark, faMoneyBill, faNewspaper, faRocket, faSearch, faTimes, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Card, Col, Row } from "react-bootstrap";
+
+import bgElectronic from "../assets/img/bgElectronic.jpg";
 
 export const Inicio = () => {
   return (
@@ -16,7 +18,7 @@ export const Inicio = () => {
         <div className="collapse navbar-collapse w-auto">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link active" href="#">
+              <a className="nav-link" href="#">
                 <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                   <FontAwesomeIcon icon={ faHome } />
                 </div>
@@ -26,7 +28,7 @@ export const Inicio = () => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <a className="nav-link active" href="#">
                 <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                   <FontAwesomeIcon icon={ faLandmark } />
                 </div>
@@ -134,10 +136,75 @@ export const Inicio = () => {
                 </Card.Body>
               </Card>
             </div>
+            <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+              <Card>
+                <Card.Body className="p-3">
+                  <Row>
+                    <Col xs="8">
+                      <div className="numbers">
+                        <p className="text-sm mb-0 text-capitalize font-weight-bold">Nullam urna enim</p>
+                        <h5 className="font-weight-bolder mb-0">
+                          24
+                          <span className="text-primary text-sm font-weight-bolder ms-1">+38%</span>
+                        </h5>
+                      </div>
+                    </Col>
+                    <Col xs="4" className="d-flex align-items-center justify-content-end">
+                      <div className="icon icon-shape bg-gradient-info shadow text-white border-radius-md d-flex align-items-center justify-content-center">
+                        <FontAwesomeIcon icon={ faNewspaper } size="lg" className="opacity-10" aria-hidden="true" />
+                      </div>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </div>
           </div>
+          <Row className="mt-4">
+            <Col xs="7" className="mb-lg-0 mb-4">
+              <Card>
+                <Card.Body className="p-3">
+                  <Row>
+                    <Col xs="6">
+                      <div className="d-flex flex-column h-100">
+                        <p className="mb-1 pt-2 text-bold">Built by developers</p>
+                        <h5 className="font-weight-bolder">Soft UI Dashboard</h5>
+                        <p className="mb-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna enim, dapibus ut enim bibendum.</p>
+                        <a className="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="#">
+                          Ver más
+                          <i className="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+                        </a>
+                      </div>
+                    </Col>
+                    <Col xs="5" className="ms-auto text-center mt-5 mt-lg-0">
+                      <div className="bg-gradient-info border-radius-lg h-100">
+                        <div className="position-relative d-flex align-items-center justify-content-center h-100">
+                          <FontAwesomeIcon icon={ faRocket } size="6x" className="w-100 position-relative z-index-2 pt-4 text-white" />
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col xs="5">
+              <Card className="h-100 p-3">
+                <div 
+                  className="overflow-hidden position-relative border-radius-lg bg-cover h-100"
+                  style={{ backgroundImage: `url(${ bgElectronic })`}}
+                >
+                  <span className="mask bg-gradient-dark"></span>
+                  <Card.Body className="position-relative z-index-1 d-flex flex-column h-100 p-3">
+                    <h5 className="text-white font-weight-bolder mb-4 pt-2">Haciendo el dashboard</h5>
+                    <p className="text-white">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna enim, dapibus ut enim bibendum, 
+                      consectetur vehicula ante. Aliquam erat volutpat. Praesent congue vitae tortor non commodo.
+                    </p>
+                  </Card.Body>
+                </div>
+              </Card>
+            </Col>
+          </Row>
         </div>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam urna enim, dapibus ut enim bibendum, consectetur vehicula ante. Aliquam erat volutpat. Praesent congue vitae tortor non commodo. Ut at erat lectus. Maecenas sed pellentesque dolor. Nunc a lorem accumsan, laoreet nibh suscipit, placerat erat.
-
       </main>
     </>
   )
