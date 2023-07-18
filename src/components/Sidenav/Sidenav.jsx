@@ -2,7 +2,7 @@ import { faHome, faLandmark, faTimes, faUsers } from "@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { setMiniSidenav, useArysoftUIController } from "../../context/context";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 const openTransparentStyles = 'sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3';
 const openWhiteStyles = 'sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-white';
@@ -16,17 +16,17 @@ const closeStyle = () => ({
   transform: 'translateX(-250px)',
 });
 
-export const Sidenav = () => {
+export const Sidenav = ({ brand, brandName, routes, ...props }) => {
   const [controller, dispatch] = useArysoftUIController();
   const { miniSidenav, transparentSidenav } = controller;
   const location = useLocation();
+  //const collapseName = location.pathname.split('/').slice(1)[0];
 
   const closeSidenav = () => setMiniSidenav(dispatch, true);
 
   useEffect(() => {
     const onMiniSidenav = () => {
       setMiniSidenav(dispatch, window.innerWidth < 1200);
-      console.log('setMiniSidenav', window.innerWidth < 1200);
     };
   
     window.addEventListener("resize", onMiniSidenav);
@@ -37,53 +37,57 @@ export const Sidenav = () => {
     }
   }, [dispatch, location]);
 
+  const renderRoutes = !routes ? [] : routes.map(({type, icon, title, key, path }) => {
+    let returnValue;
+
+    switch (type) {
+      case 'collapse': 
+        returnValue = (
+          <li key={ key } className="nav-item">
+            <NavLink to={ path.replace('*', '') } className="nav-link">
+              <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                <FontAwesomeIcon icon={ icon } />
+              </div>
+              <span className="nav-link-text ms-1">
+                { title }
+              </span>
+            </NavLink>
+          </li>
+        )
+      break;
+      case 'title':
+        returnValue = (
+          <li key={ key } className="nav-item mt-3">
+            <h6 className="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">{ title }</h6>
+          </li>
+        )
+      break;
+    }
+
+    return returnValue;
+  }); // renderRoutes
+
   return (
     <aside 
+      { ...props }
       className={ transparentSidenav ? (miniSidenav ? openTransparentStyles : openWhiteStyles) : openWhiteStyles } 
       style={ miniSidenav ? closeStyle() : openStyle() } 
     >
       <div className="sidenav-header">
         { !miniSidenav && <FontAwesomeIcon icon={ faTimes } className="p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-xl-none" onClick={ closeSidenav } /> }
         <a className="navbar-brand m-0" href="#">
-          <span className="ms-1 font-weight-bold">Zapotlán Admin</span>
+          {
+            !!brand ? (
+              <img className="navbar-brand-img h-100" src={ brand } alt="imagen principal" />
+            ) : null
+          }
+          <span className="ms-2 font-weight-bold">{ brandName }</span>
         </a>
       </div>
       <hr className="horizontal dark mt-0" />
       <div className="collapse navbar-collapse w-auto">
         <ul className="navbar-nav">
-          <li className="nav-item">
-            <a className="nav-link" href="#">
-              <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                <FontAwesomeIcon icon={ faHome } />
-              </div>
-              <span className="nav-link-text ms-1">
-                Dashboard
-              </span>
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link active" href="#">
-              <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                <FontAwesomeIcon icon={ faLandmark } />
-              </div>
-              <span className="nav-link-text ms-1">
-                Administraciones
-              </span>
-            </a>
-          </li>
-          <li className="nav-item mt-3">
-            <h6 className="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Catálogos</h6>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="#">
-              <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                <FontAwesomeIcon icon={ faUsers } />
-              </div>
-              <span className="nav-link-text ms-1">
-                Empleados
-              </span>
-            </a>
-          </li>
+          { renderRoutes }
         </ul>
       </div>
     </aside>

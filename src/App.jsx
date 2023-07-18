@@ -1,30 +1,30 @@
-import { BrowserRouter, RouterProvider } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 
 import './app.css';
 
 import publicRoute from './routes/publicRoutes';
 
-
 function App() {
-  
+
+  const renderRoutes = (routes) => {
+
+    if (!!routes) {
+      return routes.map( route => {
+        if (route.type === 'collapse') {
+          return <Route key={ route.key } path={ route.path } element={ route.element } />
+        }
+        return null;
+      });
+    }
+    return null;
+  };
+
   return (
-    <RouterProvider router={ publicRoute } />
-    // <BrowserRouter>
-    //   <>
-    //     <Container>
-    //       <h1>
-    //         <FontAwesomeIcon icon={ faUserCircle } className="me-4" />
-    //         Zapotlán - Soft UI
-    //       </h1>
-    //       <Card>
-    //         <Card.Body>
-    //           <Card.Title>Tarjetita</Card.Title>
-    //           <Card.Text>Lorem ipsum dolor sit amet</Card.Text>
-    //         </Card.Body>
-    //       </Card>
-    //     </Container>    
-    //   </>
-    // </BrowserRouter>
+    <Routes>
+      { renderRoutes(publicRoute) }
+
+      <Route path="/*" element={ <Navigate to="dashboard" /> } />
+    </Routes>
   )
 }
 

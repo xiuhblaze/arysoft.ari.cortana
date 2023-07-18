@@ -5,11 +5,14 @@ import App from './App.jsx';
 import { ArysoftUIControllerProvider } from './context/context.jsx';
 
 import './assets/css/soft-ui-dashboard.min.css';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ArysoftUIControllerProvider>
-      <App />
-    </ArysoftUIControllerProvider>
+    <BrowserRouter>
+      <ArysoftUIControllerProvider>
+        <App />
+      </ArysoftUIControllerProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 )
