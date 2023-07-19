@@ -1,10 +1,19 @@
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
 import './app.css';
 
 import publicRoute from './routes/publicRoutes';
+import { useEffect } from 'react';
+import Home from './views/home';
 
 function App() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+  }, [pathname]);
+  
 
   const renderRoutes = (routes) => {
 
@@ -22,7 +31,7 @@ function App() {
   return (
     <Routes>
       { renderRoutes(publicRoute) }
-
+      <Route path="/home" element={ <Home /> } />
       <Route path="/*" element={ <Navigate to="dashboard" /> } />
     </Routes>
   )

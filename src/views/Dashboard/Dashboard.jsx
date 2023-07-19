@@ -158,6 +158,8 @@ export const Dashboard = () => {
               <ListGroupItem>Hacer la interfaz para manejar un listado de registros</ListGroupItem>
               <ListGroupItem>Hacer la interfaz para editar un registro</ListGroupItem>
               <ListGroupItem>Hacer la interfaz para consultar un registro</ListGroupItem>
+              <ListGroupItem>Hacer la interfaz para inicio de sesión</ListGroupItem>
+              <ListGroupItem>Hacer la interfaz para home</ListGroupItem>
             </ListGroup>
           </Card>
         </Col>

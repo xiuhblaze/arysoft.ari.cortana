@@ -6,6 +6,7 @@ import { Navbar } from "../../components/Navbar";
 import publicRoute from "../../routes/publicRoutes";
 
 import escudoArmas from '../../assets/img/lgoEscudoArmas.png';
+import { Configurator } from "../../components/Configurator";
 
 export const DashboardLayout = ({children}) => {
   const [ controller, dispatch ] = useArysoftUIController();
@@ -29,6 +30,7 @@ export const DashboardLayout = ({children}) => {
           { children }
         </div>
       </main>
+      <Configurator />
     </>
   )
 }

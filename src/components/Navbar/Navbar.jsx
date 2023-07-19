@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 import { setMiniSidenav, setOpenConfigurator, setTransparentNavbar, useArysoftUIController } from '../../context/context';
 
-import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faGear, faHome, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faClock, faFile, faGear, faHome, faLock, faUser, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Breadcrums } from '../Breadcrumbs';
@@ -68,37 +68,78 @@ export const Navbar = ({ title }) => {
             <NavDropdown 
               title={ 
                 <span className="text-body font-weight-bold">
-                  <FontAwesomeIcon icon={ faUser } className="me-sm-1" />
-                  <span className="d-sm-inline d-none">adrian.castillo</span>
+                  <FontAwesomeIcon icon={ faUser } className="me-sm-2" />
+                  <span className="d-sm-inline d-none me-sm-1">adrian.castillo</span>
                 </span> } 
               id="userMenu"
             >
               <NavDropdown.Item>
+                <FontAwesomeIcon icon={ faGear } className="me-2" />
+                Perfil
+              </NavDropdown.Item>
+              <NavDropdown.Item>
                 <FontAwesomeIcon icon={ faLock } className="me-2" />
                 Cambiar contraseña
               </NavDropdown.Item>
-              <NavDropdown.Divider className="dropdown-divider horizontal dark my-3" />
+              <NavDropdown.Divider />
               <NavDropdown.Item>
                 <FontAwesomeIcon icon={ faArrowRightFromBracket } className="me-2" />
                 Cerrar sesión
               </NavDropdown.Item>
             </NavDropdown>
-              {/* <li className="nav-item d-flex align-items-center">
-                <a href="#" className="nav-link text-body font-weight-bold px-0">
-                  <FontAwesomeIcon icon={ faUser } className="me-sm-1" />
-                  <span className="d-sm-inline d-none">adrian.castillo</span>
-                </a>
-              </li> */}
-              <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
-                <a className="nav-link text-body p-0" onClick={ onMiniSidenav }>
-                  <FontAwesomeIcon icon={ faBars } />
-                </a>
-              </li>
-              <li className="nav-item ps-3 d-flex align-items-center">
-                <a href="#" className="nav-link text-body p-0">
-                  <FontAwesomeIcon icon={ faGear } />
-                </a>
-              </li>
+            <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a className="nav-link text-body p-0" onClick={ onMiniSidenav }>
+                <FontAwesomeIcon icon={ faBars } />
+              </a>
+            </li>
+            <li className="nav-item ps-3 d-flex align-items-center">
+              <a href="#" className="nav-link text-body p-0" onClick={ onConfiguratorOpen }>
+                <FontAwesomeIcon icon={ faGear } />
+              </a>
+            </li>
+            <NavDropdown
+              id="notificationsMenu"
+              title={ <span className="text-body"><FontAwesomeIcon icon={ faBell } /></span> }
+            >
+              <NavDropdown.Item>
+                <div className="d-flex py-1">
+                  <div className="my-auto mx-2">
+                    <div className="icon icon-sm icon-shape bg-gradient-primary shadow border-radius-md d-flex align-items-center justify-content-center">
+                      <FontAwesomeIcon icon={ faUserCircle } size="lg" className="opacity-10 text-white" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <div className="d-flex flex-column justify-content-center">
+                    <h6 className="text-sm font-weight-normal mb-1">
+                      <span className="font-weight-bold">Página en revisión </span>
+                      por cecilia.barajas
+                    </h6>
+                    <p className="text-xs text-secondary mb-0">
+                      <FontAwesomeIcon icon={ faClock } className="me-1" />
+                      hace 18 minutos
+                    </p>
+                  </div>
+                </div>
+              </NavDropdown.Item>
+              <NavDropdown.Item>
+                <div className="d-flex py-1">
+                  <div className="my-auto mx-2">
+                    <div className="icon icon-sm icon-shape bg-gradient-info shadow border-radius-md d-flex align-items-center justify-content-center">
+                      <FontAwesomeIcon icon={ faFile } size="lg" className="opacity-10 text-white" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <div className="d-flex flex-column justify-content-center">
+                    <h6 className="text-sm font-weight-normal mb-1">
+                      <span className="font-weight-bold">Página nueva </span>
+                      por cecilia.barajas
+                    </h6>
+                    <p className="text-xs text-secondary mb-0">
+                      <FontAwesomeIcon icon={ faClock } className="me-1" />
+                      hace 1 día
+                    </p>
+                  </div>
+                </div>
+              </NavDropdown.Item>
+            </NavDropdown>
           </ul>
         </div>
       </div>
