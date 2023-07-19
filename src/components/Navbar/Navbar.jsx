@@ -3,10 +3,11 @@ import { useLocation } from 'react-router-dom';
 
 import { setMiniSidenav, setOpenConfigurator, setTransparentNavbar, useArysoftUIController } from '../../context/context';
 
-import { faBars, faGear, faHome, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faGear, faHome, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Breadcrums } from '../Breadcrumbs';
+import { NavDropdown } from 'react-bootstrap';
 
 const navbarTypeStyckyStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky';
 const navbarTypeStaticStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl';
@@ -27,8 +28,7 @@ export const Navbar = ({ title }) => {
     }
 
     const onTransparentNavbar = () => {
-      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);      
-      //console.log('onTransparentNavbar', (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
+      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
     };
 
     window.addEventListener("scroll", onTransparentNavbar);
@@ -65,12 +65,30 @@ export const Navbar = ({ title }) => {
           </div> */}
 
           <ul className="navbar-nav d-flex flex-row justify-content-end ms-md-auto">
-              <li className="nav-item d-flex align-items-center">
+            <NavDropdown 
+              title={ 
+                <span className="text-body font-weight-bold">
+                  <FontAwesomeIcon icon={ faUser } className="me-sm-1" />
+                  <span className="d-sm-inline d-none">adrian.castillo</span>
+                </span> } 
+              id="userMenu"
+            >
+              <NavDropdown.Item>
+                <FontAwesomeIcon icon={ faLock } className="me-2" />
+                Cambiar contraseña
+              </NavDropdown.Item>
+              <NavDropdown.Divider className="dropdown-divider horizontal dark my-3" />
+              <NavDropdown.Item>
+                <FontAwesomeIcon icon={ faArrowRightFromBracket } className="me-2" />
+                Cerrar sesión
+              </NavDropdown.Item>
+            </NavDropdown>
+              {/* <li className="nav-item d-flex align-items-center">
                 <a href="#" className="nav-link text-body font-weight-bold px-0">
                   <FontAwesomeIcon icon={ faUser } className="me-sm-1" />
                   <span className="d-sm-inline d-none">adrian.castillo</span>
                 </a>
-              </li>
+              </li> */}
               <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
                 <a className="nav-link text-body p-0" onClick={ onMiniSidenav }>
                   <FontAwesomeIcon icon={ faBars } />
