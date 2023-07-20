@@ -1,18 +1,22 @@
-import React from 'react'
+import React from 'react';
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 
 import { ArysoftUIControllerProvider } from './context/context.jsx';
+import App from './App.jsx';
+import store from './store/store.jsx';
 
 import './assets/css/soft-ui-dashboard.min.css';
-import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ArysoftUIControllerProvider>
-        <App />
-      </ArysoftUIControllerProvider>
-    </BrowserRouter>
+    <Provider store={ store }>
+      <BrowserRouter>
+        <ArysoftUIControllerProvider>
+          <App />
+        </ArysoftUIControllerProvider>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 )
