@@ -1,12 +1,15 @@
+import { useEffect } from 'react';
 import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
-import './app.css';
+import { useAuthStore } from './hooks/useAuthStore';
+
+import Home from './views/home';
+import Loading from './views/loading';
 
 import publicRoute from './routes/publicRoutes';
-import { useEffect } from 'react';
-import Home from './views/home';
-import { useAuthStore } from './hooks/useAuthStore';
-import Loading from './views/loading';
+import privateRoute from './routes/privateRoutes';
+
+import './app.css';
 
 function App() {
   const { pathname } = useLocation();
@@ -43,13 +46,13 @@ function App() {
       {
         status === 'authenticated' ? (
           <>
-            { renderRoutes(publicRoute) }
+            { renderRoutes(privateRoute) }
             <Route path="/home" element={ <Home /> } />
             <Route path="/*" element={ <Navigate to="dashboard" /> } />
           </>
         ) : (
           <>
-            <Route path="/home" element={ <Home /> } />
+            { renderRoutes(publicRoute) }
             <Route path="/*" element={ <Navigate to="home" /> } />
           </>
         )

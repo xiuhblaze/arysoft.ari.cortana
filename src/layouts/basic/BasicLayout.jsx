@@ -10,6 +10,7 @@ export const BasicLayout = ({children}) => {
         { children }
       </main>
       <footer className="footer py-5">
+        <hr className="horizontal dark mb-5" />
         <Container>
           <Row>
             <Col lg="8" className="mb-4 mx-auto text-center">

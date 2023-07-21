@@ -37,7 +37,7 @@ export const useAuthStore = () => {
 
 
   const checkAuthToken = () => {
-    const token = localStorage.getItem(USER_TOKEN) || null;
+    const token = JSON.parse(localStorage.getItem(USER_TOKEN)) || null;
 
     if (!token) return dispatch(onLogout());
     //* Falta la real validación del token y hacia la API para comprobar su vigencia
@@ -51,15 +51,22 @@ export const useAuthStore = () => {
       //* Aqui va la consulta a la Api
       if (username === 'adrian.castillo' && password === '123') {
         const user = setUserInfo({ username });
-        localStorage.setItem(USER_TOKEN, user);
+        localStorage.setItem(USER_TOKEN, JSON.stringify(user));
         dispatch(onLogin(user));
       } else {
         throw new Error('El usuario y/o su contraseña no existen');
       }
     } catch (error) {
-      setError(error);
+      //console.error(`${error.name}: ${error.message}`);
+      setError(error.message);
       dispatch(onLogout());
     }
+  };
+
+  const logout = () => {
+    localStorage.clear();
+    //setError('Sesión finalizada');
+    dispatch(onLogout());
   };
 
   return {
@@ -69,5 +76,6 @@ export const useAuthStore = () => {
 
     checkAuthToken,
     loginASync,
+    logout,
   }
 };

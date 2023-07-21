@@ -1,48 +1,25 @@
 
-import { faHome, faLandmark, faList, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-import { Administraciones } from "../views/Administraciones";
-import { Dashboard } from "../views/Dashboard/Dashboard";
-import { Empleados } from "../views/Empleados";
-import { ListView } from "../views/examples/ListView";
+import Home from "../views/home";
+import { Login } from "../views/Login/Login";
 
 const publicRoute = [
   { 
     type: 'collapse',
-    title: 'Dashboard',
-    key: 'dashboard',
-    path: '/dashboard',
+    title: 'Home',
+    key: 'home',
+    path: '/home',
     icon: faHome,
-    element: <Dashboard />
-  },
-  {
-    type: 'title',
-    title: 'Catálogos',
-    key: 'catalogos',
+    element: <Home />
   },
   { 
     type: 'collapse',
-    title: 'Administraciones',
-    key: 'administraciones',
-    path: '/administraciones',
-    icon: faLandmark,
-    element: <Administraciones />
-  },
-  { 
-    type: 'collapse',
-    title: 'Empleados',
-    key: 'empleados',
-    path: '/empleados',
-    icon: faUsers,
-    element: <Empleados />
-  },
-  { 
-    type: 'collapse',
-    title: 'List example',
-    key: 'list',
-    path: '/examples/list',
-    icon: faList,
-    element: <ListView />
+    title: 'Login',
+    key: 'login',
+    path: '/login',
+    icon: faRightFromBracket,
+    element: <Login />
   },
 ];
 

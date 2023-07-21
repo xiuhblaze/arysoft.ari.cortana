@@ -10,7 +10,7 @@ import {
 const openConfiguratorStyle = 'fixed-plugin show';
 const closeConfiguratorStyle = 'fixed-plugin';
 
-export const Configurator = () => {
+export const Configurator = ({ help }) => {
   const [ controller, dispatch ] = useArysoftUIController();
   const { openConfigurator } = controller;
 
@@ -34,6 +34,11 @@ export const Configurator = () => {
           </div>
         </Card.Header>
         <hr className="horizontal dark my-1"></hr>
+        { !!help && 
+          <Card.Body className="pt-sm-3 pt-0">
+            { help }
+          </Card.Body>
+        }
       </Card>
     </div>
   )

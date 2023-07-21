@@ -1,10 +1,33 @@
 import React from 'react'
 import DashboardLayout from '../layouts/dashboard/DashboardLayout'
 import { Alert, Col, Row } from 'react-bootstrap'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+
+const textHelp = () => (
+  <>
+    <h6 className="mb-0">
+      <FontAwesomeIcon icon={ faCircleQuestion } className="me-2" />
+      Consulta la información de los empleados
+    </h6>
+    <p className="text-sm">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ut nibh eget neque semper eleifend. 
+      Nullam aliquam tortor odio, quis congue quam scelerisque in. Proin in ultricies mauris. Aenean ut nulla nisi. 
+      Mauris nec faucibus justo. Aenean molestie, enim ut eleifend imperdiet, eros nunc faucibus ex, 
+      sed mattis nunc ante cursus massa. Vestibulum eget consequat tortor, a porta magna. In non ante dui. 
+    </p>
+    <p className="text-sm">
+      Curabitur condimentum tempus tristique. Praesent accumsan tortor eget neque fermentum, nec sodales magna suscipit. 
+      Proin sed euismod risus. Sed rhoncus massa eu elit finibus, vel tristique mauris placerat. 
+      Quisque at nibh facilisis, euismod nulla ac, ultrices leo. Suspendisse ut aliquam ipsum. 
+      Donec quis sagittis erat, et cursus turpis. Sed non euismod nibh, dapibus laoreet sapien.
+    </p>
+  </>
+);
 
 export const Empleados = () => {
   return (
-    <DashboardLayout>
+    <DashboardLayout help={ textHelp() }>
       <Row>
         <Col>
           <h5>Empleados</h5>

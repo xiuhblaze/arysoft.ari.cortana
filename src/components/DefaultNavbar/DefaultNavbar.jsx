@@ -1,10 +1,22 @@
-import { faBars, faChartPie, faRightToBracket, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChartPie, faRightFromBracket, faRightToBracket, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 
 import escudoArmas from '../../assets/img/lgoEscudoArmas.png';
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 export const DefaultNavbar = () => {
+
+  const {
+    status,
+    user,
+    logout,
+  } = useAuthStore();
+
+  const onLogout = () => {
+    logout();
+  };
+
   return (
     <Container className="position-sticky z-index-sticky top-0">
       <Row>
@@ -20,19 +32,35 @@ export const DefaultNavbar = () => {
               </Navbar.Toggle>
               <Navbar.Collapse id="navbarScroll">
                 <Nav className="mx-auto">
-                  <Nav.Link href="/dashboard">
-                    <FontAwesomeIcon icon={ faChartPie } className="opacity-6 text-dark me-1" />
-                    Dashboard
-                  </Nav.Link>
-                  <Nav.Link href="#">
-                    <FontAwesomeIcon icon={ faUser } className="opacity-6 text-dark me-1" />
-                    Perfil</Nav.Link>
+                  { status === 'authenticated' ? (
+                    <>
+                      <Nav.Link href="/dashboard">
+                        <FontAwesomeIcon icon={ faChartPie } className="opacity-6 text-dark me-1" />
+                        Dashboard
+                      </Nav.Link>
+                      <Nav.Link href="/profile">
+                        <FontAwesomeIcon icon={ faUser } className="opacity-6 text-dark me-1" />
+                        Perfil
+                      </Nav.Link>
+                    </>
+                  ) : null }
                 </Nav>
-                <Nav>
-                  <Nav.Link href="#">
-                    <FontAwesomeIcon icon={ faRightToBracket } className="opacity-6 text-dark me-1" />
-                    Iniciar sesión</Nav.Link>
-                </Nav>
+                {
+                  status === 'not-authenticated' ? (
+                    <Nav>
+                      <Nav.Link href="/login">
+                        <FontAwesomeIcon icon={ faRightToBracket } className="opacity-6 text-dark me-1" />
+                        Iniciar sesión</Nav.Link>
+                    </Nav>
+                  ) : (
+                    <Nav>
+                      <Nav.Link onClick={ onLogout }>
+                        <FontAwesomeIcon icon={ faRightFromBracket } className="opacity-6 text-dark me-1" />
+                        Cerrar sesión
+                      </Nav.Link>
+                    </Nav>
+                  )
+                }
               </Navbar.Collapse>
             </Container>
           </Navbar>

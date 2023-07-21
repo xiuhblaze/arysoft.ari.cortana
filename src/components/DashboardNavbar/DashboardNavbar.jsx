@@ -1,24 +1,32 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { setMiniSidenav, setOpenConfigurator, setTransparentNavbar, useArysoftUIController } from '../../context/context';
 
-import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faClock, faFile, faGear, faHome, faLock, faUser, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faClock, faFile, faGear, faHome, faLock, faUser, faUserCircle, faUserGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Breadcrums } from '../Breadcrumbs';
 import { NavDropdown } from 'react-bootstrap';
+import { useAuthStore } from '../../hooks/useAuthStore';
 
 const navbarTypeStyckyStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky';
 const navbarTypeStaticStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl';
 
-export const Navbar = ({ title }) => {
+export const DashboardNavbar = ({ title }) => {
+  const navigate = useNavigate();
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useArysoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
 
   const fullRoute = useLocation().pathname.split('/').slice(1);
   const route = fullRoute.filter(item => item !== '');
+
+  const {
+    status,
+    user,
+    logout,
+  } = useAuthStore();
 
   useEffect(() => {
     if (fixedNavbar) {
@@ -42,6 +50,14 @@ export const Navbar = ({ title }) => {
   const onMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const onConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
 
+  const onProfileClick = () => {
+    navigate('/perfil');
+  };
+
+  const onLogout = () => {
+    logout();
+  };
+  
   return (
     <nav 
       className={ transparentNavbar ? navbarTypeStaticStyle : navbarTypeStyckyStyle } 
@@ -69,12 +85,12 @@ export const Navbar = ({ title }) => {
               title={ 
                 <span className="text-body font-weight-bold">
                   <FontAwesomeIcon icon={ faUser } className="me-sm-2" />
-                  <span className="d-sm-inline d-none me-sm-1">adrian.castillo</span>
+                  <span className="d-sm-inline d-none me-sm-1">{ user.givename }</span>
                 </span> } 
               id="userMenu"
             >
-              <NavDropdown.Item>
-                <FontAwesomeIcon icon={ faGear } className="me-2" />
+              <NavDropdown.Item onClick={ onProfileClick }>
+                <FontAwesomeIcon icon={ faUserGear } className="me-2" />
                 Perfil
               </NavDropdown.Item>
               <NavDropdown.Item>
@@ -82,7 +98,7 @@ export const Navbar = ({ title }) => {
                 Cambiar contraseña
               </NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item>
+              <NavDropdown.Item onClick={ onLogout }>
                 <FontAwesomeIcon icon={ faArrowRightFromBracket } className="me-2" />
                 Cerrar sesión
               </NavDropdown.Item>
@@ -147,4 +163,4 @@ export const Navbar = ({ title }) => {
   )
 }
 
-export default Navbar;
+export default DashboardNavbar;
