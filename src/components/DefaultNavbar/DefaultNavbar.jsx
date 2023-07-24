@@ -38,7 +38,7 @@ export const DefaultNavbar = () => {
                         <FontAwesomeIcon icon={ faChartPie } className="opacity-6 text-dark me-1" />
                         Dashboard
                       </Nav.Link>
-                      <Nav.Link href="/profile">
+                      <Nav.Link href="/perfil">
                         <FontAwesomeIcon icon={ faUser } className="opacity-6 text-dark me-1" />
                         Perfil
                       </Nav.Link>
