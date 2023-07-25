@@ -1,8 +1,11 @@
 
-import { faHome, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faCircleInfo, faHome, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-import Home from "../views/home";
+
 import { Login } from "../views/Login/Login";
+import { AboutView } from "../views/www/AboutView";
+import Home from "../views/Home";
+
 
 const publicRoute = [
   { 
@@ -15,12 +18,20 @@ const publicRoute = [
   },
   { 
     type: 'collapse',
-    title: 'Login',
-    key: 'login',
-    path: '/login',
-    icon: faRightFromBracket,
-    element: <Login />
+    title: 'About',
+    key: 'about',
+    path: '/about',
+    icon: faCircleInfo,
+    element: <AboutView />
   },
+  // { 
+  //   type: 'collapse',
+  //   title: 'Login',
+  //   key: 'login',
+  //   path: '/login',
+  //   icon: faRightFromBracket,
+  //   element: <Login />
+  // },
 ];
 
 export default publicRoute;

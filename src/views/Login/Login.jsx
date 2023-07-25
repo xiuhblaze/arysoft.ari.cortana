@@ -12,7 +12,7 @@ import ZapFormikTextInput from '../../components/Forms/ZapformikTextInput';
 
 import landscape from "../../assets/img/phoLoginLandscape.jpg";
 
-export const Login = () => {
+export const Login = () => {  
   const {
     status,
     user,

@@ -1,9 +1,9 @@
 
 import { faHome, faLandmark, faList, faUserGear, faUsers } from "@fortawesome/free-solid-svg-icons";
 
-import { Administraciones } from "../views/Administraciones";
+import { Administraciones } from "../views/examples/Administraciones";
 import { Dashboard } from "../views/Dashboard/Dashboard";
-import { Empleados } from "../views/Empleados";
+import { Empleados } from "../views/examples/Empleados";
 import { ListView } from "../views/examples/ListView";
 import Profile from "../views/profile/Profile";
 

@@ -3,13 +3,13 @@ import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
 import { useAuthStore } from './hooks/useAuthStore';
 
-import Home from './views/home';
 import Loading from './views/loading';
 
 import publicRoute from './routes/publicRoutes';
 import privateRoute from './routes/privateRoutes';
 
 import './app.css';
+import { Login } from './views/Login/Login';
 
 function App() {
   const { pathname } = useLocation();
@@ -47,13 +47,14 @@ function App() {
         status === 'authenticated' ? (
           <>
             { renderRoutes(privateRoute) }
-            <Route path="/home" element={ <Home /> } />
-            <Route path="/*" element={ <Navigate to="dashboard" /> } />
+            { renderRoutes(publicRoute) }
+            <Route path="/*" element={ <Navigate to={ privateRoute[0].path } /> } />
           </>
         ) : (
           <>
             { renderRoutes(publicRoute) }
-            <Route path="/*" element={ <Navigate to="home" /> } />
+            <Route path="/login" element={ <Login /> } />
+            <Route path="/*" element={ <Navigate to={ publicRoute[0].path } /> } />
           </>
         )
       }
