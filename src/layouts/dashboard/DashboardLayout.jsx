@@ -1,13 +1,24 @@
-import { Link, useLocation } from "react-router-dom";
-import { Sidenav } from "../../components/Sidenav";
-import { setLayout, useArysoftUIController } from "../../context/context";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
+import { setLayout, useArysoftUIController } from "../../context/context";
+import { Configurator } from "../../components/Configurator";
+
+import { Sidenav } from "../../components/Sidenav";
+import { DashboardNavbar } from "../../components/DashboardNavbar";
+import { DashboardFooter } from "../../components/Footers";
+
+import privateRoute from "../../routes/privateRoutes";
+
+<<<<<<< HEAD
 import lgoARINavbar from '../../assets/img/lgoARINavbar.png';
 import { Configurator } from "../../components/Configurator";
 import { DashboardNavbar } from "../../components/DashboardNavbar";
 import privateRoute from "../../routes/privateRoutes";
 import { DashboardFooter } from "../../components/Footers";
+=======
+import escudoArmas from '../../assets/img/lgoEscudoArmas.png';
+>>>>>>> bac6da10390ddfe9f09ac177ed557df13fa6646b
 
 export const DashboardLayout = ({ help = null, children }) => {
   const [ controller, dispatch ] = useArysoftUIController();
