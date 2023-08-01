@@ -75,14 +75,19 @@ export const Sidenav = ({ brand, brandName, routes, ...props }) => {
     >
       <div className="sidenav-header">
         { !miniSidenav && <FontAwesomeIcon icon={ faTimes } className="p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-xl-none" onClick={ closeSidenav } /> }
-        <a className="navbar-brand m-0" href="#">
-          {
-            !!brand ? (
-              <img className="navbar-brand-img h-100" src={ brand } alt="imagen principal" />
-            ) : null
-          }
-          <span className="ms-2 font-weight-bold">{ brandName }</span>
-        </a>
+        <Link to="/" className="navbar-brand m-0">
+          <div className="d-flex align-items-center">
+            {
+              !!brand ? (
+                <img className="navbar-brand-img h-100" src={ brand } alt="imagen principal" />
+              ) : null
+            }
+            <div className="d-flex flex-column justify-content-center">
+              <span className="ms-2 font-weight-bold">American <br />Registration Inc</span>
+            </div>
+          </div>
+          {/* <span className="ms-2 font-weight-bold">{ brandName }</span> */}
+        </Link>
       </div>
       <hr className="horizontal dark mt-0" />
       <div className="collapse navbar-collapse w-auto">

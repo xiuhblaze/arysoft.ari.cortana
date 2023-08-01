@@ -1,7 +1,7 @@
 import { useField } from "formik";
 
 // Basado en: https://codesandbox.io/s/formik-v2-tutorial-added-textarea-ujz18
-export const ZapFormikTextInput = ({ label, ...props }) => {
+export const AryFormikTextInput = ({ label, ...props }) => {
   const [field, meta] = useField(props);
   return (
     <div className="mb-3">
@@ -13,11 +13,11 @@ export const ZapFormikTextInput = ({ label, ...props }) => {
       />
       {
         meta.touched && meta.error ? (
-          <small className="text-danger">{ meta.error }</small>
+          <span className="text-danger text-xs">{ meta.error }</span>
         ) : null
       }
     </div>
   );
 };
 
-export default ZapFormikTextInput;
+export default AryFormikTextInput;

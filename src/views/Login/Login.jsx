@@ -8,9 +8,9 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { useAuthStore } from '../../hooks/useAuthStore';
 import BasicLayout from '../../layouts/basic/BasicLayout';
-import ZapFormikTextInput from '../../components/Forms/ZapformikTextInput';
 
 import landscape from "../../assets/img/phoLoginLandscape.jpg";
+import { AryFormikTextInput } from '../../components/Forms';
 
 export const Login = () => {  
   const {
@@ -65,11 +65,11 @@ export const Login = () => {
                     >
                       { (formik) => (
                         <Form>
-                          <ZapFormikTextInput name="userInput" 
+                          <AryFormikTextInput name="userInput" 
                             label="Usuario"
                             type="text"
                           />
-                          <ZapFormikTextInput name="passwordInput" 
+                          <AryFormikTextInput name="passwordInput" 
                             label="Contraseña"
                             type="password"
                           />

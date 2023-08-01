@@ -8,7 +8,7 @@ export const Administraciones = () => {
       <Container fluid className="py-4">
         <Row>
           <Col>
-            <h5>Administraciones</h5>
+            <h5>Lorem ipsum dolor sit amet</h5>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ut nibh eget neque semper eleifend. Nullam aliquam tortor odio, quis congue quam scelerisque in. Proin in ultricies mauris. Aenean ut nulla nisi. Mauris nec faucibus justo. Aenean molestie, enim ut eleifend imperdiet, eros nunc faucibus ex, sed mattis nunc ante cursus massa. Vestibulum eget consequat tortor, a porta magna. In non ante dui. Curabitur condimentum tempus tristique. Praesent accumsan tortor eget neque fermentum, nec sodales magna suscipit. Proin sed euismod risus. Sed rhoncus massa eu elit finibus, vel tristique mauris placerat. Quisque at nibh facilisis, euismod nulla ac, ultrices leo. Suspendisse ut aliquam ipsum. Donec quis sagittis erat, et cursus turpis. Sed non euismod nibh, dapibus laoreet sapien.
             </p>

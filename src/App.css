@@ -9,3 +9,11 @@
   background-color: #fff !important;
   box-shadow: 0 .3rem .3rem 0 rgba(0,0,0,.12) !important;
 }
+
+.text-shadow {
+  text-shadow: 0 2px 3px rgba(0,0,0,.20);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 3px 5px rgba(0,0,0,.20);
+}

@@ -24,8 +24,8 @@ export const Configurator = ({ help }) => {
       <Card className="shadow-lg">
         <Card.Header className="pb-0 pt-3">
           <div className="float-start">
-            <h5 className="mt-3 mb-0">Portal Web - Configuración</h5>
-            <p>Configuración rápida</p>
+            <h5 className="mt-3 mb-0">Cortana - Configurator</h5>
+            <p>See our options</p>
           </div>
           <div className="float-end mt-4">
             <Button variant="link" className="text-dark p-0 fixed-plugin-close-button" onClick={ onCloseConfigurator }>

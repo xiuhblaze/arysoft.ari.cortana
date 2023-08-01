@@ -17,15 +17,13 @@ export const BasicLayout = ({children}) => {
         <Container>
           <Row>
             <Col lg="8" className="mb-4 mx-auto text-center">
-              <a 
-                href="http://ciudadguzman.gob.mx/Pagina.aspx?id=02674cee-df75-4309-8802-459dade93fbf" 
+              <Link to="/contact"                
                 className="text-secondary me-xl-5 me-3 mb-sm-0 mb-2"
-                target="_blank"
               >
-                Tecnologías de la Información
-              </a>
+                Contact Us
+              </Link>
               <Link to="/about" className="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
-                Acerca de
+                About Us
               </Link>
             </Col>
           </Row>
@@ -33,7 +31,7 @@ export const BasicLayout = ({children}) => {
             <Col lg="8" className="mx-auto text-center mt-1">
               <p className="mb-0 text-secondary">
                 <FontAwesomeIcon icon={ faCopyright } className="me-1" />
-                2023, desarrollado por <strong>Tecnologías de la Información</strong> - Área de Gobierno Electrónico
+                2023, dev by <strong>Arysoft</strong> for <span className="text-primary text-primary">ARI American Registration Inc.</span>
               </p>
             </Col>
           </Row>

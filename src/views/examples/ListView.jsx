@@ -11,47 +11,47 @@ const dataList = [
     id: 1,
     estatus: 1,
     nombreCompleto: 'Adrián Castillo',
-    email: 'adrian.castillo@ciudadguzman.gob.mx',
-    area: 'Tecnologías de la Información',
-    puesto: 'Encargado de Gobierno Electrónico',
+    email: 'adrian.castillo@arysoft.com.mx',
+    area: 'Development',
+    puesto: 'Project Manager',
     fechaIngreso: '01/03/2001',
   },
   {
     id: 2,
     estatus: 2,
-    nombreCompleto: 'Cecilia Barajas',
-    email: 'cecilia.barajas@ciudadguzman.gob.mx',
-    area: 'Tecnologías de la Información',
-    puesto: 'Programador Analista',
+    nombreCompleto: 'Fulano de Tal',
+    email: 'fulano.detal@aarrin.com',
+    area: 'Auditor',
+    puesto: '9K, 14K',
     fechaIngreso: '01/01/0001',
   },
-  {
-    id: 3,
-    estatus: 1,
-    nombreCompleto: 'Rodolfo Figueroa',
-    email: 'rodolfo.figueroa@ciudadguzman.gob.mx',
-    area: 'Tecnologías de la Información',
-    puesto: 'Jefe Operativo',
-    fechaIngreso: '01/01/2008',
-  },
-  {
-    id: 4,
-    estatus: 1,
-    nombreCompleto: 'Ofelia Larios',
-    email: 'ofelia.larios@ciudadguzman.gob.mx',
-    area: 'Tecnologías de la Información',
-    puesto: 'Jefe Administrativo',
-    fechaIngreso: '01/01/1990',
-  },
-  {
-    id: 5,
-    estatus: 2,
-    nombreCompleto: 'Armando de la Torre',
-    email: 'armando.delatorre@ciudadguzman.gob.mx',
-    area: 'Tecnologías de la Información',
-    puesto: 'Encargado de Redes',
-    fechaIngreso: '01/01/2001',
-  },
+  // {
+  //   id: 3,
+  //   estatus: 1,
+  //   nombreCompleto: 'Rodolfo Figueroa',
+  //   email: 'rodolfo.figueroa@ciudadguzman.gob.mx',
+  //   area: 'Tecnologías de la Información',
+  //   puesto: 'Jefe Operativo',
+  //   fechaIngreso: '01/01/2008',
+  // },
+  // {
+  //   id: 4,
+  //   estatus: 1,
+  //   nombreCompleto: 'Ofelia Larios',
+  //   email: 'ofelia.larios@ciudadguzman.gob.mx',
+  //   area: 'Tecnologías de la Información',
+  //   puesto: 'Jefe Administrativo',
+  //   fechaIngreso: '01/01/1990',
+  // },
+  // {
+  //   id: 5,
+  //   estatus: 2,
+  //   nombreCompleto: 'Armando de la Torre',
+  //   email: 'armando.delatorre@ciudadguzman.gob.mx',
+  //   area: 'Tecnologías de la Información',
+  //   puesto: 'Encargado de Redes',
+  //   fechaIngreso: '01/01/2001',
+  // },
 ];
 
 export const ListView = () => {
@@ -62,16 +62,16 @@ export const ListView = () => {
           <Col xs="12">
             <Card className="mb-4">
               <Card.Header className="pb-0">
-                <h6>List view con html</h6>
+                <h6>List view</h6>
               </Card.Header>
               <Card.Body className="px-0 pt-0 pb-2">
                 <div className="table-responsive p-0">
                   <table className="table align-items-center mb-0">
                     <thead>
                       <tr>
-                        <th className={ headStyle }>Empleado</th>
-                        <th className={ headStyle }>Departamento</th>
-                        <th className={ `text-center ${ headStyle }` }>Ingreso</th>
+                        <th className={ headStyle }>Employee</th>
+                        <th className={ headStyle }>Function</th>
+                        <th className={ `text-center ${ headStyle }` }>Empleoyed</th>
                         <th></th>
                       </tr>
                     </thead>

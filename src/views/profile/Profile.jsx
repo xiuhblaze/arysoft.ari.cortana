@@ -36,7 +36,7 @@ export const Profile = () => {
             <Col className="col-auto my-auto">
               <div className="h-100">
                 <h5 className="mb-1">Adrián Castillo</h5>
-                <p className="mb-0 font-weight-bold text-sm">Encargado de Gobierno Electrónico</p>
+                <p className="mb-0 font-weight-bold text-sm">Project Manager</p>
               </div>
             </Col>
             <Col lg="4" md="6" className="my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
@@ -50,10 +50,10 @@ export const Profile = () => {
           <Col xs="12" xl="4">
             <Card className="h-100">
               <Card.Header className="pb-0 p-3">
-                <h6 className="mb-0">Opciones</h6>
+                <h6 className="mb-0">Settings</h6>
               </Card.Header>
               <Card.Body className="p-3">
-                <h6 className="text-uppercase text-body text-xs font-weight-bolder">De la cuenta</h6>
+                <h6 className="text-uppercase text-body text-xs font-weight-bolder">Account</h6>
                 <ul className="list-group">
                   <li className="list-group-item border-0 px-0">
                     <div className="form-check form-switch ps-0">
@@ -67,7 +67,7 @@ export const Profile = () => {
                       <label htmlFor="showNotificationsCheckbox" 
                         className="form-check-label text-body ms-3 text-truncate w-80 mb-0"
                       >
-                        Ver notificaciones
+                        Show notifications
                       </label>
                       </div>
                   </li>
@@ -83,17 +83,11 @@ export const Profile = () => {
                       <label htmlFor="bajaCheckbox" 
                         className="form-check-label text-body ms-3 text-truncate w-80 mb-0"
                       >
-                        Dar de baja
+                        Other option
                       </label>
                       </div>
                   </li>
                 </ul>
-                <p className="text-sm text-secondary">
-                  <em>Poner aquí el número de registros por página, si quiere las notificaciones y a ver que más</em>
-                </p>
-                <p className="text-sm text-secondary">
-                  <em>Lo que pueda ser personalizable para cada usario en particular -creo que esto se puede dejar hasta al útlimo.</em>
-                </p>
               </Card.Body>
             </Card>
           </Col>
@@ -102,10 +96,10 @@ export const Profile = () => {
               <Card.Header className="pb-0 p-3">
                 <Row>
                   <Col md="8" className="d-flex align-items-center">
-                    <h6 className="mb-0">Información</h6>
+                    <h6 className="mb-0">Profile Information</h6>
                   </Col>
                   <Col md="4" className="text-end">
-                    <Button variant="link" className="text-secondary px-2 py-1 mb-0" title="Editar información">
+                    <Button variant="link" className="text-secondary px-2 py-1 mb-0" title="Edit info">
                       <FontAwesomeIcon icon={ faUserEdit } />
                     </Button>
                   </Col>
@@ -116,36 +110,28 @@ export const Profile = () => {
                 <hr className="horizontal dark my-2"></hr>
                 <ul className="list-group">
                   <li className="list-group-item border-0 ps-0 pt-0 text-sm">
-                    <strong className="text-dark me-2">Código:</strong>
-                    1456
-                  </li>
-                  <li className="list-group-item border-0 ps-0 pt-0 text-sm">
-                    <strong className="text-dark me-2">Nombre:</strong>
+                    <strong className="text-dark me-2">Name:</strong>
                     Adrián Castillo Sánchez
                   </li>
                   <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Área:</strong>
-                    Jefatura de Tecnologías de la Información
+                    <strong className="text-dark me-2">Area:</strong>
+                    TI
                   </li>
                   <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Puesto:</strong>
-                    Encargado C
+                    <strong className="text-dark me-2">Function:</strong>
+                    Development
                   </li>
                   <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Correo electrónico:</strong>
-                    adrian.castillo@ciudadguzman.gob.mx
+                    <strong className="text-dark me-2">EMail:</strong>
+                    adrian.castillo@arysoft.com.mx
                   </li>
                   <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Estatus:</strong>
-                    <div className="badge bg-gradient-info">Activo</div>
+                    <strong className="text-dark me-2">Status:</strong>
+                    <div className="badge bg-gradient-success">Active</div>
                   </li>
                   <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Fecha de alta:</strong>
+                    <strong className="text-dark me-2">Employed:</strong>
                     01/03/2001
-                  </li>
-                  <li className="list-group-item border-0 ps-0 text-sm">
-                    <strong className="text-dark me-2">Fecha de baja:</strong>
-                    01/03/2033
                   </li>
                 </ul>
               </Card.Body>
@@ -154,7 +140,7 @@ export const Profile = () => {
           <Col xs="12" xl="4">
             <Card className="h-100">
               <Card.Header className="pb-0 p-3">
-                <h6 className="mb-0">Notificaciones</h6>
+                <h6 className="mb-0">Notifications</h6>
               </Card.Header>
               <Card.Body>
 
@@ -162,11 +148,11 @@ export const Profile = () => {
             </Card>
           </Col>
         </Row>
-        <Row className="my-4">
+        <Row className="my-4 d-none">
           <Col xs="12" xl="8">
             <Card className="h-100">
               <Card.Header className="pb-0 p-3">
-                <h6 className="mb-1">Grupos y Permisos</h6>
+                <h6 className="mb-1">Access Level</h6>
                 <p className="text-sm mb-0">
                   Listado de grupos a los que pertenece el usuario, estos deterniman el nivel de acceso a los
                   módulos del sistema.

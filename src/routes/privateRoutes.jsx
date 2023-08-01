@@ -1,5 +1,5 @@
 
-import { faHome, faLandmark, faList, faUserGear, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faCity, faHome, faLandmark, faList, faUserGear, faUsers } from "@fortawesome/free-solid-svg-icons";
 
 import { Administraciones } from "../views/examples/Administraciones";
 import { Dashboard } from "../views/Dashboard/Dashboard";
@@ -16,26 +16,26 @@ const privateRoute = [
     icon: faHome,
     element: <Dashboard />
   },
+  { 
+    type: 'collapse',
+    title: 'Organizations',
+    key: 'organizations',
+    path: '/organizations',
+    icon: faCity,
+    element: <Empleados />
+  },
   {
     type: 'title',
-    title: 'Catálogos',
-    key: 'catalogos',
+    title: 'Catalogs',
+    key: 'catalogs',
   },
   { 
     type: 'collapse',
-    title: 'Administraciones',
-    key: 'administraciones',
-    path: '/administraciones',
+    title: 'NACE Codes',
+    key: 'nacecodes',
+    path: '/nace-codes',
     icon: faLandmark,
     element: <Administraciones />
-  },
-  { 
-    type: 'collapse',
-    title: 'Empleados',
-    key: 'empleados',
-    path: '/empleados',
-    icon: faUsers,
-    element: <Empleados />
   },
   { 
     type: 'collapse',
@@ -47,14 +47,14 @@ const privateRoute = [
   },
   {
     type: 'title',
-    title: 'Cuenta',
-    key: 'cuenta',
+    title: 'Account',
+    key: 'account',
   },
   { 
     type: 'collapse',
-    title: 'Perfil',
-    key: 'perfil',
-    path: '/perfil',
+    title: 'Profile',
+    key: 'profile',
+    path: '/profile',
     icon: faUserGear,
     element: <Profile />
   },

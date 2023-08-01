@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { setMiniSidenav, setOpenConfigurator, setTransparentNavbar, useArysoftUIController } from '../../context/context';
 
-import { faArrowRightFromBracket, faArrowsRotate, faBars, faBell, faClock, faFile, faGear, faHome, faLock, faUser, faUserCircle, faUserGear } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket, faBars, faBell, faClock, faFile, faGear, faHome, faLock, faUser, faUserCircle, faUserGear } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Breadcrums } from '../Breadcrumbs';
@@ -51,7 +51,7 @@ export const DashboardNavbar = ({ title }) => {
   const onConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
 
   const onProfileClick = () => {
-    navigate('/perfil');
+    navigate('/profile');
   };
 
   const onLogout = () => {
@@ -91,16 +91,16 @@ export const DashboardNavbar = ({ title }) => {
             >
               <NavDropdown.Item onClick={ onProfileClick }>
                 <FontAwesomeIcon icon={ faUserGear } className="me-2" />
-                Perfil
+                Profile
               </NavDropdown.Item>
               <NavDropdown.Item>
                 <FontAwesomeIcon icon={ faLock } className="me-2" />
-                Cambiar contraseña
+                Change password
               </NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={ onLogout }>
                 <FontAwesomeIcon icon={ faArrowRightFromBracket } className="me-2" />
-                Cerrar sesión
+                Logout
               </NavDropdown.Item>
             </NavDropdown>
             <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
@@ -126,12 +126,12 @@ export const DashboardNavbar = ({ title }) => {
                   </div>
                   <div className="d-flex flex-column justify-content-center">
                     <h6 className="text-sm font-weight-normal mb-1">
-                      <span className="font-weight-bold">Página en revisión </span>
-                      por cecilia.barajas
+                      <span className="font-weight-bold">New audit prospect </span>
+                      by adrian.casillas
                     </h6>
                     <p className="text-xs text-secondary mb-0">
                       <FontAwesomeIcon icon={ faClock } className="me-1" />
-                      hace 18 minutos
+                      18 minutes ago
                     </p>
                   </div>
                 </div>
@@ -145,12 +145,12 @@ export const DashboardNavbar = ({ title }) => {
                   </div>
                   <div className="d-flex flex-column justify-content-center">
                     <h6 className="text-sm font-weight-normal mb-1">
-                      <span className="font-weight-bold">Página nueva </span>
-                      por cecilia.barajas
+                      <span className="font-weight-bold">Audit 9k closed </span>
+                      by Pame
                     </h6>
                     <p className="text-xs text-secondary mb-0">
                       <FontAwesomeIcon icon={ faClock } className="me-1" />
-                      hace 1 día
+                      1 day
                     </p>
                   </div>
                 </div>

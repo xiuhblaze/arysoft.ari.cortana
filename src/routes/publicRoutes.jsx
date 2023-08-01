@@ -5,6 +5,7 @@ import { faCircleInfo, faHome, faRightFromBracket } from "@fortawesome/free-soli
 import { Login } from "../views/Login/Login";
 import { AboutView } from "../views/www/AboutView";
 import Home from "../views/Home";
+import ContactView from "../views/www/ContactView";
 
 
 const publicRoute = [
@@ -24,14 +25,14 @@ const publicRoute = [
     icon: faCircleInfo,
     element: <AboutView />
   },
-  // { 
-  //   type: 'collapse',
-  //   title: 'Login',
-  //   key: 'login',
-  //   path: '/login',
-  //   icon: faRightFromBracket,
-  //   element: <Login />
-  // },
+  { 
+    type: 'collapse',
+    title: 'Contact',
+    key: 'contact',
+    path: '/contact',
+    icon: faRightFromBracket,
+    element: <ContactView />
+  },
 ];
 
 export default publicRoute;
