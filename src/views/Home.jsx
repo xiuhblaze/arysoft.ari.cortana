@@ -34,7 +34,7 @@ export const Home = () => {
     <BasicLayout>
       <header className="header-2">
         <div className="page-header min-vh-75 relative" style={{ backgroundImage: `url(${ bgAnalist })`}}>
-          <span className="mask bg-gradient-success opacity-8"></span>
+          <span className="mask bg-gradient-info opacity-8"></span>
           <Container>
             <Row>
               <Col lg="7" className="text-center mx-auto">
@@ -51,6 +51,7 @@ export const Home = () => {
           </div>
         </div>
       </header>
+
       <section className="pt-3 pb-4">
         <Container>
           <Row>
@@ -84,11 +85,12 @@ export const Home = () => {
           </Row>
         </Container>
       </section>
+
       <section className="mb-5">
         <Container>
           <Row>
             <Col xs="12" md="7" className="py-sm-7">
-              <h3 className="text-gradient text-success mb-0">Why Choose Us?</h3>
+              <h3 className="text-gradient text-info mb-0">Why Choose Us?</h3>
               <h3>Process approach</h3>
               <p className="pe-md-5 mb-4">
                 Our service is a guarantee of conducting audits according to the client’s requirements, 
@@ -98,7 +100,7 @@ export const Home = () => {
                 Audit to reach better results, and not just an audit.
               </p>
               <div className="p-3 info-horizontal">
-                <div className="icon icon-shape rounded-circle bg-gradient-success shadow d-flex align-items-center justify-content-center">
+                <div className="icon icon-shape rounded-circle bg-gradient-info shadow d-flex align-items-center justify-content-center">
                   <FontAwesomeIcon icon={ faFileSignature } size="lg" className="text-white" />
                 </div>
                 <div className="description ps-3">
@@ -109,7 +111,7 @@ export const Home = () => {
                 </div>
               </div>
               <div className="p-3 info-horizontal">
-                <div className="icon icon-shape rounded-circle bg-gradient-success shadow d-flex align-items-center justify-content-center">
+                <div className="icon icon-shape rounded-circle bg-gradient-info shadow d-flex align-items-center justify-content-center">
                   <FontAwesomeIcon icon={ faGears } size="lg" className="text-white" />
                 </div>
                 <div className="description ps-3">
@@ -120,7 +122,7 @@ export const Home = () => {
                 </div>
               </div>
               <div className="p-3 info-horizontal">
-                <div className="icon icon-shape rounded-circle bg-gradient-success shadow d-flex align-items-center justify-content-center">
+                <div className="icon icon-shape rounded-circle bg-gradient-info shadow d-flex align-items-center justify-content-center">
                   <FontAwesomeIcon icon={ faRankingStar } size="lg" className="text-white" />
                 </div>
                 <div className="description ps-3">
@@ -134,7 +136,7 @@ export const Home = () => {
               </div>
             </Col>
             <Col xs="12" md="5" className="my-auto">
-              <Card className="card-background card-background-mask-success tilt" data-tilt="">
+              <Card className="card-background card-background-mask-info tilt" data-tilt="">
                 <div className="full-background" style={{ backgroundImage: `url(${ landscape })`}}>
                 </div>
                 <Card.Body className="pt-7 text-center d-flex flex-column justify-content-center align-items-center">

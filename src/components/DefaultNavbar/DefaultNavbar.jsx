@@ -36,21 +36,9 @@ export const DefaultNavbar = () => {
               </Navbar.Toggle>
               <Navbar.Collapse id="navbarScroll">
                 <Nav className="mx-auto">
-                  { status === 'authenticated' ? (
-                    <>
-                      <Link to="/dashboard" className="nav-link text-dark d-flex align-items-center me-2" >
-                        <FontAwesomeIcon icon={ faChartPie } className="opacity-6 text-dark me-1" />
-                        Dashboard
-                      </Link>
-                      {/* <Link to="/perfil" className="nav-link d-flex align-items-center me-2">
-                        <FontAwesomeIcon icon={ faUser } className="opacity-6 text-dark me-1" />
-                        Perfil
-                      </Link> */}
-                    </>
-                  ) : null }
-                  <Nav.Link href="/about" className="text-dark d-flex align-items-center me-2">
+                  <Link to="/about" className="nav-link text-dark d-flex align-items-center me-2">
                     About Us
-                  </Nav.Link>
+                  </Link>
                   <Nav.Link href="/" className="text-dark d-flex align-items-center me-2">
                     Services
                   </Nav.Link>
@@ -77,9 +65,17 @@ export const DefaultNavbar = () => {
                   </Nav.Link> */}
                 </Nav>
                 <Nav>
-                <Nav.Link href="/" className="text-dark d-flex align-items-center me-2">
+                  { status === 'authenticated' ? (
+                    <>
+                      <Link to="/dashboard" className="nav-link text-dark d-flex align-items-center me-2" >
+                        <FontAwesomeIcon icon={ faChartPie } className="opacity-6 text-dark me-1" />
+                        Dashboard
+                      </Link>
+                    </>
+                  ) : null }
+                  <Link to="/contact" className="nav-link text-dark d-flex align-items-center me-2">
                     Contact Us
-                  </Nav.Link>
+                  </Link>
                 {
                   status === 'not-authenticated' ? (
                     <Link to="/login" className="nav-link text-dark">

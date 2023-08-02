@@ -1,8 +1,6 @@
 
 import { faCircleInfo, faHome, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-
-import { Login } from "../views/Login/Login";
 import { AboutView } from "../views/www/AboutView";
 import Home from "../views/Home";
 import ContactView from "../views/www/ContactView";
