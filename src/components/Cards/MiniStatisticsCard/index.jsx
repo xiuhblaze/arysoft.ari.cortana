@@ -1,2 +1,0 @@
-export { MiniStatisticsCard } from "./MiniStatisticsCard";
-

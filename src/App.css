@@ -17,3 +17,27 @@
 .text-shadow-lg {
   text-shadow: 0 3px 5px rgba(0,0,0,.20);
 }
+
+/* ARI Color
+******************************************************************************/
+
+.bg-gradient-ari {
+  background-image: linear-gradient(310deg, #0e4d5d, #57b3c9);
+}
+
+.text-ari {
+  color: #297b8f;
+}
+
+.text-gradient.text-ari {
+  background-image: linear-gradient(310deg, #0e4d5d, #57b3c9);
+}
+
+.card.card-background.card-background-mask-ari:before {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.card.card-background.card-background-mask-ari:after {
+  background-image: linear-gradient(310deg, #0e4d5d 0%, #57b3c9 100%);
+  opacity: .85;
+}

@@ -13,7 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { DashboardLayout } from '../../layouts/dashboard';
-import { MiniStatisticsCard } from '../../components/Cards/MiniStatisticsCard';
+import { MiniStatisticsCard } from '../../components/Cards';
 
 import bgElectronic from '../../assets/img/bgElectronic.jpg';
 

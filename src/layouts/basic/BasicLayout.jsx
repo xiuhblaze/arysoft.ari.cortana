@@ -29,9 +29,9 @@ export const BasicLayout = ({children}) => {
           </Row>
           <Row>
             <Col lg="8" className="mx-auto text-center mt-1">
-              <p className="mb-0 text-secondary">
+              <p className="mb-0 text-secondary text-sm">
                 <FontAwesomeIcon icon={ faCopyright } className="me-1" />
-                2023, dev by <strong>Arysoft</strong> for <span className="text-primary text-primary">ARI American Registration Inc.</span>
+                2023, dev by <strong>Arysoft</strong> for <span className="text-ari text-gradient">ARI American Registration Inc.</span>
               </p>
             </Col>
           </Row>

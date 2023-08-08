@@ -1,10 +1,10 @@
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartLine, faFileSignature, faGears, faPoo, faRankingStar, faRightFromBracket, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faChartLine, faCircleArrowDown, faFileSignature, faGears, faPoo, faRankingStar, faRightFromBracket, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
 import { BasicLayout } from "../layouts/basic/BasicLayout";
 import { useAuthStore } from "../hooks/useAuthStore";
@@ -13,6 +13,7 @@ import landscape from '../assets/img/phoLoginLandscape.jpg';
 import bgAnalist from '../assets/img/bg-analisis-papel.jpg';
 import lgoARI from '../assets/img/lgoARI.png';
 import lgoARIblanco from '../assets/img/lgoAriBlanco.png';
+import imgWhyUs from '../assets/img/why-us.jpg';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -155,53 +156,36 @@ export const Home = () => {
         </Container>
       </section>
       <section>
-        <Container>
-          <Row className="align-items-center">
-            <Col lg="6" className="ms-auto">
-              { status === 'authenticated' ? (
-                <div className="warning">
-                  <div className="icon text-gradient text-warning">
-                    <FontAwesomeIcon icon={ faRightFromBracket } size="2x" />
+        <Container className="mt-sm-5">
+          <div className="page-header min-vh-50 my-sm-3 mb-3 border-radius-xl"
+            style={{ backgroundImage: `url(${ imgWhyUs })`}}>
+              <span className="mask bg-gradient-dark"></span>
+              <Container className="py-5">
+                <Row>
+                  <div className="col-lg-6 ms-lg-5">
+                    <h4 className="text-white mb-0">ISO Survey</h4>
+                    <h1 className="text-white">Around the world</h1>
+                    <p className="lead text-white opacity-8">
+                      Every year we perform a survey of certifications to our management system standards. 
+                      The survey shows the number of valid certificates to ISO management standards 
+                      (such as ISO 9001 and ISO 14001) reported for each country, each year.
+                    </p>
+                    <p className="text-white opacity-8">
+                      ISO does not perform certification. Organizations looking to get certified to an ISO 
+                      standard must contact an independent certification body. The ISO Survey counts the 
+                      number of certificates issued by certification bodies that have been accredited by 
+                      members of the <a className="text-info" href="https://www.iaf.nu/" target="_blank">International Accreditation Forum (IAF)</a>.
+                    </p>
+                    <p className="text-white opacity-8">
+                      The full Survey data is available in Excel 
+                      format <a href="#" className="text-info icon-move-right">here
+                        <FontAwesomeIcon icon={ faCircleArrowDown } className="text-sm ms-1" />
+                      </a>
+                    </p>
                   </div>
-                  <h5 className="font-weight-bolder mt-3">Cerrar sesión</h5>
-                  <p className="pe-5">
-                    Una vez finalizadas las tareas es recomendable cerrar sesión para evitar que alguien más
-                    haga uso indebido de su cuenta.
-                  </p>
-                  <div className="text-end">
-                    <Button type="button" onClick={ onLogoutClick } variant="warning" className="bg-gradient-warning">Cerrar Sesión</Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="info">
-                  <div className="icon text-gradient text-info">
-                    <FontAwesomeIcon icon={ faRightToBracket } size="2x" />
-                  </div>
-                  <h5 className="font-weight-bolder mt-3">Iniciar sesión</h5>
-                  <p className="pe-5">
-                    Solo personal autorizado puede acceder a publicar información dentro de nuestro Portal Web,
-                    cada departamento cuenta con un enlace técnico quien es el que publica la información.
-                  </p>
-                  <div className="text-end">
-                    <Button type="button" onClick={ onLoginClick } variant="info" className="bg-gradient-info" >Iniciar sesión</Button>
-                  </div>
-                </div>
-              )}
-            </Col>
-            <Col lg="4" className="ms-auto me-auto p-lg-4 mt-lg-0 mt-4">
-              <Card className="card-background card-background-mask-info tilt" data-tilt="">
-                <div className="full-background" style={{ backgroundImage: `url(${ landscape })`}}>
-                </div>
-                <Card.Body className="pt-7 text-center d-flex flex-column justify-content-center align-items-center">
-                  <div className="icon icon-lg up mb-3 mt-3">
-                    <FontAwesomeIcon icon={ faPoo } size="4x" />
-                  </div>
-                  <h2 className="text-white up mb-0">Hola mundo</h2>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                </Row>
+              </Container>
+          </div>
         </Container>
       </section>
     </BasicLayout>
