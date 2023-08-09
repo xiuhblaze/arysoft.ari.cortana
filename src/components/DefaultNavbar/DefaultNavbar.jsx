@@ -39,7 +39,7 @@ export const DefaultNavbar = () => {
                   <Link to="/about" className="nav-link text-dark d-flex align-items-center me-2">
                     About Us
                   </Link>
-                  <Nav.Link href="/" className="text-dark d-flex align-items-center me-2">
+                  <Nav.Link href="/services" className="text-dark d-flex align-items-center me-2">
                     Services
                   </Nav.Link>
                   <Nav.Link href="/" className="text-dark d-flex align-items-center me-2">

@@ -1,9 +1,10 @@
 
-import { faCircleInfo, faHome, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faCircleInfo, faHome, faRightFromBracket, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
 import { AboutView } from "../views/www/AboutView";
 import Home from "../views/Home";
 import ContactView from "../views/www/ContactView";
+import ServicesView from "../views/www/ServicesView";
 
 
 const publicRoute = [
@@ -30,6 +31,14 @@ const publicRoute = [
     path: '/contact',
     icon: faRightFromBracket,
     element: <ContactView />
+  },
+  { 
+    type: 'collapse',
+    title: 'Services',
+    key: 'services',
+    path: '/services',
+    icon: faUserCircle,
+    element: <ServicesView />
   },
 ];
 
