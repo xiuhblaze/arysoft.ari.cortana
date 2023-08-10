@@ -5,6 +5,7 @@ import { AboutView } from "../views/www/AboutView";
 import Home from "../views/Home";
 import ContactView from "../views/www/ContactView";
 import ServicesView from "../views/www/ServicesView";
+import StepsView from "../views/www/StepsView";
 
 
 const publicRoute = [
@@ -39,6 +40,14 @@ const publicRoute = [
     path: '/services',
     icon: faUserCircle,
     element: <ServicesView />
+  },
+  { 
+    type: 'collapse',
+    title: 'Steps for certification',
+    key: 'steps',
+    path: '/steps-for-certification',
+    icon: faUserCircle,
+    element: <StepsView />
   },
 ];
 
