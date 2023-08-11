@@ -44,9 +44,9 @@ export const Login = () => {
               <Col xl="4" lg="5" md="6" className="d-flex flex-column mx-auto">
                 <Card className="card-plain mt-8">
                   <Card.Header className="pb-0 text-left bg-transparent">
-                    <h3 className="font-weight-bolder text-info text-gradient">Bienvenido</h3>
+                    <h3 className="font-weight-bolder text-info text-gradient">Welcome back</h3>
                     <p className="mb-0">
-                      Ingresa tu nombre de usuario y contraseña para iniciar sesión
+                      Enter your username and password to sign in
                     </p>
                   </Card.Header>
                   <Card.Body>
@@ -58,23 +58,23 @@ export const Login = () => {
                       onSubmit={ onSubmitForm }
                       validationSchema={ Yup.object({
                         userInput: Yup.string()
-                          .required('Es necesario el nombre del usuario'),
+                          .required('Required'),
                         passwordInput: Yup.string()
-                          .required('Es necesaria la contraseña del usuario'),
+                          .required('Required'),
                       })}
                     >
                       { (formik) => (
                         <Form>
                           <AryFormikTextInput name="userInput" 
-                            label="Usuario"
+                            label="Username"
                             type="text"
                           />
                           <AryFormikTextInput name="passwordInput" 
-                            label="Contraseña"
+                            label="Password"
                             type="password"
                           />
                           <div className="text-center">
-                            <Button type="submit" variant="primary" className="bg-gradient-info w-100 mt-4 mb-0">Iniciar sesión</Button>
+                            <Button type="submit" variant="primary" className="bg-gradient-info w-100 mt-4 mb-0">Login</Button>
                           </div>
                         </Form>
                       )}
@@ -82,7 +82,7 @@ export const Login = () => {
                   </Card.Body>
                   <Card.Footer className="text-center pt-0 px-lg-2 px-1">
                     <p className="mb-4 text-sm mx-auto">
-                      ¿Necesitas una cuenta?<br />Solicitala al departamento de TI
+                      Don't have an account?
                     </p>
                   </Card.Footer>
                 </Card>

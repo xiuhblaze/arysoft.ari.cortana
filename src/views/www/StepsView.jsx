@@ -1,13 +1,14 @@
 import React from 'react'
 import BasicLayout from '../../layouts/basic/BasicLayout';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Card, Col, Container, Row } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faHand, faShoePrints } from '@fortawesome/free-solid-svg-icons';
+import { faBarsStaggered, faBell, faCertificate, faComment, faDiagramProject, faFilter, faHand, faListCheck, faShoePrints } from '@fortawesome/free-solid-svg-icons';
 import StepsTimeline from './components/StepsTimeline';
 
 import imgPeopleSteps from '../../assets/img/people-steps.jpg'
 import imgAuditCertification from '../../assets/img/ari-audit-certification-process.jpg';
+import imgSuspendingCertification from '../../assets/img/ari-suspending-certification-flow-process.jpg';
 
 const TypicalProcess = () => {
   return (
@@ -36,6 +37,18 @@ const TypicalProcess = () => {
   )
 };
 
+const SuspendingCertification = () => {
+  return (
+    <Row>
+      <Col lg="12">
+        <a href={ imgSuspendingCertification } target="_blank" title="Open in new tab">
+          <img src={ imgSuspendingCertification } alt="" className="img-fluid" />
+        </a>
+      </Col>
+    </Row>
+  )
+};
+
 export const StepsView = () => {
   return (
     <BasicLayout>
@@ -54,7 +67,7 @@ export const StepsView = () => {
       <section className="my-5 pt-5">
         <Container>
           <Row>
-            <Col md="6" className="mx-auto">
+            <Col md="6" className="ms-auto">
               <div className="timeline timeline-one-side">
                 <StepsTimeline
                   icon={{ icon: faShoePrints, color: 'success' }}
@@ -63,53 +76,63 @@ export const StepsView = () => {
                 >
                   <TypicalProcess />
                 </StepsTimeline>
-                
-                <div className="timeline-block mb-3">
-                  <span className="timeline-step">
-                    <FontAwesomeIcon icon={ faHand } className='text-warning text-gradient' />
-                  </span>
-                  <div className="timeline-content">
-                    <h6 className="text-dark text-sm font-weight-bold mb-0">Suspending Certification flow proces</h6>
-                    <p className="text-secondary font-weight-bold text-xs mt-1 mb-0">Rev A ARI-FR-67</p>
-                  </div>
-                </div>
-                <div className="timeline-block mb-3">
-                  <span className="timeline-step">
-                    <i className="ni ni-cart text-info text-gradient"></i>
-                  </span>
-                  <div className="timeline-content">
-                    <h6 className="text-dark text-sm font-weight-bold mb-0">Reducing Scope flow process</h6>
-                    <p className="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
-                  </div>
-                </div>
-                <div className="timeline-block mb-3">
-                  <span className="timeline-step">
-                    <i className="ni ni-credit-card text-warning text-gradient"></i>
-                  </span>
-                  <div className="timeline-content">
-                    <h6 className="text-dark text-sm font-weight-bold mb-0">Short Notice flow process</h6>
-                    <p className="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
-                  </div>
-                </div>
-                <div className="timeline-block mb-3">
-                  <span className="timeline-step">
-                    <i className="ni ni-key-25 text-primary text-gradient"></i>
-                  </span>
-                  <div className="timeline-content">
-                    <h6 className="text-dark text-sm font-weight-bold mb-0">Information Upon Request flow process</h6>
-                    <p className="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
-                  </div>
-                </div>
-                <div className="timeline-block">
-                  <span className="timeline-step">
-                    <i className="ni ni-money-coins text-dark text-gradient"></i>
-                  </span>
-                  <div className="timeline-content">
-                    <h6 className="text-dark text-sm font-weight-bold mb-0">CERTIFICATE RESTORATION</h6>
-                    <p className="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
-                  </div>
-                </div>
+                <StepsTimeline
+                  icon={{ icon: faHand, color: 'secondary' }}
+                  text="Suspending Certification flow proces"
+                  subtext="Rev A ARI-FR-67"
+                >
+                  <SuspendingCertification />
+                </StepsTimeline>
+                <StepsTimeline
+                  icon={{ icon: faFilter, color: 'info' }}
+                  text="Reducing Scope flow process"
+                  subtext="Rev A ARI-FR-67"
+                >
+                </StepsTimeline>
+                <StepsTimeline
+                  icon={{ icon: faDiagramProject, color: 'primary' }}
+                  text="Short Notice flow process"
+                  subtext="Rev A ARI-FR-67"
+                >
+                </StepsTimeline>
+                <StepsTimeline
+                  icon={{ icon: faListCheck, color: 'ari' }}
+                  text="Information Upon Request flow process"
+                  subtext="Rev A ARI-FR-67"
+                >
+                </StepsTimeline>
+                <StepsTimeline
+                  icon={{ icon: faCertificate, color: 'warning' }}
+                  text="CERTIFICATE RESTORATION"
+                  subtext="Rev A ARI-FR-67"
+                >
+                </StepsTimeline>
               </div>
+            </Col>
+            <Col md="3" className="me-auto">
+              <Card className="mb-4">
+                <Card.Body className="p-3">
+                  <h6>Frequently Questions</h6>
+                  <p className="text-xs font-weight-bold">
+                    Frequently asked questions
+                  </p>
+                  <a href="#" target="_blank" className="btn bg-gradient-primary btn-sm w-100 mb-0">
+                    Download
+                  </a>
+                </Card.Body>
+              </Card>
+              <Card className="overflow-hidden">
+                <span className="mask bg-gradient-primary"></span>
+                <Card.Body className="position-relative z-index-1 p-3">
+                  <h6 className="text-white">Use of Mark</h6>
+                  <p className="text-white text-xs font-weight-bold">
+                    Preferences to certifications marks
+                  </p>
+                  <a href="#" target="_blank" className="btn btn-white btn-sm w-100 mb-0">
+                    Download
+                  </a>
+                </Card.Body>
+              </Card>
             </Col>
           </Row>
         </Container>

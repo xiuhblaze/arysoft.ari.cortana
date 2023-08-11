@@ -10,7 +10,7 @@ export const ServicesCard = ({ title, subtitle, desc, accredited, image, childre
 
   return (
     <>
-      <Card className="text-center p-3 h-100">
+      <Card { ...props } className="text-center p-3 h-100">
         { !!image ? (
           <div className="z-index-1 mx-auto">
             <div className="position-relative w-25 ">

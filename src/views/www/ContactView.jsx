@@ -7,6 +7,7 @@ import BasicLayout from '../../layouts/basic/BasicLayout';
 import { AryFormikTextArea, AryFormikTextInput } from '../../components/Forms';
 
 import bgElectronic from '../../assets/img/bgElectronic.jpg';
+import imgTeam3 from '../../assets/img/team-3.jpg';
 
 export const ContactView = () => {
 
@@ -37,7 +38,7 @@ export const ContactView = () => {
           <div>
             <img 
               className="position-absolute fixed-top ms-auto w-50 h-100 z-index-0 d-none d-sm-none d-md-block border-radius-section border-top-end-radius-0 border-top-start-radius-0 border-bottom-end-radius-0"
-              src={ bgElectronic} />
+              src={ imgTeam3 } />
           </div>
           <Container>
             <Row>
