@@ -60,9 +60,9 @@ export const Home = () => {
               <Row>
                 <Col md="4" className="position-relative">
                   <div className="p-3 text-center">
-                    <h1 className="text-gradient text-info">56</h1>
-                    <h5 className="mt-3">Organizations</h5>
-                    <p className="text-sm">Who use our services</p>
+                    <h1 className="text-gradient text-info">8</h1>
+                    <h5 className="mt-3">Courses</h5>
+                    <p className="text-sm">What do we offer to our clients</p>
                   </div>
                   <hr className="vertical dark" />
                 </Col>
@@ -76,7 +76,7 @@ export const Home = () => {
                 </Col>
                 <Col md="4" className="position-relative">
                   <div className="p-3 text-center">
-                    <h1 className="text-gradient text-warning">16</h1>
+                    <h1 className="text-gradient text-warning">6</h1>
                     <h5 className="mt-3">Certifications services</h5>
                     <p className="text-sm">Where we can help you</p>
                   </div>

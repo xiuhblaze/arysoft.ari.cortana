@@ -45,13 +45,13 @@ export const DefaultNavbar = () => {
                   <Nav.Link href="/steps-for-certification" className="text-dark d-flex align-items-center me-2">
                     Steps for Certification
                   </Nav.Link>
-                  <Nav.Link href="/" className="text-dark d-flex align-items-center me-2">
+                  <Nav.Link href="/news" className="text-dark d-flex align-items-center me-2">
                     News
                   </Nav.Link>
                   <NavDropdown title="Certificates" id="certificate-nav-dropdown" bsPrefix="dropdown-toggle nav-link text-dark">
                     {/* <NavDropdown.Item href="/about">Accreditation Certificate</NavDropdown.Item>
                     <NavDropdown.Item href="/">Certificate Status</NavDropdown.Item> */}
-                    <Link to="/about" className="dropdown-item">Accreditation Certificate</Link>
+                    <Link to="/accreditation" className="dropdown-item">Accreditation Certificate</Link>
                     <Link to="/contact" className="dropdown-item">Certificate Status</Link>
                   </NavDropdown>
                   <Nav.Link href="http://www.lictus.com.mx" target="_blank" className="ms-2">

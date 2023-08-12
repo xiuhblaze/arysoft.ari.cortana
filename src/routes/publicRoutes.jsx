@@ -6,6 +6,8 @@ import Home from "../views/Home";
 import ContactView from "../views/www/ContactView";
 import ServicesView from "../views/www/ServicesView";
 import StepsView from "../views/www/StepsView";
+import AccreditationView from "../views/www/AccreditationView";
+import NewsView from "../views/www/NewsView";
 
 
 const publicRoute = [
@@ -48,6 +50,22 @@ const publicRoute = [
     path: '/steps-for-certification',
     icon: faUserCircle,
     element: <StepsView />
+  },
+  { 
+    type: 'collapse',
+    title: 'Accreditation Certificate',
+    key: 'accreditation',
+    path: '/accreditation',
+    icon: faUserCircle,
+    element: <AccreditationView />
+  },
+  { 
+    type: 'collapse',
+    title: 'News',
+    key: 'news',
+    path: '/news',
+    icon: faUserCircle,
+    element: <NewsView />
   },
 ];
 

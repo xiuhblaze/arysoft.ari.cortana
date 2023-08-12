@@ -9,6 +9,10 @@ import StepsTimeline from './components/StepsTimeline';
 import imgPeopleSteps from '../../assets/img/people-steps.jpg'
 import imgAuditCertification from '../../assets/img/ari-audit-certification-process.jpg';
 import imgSuspendingCertification from '../../assets/img/ari-suspending-certification-flow-process.jpg';
+import imgReducingScope from '../../assets/img/ari-reducing-scope-flow-process.jpg';
+import imgShortNotice from '../../assets/img/ari-short-notice-flow-process.jpg';
+import imgInformationUpon from '../../assets/img/ari-information-upon-request-flow-process.jpg';
+import imgCertificateRestoration from '../../assets/img/ari-certificate-restoration.jpg';
 
 const TypicalProcess = () => {
   return (
@@ -43,6 +47,54 @@ const SuspendingCertification = () => {
       <Col lg="12">
         <a href={ imgSuspendingCertification } target="_blank" title="Open in new tab">
           <img src={ imgSuspendingCertification } alt="" className="img-fluid" />
+        </a>
+      </Col>
+    </Row>
+  )
+};
+
+const ReducingScope = () => {
+  return (
+    <Row>
+      <Col lg="12">
+        <a href={ imgReducingScope } target="_blank" title="Open in new tab">
+          <img src={ imgReducingScope } alt="" className="img-fluid" />
+        </a>
+      </Col>
+    </Row>
+  )
+};
+
+const ShortNotice = () => {
+  return (
+    <Row>
+      <Col lg="12">
+        <a href={ imgShortNotice } target="_blank" title="Open in new tab">
+          <img src={ imgShortNotice } alt="" className="img-fluid" />
+        </a>
+      </Col>
+    </Row>
+  )
+};
+
+const InformationUpon = () => {
+  return (
+    <Row>
+      <Col lg="12">
+        <a href={ imgInformationUpon } target="_blank" title="Open in new tab">
+          <img src={ imgInformationUpon } alt="" className="img-fluid" />
+        </a>
+      </Col>
+    </Row>
+  )
+};
+
+const CertificateRestoration = () => {
+  return (
+    <Row>
+      <Col lg="12">
+        <a href={ imgCertificateRestoration } target="_blank" title="Open in new tab">
+          <img src={ imgCertificateRestoration } alt="" className="img-fluid" />
         </a>
       </Col>
     </Row>
@@ -88,24 +140,28 @@ export const StepsView = () => {
                   text="Reducing Scope flow process"
                   subtext="Rev A ARI-FR-67"
                 >
+                  <ReducingScope />
                 </StepsTimeline>
                 <StepsTimeline
                   icon={{ icon: faDiagramProject, color: 'primary' }}
                   text="Short Notice flow process"
                   subtext="Rev A ARI-FR-67"
                 >
+                  <ShortNotice />
                 </StepsTimeline>
                 <StepsTimeline
                   icon={{ icon: faListCheck, color: 'ari' }}
                   text="Information Upon Request flow process"
                   subtext="Rev A ARI-FR-67"
                 >
+                  <InformationUpon />
                 </StepsTimeline>
                 <StepsTimeline
                   icon={{ icon: faCertificate, color: 'warning' }}
                   text="CERTIFICATE RESTORATION"
                   subtext="Rev A ARI-FR-67"
                 >
+                  <CertificateRestoration />
                 </StepsTimeline>
               </div>
             </Col>
