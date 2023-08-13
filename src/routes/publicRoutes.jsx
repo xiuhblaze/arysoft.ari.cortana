@@ -8,6 +8,7 @@ import ServicesView from "../views/www/ServicesView";
 import StepsView from "../views/www/StepsView";
 import AccreditationView from "../views/www/AccreditationView";
 import NewsView from "../views/www/NewsView";
+import CertificateStatusView from "../views/www/CertificateStatusView";
 
 
 const publicRoute = [
@@ -66,6 +67,14 @@ const publicRoute = [
     path: '/news',
     icon: faUserCircle,
     element: <NewsView />
+  },
+  { 
+    type: 'collapse',
+    title: 'Certificate Status',
+    key: 'status',
+    path: '/certificate-status',
+    icon: faUserCircle,
+    element: <CertificateStatusView />
   },
 ];
 

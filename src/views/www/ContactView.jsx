@@ -46,55 +46,69 @@ export const ContactView = () => {
                 <Card className="d-flex blur justify-content-center p-4 shadow-lg my-sm-0 my-sm-6 mt-8 mb-5">
                   <div className="text-center">
                     <h3 className="text-info text-gradient">Contact Us</h3>
-                    <p className="mb-0">
-                      For further questions contact using our contact form.
-                    </p>
-                    <Formik
-                      initialValues={ initialValues }
-                      validationSchema={ validationSchema }
-                      onSubmit={ onFormSubmit }
-                    >
-                      { (formik) => (
-                        <Form>
-                          <Card.Body className="text-start pb-2">
-                            <Row>
-                              <Col md="6">
-                                <AryFormikTextInput name="nombreInput" 
-                                  label="Name"
-                                  type="text"
-                                  placeholder="full name"
-                                />
-                              </Col>
-                              <Col md="6">
-                                <AryFormikTextInput name="emailInput"
-                                  label="Email"
-                                  type="email"
-                                  placeholder="youremail@example.com"
-                                />
-                              </Col>
-                              <Col md="12">
-                                <AryFormikTextArea name="comentarioInput"
-                                  label="How can we help you?"  
-                                  rows="6"
-                                  placeholder=""                            
-                                />
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col md="12" className="text-center">
-                                <Button type="submit" className="bg-gradient-info mt-3 mb-0">
-                                  Send Message
-                                </Button>
-                              </Col>
-                            </Row>
+                    {
+                      false ? (
+                        <>
+                          <p className="mb-0">
+                            For further questions contact using our contact form.
+                          </p>
+                          <Formik
+                            initialValues={ initialValues }
+                            validationSchema={ validationSchema }
+                            onSubmit={ onFormSubmit }
+                          >
+                            { (formik) => (
+                              <Form>
+                                <Card.Body className="text-start pb-2">
+                                  <Row>
+                                    <Col md="6">
+                                      <AryFormikTextInput name="nombreInput" 
+                                        label="Name"
+                                        type="text"
+                                        placeholder="full name"
+                                      />
+                                    </Col>
+                                    <Col md="6">
+                                      <AryFormikTextInput name="emailInput"
+                                        label="Email"
+                                        type="email"
+                                        placeholder="youremail@example.com"
+                                      />
+                                    </Col>
+                                    <Col md="12">
+                                      <AryFormikTextArea name="comentarioInput"
+                                        label="How can we help you?"  
+                                        rows="6"
+                                        placeholder=""                            
+                                      />
+                                    </Col>
+                                  </Row>
+                                  <Row>
+                                    <Col md="12" className="text-center">
+                                      <Button type="submit" className="bg-gradient-info mt-3 mb-0">
+                                        Send Message
+                                      </Button>
+                                    </Col>
+                                  </Row>
+                                </Card.Body>
+                              </Form>
+                            )}
+                          </Formik>
+                        </>
+                      ) : (
+                        <>
+                          <Card.Body className="pb-2 text-start">
+                            <p>
+                              If you would like to speak with someone at ARI, please contact our local office 
+                              at the number below. If you have a question, you can write us an email.
+                            </p>
+                            <h6>Our policies</h6>
+                            <p>Complaints, disputes and appeals policy and process <a className="text-info" href="/files/ari-a-05-complaints-an-appeals-instructions.pdf" target="_blank">Download</a></p>
+                            <h6>Contact Us</h6>
+                            
                           </Card.Body>
-                        </Form>
+                        </>
                       )}
-                    </Formik>
-
-                    <Card.Body className="pb-2">
-
-                    </Card.Body>
                   </div>
 
                 </Card>

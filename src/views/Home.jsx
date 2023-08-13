@@ -14,6 +14,7 @@ import bgAnalist from '../assets/img/bg-analisis-papel.jpg';
 import lgoARI from '../assets/img/lgoARI.png';
 import lgoARIblanco from '../assets/img/lgoAriBlanco.png';
 import imgWhyUs from '../assets/img/why-us.jpg';
+import imgPeopleWork from '../assets/img/people-at-work-first-plane.jpg';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export const Home = () => {
           <Container>
             <Row>
               <Col lg="7" className="text-center mx-auto">
-                <img src={ lgoARIblanco } height="200px" className="mt-n5" />
+                <img src={ lgoARIblanco } height="200px" />
                 <h1 className="text-white text-shadow-lg pt-3 mt-3">Improving your management systems!</h1>
                 {/* <p className="lead text-white text-shadow mt-3">
                 Improving your management systems!
@@ -53,7 +54,7 @@ export const Home = () => {
         </div>
       </header>
 
-      <section className="pt-3 pb-4">
+      {/* <section className="pt-3 pb-4">
         <Container>
           <Row>
             <Col lg="9" className="z-index-2 border-radius-xl mt-n10 mx-auto py-3 blur shadow-blur">
@@ -85,7 +86,7 @@ export const Home = () => {
             </Col>
           </Row>
         </Container>
-      </section>
+      </section> */}
 
       <section className="mb-5">
         <Container>
@@ -138,7 +139,7 @@ export const Home = () => {
             </Col>
             <Col xs="12" md="5" className="my-auto">
               <Card className="card-background card-background-mask-info tilt" data-tilt="">
-                <div className="full-background" style={{ backgroundImage: `url(${ landscape })`}}>
+                <div className="full-background" style={{ backgroundImage: `url(${ imgPeopleWork })`}}>
                 </div>
                 <Card.Body className="pt-7 text-center d-flex flex-column justify-content-center align-items-center">
                   <div className="icon icon-lg up mb-3 mt-3">

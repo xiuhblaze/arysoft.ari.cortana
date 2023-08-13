@@ -172,7 +172,7 @@ export const StepsView = () => {
                   <p className="text-xs font-weight-bold">
                     Frequently asked questions
                   </p>
-                  <a href="#" target="_blank" className="btn bg-gradient-primary btn-sm w-100 mb-0">
+                  <a href="/files/ari-faq.pdf" target="_blank" className="btn bg-gradient-primary btn-sm w-100 mb-0">
                     Download
                   </a>
                 </Card.Body>
@@ -184,7 +184,7 @@ export const StepsView = () => {
                   <p className="text-white text-xs font-weight-bold">
                     Preferences to certifications marks
                   </p>
-                  <a href="#" target="_blank" className="btn btn-white btn-sm w-100 mb-0">
+                  <a href="/files/ari-references-to-certifications-marks.pdf" target="_blank" className="btn btn-white btn-sm w-100 mb-0">
                     Download
                   </a>
                 </Card.Body>

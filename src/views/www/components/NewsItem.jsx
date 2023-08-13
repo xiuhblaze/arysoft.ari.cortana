@@ -1,7 +1,8 @@
-import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { ListGroupItem, Modal } from 'react-bootstrap';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
 
 export const NewsItem = ({ title, subtitle, children, ...props }) => {
   const [showModal, setShowModal] = useState(false);
@@ -24,11 +25,14 @@ export const NewsItem = ({ title, subtitle, children, ...props }) => {
       </ListGroupItem>
 
       <Modal show={ showModal } onHide={ onClose } size="lg">
-        <Modal.Header closeButton>
+        {/* <Modal.Header closeButton>
           <Modal.Title>{ title }</Modal.Title>
-        </Modal.Header>
+        </Modal.Header> */}
         <Modal.Body className="mx-4">
-          { children }
+          <h2 className="text-center my-4">{ title }</h2>
+          <div className="overflow-y-scroll" style={{ maxHeight: '50vh' }}>
+            { children }
+          </div>
         </Modal.Body>
         <Modal.Footer className="text-end pe-4">
           <button className="btn bg-gradient-dark" onClick={ onClose }>Close</button>

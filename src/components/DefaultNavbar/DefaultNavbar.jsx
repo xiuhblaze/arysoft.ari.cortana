@@ -39,20 +39,20 @@ export const DefaultNavbar = () => {
                   <Link to="/about" className="nav-link text-dark d-flex align-items-center me-2">
                     About Us
                   </Link>
-                  <Nav.Link href="/services" className="text-dark d-flex align-items-center me-2">
+                  <Link to="/services" className="nav-link text-dark d-flex align-items-center me-2">
                     Services
-                  </Nav.Link>
-                  <Nav.Link href="/steps-for-certification" className="text-dark d-flex align-items-center me-2">
+                  </Link>
+                  <Link to="/steps-for-certification" className="nav-link text-dark d-flex align-items-center me-2">
                     Steps for Certification
-                  </Nav.Link>
-                  <Nav.Link href="/news" className="text-dark d-flex align-items-center me-2">
+                  </Link>
+                  <Link to="/news" className="nav-link text-dark d-flex align-items-center me-2">
                     News
-                  </Nav.Link>
+                  </Link>
                   <NavDropdown title="Certificates" id="certificate-nav-dropdown" bsPrefix="dropdown-toggle nav-link text-dark">
                     {/* <NavDropdown.Item href="/about">Accreditation Certificate</NavDropdown.Item>
                     <NavDropdown.Item href="/">Certificate Status</NavDropdown.Item> */}
                     <Link to="/accreditation" className="dropdown-item">Accreditation Certificate</Link>
-                    <Link to="/contact" className="dropdown-item">Certificate Status</Link>
+                    <Link to="/certificate-status" className="dropdown-item">Certificate Status</Link>
                   </NavDropdown>
                   <Nav.Link href="http://www.lictus.com.mx" target="_blank" className="ms-2">
                     <img src={ lgoLictus } height="20" />
