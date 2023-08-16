@@ -1,5 +1,10 @@
 import { Card, Col, Container, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from "date-fns";
+import enUS from 'date-fns/locale/en-US'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowRight,
@@ -16,6 +21,44 @@ import { DashboardLayout } from '../../layouts/dashboard';
 import { MiniStatisticsCard } from '../../components/Cards';
 
 import bgElectronic from '../../assets/img/bgElectronic.jpg';
+import { addDays, addHours } from 'date-fns';
+
+const locales = {
+  'en-US': enUS,
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+})
+
+const myEventsList = [
+  {
+      title: 'Auditoria ISO 9K Etapa 2',
+      notes: 'Aun falta confirmación del cliente',
+      start: new Date(),
+      end: addHours(new Date(), 2),
+      bgColor: '#347CF7',
+      user: {
+        id: '123',
+        name: 'Adrián'
+      }
+    },
+    {
+      title: 'Auditoria ISO 14K Recertificación',
+      notes: 'Viaticos en proceso',
+      start: addDays(new Date(), 2),
+      end: addDays(new Date(), 3),
+      bgColor: '#82d616',
+      user: {
+        id: '123',
+        name: 'Ariadne Elizabeth'
+      }
+    }
+];
 
 export const Dashboard = () => {
   return (
@@ -53,6 +96,21 @@ export const Dashboard = () => {
               percentage={{ text: '+13', color: 'dark' }}
               icon={{ icon: faNewspaper, bgColor: 'primary' }}
             />
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col md="12">
+            <Card>
+              <Card.Body>
+                <Calendar
+                  localizer={localizer}
+                  events={myEventsList}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: '60vh' }}
+                />
+              </Card.Body>
+            </Card>
           </Col>
         </Row>
         <Row className="mt-4">
@@ -125,3 +183,5 @@ export const Dashboard = () => {
     </DashboardLayout>
   )
 }
+
+export default Dashboard;

@@ -130,7 +130,7 @@ export const StepsView = () => {
                 </StepsTimeline>
                 <StepsTimeline
                   icon={{ icon: faHand, color: 'secondary' }}
-                  text="Suspending Certification flow proces"
+                  text="Suspending Certification flow process"
                   subtext="Rev A ARI-FR-67"
                 >
                   <SuspendingCertification />

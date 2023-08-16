@@ -92,7 +92,7 @@ export const Home = () => {
         <Container>
           <Row>
             <Col xs="12" md="7" className="py-sm-7">
-              <h3 className="text-gradient text-info mb-0">Why Choose Us?</h3>
+              <h3 className="text-gradient text-info mb-0">Why Choosing Us?</h3>
               <h3>Process approach</h3>
               <p className="pe-md-5 mb-4">
                 Our service is a guarantee of conducting audits according to the client’s requirements, 

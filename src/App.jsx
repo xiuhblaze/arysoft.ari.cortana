@@ -33,7 +33,7 @@ function App() {
     if (!!routes) {
       return routes.map( route => {
         if (route.type === 'collapse') {
-          return <Route key={ route.key } path={ route.path } element={ route.element } />
+          return <Route key={ route.key } path={ route.path } element={ <route.element /> } />
         }
         return null;
       });
