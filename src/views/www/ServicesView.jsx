@@ -2,7 +2,7 @@ import BasicLayout from "../../layouts/basic/BasicLayout";
 
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
+import { faCircleArrowDown, faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 
 import ServicesCard from "./components/ServicesCard";
 
@@ -123,6 +123,31 @@ const Iso22000Content = () => {
   );
 };
 
+const FSSC22000Content = () => {
+  return (
+    <>
+      <p>
+        This scheme has the recognition of GFSI, in addition to having the requirements of ISO 22000 
+        and FSSC requirements.
+      </p>
+      <p>
+        Is focused to assurance the effective implementation on controls to prevent that the food can harm 
+        customer during the Hazard Analysis based on Alimentarius CODEX to identify Hazard: Physical, 
+        Chemical, Biological, Radiological, and this scheme have the analysis to Food defence and food 
+        fraud, supporting companies to ensure all food safety risks.
+      </p>
+      <h4>Benefits</h4>
+      <p>Prevention in:</p>
+      <ul>
+        <li>Serious harm to customer health</li>
+        <li>Complains or legals persecution</li>
+        <li>Recall associated cost</li>
+        <li>Rework and scrap reduction</li>
+      </ul>
+    </>
+  );
+};
+
 const Iso9001Content = () => {
   return (
     <>
@@ -149,6 +174,12 @@ const Iso9001Content = () => {
         <li>Client complaint, non conformity product</li>
         <li>Process environment</li>
       </ul>
+      <p>
+        <a href="/files/ari-brochure-ISO9001.pdf" target="_blank">
+          Download
+          <FontAwesomeIcon icon={ faCircleArrowDown } className="text-sm ms-1" />
+        </a>
+      </p>
     </>
   );
 };
@@ -198,7 +229,7 @@ export const ServicesView = () => {
               <ServicesCard
                 title="ISO 45001:2018"
                 subtitle="HEALTH AND SAFETY MANAGEMENT SYSTEM"
-                accredited={ true }
+                accredited="(Accredited service)"
                 desc="About tan 6,300 person diez per month because of accidents or health because of work activities."
                 image={ imgCertified45001 }
               >
@@ -209,7 +240,7 @@ export const ServicesView = () => {
               <ServicesCard
                 title="ISO 14001:2015"
                 subtitle="ENVIRONMENTAL MANAGEMENT SYSTEM"
-                accredited={ true }
+                accredited="(Accredited service)"
                 desc="Environmental is always a concern when Organization have preventive pollution and environmental protection compromise."
                 image={ imgCertified14001 }
               >
@@ -220,7 +251,7 @@ export const ServicesView = () => {
               <ServicesCard
                 title="ISO 27001:2013"
                 subtitle="INFORMATION SECURITY MANAGEMENT SYSTEM"
-                accredited={ false }
+                accredited="(Unaccredited service)"
                 desc="The application of these family estándar helps to the Organizations to manage the information security for all Information resources..."
               >
                 <Iso27001Content />
@@ -230,7 +261,7 @@ export const ServicesView = () => {
               <ServicesCard
                 title="ISO 22000:2018"
                 subtitle="FOOD SAFETY MANAGEMENT SYSTEM"
-                accredited={ true }
+                accredited="(Accredited service)"
                 desc="Is focused to guarantee the effective implementation on controls to prevent that the food can harm customer during the Hazard Analysis..."
                 image={ imgCertified22000 }
               >
@@ -239,9 +270,20 @@ export const ServicesView = () => {
             </Col>
             <Col lg="4" className="mb-4">
               <ServicesCard
+                title="FSSC 22000"
+                subtitle="FOOD SAFETY SYSTEM CERTIFICATION"
+                accredited="(Provisional service)"
+                desc="This scheme has the recognition of GFSI, in addition to having the requirements of ISO 22000 and FSSC requirements."
+                image={ imgCertified22000 }
+              >
+                <FSSC22000Content />
+              </ServicesCard>
+            </Col>
+            <Col lg="4" className="mb-4">
+              <ServicesCard
                 title="ISO 9001:2015"
                 subtitle="QUALITY MANAGEMENT SYSTEM"
-                accredited={ true }
+                accredited="(Accredited service)"
                 desc="This standard provides orientation and tolos to those Companies and Organisations who want to assure quality in their products and services..."
                 image={ imgCertified9001 }
               >
@@ -251,7 +293,7 @@ export const ServicesView = () => {
             <Col lg="4" className="mb-4">
               <ServicesCard
                 title="Global Markets"
-                accredited={ false }
+                accredited="(Unaccredited service)"
                 desc="It is a program designed for small and medium-sized companies that wish to enter Continuous Improvement..."
               >
                 <GlobalMarkets />

@@ -177,12 +177,12 @@ export const Home = () => {
                       number of certificates issued by certification bodies that have been accredited by 
                       members of the <a className="text-info" href="https://www.iaf.nu/" target="_blank">International Accreditation Forum (IAF)</a>.
                     </p>
-                    <p className="text-white opacity-8">
+                    {/* <p className="text-white opacity-8">
                       The full Survey data is available in Excel 
                       format <a href="#" className="text-info icon-move-right">here
                         <FontAwesomeIcon icon={ faCircleArrowDown } className="text-sm ms-1" />
                       </a>
-                    </p>
+                    </p> */}
                   </div>
                 </Row>
               </Container>

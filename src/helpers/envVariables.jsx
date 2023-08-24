@@ -1,8 +1,9 @@
 const envVariables = () => {
-  const USER_TOKEN = 'ti-usertoken';
+  const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
 
   return {
-    USER_TOKEN,
+    ...import.meta.env,
+    NACECODES_OPTIONS,
   }
 };
 

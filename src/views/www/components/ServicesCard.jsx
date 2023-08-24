@@ -26,10 +26,8 @@ export const ServicesCard = ({ title, subtitle, desc, accredited, image, childre
             <h6 className="category text-ari text-gradient">{ subtitle }</h6>
           ) : null }
           { !!accredited ? (
-            <p className="text-dark text-sm">(Accredited service)</p>
-          ) : (
-            <p className="text-secondary text-sm">(Unaccredited service)</p>
-          )}
+            <p className="text-dark text-sm">{ accredited }</p>
+          ) : null }
           <p className="card-description">
             { desc }
           </p>
@@ -50,10 +48,8 @@ export const ServicesCard = ({ title, subtitle, desc, accredited, image, childre
           <h2 className="text-center text-ari text-gradient">{ title }</h2>
           <p className="lead text-center text-dark mb-0">{ subtitle }</p>
           { !!accredited ? (
-            <p className="text-dark text-sm text-center">(Accredited service)</p>
-          ) : (
-            <p className="text-secondary text-sm text-center">(Unaccredited service)</p>
-          )}
+            <p className="text-dark text-sm text-center">{ accredited }</p>
+          ) : null }
           { children }
         </Modal.Body>
         <Modal.Footer className="text-end pe-5">

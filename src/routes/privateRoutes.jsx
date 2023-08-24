@@ -4,6 +4,7 @@ import { faCity, faHome, faLandmark, faList, faUserGear, faUsers } from "@fortaw
 import { lazy } from "react";
 
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
+const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyList = lazy(() => import('../views/examples/ListView'));
 
 const privateRoute = [
@@ -28,14 +29,14 @@ const privateRoute = [
     title: 'Catalogs',
     key: 'catalogs',
   },
-  // { 
-  //   type: 'collapse',
-  //   title: 'NACE Codes',
-  //   key: 'nacecodes',
-  //   path: '/nace-codes',
-  //   icon: faLandmark,
-  //   element: <Administraciones />
-  // },
+  { 
+    type: 'collapse',
+    title: 'NACE Codes',
+    key: 'nacecodes',
+    path: '/nace-codes',
+    icon: faLandmark,
+    element: lazyNacecodes
+  },
   { 
     type: 'collapse',
     title: 'List example',

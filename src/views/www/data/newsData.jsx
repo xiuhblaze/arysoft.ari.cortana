@@ -5,7 +5,7 @@ const news = [
     subtitle: 'GFSI Benchmarking Requirements Add New Scope',
     content: (
       <>
-        <img src="https://aarrin.com/mobile/app_resources/page_content/Imagen1.png" className="float-start me-2" />
+        <img src="/images/Imagen1.png" className="float-start me-2" />
         <p>
           <i>GFSI Benchmarking Requirements Add&nbsp;New Scope.</i>
           <br /><br />
@@ -60,7 +60,7 @@ const news = [
     content: (
       <>
         <figure className="image image-style-align-right">
-          <img src="https://aarrin.com/mobile/app_resources/page_content/cgf-logo.png" />          
+          <img src="/images/cgf-logo.png" />          
         </figure>
         <p>
           <i>
@@ -126,7 +126,7 @@ const news = [
               levels of food safety versus the lowest level of compliance, and GFSI can help us achieve this”.
             </p>
             <figure className="image">
-              <img className="img-fluid border-radius-md" src="https://aarrin.com/mobile/app_resources/page_content/gfsi-38-coalition-members.jpg.webp" />
+              <img className="img-fluid border-radius-md" src="/images/gfsi-38-coalition-members.jpg.webp" />
               <figcaption>
                 <a href="https://mygfsi.com/who-we-are/governance">
                   <strong>Current Members of GFSI</strong>
@@ -145,7 +145,7 @@ const news = [
     subtitle: 'As a result of the health contingency due to COVID-19, uncertainty has arisen in certified companies...',
     content: (
       <>
-        <img src="https://aarrin.com/mobile/app_resources/page_content/iStock-499147978.jpg" className="img-fluid" />
+        <img src="/images/iStock-499147978.jpg" className="img-fluid" />
         <p>
           As a result of the health contingency due to COVID-19, uncertainty has arisen in certified companies or 
           companies that are in the certification process as a result of the closure of activities required by the 
@@ -214,7 +214,7 @@ const news = [
     subtitle: 'During the years Management System Tools are develop to help organization to Manage Risks...',
     content: (
       <>
-        <img src="https://www.aarrin.com/wp-content/uploads/2019/07/iStock-475971188-1024x683.jpg" className="img-fluid" />
+        <img src="/images/iStock-475971188-1024x683.jpg" className="img-fluid" />
         <p>
           During the years Management System Tools are develop to help organization to Manage Risks. Some of those tools have 
           different approach and focus. ISO 31010 provides information for each tool and benefits.
@@ -291,7 +291,7 @@ const news = [
           of the supply chain. Also, ISO 22000 certification, performed by an accredited certification body, allows the 
           potential for organizations to attract new customers and to enter international or selective markets
         </p>
-        <img src="https://aarrin.com/mobile/app_resources/page_content/Imagen1.jpg" className="float-end ms-2" />
+        <img src="/images/Imagen1.jpg" className="float-end ms-2" />
         <p>
           In accordance with the provisions of the <i><strong>Expected Outcomes Document for Certification to ISO 22000, a Food 
             Safety Management System (FSMS)&nbsp;</strong></i>the organizations demonstrate their commitment to:
@@ -313,7 +313,7 @@ const news = [
         <ol>
           <li>
             Top management commitment through a written food safety policy and established objectives that ensures the integration 
-            of the FSMS requirements into the organization’s business practices.
+            of the FSMS requirements into the organization's business practices.
           </li>
           <li>
             Procedures in place to identify and implement aplicable statutory and regulatory requirements related to its products 
@@ -393,7 +393,7 @@ const news = [
           extract resources from nature.
         </p>
         <h4><strong>Benefits of the circular economy:</strong></h4>
-        <img className="img-fluid float-end" src="https://unctad.org/sites/default/files/inline-images/ditc-ted-circular-economy-Benefits-1-450_0.jpg" alt="The Circular Economy" />
+        <img className="img-fluid float-end" src="/images/ditc-ted-circular-economy-Benefits-1-450_0.jpg" alt="The Circular Economy" />
         <ul>
           <li>Minimize pollution and waste.</li>
           <li>Extend product life cycles.</li>
@@ -449,7 +449,21 @@ const news = [
             <strong>Verification:</strong> confirmation that the information declared as “claim” (the object of conformity assessment) 
             is truthfully stated. Requirements for verification bodies are specified in the ISO/IEC 17029 standard.
           </li>
-          <li><strong>Certification:</strong> Independent (third-party) attestation of conformity. Requirements for certification bodies are specified in the standards ISO/IEC 17021-1 (for management systems as objects of conformity assessment), ISO/IEC 17065 (for products, processes, and services as objects of conformity assessment) and ISO/IEC 17024 (for persons as objects of conformity assessment).</li></ul><p>Conformity assessment builds credibility that products, processes, services, systems or claims meet specific requirements in circular economy aspects such as recyclability, reusability, repairability, upgradability, etc.</p><p>&nbsp;</p><p>Source:&nbsp;<a href="https://www.iso.org/insights/circular-economy-building-trust.html">https://www.iso.org/insights/circular-economy-building-trust.html</a></p>
+          <li>
+            <strong>Certification:</strong> Independent (third-party) attestation of conformity. Requirements for 
+            certification bodies are specified in the standards ISO/IEC 17021-1 (for management systems as objects 
+            of conformity assessment), ISO/IEC 17065 (for products, processes, and services as objects of conformity 
+            assessment) and ISO/IEC 17024 (for persons as objects of conformity assessment).
+          </li>
+        </ul>
+        <p>
+          Conformity assessment builds credibility that products, processes, services, systems or claims meet 
+          specific requirements in circular economy aspects such as recyclability, reusability, repairability, 
+          upgradability, etc.
+        </p>
+        <p>
+          Source:&nbsp;<a href="https://www.iso.org/insights/circular-economy-building-trust.html">https://www.iso.org/insights/circular-economy-building-trust.html</a>
+        </p>
       </>
     )
   },
@@ -482,7 +496,7 @@ const news = [
     subtitle: 'Guidelines, provides principles, framework and a process for managing risk...',
     content: (
       <>
-        <img src="https://www.aarrin.com/wp-content/uploads/2019/07/31k-1.jpg" className="img-fluid float-end" />
+        <img src="/images/31k-1.jpg" className="img-fluid float-end" />
         <p>
           ISO 31000:2018, Risk management - Guidelines, provides principles, framework and a process for managing risk. It can 
           be used by any organization regardless of its size, activity or sector.
