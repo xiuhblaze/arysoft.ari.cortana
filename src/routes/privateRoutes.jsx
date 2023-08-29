@@ -33,7 +33,7 @@ const privateRoute = [
     type: 'collapse',
     title: 'NACE Codes',
     key: 'nacecodes',
-    path: '/nace-codes',
+    path: '/nace-codes/*',
     icon: faLandmark,
     element: lazyNacecodes
   },

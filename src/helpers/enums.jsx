@@ -18,6 +18,16 @@ const enums = () => {
     updatedDesc: 6,
   });
 
+  const NacecodeOrderType = Object.freeze({
+    nothing: 0,
+    sector: 1,
+    description: 2,
+    updated: 3,
+    sectorDesc: 4,
+    descriptionDesc: 5,
+    updatedDesc: 6
+  });
+  
   const OrganizationStatusType = Object.freeze({
     nothing: 0,
     new: 1,
@@ -50,6 +60,7 @@ const enums = () => {
     DefaultStatusType,
 
     ContactOrderType,
+    NacecodeOrderType,
     OrganizationStatusType,
     SiteOrderType,
     StandardOrderType,
