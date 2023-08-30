@@ -13,11 +13,11 @@ import { useAuthStore } from '../../hooks/useAuthStore';
 const navbarTypeStyckyStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky';
 const navbarTypeStaticStyle = 'navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl';
 
-export const DashboardNavbar = ({ title }) => {
+export const DashboardNavbar = () => {
   const navigate = useNavigate();
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useArysoftUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, navbarTitle } = controller;
 
   const fullRoute = useLocation().pathname.split('/').slice(1);
   const route = fullRoute.filter(item => item !== '');
@@ -66,7 +66,7 @@ export const DashboardNavbar = ({ title }) => {
       <div className="container-fluid py-1 px-3">
         <Breadcrums 
           icon={ faHome }
-          title={ !!title ? title : route[route.length - 1]}
+          title={ !!navbarTitle ? navbarTitle : route[route.length - 1]}
           route={ route }
         />
 

@@ -1,14 +1,17 @@
-import { Card, Col, Container, Row } from "react-bootstrap";
-import NaceTableList from "./components/NaceTableList";
-import useNacecodesStore from "../../hooks/useNaceCodesStore";
 import { useEffect } from "react";
-import envVariables from "../../helpers/envVariables";
 import { useNavigate } from "react-router-dom";
-import { useArysoftUIController } from "../../context/context";
-import enums from "../../helpers/enums";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
+
+import envVariables from "../../helpers/envVariables";
+import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+
+import enums from "../../helpers/enums";
+
 import AryPagination from "../../components/AryPagination/AryPagination";
+import NaceTableList from "./components/NaceTableList";
 import ToolbarForm from "./components/ToolbarForm";
+import useNacecodesStore from "../../hooks/useNaceCodesStore";
 
 export const ListView = () => {
   const navigate = useNavigate();
@@ -40,7 +43,7 @@ export const ListView = () => {
     nacecodesAsync(search);
     localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
 
-    // setNavbarTitle(dispatch, null);
+    setNavbarTitle(dispatch, null);
   }, []);
   
   useEffect(() => {

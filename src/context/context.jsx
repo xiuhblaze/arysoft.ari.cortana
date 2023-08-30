@@ -25,6 +25,9 @@ const reducer = (state, action) => {
     case "LAYOUT": {
       return { ...state, layout: action.value };
     }
+    case "NAVBAR_TITLE": {
+      return { ...state, navbarTitle: action.value };
+    }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -40,6 +43,7 @@ const ArysoftUIControllerProvider = ({ children }) => {
     fixedNavbar: true,
     openConfigurator: false,
     layout: "dashboard",
+    navbarTitle: null,
   };
 
   const [controller, dispatch] = useReducer(reducer, initialState);
@@ -66,6 +70,7 @@ const setTransparentNavbar = (dispatch, value) => dispatch({ type: "TRANSPARENT_
 const setFixedNavbar = (dispatch, value) => dispatch({ type: "FIXED_NAVBAR", value });
 const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGURATOR", value });
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
+const setNavbarTitle = (dispatch, value) => dispatch({ type: "NAVBAR_TITLE", value});
 
 export {
   ArysoftUIControllerProvider,
@@ -77,4 +82,5 @@ export {
   setFixedNavbar,
   setOpenConfigurator,
   setLayout,
+  setNavbarTitle,
 };

@@ -11,10 +11,12 @@ import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 
 import Code from "./Code";
 import Status from "./Status";
+import DetailsModal from "./DetailsModal";
+import { Link } from "react-router-dom";
 
 export const NaceTableList = () => {
   const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
-  const { NacecodeOrderType } = enums();
+  const { NacecodeOrderType, DefaultStatusType } = enums();
   const [showModal, setShowModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(NacecodeOrderType.sector);
   const { NACECODES_OPTIONS } = envVariables();
@@ -31,6 +33,18 @@ export const NaceTableList = () => {
     }
   }, [nacecodes]);
   
+
+  // METHODS
+
+  const onShowModal = (id) => {    
+    setShowModal(true);
+    nacecodeAsync(id);
+  }
+
+  const onCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <>
     {
@@ -70,8 +84,14 @@ export const NaceTableList = () => {
                   <td className="text-sm text-center"><Status value={ item.Status } /></td>
                   <td>
                     <div className="d-flex justify-content-center gap-2">
-                      <FontAwesomeIcon icon={ faClone } />
-                      <FontAwesomeIcon icon={ faEdit } />
+                      <a href="#" onClick={ () => onShowModal(item.NaceCodeID) } title="Details">
+                        <FontAwesomeIcon icon={ faClone } />
+                      </a>
+                      { item.Status !== DefaultStatusType.deleted && (
+                        <Link to={ `${ item.NaceCodeID }` } title="Edit">
+                          <FontAwesomeIcon icon={ faEdit } />
+                        </Link>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -81,6 +101,7 @@ export const NaceTableList = () => {
         </div>
       ) : null
     }
+    <DetailsModal show={ showModal } onHide={ onCloseModal } />
     </>
   )
 }

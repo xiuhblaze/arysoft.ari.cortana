@@ -191,7 +191,7 @@ export const useNacecodesStore = () => {
     }
   };
 
-  const nacecodeClearItem = () => {
+  const nacecodeClear = () => {
     dispatch(setNacecode(null));
   };
 
@@ -219,7 +219,7 @@ export const useNacecodesStore = () => {
     nacecodeCreateAsync,
     nacecodeSaveAsync,
     nacecodeDeleteAsync,
-    nacecodeClearItem,
+    nacecodeClear,
   };
 };
 

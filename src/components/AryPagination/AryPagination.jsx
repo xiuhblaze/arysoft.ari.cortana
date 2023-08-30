@@ -15,13 +15,6 @@ export const AryPagination = ({ currentPage, totalPages, totalCount = 0, showSta
   const iInicio = inicio === 0 ? currentPage - PAGE_MAX_DISPLAY + 1 : Math.floor(currentPage * 0.1) * 10 + 1;
   const iFin = iInicio + PAGE_MAX_DISPLAY - 1 < totalPages ? iInicio + PAGE_MAX_DISPLAY - 1 : totalPages;
 
-  // console.log({
-  //   inicio, iInicio, iFin, currentPage, PAGE_MAX_DISPLAY, totalPages
-  // });
-
-  // console.log(iInicio + PAGE_MAX_DISPLAY - 1)
-
-
   if (iInicio > 1) {
     items.push(
       <Pagination.First key="first" onClick={ () => { onClickGoPage(1) }} title="First page" />

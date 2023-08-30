@@ -29,35 +29,11 @@ export const nacecodesSlice = createSlice({
       state.nacecodes = action.payload.nacecodes;
       state.nacecodesMeta = action.payload.nacecodesMeta;
     },
+
     // Element
     onNacecodeLoading: (state) => {
       state.isNacecodeLoading = true;
       state.nacecode = null;
-    },
-    onNacecodeCreating: (state) => {
-      state.isNacecodeCreating = true;
-      state.nacecodeCreatedOk = false;
-      state.nacecode = null;      
-    },
-    isNacecodeCreated: (state) => {
-      state.isNacecodeCreating = false;
-      state.nacecodeCreatedOk = true;
-    },
-    onNacecodeSaving: (state) => {
-      state.isNacecodeSaving = true;
-      state.nacecodeSavedOk = false;
-    },
-    isNacecodeSaved: (state) => {
-      state.isNacecodeSaving = false;
-      state.nacecodeSavedOk = true;
-    },
-    onNacecodeDeleting: (state) => {
-      state.isNacecodeDeleting = true;
-      state.nacecodeDeletedOk = false;
-    },
-    isNacecodeDeleted: (state) => {
-      state.isNacecodeDeleting = false;
-      state.nacecodeDeletedOk = true;
     },
     setNacecode: (state, action) => {
       state.isNacecodeLoading = false;
@@ -69,6 +45,45 @@ export const nacecodesSlice = createSlice({
       state.nacecodeDeletedOk = false;
       state.nacecode = action.payload;
     },
+    // element - creating
+    onNacecodeCreating: (state) => {
+      state.isNacecodeCreating = true;
+      state.nacecodeCreatedOk = false;
+      state.nacecode = null;      
+    },
+    isNacecodeCreated: (state) => {
+      state.isNacecodeCreating = false;
+      state.nacecodeCreatedOk = true;
+    },
+    // element - saving
+    onNacecodeSaving: (state) => {
+      state.isNacecodeSaving = true;
+      state.nacecodeSavedOk = false;
+    },
+    isNacecodeSaved: (state, action) => {
+      state.isNacecodeSaving = false;
+      state.nacecodeSavedOk = true;
+      if (!!action?.payload) {
+        state.nacecodes = state.nacecodes.map( item => {
+          if (item.NaceCodeID === action.payload.NaceCodeID) {
+            return {
+              ...item,
+              ...action.payload,
+            }
+          }
+        });
+      } 
+    },
+    // element - deleting
+    onNacecodeDeleting: (state) => {
+      state.isNacecodeDeleting = true;
+      state.nacecodeDeletedOk = false;
+    },
+    isNacecodeDeleted: (state) => {
+      state.isNacecodeDeleting = false;
+      state.nacecodeDeletedOk = true;
+    },
+    
     // Misc
     setNacecodesErrorMessage: (state, action) => {
       state.isNacecodesLoading = false;
