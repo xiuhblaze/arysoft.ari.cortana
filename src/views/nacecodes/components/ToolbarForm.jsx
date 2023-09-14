@@ -8,7 +8,7 @@ import envVariables from "../../../helpers/envVariables";
 import enums from "../../../helpers/enums";
 
 import useNacecodesStore from "../../../hooks/useNaceCodesStore";
-import {AryFormikTextInput, AryFormikSelectInput} from "../../../components/Forms";
+import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 
 export const ToolbarForm = () => {
   const { DefaultStatusType, NacecodeOrderType } = enums();
@@ -16,6 +16,7 @@ export const ToolbarForm = () => {
   const [initialValues, setInitialValues] = useState({
     textInput: '',
     statusSelect: '',
+    includeDeletedCheck: false,
   })
   const {
     isNacecodeCreating,
@@ -29,6 +30,7 @@ export const ToolbarForm = () => {
       setInitialValues({
         textInput: savedSearch?.text ?? '',
         statusSelect: savedSearch?.status ?? '',
+        includeDeletedCheck: savedSearch?.includeDeleted ?? false,
       });
     }
   }, []);
@@ -36,7 +38,6 @@ export const ToolbarForm = () => {
   // METHODS
 
   const onNewItem = () => {
-    console.log('New Nace code');
     nacecodeCreateAsync();
   };
 
@@ -46,6 +47,7 @@ export const ToolbarForm = () => {
       ...savedSearch,
       text: values.textInput,
       status: values.statusSelect,
+      includeDeleted: values.includeDeletedCheck,
       pageNumber: 1,
     };
 
@@ -60,12 +62,14 @@ export const ToolbarForm = () => {
     const search = {
       pageSize: savedSearch?.pageSize ?? VITE_PAGE_PAGESIZE,
       pageNumber: 1,
+      includeDeleted: false,
       order: NacecodeOrderType.sector,
     };
 
     setInitialValues({
       textInput: '',
       statusSelect: '',
+      includeDeletedCheck: false,
     });
 
     nacecodesAsync(search);
@@ -107,6 +111,17 @@ export const ToolbarForm = () => {
                             return ( <option key={ key } value={ DefaultStatusType[key] } className="text-capitalize">{ key }</option> );
                         })}
                       </AryFormikSelectInput>
+                    </div>
+                    <div className="col-auto ps-0">
+                      <div className="form-check form-switch mt-lg-2 mt-xxl-2">
+                        <input id="includeDeletedCheck" name="includeDeletedCheck" 
+                          className="form-check-input"
+                          type="checkbox"
+                          onChange={ formik.handleChange }
+                          checked={ formik.values.includeDeletedCheck }
+                        />
+                        <label className="form-check-label" htmlFor="includeDeletedCheck">Show deleted records</label>
+                      </div>
                     </div>
                   </div>
                 </div>

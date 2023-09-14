@@ -20,17 +20,20 @@ import {
 
 import enums from "../helpers/enums";
 import envVariables from "../helpers/envVariables";
+import getErrorMessages from "../helpers/getErrorMessages";
 
 const NACECODES_URI = '/nacecodes';
+const { VITE_DEFAULT_PAGESIZE } = envVariables();
 
 const getSearhQuery = (options = {}) => {
   let query = '';
 
-  query = `?pagesize=${ options?.pageSize ?? '0' }`;
-  query += options?.pageNumber ? `&pagenumber=${ options.pageNumber }` : '';
+  query = `?pagesize=${ options?.pageSize ?? VITE_DEFAULT_PAGESIZE }`;
+  query += options?.pageNumber ? `&pagenumber=${ options.pageNumber }` : '&pagenumber=1';
 
   query += options?.text?.length > 0 ? `&text=${ options.text }` : '';
   query += options?.status ? `&status=${ options.status }` : '';
+  query += options?.includeDeleted ? `&includeDeleted=${ options.includeDeleted }` : '';
 
   query += options?.order ? `&order=${ options.order }` : '';
     
@@ -55,7 +58,6 @@ export const useNacecodesStore = () => {
 
     nacecodeErrorMessage,
   } = useSelector(state => state.nacecodes);
-
   const { user } = useSelector(state => state.auth);
   const { DefaultStatusType } = enums();
 
@@ -85,8 +87,6 @@ export const useNacecodesStore = () => {
     const query = getSearhQuery(options);
 
     try {
-      // const pageSize = options.pageSize ?? '0';      
-      // const resp = await cortanaApi.get(`${ NACECODES_URI }?pagesize=${ pageSize }${ params }`);
       const resp = await cortanaApi.get(`${ NACECODES_URI }${ query }`);
       const { Data, Meta } = await resp.data;
 
@@ -95,8 +95,7 @@ export const useNacecodesStore = () => {
         nacecodesMeta: Meta,
       }));
     } catch (error) {
-      console.log(error);
-      const message = 'An unhandled exception has occurred, (see log).';
+      const message = getErrorMessages(error);
       setError(message);
     }
   };
@@ -109,7 +108,7 @@ export const useNacecodesStore = () => {
   const nacecodeAsync = async (id) => {
     dispatch(onNacecodeLoading());
 
-    if (!id) { setError('Must specify the ID'); return; }
+    if (!id) { setError('You must specify the ID'); return; }
 
     try {
       const resp = await cortanaApi.get(`${ NACECODES_URI }/${ id }`);
@@ -117,8 +116,7 @@ export const useNacecodesStore = () => {
       
       dispatch(setNacecode(Data));
     } catch (error) {
-      console.log(error);
-      const message = 'An unhandled exception has occurred, (see log).';
+      const message = getErrorMessages(error);
       setError(message);
     }
   };
@@ -144,8 +142,7 @@ export const useNacecodesStore = () => {
       dispatch(setNacecode(Data));
       dispatch(isNacecodeCreated());
     } catch (error) {
-      console.log(error);
-      const message = 'An unhandled exception has occurred, (see log).';
+      const message = getErrorMessages(error);
       setError(message);
     }
   };
@@ -153,21 +150,25 @@ export const useNacecodesStore = () => {
   /**
    * Llama al endpoint para actualizar los datos de un registro, si es uno nuevo
    * lo marca con su primer estado
-   * @param {NacecodeID, Name, Description, Status, UpdatedUser} item nacecode a actualizar en la BDD
+   * @param {NacecodeID, Sector, Division, Group, Class, Description, Status, UpdatedUser} item nacecode a actualizar en la BDD
    */
-  const nacecodeSaveAsync = async (item) => {
+  const nacecodeSaveAsync = async (item) => {    
     dispatch(onNacecodeSaving());
 
-    try {
-      const resp = await cortanaApi.put(`${ NACECODES_URI }/${ item.NaceCodeID }`, item);
-      console.log(resp);
+    const toSave = {
+      ...item,
+      UpdatedUser: user.username,
+    }
 
-      dispatch(isNacecodeSaved());
+    try {
+      const resp = await cortanaApi.put(`${ NACECODES_URI }/${ item.NaceCodeID }`, toSave);
+      const { Data } = await resp.data;
+      
+      dispatch(isNacecodeSaved(Data));
 
     } catch (error) {
-      console.log(error);
-      const message = 'An unhandled exception has occurred, (see log).';
-      setError(message);      
+      const message = getErrorMessages(error);
+      setError(message);     
     }
 
   };
@@ -180,14 +181,11 @@ export const useNacecodesStore = () => {
     dispatch(onNacecodeDeleting());
 
     try {
-      const resp = await cortanaApi.delete(`${ NACECODES_URI }/${ id }`);
-      console.log(resp);
-
+      await cortanaApi.delete(`${ NACECODES_URI }/${ id }`);
       dispatch(isNacecodeDeleted());
     } catch (error) {
-      console.log(error);
-      const message = 'An unhandled exception has occurred, (see log).';
-      setError(message);      
+      const message = getErrorMessages(error);
+      setError(message);     
     }
   };
 

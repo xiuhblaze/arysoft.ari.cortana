@@ -1,12 +1,15 @@
-import { Modal, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import enums from '../../../helpers/enums';
-import useNacecodesStore from '../../../hooks/useNaceCodesStore';
 import { useEffect } from 'react';
+import { Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import Code from './Code';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightToBracket, faArrowRotateLeft, faEdit } from '@fortawesome/free-solid-svg-icons';
+
+import enums from '../../../helpers/enums';
+import useNacecodesStore from '../../../hooks/useNaceCodesStore';
+import { ViewLoading } from '../../../components/Loaders';
+import Code from './Code';
 
 export const DetailsModal = ({ show, onHide, ...props }) => {
   const navigate = useNavigate();
@@ -33,7 +36,22 @@ export const DetailsModal = ({ show, onHide, ...props }) => {
   };
 
   const onRestoreButton = () => {
-
+    Swal.fire({
+      title: 'NACE Codes',
+      text: 'Do you want to restore the registry?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Restore',
+      cancelButtonText: 'Cancel',
+    }).then( resp => {
+      if (resp.value) {
+        const itemToSave = {
+          ...nacecode,
+          status: DefaultStatusType.active,
+        };
+        nacecodeSaveAsync(itemToSave);
+      }
+    });
   };
 
   return (
@@ -43,13 +61,7 @@ export const DetailsModal = ({ show, onHide, ...props }) => {
       </Modal.Header>
       <Modal.Body>
         { isNacecodeLoading ? (
-          <div className="text-center">
-            <div className="w-100 m-auto" style={{ paddingTop: 'calc(25vh - 50px)', paddingBottom: '25vh', width: '3rem', height: '3rem' }}>
-              <Spinner animation="border" variant="info" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            </div>
-          </div>
+          <ViewLoading />
         ) : !!nacecode ? (
           <>
             <h6>{ nacecode.Description }</h6>

@@ -13,6 +13,7 @@ import Code from "./Code";
 import Status from "./Status";
 import DetailsModal from "./DetailsModal";
 import { Link } from "react-router-dom";
+import { ViewLoading } from "../../../components/Loaders";
 
 export const NaceTableList = () => {
   const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -49,19 +50,13 @@ export const NaceTableList = () => {
     <>
     {
       isNacecodesLoading ? (
-        <div className="text-center">
-          <div className="w-100 m-auto" style={{ paddingTop: 'calc(25vh - 50px)', paddingBottom: '25vh', width: '3rem', height: '3rem' }}>
-            <Spinner animation="border" variant="info" role="status">
-              <span className="visually-hidden">Cargando...</span>
-            </Spinner>
-          </div>
-        </div>
+        <ViewLoading />
       ) : !!nacecodes ? (
         <div className="table-responsive p-0">
           <table className="table align-items-center mb-0">
             <thead>
               <tr>
-                <th className={ `${headStyle} text-center` }>Code</th>
+                <th className={ `${headStyle} text-end` }>Code</th>
                 <th className={ headStyle }>Description</th>
                 <th className={ `${headStyle} text-center` }>Status</th>
                 <th className={ `${headStyle} text-center` }>Action</th>
@@ -69,7 +64,7 @@ export const NaceTableList = () => {
             </thead>
             <tbody>
               { nacecodes.map( item => (
-                <tr key={ item.NaceCodeID }>
+                <tr key={ item.NaceCodeID } className={ item.Status === DefaultStatusType.deleted ? 'opacity-6' : ''}>
                   <td className="text-sm text-secondary font-weight-bold text-end">
                     <Code 
                       sector={ item.Sector }

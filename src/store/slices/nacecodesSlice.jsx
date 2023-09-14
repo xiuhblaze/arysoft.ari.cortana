@@ -71,6 +71,7 @@ export const nacecodesSlice = createSlice({
               ...action.payload,
             }
           }
+          return item;
         });
       } 
     },

@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export const standardsSlice = createSlice({
-  name: "standardsSlice",
+  name: 'standards',
   initialState: {
-    // Collection
+    // list
     isStandardsLoading: false,
     standards: [],
-    standardsMeta: null,    
-    // Element
+    standardsMeta: null,
+    isStandardsFullListLoading: false,
+    standardsFullList: [],
+    // element
     isStandardLoading: false,
     isStandardCreating: false,
     standardCreatedOk: false,
@@ -16,51 +18,29 @@ export const standardsSlice = createSlice({
     isStandardDeleting: false,
     standardDeletedOk: false,
     standard: null,
-
-    standardErrorMessage: null,
+    // misc
+    standardsErrorMessage: undefined,
   },
   reducers: {
-    // Collection
+    // list
     onStandardsLoading: (state) => {
       state.isStandardsLoading = true;
-    },
-    isStandardsLoaded: (state) => {
-      state.isStandardsLoading = false;
     },
     setStandards: (state, action) => {
       state.isStandardsLoading = false;
       state.standards = action.payload.standards;
       state.standardsMeta = action.payload.standardsMeta;
     },
-    // Element
+    onStandardsFullListLoading: (state) => {
+      state.isStandardsFullListLoading = true;
+    },
+    setStandardsFullList: (state, action) => {
+      state.isStandardsFullListLoading = false;
+      state.standardsFullList = action.payload.data;
+    },
+    // element
     onStandardLoading: (state) => {
       state.isStandardLoading = true;
-      state.standard = null;
-    },
-    onStandardCreating: (state) => {
-      state.isStandardCreating = true;
-      state.standardCreatedOk = false;
-      state.standard = null;      
-    },
-    isStandardCreated: (state) => {
-      state.isStandardCreating = false;
-      state.standardCreatedOk = true;
-    },
-    onStandardSaving: (state) => {
-      state.isStandardSaving = true;
-      state.standardSavedOk = false;
-    },
-    isStandardSaved: (state) => {
-      state.isStandardSaving = false;
-      state.standardSavedOk = true;
-    },
-    onStandardDeleting: (state) => {
-      state.isStandardDeleting = true;
-      state.standardDeletedOk = false;
-    },
-    isStandardDeleted: (state) => {
-      state.isStandardDeleting = false;
-      state.standardDeletedOk = true;
     },
     setStandard: (state, action) => {
       state.isStandardLoading = false;
@@ -72,7 +52,56 @@ export const standardsSlice = createSlice({
       state.standardDeletedOk = false;
       state.standard = action.payload;
     },
-    // Misc
+    clearStandard: (state) => {
+      state.isStandardLoading = false;
+      state.isStandardCreating = false;
+      state.standardCreatedOk = false;
+      state.isStandardSaving = false;
+      state.standardSavedOk = false;
+      state.isStandardDeleting = false;
+      state.standardDeletedOk = false;
+      state.standard = null;
+    },
+    // element - creating
+    onStandardCreating: (state) => {
+      state.isStandardCreating = true;
+      state.standardCreatedOk = false;
+      state.standard = null;
+    },
+    isStandardCreated: (state) => {
+      state.isStandardCreating = false;
+      state.standardCreatedOk = true;
+    },
+    // element - saving
+    onStandardSaving: (state) => {
+      state.isStandardSaving = true;
+      state.standardSavedOk = false;
+    },
+    isStandardSaved: (state, action) => {
+      state.isStandardSaving = false;
+      state.standardSavedOk = true;
+      if (!!action?.payload) {
+        state.standards = state.standards.map( item => {
+          if (item.StandardID === action.payload.StandardID) {
+            return {
+              ...item,
+              ...action.payload,
+            }
+          }
+          return item;
+        });
+      }
+    },
+    // element - deleting
+    onStandardDeleting: (state) => {
+      state.isStandardDeleting = true;
+      state.standardDeletedOk = false;
+    },
+    isStandardDeleted: (state) => {
+      state.isStandardDeleting = false;
+      state.standardDeletedOk = true;
+    },
+    // misc
     setStandardsErrorMessage: (state, action) => {
       state.isStandardsLoading = false;
       state.isStandardLoading = false;
@@ -82,26 +111,32 @@ export const standardsSlice = createSlice({
       state.standardSavedOk = false;
       state.isStandardDeleting = false;
       state.standardDeletedOk = false;
-      state.standardErrorMessage = action.payload;
+      state.standardsErrorMessage = action.payload;
+    },
+    clearStandardsErrorMessage: (state) => {
+      state.standardsErrorMessage = undefined;
     }
   }
 });
 
 export const {
   onStandardsLoading,
-  isStandardsLoaded,
   setStandards,
+  onStandardsFullListLoading,
+  setStandardsFullList,
 
   onStandardLoading,
+  setStandard,  
+  clearStandard,
   onStandardCreating,
   isStandardCreated,
   onStandardSaving,
   isStandardSaved,
   onStandardDeleting,
   isStandardDeleted,
-  setStandard,
-
-  setStandardsErrorMessage,  
+  
+  setStandardsErrorMessage,
+  clearStandardsErrorMessage,
 } = standardsSlice.actions;
 
 export default standardsSlice;

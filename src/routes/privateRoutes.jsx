@@ -5,6 +5,7 @@ import { lazy } from "react";
 
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
+const lazyStandards = lazy(() => import('../views/standards'));
 const lazyList = lazy(() => import('../views/examples/ListView'));
 
 const privateRoute = [
@@ -28,6 +29,14 @@ const privateRoute = [
     type: 'title',
     title: 'Catalogs',
     key: 'catalogs',
+  },
+  { 
+    type: 'collapse',
+    title: 'Standards',
+    key: 'standards',
+    path: '/standards/*',
+    icon: faLandmark,
+    element: lazyStandards
   },
   { 
     type: 'collapse',

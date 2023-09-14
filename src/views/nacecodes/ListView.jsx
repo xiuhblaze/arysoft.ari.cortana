@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 
 import envVariables from "../../helpers/envVariables";
 import { setNavbarTitle, useArysoftUIController } from "../../context/context";
-
 import enums from "../../helpers/enums";
 
 import AryPagination from "../../components/AryPagination/AryPagination";
