@@ -8,6 +8,8 @@ import enums from "../../helpers/enums";
 import { useStandardsStore } from "../../hooks/useStandardsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import StandardsTableList from "./components/StandardsTableList";
+import AryPagination from "../../components/AryPagination/AryPagination";
+import ToolbarForm from "./components/ToolbarForm";
 
 const ListView = () => {
   const navigate = useNavigate();
@@ -83,10 +85,27 @@ const ListView = () => {
         <Col>
           <Card className="mb-4">
             <Card.Header className="pb-0">
-              -toolbar
+              <ToolbarForm />
             </Card.Header>
             <Card.Body className="px-0 pt-0 pb-2">
-              <StandardsTableList />
+              { !!standardsMeta && (
+                  <AryPagination
+                    currentPage={ standardsMeta.CurrentPage } 
+                    totalPages={ standardsMeta.TotalPages }
+                    onClickGoPage={ onClickGoPage } 
+                  />
+              )}
+              <StandardsTableList onOrder={ onClickOrderList } />
+              { !!standardsMeta && (
+                  <AryPagination
+                    currentPage={ standardsMeta.CurrentPage } 
+                    totalPages={ standardsMeta.TotalPages }
+                    totalCount={ standardsMeta.TotalCount }
+                    showStatistics="true"
+                    onClickGoPage={ onClickGoPage } 
+                    className="mt-2"
+                  />
+              )}
             </Card.Body>
           </Card>
         </Col>

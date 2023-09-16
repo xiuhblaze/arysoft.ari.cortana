@@ -16,7 +16,7 @@ export const Breadcrums = ({ icon, title, route }) => {
         {
           routes.map( item => (
             <li key={ item } className="breadcrumb-item text-sm" aria-current="page">
-              <Link to={ `/${ item }`}>
+              <Link to={ `/${ item }/`}>
                 { item }
               </Link>
             </li>

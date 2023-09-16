@@ -42,6 +42,9 @@ const enums = () => {
     name: 1,
     status: 2,
     update: 3,
+    nameDesc: 4,
+    statusDesc: 5,
+    updateDesc: 6,
   });
 
   const SiteOrderType = Object.freeze({

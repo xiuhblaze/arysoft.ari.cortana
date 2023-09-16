@@ -142,9 +142,9 @@ export const useStandardsStore = () => {
 
     try {
       const resp = await cortanaApi.get(`/standards/${ id }`);
-      const { data } = await resp.data;
+      const { Data } = await resp.data;
 
-      dispatch(setStandard(data));
+      dispatch(setStandard(Data));
     } catch (error) {
       const message = getErrorMessages(error);
       setError(message);
