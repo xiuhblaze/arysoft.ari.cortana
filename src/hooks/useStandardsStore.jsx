@@ -182,10 +182,10 @@ export const useStandardsStore = () => {
 
     const toSave = {
       ...item,
-      usuarioActualizacion: user.username,
+      UpdatedUser: user.username,
     }
     try {
-      const resp = await cortanaApi.put(`/standards/${ toSave.id }`, toSave);
+      const resp = await cortanaApi.put(`/standards/${ toSave.StandardID }`, toSave);
       const { Data } = await resp.data;
 
       dispatch(setStandard(Data));

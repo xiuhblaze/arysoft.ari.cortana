@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Form, Formik } from 'formik';
 
 import Swal from 'sweetalert2';
-
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
-import enums from '../../helpers/enums';
-import useNacecodesStore from '../../hooks/useNaceCodesStore';
-import { Card, Col, Container, Row } from 'react-bootstrap';
-import { ViewLoading } from '../../components/Loaders';
-import Status from './components/Status';
-import { Form, Formik } from 'formik';
-import { AryFormikTextInput } from '../../components/Forms';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { Card, Col, Container, Row } from 'react-bootstrap';
+
+import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import useNacecodesStore from '../../hooks/useNaceCodesStore';
+import enums from '../../helpers/enums';
+import { ViewLoading } from '../../components/Loaders';
+import { AryFormikTextInput } from '../../components/Forms';
+import Status from './components/Status';
 
 export const EditView = () => {
   const { id } = useParams();
