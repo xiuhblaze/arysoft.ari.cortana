@@ -180,8 +180,13 @@ export const useNacecodesStore = () => {
   const nacecodeDeleteAsync = async (id) => {
     dispatch(onNacecodeDeleting());
 
+    const toDelete = {
+      NaceCodeID: id,
+      UpdatedUser: user.username,
+    }
+
     try {
-      await cortanaApi.delete(`${ NACECODES_URI }/${ id }`);
+      await cortanaApi.delete(`${ NACECODES_URI }/${ id }`, { data: toDelete });
       dispatch(isNacecodeDeleted());
     } catch (error) {
       const message = getErrorMessages(error);

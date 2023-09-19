@@ -6,7 +6,9 @@ export const organizationsSlice = createSlice({
     // Collection
     isOrganizationsLoading: false,
     organizations: [],
-    organizationsMeta: null,    
+    organizationsMeta: null,
+    isOrganizationsFullListLoading: false,
+    organizationsFullList: [],
     // Element
     isOrganizationLoading: false,
     isOrganizationCreating: false,
@@ -24,43 +26,22 @@ export const organizationsSlice = createSlice({
     onOrganizationsLoading: (state) => {
       state.isOrganizationsLoading = true;
     },
-    isOrganizationsLoaded: (state) => {
-      state.isOrganizationsLoading = false;
-    },
     setOrganizations: (state, action) => {
       state.isOrganizationsLoading = false;
       state.organizations = action.payload.organizations;
       state.organizationsMeta = action.payload.organizationsMeta;
     },
-    // Element
+    onOrganizationsFullListLoading: (state) => {
+      state.isOrganizationsFullListLoading = true;
+    },
+    setOrganizationsFullList: (state, action) => {
+      state.isOrganizationsFullListLoading = false;
+      state.organizationsFullList = action.payload.data;
+    },
+    // Element data
     onOrganizationLoading: (state) => {
       state.isOrganizationLoading = true;
       state.organization = null;
-    },
-    onOrganizationCreating: (state) => {
-      state.isOrganizationCreating = true;
-      state.organizationCreatedOk = false;
-      state.organization = null;
-    },
-    isOrganizationCreated: (state) => {
-      state.isOrganizationCreating = false;
-      state.organizationCreatedOk = true;
-    },
-    onOrganizationSaving: (state) => {
-      state.isOrganizationSaving = true;
-      state.organizationSavedOk = false;
-    },
-    isOrganizationSaved: (state) => {
-      state.isOrganizationSaving = false;
-      state.organizationSavedOk = true;
-    },
-    onOrganizationDeleting: (state) => {
-      state.isOrganizationDeleting = true;
-      state.organizationDeletedOk = false;
-    },
-    isOrganizationDeleted: (state) => {
-      state.isOrganizationDeleting = false;
-      state.organizationDeletedOk = true;
     },
     setOrganization: (state, action) => {
       state.isOrganizationLoading = false;
@@ -71,6 +52,45 @@ export const organizationsSlice = createSlice({
       state.isOrganizationDeleting = false;
       state.organizationDeletedOk = false;
       state.organization = action.payload;
+    },
+    // element creating data
+    onOrganizationCreating: (state) => {
+      state.isOrganizationCreating = true;
+      state.organizationCreatedOk = false;
+      state.organization = null;
+    },
+    isOrganizationCreated: (state) => {
+      state.isOrganizationCreating = false;
+      state.organizationCreatedOk = true;
+    },
+    // element saving data
+    onOrganizationSaving: (state) => {
+      state.isOrganizationSaving = true;
+      state.organizationSavedOk = false;
+    },
+    isOrganizationSaved: (state) => {
+      state.isOrganizationSaving = false;
+      state.organizationSavedOk = true;
+      if (!!action?.payload) {
+        state.organizations = state.organizations.map( item => {
+          if (item.OrganizationID === action.payload.OrganizationID) {
+            return {
+              ...item,
+              ...action.payload,
+            }
+          }
+          return item;
+        });
+      }
+    },
+    // element deleting data
+    onOrganizationDeleting: (state) => {
+      state.isOrganizationDeleting = true;
+      state.organizationDeletedOk = false;
+    },
+    isOrganizationDeleted: (state) => {
+      state.isOrganizationDeleting = false;
+      state.organizationDeletedOk = true;
     },
     // Misc
     setOrganizationsErrorMessage: (state, action) => {
@@ -89,8 +109,9 @@ export const organizationsSlice = createSlice({
 
 export const {
   onOrganizationsLoading,
-  isOrganizationsLoaded,
   setOrganizations,
+  onOrganizationsFullListLoading,
+  setOrganizationsFullList,
 
   onOrganizationLoading,
   onOrganizationCreating,

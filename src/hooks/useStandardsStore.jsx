@@ -114,8 +114,8 @@ export const useStandardsStore = () => {
     try {
       const query = getSearchQuery({
         pageSize: 0,
-        estatus: EstatusType.activo,
-        orden: StandardsOrdenType.nombre,
+        estatus: EstatusType.active,
+        orden: StandardsOrdenType.name,
       });
 
       const resp = await cortanaApi.get(`/standards${ query }`);
@@ -204,8 +204,8 @@ export const useStandardsStore = () => {
     dispatch(onStandardDeleting());
 
     const toDelete = {
-      id: id,
-      usuarioActualizacion: user.username,
+      StandardID: id,
+      UpdatedUser: user.username,
     }
 
     try {

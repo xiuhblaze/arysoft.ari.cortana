@@ -102,7 +102,6 @@ export const nacecodesSlice = createSlice({
 
 export const {
   onNacecodesLoading,
-  isNacecodesLoaded,
   setNacecodes,
 
   onNacecodeLoading,

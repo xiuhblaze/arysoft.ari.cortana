@@ -37,6 +37,18 @@ const enums = () => {
     deleted: 5,
   });
 
+  const OrganizationOrderType = Object.freeze({
+    nothing: 0,
+    name: 1,
+    legalEntity: 2,
+    status: 3,
+    updated: 4,
+    nameDesc: 5,
+    legalEntityDesc: 6,
+    statusDesc: 7,
+    updatedDesc: 8,
+  });
+
   const StandardOrderType = Object.freeze({
     nothing: 0,
     name: 1,
@@ -65,6 +77,7 @@ const enums = () => {
     ContactOrderType,
     NacecodeOrderType,
     OrganizationStatusType,
+    OrganizationOrderType,
     SiteOrderType,
     StandardOrderType,
   }
