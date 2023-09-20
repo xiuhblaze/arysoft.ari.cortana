@@ -1,16 +1,17 @@
-import { useState } from "react";
-import enums from "../../../helpers/enums";
-import envVariables from "../../../helpers/envVariables";
-import { useStandardsStore } from "../../../hooks/useStandardsStore";
-import { useEffect } from "react";
-import { ViewLoading } from "../../../components/Loaders";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp, faClone, faEdit } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
-import Status from "./Status";
-import getFriendlyDate from "../../../helpers/getFriendlyDate";
-import DetailsModal from "./DetailsModal";
+
+import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
 import AryTableSortIcon from "../../../components/AryTableSortIcon/AryTableSortIcon";
+import { ViewLoading } from "../../../components/Loaders";
+import getFriendlyDate from "../../../helpers/getFriendlyDate";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
+
+import DetailsModal from "./DetailsModal";
+import Status from "./Status";
 
 const StandardsTableList = ({ onOrder }) => {
   const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';

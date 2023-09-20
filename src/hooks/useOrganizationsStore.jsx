@@ -18,8 +18,6 @@ import {
   isOrganizationDeleted,  
 
   setOrganizationsErrorMessage,
-  clearOrganizationsErrorMessage,
-  clearOrganization,
 } from "../store/slices/organizationsSlice";
 
 import envVariables from "../helpers/envVariables";
@@ -78,7 +76,7 @@ export const useOrganizationsStore = () => {
 
     dispatch(setOrganizationsErrorMessage(message));
     setTimeout(() => {
-      dispatch(clearOrganizationsErrorMessage());
+      dispatch(setOrganizationsErrorMessage(null));
     }, 10);
   };
 
@@ -219,7 +217,7 @@ export const useOrganizationsStore = () => {
   }
 
   const organizationClear = () => {
-    dispatch(clearOrganization());
+    dispatch(setOrganization(null));
   }
 
   return {

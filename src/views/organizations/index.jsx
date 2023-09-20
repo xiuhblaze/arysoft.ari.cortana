@@ -5,7 +5,7 @@ import { DashboardLayout } from '../../layouts/dashboard';
 import ListView from './ListView';
 import EditView from './EditView';
 
-export const Standards = () => {
+export const Organizations = () => {
   return (
     <DashboardLayout>
       <Routes>
@@ -17,4 +17,4 @@ export const Standards = () => {
   )
 }
 
-export default Standards;
+export default Organizations;

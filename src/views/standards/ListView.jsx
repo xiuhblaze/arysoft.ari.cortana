@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 import { setNavbarTitle, useArysoftUIController } from "../../context/context";
 import envVariables from "../../helpers/envVariables";

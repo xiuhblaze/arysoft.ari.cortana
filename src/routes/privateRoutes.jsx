@@ -5,6 +5,7 @@ import { lazy } from "react";
 
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
+const lazyOrganizations = lazy(() => import('../views/organizations'));
 const lazyStandards = lazy(() => import('../views/standards'));
 const lazyList = lazy(() => import('../views/examples/ListView'));
 
@@ -17,14 +18,14 @@ const privateRoute = [
     icon: faHome,
     element: lazyDashboard
   },
-  // { 
-  //   type: 'collapse',
-  //   title: 'Organizations',
-  //   key: 'organizations',
-  //   path: '/organizations',
-  //   icon: faCity,
-  //   element: <Empleados />
-  // },
+  { 
+    type: 'collapse',
+    title: 'Organizations',
+    key: 'organizations',
+    path: '/organizations/*',
+    icon: faCity,
+    element: lazyOrganizations
+  },
   {
     type: 'title',
     title: 'Catalogs',
