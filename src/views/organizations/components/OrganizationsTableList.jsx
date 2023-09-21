@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import enums from "../../../helpers/enums";
-import envVariables from "../../../helpers/envVariables";
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { ViewLoading } from "../../../components/Loaders";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBuilding, faClone, faEdit, faGlobe, faPhone } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+
+import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
+import getFriendlyDate from "../../../helpers/getFriendlyDate";
+import { ViewLoading } from "../../../components/Loaders";
+
+import Status from "./Status";
+import DetailsModal from "./DetailsModal";
+import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 
 const OrganizationsTableList = () => {
   const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -14,7 +19,7 @@ const OrganizationsTableList = () => {
   const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
   const { ORGANIZATIONS_OPTIONS } = envVariables();
   const {
-    isOrganizationLoading,
+    isOrganizationsLoading,
     organizations,
     organizationAsync,
   } = useOrganizationsStore();
@@ -40,13 +45,19 @@ const OrganizationsTableList = () => {
 
   return (
     <>
-      { isOrganizationLoading ? (
+      { isOrganizationsLoading ? (
         <ViewLoading />
       ) : !!organizations ? (
         <div className="table-responsive p-0">
           <table className="table align-items-center mb-0">
             <thead>
-
+              <tr>
+                <th className={ headStyle }>Organization</th>
+                <th className={ headStyle }>Contact</th>
+                <th className={ `${headStyle} text-center` }>Status</th>
+                <th className={ headStyle }>Info</th>
+                <th className={ `${headStyle} text-center` }>Action</th>
+              </tr>
             </thead>
             <tbody>
               {
@@ -86,7 +97,15 @@ const OrganizationsTableList = () => {
                           )} 
                         </div>
                       </td>
-
+                      <td className="align-middle text-center text-sm">
+                        <Status value={ item.Status } />
+                      </td>
+                      <td>
+                        <div className="d-flex flex-column align-items-start">
+                          <div className="text-xs"><strong>Updated</strong> { getFriendlyDate(item.Updated) } </div>
+                          <div className="text-xs"><strong>By</strong> { item.UpdatedUser }</div>
+                        </div>
+                      </td>
                       <td>
                           <div className="d-flex justify-content-center gap-2">
                             <a href="#" onClick={ () => onShowModal(item.OrganizationID) } title="Details">
@@ -106,7 +125,9 @@ const OrganizationsTableList = () => {
             </tbody>
           </table>
         </div>
-      ) : null }
+      ) : null 
+    }
+    <DetailsModal show={ showModal } onHide={ onCloseModal } />
     </>
   )
 }
