@@ -10,9 +10,10 @@ import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import OrganizationsTableList from "./components/OrganizationsTableList";
+import Toolbar from "./components/Toolbar";
 
 const ListView = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const {
     ORGANIZATIONS_OPTIONS,
     VITE_PAGE_PAGESIZE,
@@ -43,11 +44,11 @@ const ListView = () => {
     setNavbarTitle(dispatch, null);
   }, []);
   
-  useEffect(() => {
-    if (organizationCreatedOk) {
-      navigate(`/organizations/${ organization.OrganizationID }`);
-    }
-  }, [organizationCreatedOk]);
+  // useEffect(() => {
+  //   if (organizationCreatedOk) {
+  //     navigate(`/organizations/${ organization.OrganizationID }`);
+  //   }
+  // }, [organizationCreatedOk]);
 
   useEffect(() => {
     if (!!organizationsErrorMessage) {
@@ -85,7 +86,7 @@ const ListView = () => {
         <Col>
           <Card className="mb-4">
             <Card.Header className="pb-0">
-              -Toolbar
+              <Toolbar />
             </Card.Header>
             <Card.Body className="px-0 pt-0 pb-2">
               { !!organizationsMeta && (

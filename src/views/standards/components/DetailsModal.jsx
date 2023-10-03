@@ -107,7 +107,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                 className="btn bg-gradient-secondary mb-0" 
                 onClick={ onRestoreButton }
                 title="Retore"
-                disabled={ isPersonaSaving }
+                disabled={ isStandardSaving }
               >
                 <FontAwesomeIcon icon={ faArrowRotateLeft } size="lg" />
               </button>

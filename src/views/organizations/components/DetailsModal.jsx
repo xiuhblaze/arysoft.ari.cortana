@@ -4,11 +4,11 @@ import Swal from 'sweetalert2';
 
 import enums from "../../../helpers/enums";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { Col, Modal, Row } from "react-bootstrap";
+import { Card, Col, ListGroup, Modal, Row } from "react-bootstrap";
 import { ViewLoading } from "../../../components/Loaders";
 import Status from "./Status";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightToBracket, faArrowRotateLeft, faEdit, faGlobe, faPhone, faShare } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleXmark, faCertificate, faEdit, faGlobe, faPhone, faPlus, faShare, faSquarePlus, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 
 import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
@@ -120,46 +120,125 @@ const DetailsModal = ({ show, onHide, ...props }) => {
               </div>
 
               <Row className="mt-4">
-                <Col xs="12" sm="6" className="position-relative">
-                  <h6 className="d-flex justify-content-between">
-                    <span>{ organization.LegalEntity }</span>
-                    
-                  </h6>
-                  <hr className="horizontal dark my-2" />
-                  <ul className="list-group">
-                    <li className="list-group-item border-0 ps-0 text-sm">
-                      <strong className="text-dark me-2">
-                        <FontAwesomeIcon icon={ faGlobe } className="me-1" />
-                        Website:
-                      </strong>
-                      <a href={ `http://${ organization.Website }` } target="_blank">
-                        { organization.Website }
-                        <FontAwesomeIcon icon={ faShare } className="ms-1" />
-                      </a>
-                    </li>
-                    <li className="list-group-item border-0 ps-0 text-sm">
-                      <strong className="text-dark me-2">
-                        <FontAwesomeIcon icon={ faPhone } className="me-1" />
-                        Phone:
-                      </strong>
-                      { organization.Phone }
-                      <a href={ `tel:${ organization.Phone }`}>
-                        <FontAwesomeIcon icon={ faShare } className="ms-1" />
-                      </a>
-                    </li>
-                  </ul>
-                  <hr className="vertical dark" />
+                <Col xs="12" sm={4}>
+                  <Card className="h-100">
+                    <Card.Header className="pb-0 p-3">
+                      <h6 className="mb-0">Contacts</h6>
+                    </Card.Header>
+                    <Card.Body className="p-3">
+                      <ListGroup>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="avatar me-3">
+                            <img className="border-radius-lg shadow" src="/files/contacts/contact (4).jpg" />
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">Anne Marie</h6>
+                            <p className="mb-0 text-xs">
+                              <a href="mailto:anne@organization.com">anne@organization.com</a><br />
+                              <a href="tel:3410000000">341 000 0000 ext 000</a>
+                            </p>
+                          </div>
+                        </ListGroup.Item>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="avatar me-3">
+                            <img className="border-radius-lg shadow" src="/files/contacts/contact (1).jpg" />
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">Peter Norton</h6>
+                            <p className="mb-0 text-xs">
+                            <a href="mailto:anne@organization.com">peter@organization.com</a><br />
+                              <a href="tel:3410000000">341 000 0000 ext 000</a>
+                            </p>
+                          </div>
+                        </ListGroup.Item>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2 opacity-6">
+                          <div className="avatar me-3">
+                            <img className="border-radius-lg shadow" src="/files/contacts/contact (2).jpg" />
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">Grace Old Contact</h6>
+                            <p className="mb-0 text-xs">
+                            <a href="mailto:anne@organization.com">grace@organization.com</a><br />
+                              <a href="tel:3410000000">341 000 0000 ext 000</a>
+                            </p>
+                          </div>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    </Card.Body>
+                  </Card>
                 </Col>
-                <Col xs="12" sm="6">
-                  <h5>Contacts</h5>
-                  <h5>Sites</h5>
+                <Col xs="12" sm="4">
+                  <Card className="h-100">
+                    <Card.Header className="pb-0 p-3">
+                      <h6 className="mb-0">Sites</h6>
+                    </Card.Header>
+                    <Card.Body className="p-3">
+                      <ListGroup>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="me-3">
+                            <div className="icon icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center">
+                              <FontAwesomeIcon icon={ faBuilding } size="lg" className="text-white mx-3" aria-hidden="true" />
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">Arysoft headquarters</h6>
+                            <p className="mb-0 text-xs">Adolfo Ruiz Cortinez 701, Los Olivos, Ciudad Guzmán</p>
+                          </div>
+                        </ListGroup.Item>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="me-3">
+                            <div className="icon icon-shape bg-gradient-secondary border-radius-md d-flex align-items-center justify-content-center">
+                              <FontAwesomeIcon icon={ faBuilding } size="lg" className="text-white mx-3" aria-hidden="true" />
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">Arysoft studios</h6>
+                            <p className="mb-0 text-xs">Nombr de la calle 122, Centro, Colima</p>
+                          </div>
+                        </ListGroup.Item>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="me-3">
+                            <div className="icon icon-shape bg-gradient-light border-radius-md d-flex align-items-center justify-content-center">
+                              <FontAwesomeIcon icon={ faBuildingCircleXmark } size="lg" className="text-white mx-3" aria-hidden="true" />
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center opacity-6">
+                            <h6 className="mb-0 text-sm">Arysoft old</h6>
+                            <p className="mb-0 text-xs">Federico del Toro 130 int 303, Centro, Ciudada Guzmán</p>
+                          </div>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col xs="12" sm="4">
+                  <Card className="h-100">
+                    <Card.Header className="pb-0 p-3">
+                      <h6 className="mb-0">Certificates</h6>
+                    </Card.Header>
+                    <Card.Body className="p-3">
+                      <ListGroup>
+                        <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
+                          <div className="me-3">
+                            <div className="icon icon-shape bg-gradient-warning border-radius-md d-flex align-items-center justify-content-center">
+                              <FontAwesomeIcon icon={ faCertificate } size="lg" className="text-white mx-3" aria-hidden="true" />
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start flex-column justify-content-center">
+                            <h6 className="mb-0 text-sm">ISO 9000</h6>
+                            <p className="mb-0 text-xs">Expires: 2024/04/23</p>
+                          </div>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    </Card.Body>
+                  </Card>
                 </Col>
               </Row>
             </>
           ) : null
         }
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="border-top-0">
         <div className="d-flex justify-content-between align-items-center w-100">
           <div>
             { !!organization && (
