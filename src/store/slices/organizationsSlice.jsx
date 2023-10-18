@@ -68,7 +68,7 @@ export const organizationsSlice = createSlice({
       state.isOrganizationSaving = true;
       state.organizationSavedOk = false;
     },
-    isOrganizationSaved: (state) => {
+    isOrganizationSaved: (state, action) => {
       state.isOrganizationSaving = false;
       state.organizationSavedOk = true;
       if (!!action?.payload) {

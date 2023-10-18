@@ -1,18 +1,18 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-import * as Yup from 'yup';
-import Swal from 'sweetalert2';
-import enums from "../../helpers/enums";
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
-import { useStandardsStore } from "../../hooks/useStandardsStore";
-import { Card, Col, Container, Row } from "react-bootstrap";
-import { ViewLoading } from "../../components/Loaders";
-import Status from "./components/Status";
 import { Form, Formik } from "formik";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import * as Yup from 'yup';
+import Swal from 'sweetalert2';
+
+import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import enums from "../../helpers/enums";
 import { AryFormikTextInput } from "../../components/Forms";
+import Status from "./components/Status";
+import { ViewLoading } from "../../components/Loaders";
+import { useStandardsStore } from "../../hooks/useStandardsStore";
 
 const EditView = () => {
   const { id } = useParams();

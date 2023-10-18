@@ -12,7 +12,11 @@ import Status from "./components/Status";
 import { Form, Formik } from "formik";
 import { AryFormikTextInput } from "../../components/Forms";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faTrashCan, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCheckDouble, faSave, faTrashCan, faUserGear, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import statusProps from "./helpers/StatusProps";
+
+import bgHead from '../../assets/img/bgTrianglesBW.jpg';
+import { Button } from "react-bootstrap";
 
 const EditView = () => {
   const { id } = useParams();
@@ -73,6 +77,18 @@ const EditView = () => {
 
   const onFormSubmit = (values) => {
     console.log(values);
+
+    const itemToSave = {
+      OrganizationID: organization.OrganizationID,
+      Name: values.nameInput,
+      LegalEntity: values.legalEntityInput,
+      LogoFile: '',
+      Website: values.websiteInput,
+      Phone: values.phoneInput,
+      Status: organization.Status,
+    };
+
+    organizationSaveAsync(itemToSave);
   };
 
   const onCancelButton = () => {
@@ -103,16 +119,43 @@ const EditView = () => {
           <Card>
             {
               isOrganizationLoading ? (
-                <ViewLoading />
+                <Card.Body>
+                  <ViewLoading />
+                </Card.Body>
               ) : !!organization ? (
                 <>
-                  <Card.Header  className="d-flex flex-column flex-sm-row justify-content-between align-items-center pb-0">
-                    <h6>Organization</h6>
-                    <div>
-                      <Status value={ organization.Status } />
-                    </div>
-                  </Card.Header>
                   <Card.Body>
+                    <div 
+                      className="page-header min-height-100 border-radius-lg"
+                      style={{
+                        backgroundImage: `url(${ bgHead })`,
+                        backgroundPositionY: '50%'
+                      }}
+                    >
+                      <span className={ `mask bg-gradient-${ statusProps[organization.Status].bgColor } opacity-6` }></span>
+                    </div>
+                    <div className="card card-body blur shadow-blur mx-4 mt-n5 overflow-hidden">
+                      <div className="row gx-4">
+                        <div className="col-auto">
+                          <div className="avatar avatar-xl position-relative">
+                            <img src="/files/organizations/lgoArysoft2019.png" alt="profile_image" className="w-100 border-radius-lg shadow-sm" />
+                          </div>
+                        </div>
+                        <div className="col-auto my-auto">
+                          <div className="h-100">
+                            <h5 className="mb-1">
+                              { organization.Name }
+                            </h5>
+                            <p className="mb-0 font-weight-bold text-sm">
+                              { organization.LegalEntity }
+                            </p>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
+                          <Status value={ organization.Status } />
+                        </div>
+                      </div>
+                    </div>
                     <Formik
                       initialValues={{
                         nameInput: organization?.Name || '',
@@ -183,11 +226,19 @@ const EditView = () => {
                                 <label className="form-check-label" htmlFor="activaCheck">Is active</label>
                               </div> */}
                               <span className="text-secondary">(aquí van las opciones de cambio de status)</span>
+                              <hr className="horizontal dark my-3" />
                             </Col>
                           </Row>
                           <Row>
-                            <Col xs={12}>
-                              <hr className="horizontal dark my-3" />
+                            <Col xs={12} className="d-flex gap-2">
+                              <Button type="button" variant="success" className="bg-gradient-success">
+                                <FontAwesomeIcon icon={ faCheck } size="lg" className="me-1" />
+                                Approve
+                              </Button>
+                              <Button type="button" className="bg-gradient-info">
+                                <FontAwesomeIcon icon={ faCheckDouble } size="lg" className="me-1" />
+                                Active
+                              </Button>
                               <button type="button" 
                                 className="btn bg-gradient-secondary"
                                 onClick={ onDeleteButton }
@@ -281,16 +332,23 @@ const EditView = () => {
                     </a>
                   </div>
                 </ListGroup.Item>
-                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2 opacity-6">
-                  <div className="avatar me-3">
-                    <img className="border-radius-lg shadow" src="/files/contacts/contact (2).jpg" />
+                <ListGroup.Item className="border-0 d-flex justify-content-between align-items-center px-0 mb-2 opacity-6">
+                  <div className="d-flex align-items-center me-2">
+                    <div className="avatar me-3">
+                      <img className="border-radius-lg shadow" src="/files/contacts/contact (2).jpg" />
+                    </div>
+                    <div className="d-flex align-items-start flex-column justify-content-center">
+                      <h6 className="mb-0 text-sm">Grace Old Contact</h6>
+                      <p className="mb-0 text-xs">
+                        <a href="mailto:anne@organization.com">grace@organization.com</a><br />
+                        <a href="tel:3410000000">341 000 0000 ext 000</a>
+                      </p>
+                    </div>
                   </div>
-                  <div className="d-flex align-items-start flex-column justify-content-center">
-                    <h6 className="mb-0 text-sm">Grace Old Contact</h6>
-                    <p className="mb-0 text-xs">
-                    <a href="mailto:anne@organization.com">grace@organization.com</a><br />
-                      <a href="tel:3410000000">341 000 0000 ext 000</a>
-                    </p>
+                  <div>
+                    <a href="#" onClick={ () => { console.log('Edit contact') }} title="Edit contact">
+                      <FontAwesomeIcon icon={ faUserGear } />
+                    </a>
                   </div>
                 </ListGroup.Item>
               </ListGroup>

@@ -12,6 +12,7 @@ import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleX
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 
 import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
+import statusProps from "../helpers/StatusProps";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                   backgroundPositionY: '50%'
                 }}
               >
-                <span className="mask bg-gradient-info opacity-6"></span>
+                <span className={ `mask bg-gradient-${ statusProps[organization.Status].bgColor } opacity-6` }></span>
               </div>
               <div className="card card-body blur shadow-blur mx-4 mt-n5 overflow-hidden">
                 <div className="row gx-4">

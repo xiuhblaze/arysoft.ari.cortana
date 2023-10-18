@@ -1,15 +1,11 @@
+import statusProps from "../helpers/StatusProps";
 
 export const Status = ({ value, ...props }) => {
-  const status = [
-    { bgColor: "secondary", label: "-" },
-    { bgColor: "warning", label: "New" },
-    { bgColor: "success", label: "Approved" },
-    { bgColor: "info", label: "Active" },
-    { bgColor: "secondary", label: "Inactive" },
-    { bgColor: "danger", label: "Deleted" },
-  ];
+
   return (
-    <div { ...props } className={ `badge badge-sm bg-gradient-${ status[value].bgColor }` } >{ status[value].label }</div>
+    <div { ...props } className={ `badge badge-sm bg-gradient-${ statusProps[value].bgColor }` } >
+      { statusProps[value].label }
+    </div>
   )
 }
 
