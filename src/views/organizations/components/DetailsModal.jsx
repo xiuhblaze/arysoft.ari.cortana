@@ -1,18 +1,19 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"
+import { Card, Col, ListGroup, Modal, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleXmark, faCertificate, faEdit, faGlobe, faPhone, faShare } from "@fortawesome/free-solid-svg-icons";
+
 import enums from "../../../helpers/enums";
+import getFriendlyDate from "../../../helpers/getFriendlyDate";
+import statusProps from "../helpers/StatusProps";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { Card, Col, ListGroup, Modal, Row } from "react-bootstrap";
 import { ViewLoading } from "../../../components/Loaders";
 import Status from "./Status";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleXmark, faCertificate, faEdit, faGlobe, faPhone, faPlus, faShare, faSquarePlus, faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import getFriendlyDate from "../../../helpers/getFriendlyDate";
 
 import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
-import statusProps from "../helpers/StatusProps";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
   // METHODS
 
   const onEditButton = () => {
-    navigate(`/organizations/${ organization.OrganizationID }`);
+    navigate(`/organizations/${ organization.ID }`);
   }
 
   const onRestoreButton = () => {

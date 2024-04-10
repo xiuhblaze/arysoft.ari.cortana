@@ -2,8 +2,6 @@
 export const getErrorMessages = (error) => {
   let message = '';
 
-  //console.log(error.response.data.errors);
-
   if (!!error.response?.data?.errors) {
     const { errors } = error.response.data;
 
@@ -13,6 +11,10 @@ export const getErrorMessages = (error) => {
     }
     message += '</div>';
     return message;
+  }
+  
+  if (!!error.response?.data?.Detail) {
+      return error.response.data.Detail
   }
 
   console.log(error);

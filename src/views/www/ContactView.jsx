@@ -108,7 +108,7 @@ export const ContactView = () => {
                             <p>Complaints, disputes and appeals policy and process <a className="text-info" href="/files/ari-a-05-complaints-an-appeals-instructions.pdf" target="_blank">Download</a></p>
                             <h4 className='text-info text-gradient'>Contact Information</h4>
                             <Row>
-                              <Col md="6">
+                              {/* <Col md="6">
                                 <h5>Ciudad de México</h5>
                                 <div className="d-flex p-2">
                                   <div>
@@ -126,7 +126,7 @@ export const ContactView = () => {
                                     <a href="mailto:managermx@aarrin.com" className="text-sm opacity-8">managermx@aarrin.com</a>
                                   </div>
                                 </div>
-                              </Col>
+                              </Col> */}
                               <Col md="6">
                                 <h5>Guadalajara</h5>
                                 <div className="d-flex p-2 pb-0">
@@ -136,13 +136,14 @@ export const ContactView = () => {
                                   <div className="ps-3">
                                     <a href="tel:3330442083" className="text-sm opacity-8">(+52) 333 044 2083</a>
                                   </div>
-                                </div>
-                                <div className="d-flex p-2 pt-0">
                                   <div>
-                                    <FontAwesomeIcon icon={ faPhone } />
-                                  </div>
-                                  <div className="ps-3">
-                                    <a href="tel:3332616182" className="text-sm opacity-8">(+52) 333 261 6182</a>
+                                    <a href="https://api.whatsapp.com/send?phone=3330442083"
+                                      className="text-sm opacity-8 text-success ms-2"
+                                      target="_blank"
+                                      title="Whatsapp"
+                                    >
+                                      <FontAwesomeIcon icon={ faPhoneSquare } size="xl" />
+                                    </a>
                                   </div>
                                 </div>
                                 <div className="d-flex p-2">
@@ -166,6 +167,56 @@ export const ContactView = () => {
                                 </div>
                               </Col>
                               <Col md="6">
+                                <h5>Puebla</h5>
+                                <div className="d-flex p-2 pb-0">
+                                  <div>
+                                    <FontAwesomeIcon icon={ faPhone } />
+                                  </div>
+                                  <div className="ps-3">
+                                    <a href="tel:2226712460" className="text-sm opacity-8">(+52) 222 671 2460</a>
+                                  </div>
+                                  <div>
+                                    <a href="https://api.whatsapp.com/send?phone=2226712460"
+                                      className="text-sm opacity-8 text-success ms-2"
+                                      target="_blank"
+                                      title="Whatsapp"
+                                    >
+                                      <FontAwesomeIcon icon={ faPhoneSquare } size="xl" />
+                                    </a>
+                                  </div>
+                                </div>
+                                <div className="d-flex p-2">
+                                  <div>
+                                    <FontAwesomeIcon icon={ faEnvelope } />
+                                  </div>
+                                  <div className="ps-3">
+                                    <a href="mailto:salespuebla@aarrin.com" className="text-sm opacity-8">salespuebla@aarrin.com</a>
+                                  </div>
+                                </div>
+                              </Col>
+                              <Col md="6">
+                                <h5>Santiago, Chile</h5>
+                                <div className="d-flex p-2">
+                                  <div>
+                                    <FontAwesomeIcon icon={ faEnvelope } />
+                                  </div>
+                                  <div className="ps-3">
+                                    <a href="mailto:salessantiago@aarrin.com" className="text-sm opacity-8">salessantiago@aarrin.com</a>
+                                  </div>
+                                </div>
+                              </Col>
+                              <Col md="6">
+                                <h5>Linares, Chile</h5>
+                                <div className="d-flex p-2">
+                                  <div>
+                                    <FontAwesomeIcon icon={ faEnvelope } />
+                                  </div>
+                                  <div className="ps-3">
+                                    <a href="mailto:saleslinares@aarin.com" className="text-sm opacity-8">saleslinares@aarrin.com</a>
+                                  </div>
+                                </div>
+                              </Col>
+                              {/* <Col md="6">
                               <h5 className="text-success text-gradient">Whatsapp</h5>
                                 <div className="d-flex p-2">
                                   <div>
@@ -178,7 +229,7 @@ export const ContactView = () => {
                                     >(+52) 556 130 8985</a>
                                   </div>
                                 </div>
-                              </Col>
+                              </Col> */}
                             </Row>
                           </Card.Body>
                         </>

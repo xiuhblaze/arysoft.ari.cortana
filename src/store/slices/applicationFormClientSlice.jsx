@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const applicationFormSlice = createSlice({
-  name: "applicationForm",
+export const applicationFormClientSlice = createSlice({
+  name: "applicationFormClientSlice",
   initialState: {
     isSending: false, // Cuando se está enviando el formulario
     status: null, // empty, new, send, confirm, approved, rejected, error
@@ -58,6 +58,6 @@ export const {
   setErrorMessage,
   clearErrorMessage,
   setStatus
-} = applicationFormSlice.actions;
+} = applicationFormClientSlice.actions;
 
-export default applicationFormSlice;
+export default applicationFormClientSlice;

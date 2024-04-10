@@ -1,6 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import envVariables from "../helpers/envVariables";
 import { clearAuthErrorMessage, onChecking, onLogin, onLogout, setAuthErrorMessage } from "../store/slices/authslice";
+import cortanaApi from '../api/cortanaApi';
+import { jwtDecode } from "jwt-decode";
+import getErrorMessages from "../helpers/getErrorMessages";
+
 
 const { VITE_TOKEN } = envVariables();
 
@@ -13,7 +17,7 @@ export const useAuthStore = () => {
   } = useSelector(state => state.auth);
 
 
-  // Methods
+  // METHODS
 
   const setError = (message) => {
     if (message.length === 0) return;
@@ -24,11 +28,11 @@ export const useAuthStore = () => {
   };
 
   const setUserInfo = (token) => {
-
+    const userInfo = jwtDecode(token);
     const user = {
-      id: Date.now(),
-      username: token.username,
-      givename: token.username,
+      id: userInfo.userid,
+      username: userInfo.username,
+      givename: userInfo.username,
       role: 'admin',
     };
 
@@ -44,28 +48,25 @@ export const useAuthStore = () => {
     dispatch(onLogin(token));
   };
 
-  const loginASync = async ({ username, password }) => {
+  const loginASync = async (values) => {
     dispatch(onChecking());
 
     try {
-      //* Aqui va la consulta a la Api
-      if (username === 'adrian.castillo' && password === '123') {
-        const user = setUserInfo({ username });
-        localStorage.setItem(VITE_TOKEN, JSON.stringify(user));
-        dispatch(onLogin(user));
-      } else {
-        throw new Error('El usuario y/o su contraseña no existen');
-      }
+      const result = await cortanaApi.post('/auth', values);
+      const token =  result.data.Data;
+      const user = setUserInfo(token);
+      localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
+      dispatch(onLogin(user));      
     } catch (error) {
-      //console.error(`${error.name}: ${error.message}`);
-      setError(error.message);
+      const message = getErrorMessages(error);
+      setError(message);
       dispatch(onLogout());
     }
   };
 
   const logout = () => {
     localStorage.clear();
-    //setError('Sesión finalizada');
+    setError('Sesión finalizada');
     dispatch(onLogout());
   };
 

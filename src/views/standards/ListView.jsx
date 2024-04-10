@@ -46,7 +46,7 @@ const ListView = () => {
   
   useEffect(() => {
     if (standardCreatedOk) {
-      navigate(`/standards/${ standard.StandardID }`);
+      navigate(`/standards/${ standard.ID }`);
     }
   }, [standardCreatedOk]);
 

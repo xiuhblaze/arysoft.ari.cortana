@@ -35,7 +35,7 @@ const getSearchQuery = (options = {}) => {
 
   query += options?.text ? `&text=${ options.text }` : '';
   query += options?.status ? `&status=${ options.status }` : '';
-  query += options?.includeDeleted ? `&includeDeleted=${ options.includeDeleted }` : '';
+  query += options?.includeDeleted ? `&includedeleted=${ options.includeDeleted }` : '';
 
   query += options?.order ? `&order=${ options.order }` : '';
   return query;
@@ -71,9 +71,7 @@ export const useOrganizationsStore = () => {
   // Methods
 
   const setError = (message) => {
-
     if (message.length === 0) return;
-
     dispatch(setOrganizationsErrorMessage(message));
     setTimeout(() => {
       dispatch(setOrganizationsErrorMessage(null));

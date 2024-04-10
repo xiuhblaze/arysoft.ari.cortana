@@ -48,7 +48,7 @@ const OrganizationsTableList = () => {
   useEffect(() => {
     if (!!organizations) {
       const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-      setCurrentOrder(savedSearch.order);
+      setCurrentOrder(savedSearch.order ?? OrganizationOrderType.name);
     }
   }, [organizations]);
 
@@ -120,7 +120,7 @@ const OrganizationsTableList = () => {
                   const iconStyle = `icon icon-sm icon-shape ${ item.Status === OrganizationStatusType.active ? 'bg-gradient-info' : 'bg-gradient-secondary' } border-radius-md d-flex align-items-center justify-content-center me-3`;
 
                   return (
-                    <tr key={ item.OrganizationID }>
+                    <tr key={ item.ID }>
                       <td>
                         <div className="d-flex px-2 py-1">
                           <div>
@@ -163,11 +163,11 @@ const OrganizationsTableList = () => {
                       </td>
                       <td>
                           <div className="d-flex justify-content-center gap-2">
-                            <a href="#" onClick={ () => onShowModal(item.OrganizationID) } title="Details">
+                            <a href="#" onClick={ () => onShowModal(item.ID) } title="Details">
                               <FontAwesomeIcon icon={ faClone } />
                             </a>
                             { item.Status !== OrganizationStatusType.deleted && (
-                              <Link to={ `${ item.OrganizationID }` } title="Edit">
+                              <Link to={ `${ item.ID }` } title="Edit">
                                 <FontAwesomeIcon icon={ faEdit } />
                               </Link>
                             )}

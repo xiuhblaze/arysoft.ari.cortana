@@ -2,16 +2,18 @@ import { configureStore } from "@reduxjs/toolkit";
 
 
 import authSlice from "./slices/authslice";
-import applicationFormSlice from "./slices/applicationFormSlice";
+import applicationFormClientSlice from "./slices/applicationFormClientSlice";
 import contactsSlice from "./slices/contactsSlice";
 import nacecodesSlice from "./slices/nacecodesSlice";
 import organizationsSlice from "./slices/organizationsSlice";
 import sitesSlice from "./slices/sitesSlice";
 import standardsSlice from "./slices/standardsSlice";
+import applicationFormsSlice from "./slices/applicationFormsSlice";
 
 export const store = configureStore({
   reducer: {
-    applicationForm: applicationFormSlice.reducer,
+    applicationFormClientSlice: applicationFormClientSlice.reducer,
+    applicationFormsSlice: applicationFormsSlice.reducer,
     auth: authSlice.reducer,
     contacts: contactsSlice.reducer,
     nacecodes: nacecodesSlice.reducer,

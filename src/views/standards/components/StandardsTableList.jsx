@@ -28,7 +28,7 @@ const StandardsTableList = ({ onOrder }) => {
   useEffect(() => {
     if (!!standards) {
       const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-      setCurrentOrder(savedSearch.order);
+      setCurrentOrder(savedSearch.order ?? StandardOrderType.name);
     }
   }, [standards]);
 
@@ -121,7 +121,7 @@ const StandardsTableList = ({ onOrder }) => {
               <tbody>
                 {
                   standards.map( item => (
-                    <tr key={ item.StandardID }>
+                    <tr key={ item.ID }>
                       <td>
                         <div className="d-flex flex-column align-items-start">
                           <h6 className="text-sm mb-0">
@@ -143,11 +143,11 @@ const StandardsTableList = ({ onOrder }) => {
                       </td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
-                          <a href="#" onClick={ () => onShowModal(item.StandardID) } title="Details">
+                          <a href="#" onClick={ () => onShowModal(item.ID) } title="Details">
                             <FontAwesomeIcon icon={ faClone } />
                           </a>
                           { item.Status !== DefaultStatusType.deleted && (
-                            <Link to={ `${ item.StandardID }` } title="Edit">
+                            <Link to={ `${ item.ID }` } title="Edit">
                               <FontAwesomeIcon icon={ faEdit } />
                             </Link>
                           )}

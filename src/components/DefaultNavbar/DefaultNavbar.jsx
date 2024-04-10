@@ -71,10 +71,10 @@ export const DefaultNavbar = () => {
                       Certificate Status
                     </Link>
                   </NavDropdown>
-                  <Nav.Link href="http://www.lictus.com.mx" target="_blank" className="ms-2">
+                  {/* <Nav.Link href="http://www.lictus.com.mx" target="_blank" className="ms-2">
                     <img src={ lgoLictus } height="20" />
                   </Nav.Link>
-                  {/* <Nav.Link href="/" className="d-flex align-items-center me-2">
+                  <Nav.Link href="/" className="d-flex align-items-center me-2">
                     Accreditation Certificate
                   </Nav.Link>
                   <Nav.Link href="/" className="d-flex align-items-center me-2">

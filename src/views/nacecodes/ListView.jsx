@@ -47,7 +47,7 @@ export const ListView = () => {
   
   useEffect(() => {
     if (nacecodeCreatedOk) {
-      navigate(`/nace-codes/${ nacecode.NaceCodeID }`);
+      navigate(`/nace-codes/${ nacecode.ID }`);
     }
   }, [nacecodeCreatedOk]);
 
