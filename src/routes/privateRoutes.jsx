@@ -23,7 +23,7 @@ const privateRoute = [
         type: 'collapse',
         title: 'Application Forms',
         key: 'application-forms',
-        path: '/application-forms',
+        path: '/application-forms/*',
         icon: faClipboard,
         element: lazyApplicationForm
     },

@@ -229,7 +229,6 @@ export const useApplicationFormsStore = () => {
 
         // methods
         applicationFormsAsync,
-        applicationFormsFullListAsync,
         applicationFormAsync,
         applicationFormCreateAsync,
         applicationFormSaveAsync,

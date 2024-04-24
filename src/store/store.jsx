@@ -12,8 +12,8 @@ import applicationFormsSlice from "./slices/applicationFormsSlice";
 
 export const store = configureStore({
   reducer: {
-    applicationFormClientSlice: applicationFormClientSlice.reducer,
-    applicationFormsSlice: applicationFormsSlice.reducer,
+    applicationFormClient: applicationFormClientSlice.reducer,
+    applicationForms: applicationFormsSlice.reducer,
     auth: authSlice.reducer,
     contacts: contactsSlice.reducer,
     nacecodes: nacecodesSlice.reducer,

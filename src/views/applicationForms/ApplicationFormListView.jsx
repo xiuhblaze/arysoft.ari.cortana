@@ -1,8 +1,12 @@
-import { Card, Col, Container, Row } from "react-bootstrap";
-import envVariables from "../../helpers/envVariables";
-import { useApplicationFormsStore } from "../../hooks/useApplicationFormsStore";
 import { useEffect } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
+import Swal from 'sweetalert2';
+
+import envVariables from "../../helpers/envVariables";
 import enums from "../../helpers/enums";
+import { useApplicationFormsStore } from "../../hooks/useApplicationFormsStore";
+import ApplicationFormToolbar from "./components/ApplicationFormToolbar";
+import ApplicationFormTableList from "./components/ApplicationFormTableList";
 
 const ApplicationFormListView = () => {
     const { 
@@ -35,6 +39,13 @@ const ApplicationFormListView = () => {
         applicationFormsAsync(search);
         localStorage.setItem(APPLICATION_FORM_OPTIONS, JSON.stringify(search));
     }, []);
+
+    useEffect(() => {
+      if (!!applicationFormsErrorMessage) {
+        Swal.fire('Applications Form', applicationFormsErrorMessage, 'error');
+      }
+
+    }, [applicationFormsErrorMessage]);
     
 
     // METHODS
@@ -49,23 +60,10 @@ const ApplicationFormListView = () => {
                 <Col>
                     <Card className="mb-4">
                         <Card.Header className="pb-0">
-                            Toolbar goes here
+                            <ApplicationFormToolbar />
                         </Card.Header>
                         <Card.Body className="px-0 pt-0 pb-2">
-                            <table className="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <div className="d-flex justify-content-start align-items-center gap-1">
-                                                Organization
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
+                            <ApplicationFormTableList />
                         </Card.Body>
                     </Card>
                 </Col>

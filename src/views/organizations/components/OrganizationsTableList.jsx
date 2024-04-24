@@ -48,7 +48,7 @@ const OrganizationsTableList = () => {
   useEffect(() => {
     if (!!organizations) {
       const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-      setCurrentOrder(savedSearch.order ?? OrganizationOrderType.name);
+      setCurrentOrder(savedSearch?.order ?? OrganizationOrderType.name);
     }
   }, [organizations]);
 

@@ -8,6 +8,23 @@ const enums = () => {
     deleted: 3,
   });
 
+  const ApplicationFormStatusType = Object.freeze({
+    nothing: 0,
+    new: 1,
+    send: 2,
+    salesReview: 3,
+    applicantReview: 4,
+    salesEvaluation: 5,
+    acceptedClient: 6,
+    rejectedClient: 7,
+    acreditedAuditor: 8,
+    // Todo: Faltan estados
+    active: 9,
+    // Todo: Faltan estados
+    cancel: 10,
+    deleted: 11,
+  });
+
   const ApplicationFormOrderType = Object.freeze({
     nothing: 0,
     organization: 1,
@@ -82,6 +99,7 @@ const enums = () => {
   return {
     DefaultStatusType,
 
+    ApplicationFormStatusType,
     ApplicationFormOrderType,
     ContactOrderType,
     NacecodeOrderType,
