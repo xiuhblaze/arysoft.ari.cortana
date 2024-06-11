@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClone, faEdit } from "@fortawesome/free-solid-svg-icons";
 import enums from "../../../helpers/enums";
 import { Link } from "react-router-dom";
+import ApplicationFormTableItem from "./ApplicationFormTableItem";
+import ApplicationFormDetailsModal from "./ApplicationFormDetailsModal";
 
 const ApplicationFormTableList = () => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -15,7 +17,8 @@ const ApplicationFormTableList = () => {
 
     const {
         isApplicationFormsLoading,
-        applicationForms
+        applicationForms,
+        applicationFormAsync,
     } = useApplicationFormsStore();
 
     // HOOKS
@@ -26,7 +29,9 @@ const ApplicationFormTableList = () => {
 
     const onShowModal = (id) => {
         setShowModal(true);
-        // organizationAsync(id);
+
+        // console.log(id);
+        applicationFormAsync(id);
     }
 
     const onCloseModal = () => {
@@ -46,40 +51,22 @@ const ApplicationFormTableList = () => {
                                     <th className={ headStyle }>Organization</th>
                                     <th className={ headStyle }>Standard</th>
                                     <th className={ headStyle }>Services</th>
-                                    <th className={ headStyle }>Status</th>
+                                    <th className={ `${headStyle} text-center` }>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    applicationForms.map(item => {
-                                        return (
-                                            <tr key={item.ID}>
-                                                <td>{item.OrtanizationName}</td>
-                                                <td>{item.StandardName}</td>
-                                                <td>{item.Services}</td>
-                                                <td><ApplicationFormBadgeStatus status={item.Status} /></td>
-                                                <td>
-                                                    <div className="d-flex justify-content-center gap-2">
-                                                        <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                                                            <FontAwesomeIcon icon={faClone} />
-                                                        </a>
-                                                        {item.Status !== ApplicationFormStatusType.deleted && (
-                                                            <Link to={`${item.ID}`} title="Edit">
-                                                                <FontAwesomeIcon icon={faEdit} />
-                                                            </Link>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                }
+                                { applicationForms.map(item => ( <ApplicationFormTableItem 
+                                    key={ item.ID }
+                                    item={ item } 
+                                    onShowModal={ onShowModal }
+                                />))}
                             </tbody>
                         </table>
                     </div>
                 ) : null
             }
+            <ApplicationFormDetailsModal show={ showModal } onHide={ onCloseModal } />
         </>
     )
 }

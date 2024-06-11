@@ -11,6 +11,7 @@ import { Card, Col, Container, Row } from "react-bootstrap";
 import StandardsTableList from "./components/StandardsTableList";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import ToolbarForm from "./components/ToolbarForm";
+import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 
 const ListView = () => {
   const navigate = useNavigate();
@@ -101,12 +102,12 @@ const ListView = () => {
                   <AryPagination
                     currentPage={ standardsMeta.CurrentPage } 
                     totalPages={ standardsMeta.TotalPages }
-                    totalCount={ standardsMeta.TotalCount }
-                    showStatistics="true"
+                    totalCount={ standardsMeta.TotalCount }                    
                     onClickGoPage={ onClickGoPage } 
                     className="mt-2"
                   />
               )}
+              { <AryListStatistics meta={standardsMeta } className="my-3"/> }
             </Card.Body>
           </Card>
         </Col>
