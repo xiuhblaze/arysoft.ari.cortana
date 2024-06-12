@@ -28,7 +28,7 @@ const StandardsTableList = ({ onOrder }) => {
     useEffect(() => {
         if (!!standards) {
             const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-            setCurrentOrder(savedSearch.order ?? StandardOrderType.name);
+            setCurrentOrder(savedSearch?.order ?? StandardOrderType.name);
         }
     }, [standards]);
 
