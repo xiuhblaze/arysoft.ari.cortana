@@ -109,7 +109,7 @@ const OrganizationsTableList = () => {
                       Status
                     </div>
                   </div>
-                </th>z
+                </th>
                 <th className={ headStyle }>Info</th>
                 <th className={ `${headStyle} text-center` }>Action</th>
               </tr>

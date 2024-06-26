@@ -32,7 +32,7 @@ export const DetailsModal = ({ show, onHide, ...props }) => {
   }, [nacecodeSavedOk]);
   
   const onEditButton = () => {
-    navigate(`/nace-codes/${ nacecode.NaceCodeID }`);
+    navigate(`/nace-codes/${ nacecode.ID }`);
   };
 
   const onRestoreButton = () => {

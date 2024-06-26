@@ -42,10 +42,9 @@ const Toolbar = () => {
 
         if (!!savedSearch) {
             setInitialValues({
-                ...savedSearch,
-                textInput: savedSearch.text,
-                statusSelect: savedSearch.status,
-                includeDeletedCheck: savedSearch.includeDeleted,
+                textInput: savedSearch.text ?? '',
+                statusSelect: savedSearch.status ?? '',
+                includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
     }, []);

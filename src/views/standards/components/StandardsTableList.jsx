@@ -135,6 +135,9 @@ const StandardsTableList = ({ onOrder }) => {
                                                 <p className="text-xs text-secondary mb-0">
                                                     {item.Description}
                                                 </p>
+                                                <p className="text-xs text-secondary mb-0">
+                                                    {item.ID}
+                                                </p>
                                             </div>
                                         </td>
                                         <td>

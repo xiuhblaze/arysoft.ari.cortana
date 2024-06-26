@@ -60,20 +60,9 @@ export const nacecodesSlice = createSlice({
       state.isNacecodeSaving = true;
       state.nacecodeSavedOk = false;
     },
-    isNacecodeSaved: (state, action) => {
+    isNacecodeSaved: (state) => {
       state.isNacecodeSaving = false;
       state.nacecodeSavedOk = true;
-      if (!!action?.payload) {
-        state.nacecodes = state.nacecodes.map( item => {
-          if (item.NaceCodeID === action.payload.NaceCodeID) {
-            return {
-              ...item,
-              ...action.payload,
-            }
-          }
-          return item;
-        });
-      } 
     },
     // element - deleting
     onNacecodeDeleting: (state) => {

@@ -175,7 +175,7 @@ export const useStandardsStore = () => {
 
   /**
    * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-   * @param {StandardID, Name, Description, Status, UpdatedUser} item Objeto tipo Standard
+   * @param {ID, Name, Description, Status, UpdatedUser} item Objeto tipo Standard
    */
   const standardSaveAsync = async (item) => {
     dispatch(onStandardSaving());
