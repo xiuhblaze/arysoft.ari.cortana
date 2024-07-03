@@ -50,9 +50,6 @@ const ApplicationFormListView = () => {
 
     // METHODS
 
-    
-
-
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
