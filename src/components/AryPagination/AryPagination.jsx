@@ -1,20 +1,45 @@
+import { useEffect, useRef, useState } from 'react';
 import { Pagination } from "react-bootstrap";
+
 import envVariables from "../../helpers/envVariables";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile, faList } from "@fortawesome/free-solid-svg-icons";
 
-const { VITE_PAGE_MAX_DISPLAY } = envVariables();
-
-export const AryPagination = ({ currentPage, totalPages, totalCount = 0, showStatistics = false, onClickGoPage, ...props }) => {
+export const AryPagination = ({ currentPage, totalPages, onClickGoPage, ...props }) => {
+    const {
+        VITE_PAGE_MAX_DISPLAY,
+        VITE_PAGINATION_MIN,
+        VITE_PAGINATION_MAX,
+    } = envVariables();
     const PAGE_MAX_DISPLAY = Number(VITE_PAGE_MAX_DISPLAY);
+    const PAGINATION_MIN = Number(VITE_PAGINATION_MIN);
+    const PAGINATION_MAX = Number(VITE_PAGINATION_MAX);
+
+    const [maxElements, setMaxElements] = useState(PAGE_MAX_DISPLAY);
+    const containerRef = useRef(null);
 
     if (currentPage < 1 || currentPage > totalPages) return;
 
-    const items = [];
-    const inicio = (currentPage * 0.1) - Math.floor(currentPage * 0.1);
-    const iInicio = inicio === 0 ? currentPage - PAGE_MAX_DISPLAY + 1 : Math.floor(currentPage * 0.1) * 10 + 1;
-    const iFin = iInicio + PAGE_MAX_DISPLAY - 1 < totalPages ? iInicio + PAGE_MAX_DISPLAY - 1 : totalPages;
+    useEffect(() => {
+        const onMiniPagination = () => {
+            const currentWidth = containerRef.current.clientWidth;
+            setMaxElements(currentWidth < 576 ? PAGINATION_MIN : PAGINATION_MAX);
+        };
 
+        window.addEventListener('resize', onMiniPagination);
+        onMiniPagination();
+        
+        return () => {
+            window.removeEventListener('resize', onMiniPagination);
+        }
+    });
+
+    let i = 0;
+    do { i += maxElements; } while (i < currentPage);
+    const iInicio = i - maxElements + 1;
+    const iFin = iInicio + maxElements - 1 < totalPages
+        ? iInicio + maxElements - 1
+        : totalPages;
+    const items = [];
+    
     if (iInicio > 1) {
         items.push(
             <Pagination.First key="first" onClick={() => { onClickGoPage(1) }} title="First page" />
@@ -29,7 +54,7 @@ export const AryPagination = ({ currentPage, totalPages, totalCount = 0, showSta
 
     if (iInicio > 1) {
         items.push(
-            <Pagination.Ellipsis key="10prev" onClick={() => { onClickGoPage(iInicio - 1) }} title="Previous pages block" />
+            <Pagination.Ellipsis key="blockPrev" onClick={() => { onClickGoPage(iInicio - 1) }} title="Previous pages block" />
         );
     }
 
@@ -47,7 +72,7 @@ export const AryPagination = ({ currentPage, totalPages, totalCount = 0, showSta
 
     if (iFin < totalPages) {
         items.push(
-            <Pagination.Ellipsis key="10next" onClick={() => { onClickGoPage(iFin + 1) }} title="Next pages block" />
+            <Pagination.Ellipsis key="blocknext" onClick={() => { onClickGoPage(iFin + 1) }} title="Next pages block" />
         );
     }
 
@@ -65,22 +90,10 @@ export const AryPagination = ({ currentPage, totalPages, totalCount = 0, showSta
     }
 
     return (
-        <div {...props} >
-            <Pagination className="d-flex justify-content-center pagination-info mb-1">
+        <div {...props} ref={ containerRef }>
+            <Pagination className="d-flex justify-content-center pagination-info">
                 {items}
             </Pagination>
-            {showStatistics && (
-                <div className="text-sm d-flex justify-content-center gap-4 mb-3">
-                    <span>
-                        <FontAwesomeIcon icon={faList} className="me-1 opacity-7" />
-                        Total: {totalCount}
-                    </span>
-                    <span>
-                        <FontAwesomeIcon icon={faFile} className="me-1 opacity-7" />
-                        Per page: {totalPages}
-                    </span>
-                </div>
-            )}
         </div>
     )
 }
