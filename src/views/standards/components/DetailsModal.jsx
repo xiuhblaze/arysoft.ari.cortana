@@ -1,15 +1,16 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"
-import { Modal } from "react-bootstrap";
+import { ListGroup, Modal } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
 import enums from "../../../helpers/enums";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightToBracket, faArrowRotateLeft, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faAlignLeft, faAngleRight, faArrowRightToBracket, faArrowRotateLeft, faCalendarDay, faEdit, faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { ViewLoading } from "../../../components/Loaders";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import Status from "./Status";
+import ListGroupItemData from "../../../components/ListGroup/ListGroupItemData";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -57,7 +58,24 @@ const DetailsModal = ({ show, onHide, ...props }) => {
     return (
         <Modal {...props} show={show} onHide={onHide} size="md">
             <Modal.Header>
-                <Modal.Title>Details</Modal.Title>
+                {
+                    !!standard ? (
+                        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center pb-0 w-100">
+                            <Modal.Title>
+                                <FontAwesomeIcon icon={ faLandmark } className="me-3" />
+                                { standard.Name }
+                            </Modal.Title>
+                            <div>
+                                <Status value={ standard.Status } />
+                            </div>
+                        </div>
+                    ) : (
+                        <Modal.Title>
+                            <FontAwesomeIcon icon={ faLandmark } className="me-3" />
+                            Details
+                        </Modal.Title>
+                    )
+                }
             </Modal.Header>
             <Modal.Body>
                 {
@@ -65,26 +83,28 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                         <ViewLoading />
                     ) : !!standard ? (
                         <>
-                            <h6>{standard.Name}</h6>
-                            <hr className="horizontal gray-light my-2" />
-                            <ul className="list-group">
-                                <li className="list-group-item border-0 ps-0 text-sm">
-                                    <strong className="text-dark me-2">Standard:</strong>
-                                    {standard.Name}
-                                </li>
-                                <li className="list-group-item border-0 ps-0 text-sm">
-                                    <strong className="text-dark me-2">Description:</strong>
-                                    {standard.Description}
-                                </li>
-                                <li className="list-group-item border-0 ps-0 text-sm">
-                                    <strong className="text-dark me-2">Maximum reduction days:</strong>
-                                    {!!standard.MaxReductionDays ? standard.MaxReductionDays : '0'}
-                                </li>
-                                <li className="list-group-item border-0 ps-0 text-sm">
-                                    <strong className="text-dark me-2">Status:</strong>
-                                    <Status value={standard.Status} />
-                                </li>
-                            </ul>
+                            <ListGroup>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Standard:" icon={ faLandmark }>
+                                        {standard.Name}
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Description:" icon={ faAlignLeft }>
+                                        {standard.Description}
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Maximum reduction days:" icon={ faCalendarDay }>
+                                        {!!standard.MaxReductionDays ? standard.MaxReductionDays : '0'}
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                                {/* <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Status:" icon={ faAngleRight }>
+                                        <Status value={standard.Status} />
+                                    </ListGroupItemData>
+                                </ListGroup.Item> */}
+                            </ListGroup>
                         </>
                     ) : null
                 }
@@ -108,24 +128,23 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                     <div className="d-flex justify-content-end gap-2">
                         {standard?.Status === DefaultStatusType.deleted && (
                             <button type="button"
-                                className="btn bg-gradient-secondary mb-0"
+                                className="btn bg-gradient-info mb-0"
                                 onClick={onRestoreButton}
-                                title="Retore"
+                                title="Restore"
                                 disabled={isStandardSaving}
                             >
                                 <FontAwesomeIcon icon={faArrowRotateLeft} size="lg" />
                             </button>
                         )}
-                        <button type="button" className="btn btn-outline-secondary mb-0" onClick={onHide}>
-                            <FontAwesomeIcon icon={faArrowRightToBracket} className="me-1" size="lg" />
-                            Close
-                        </button>
                         {standard?.Status !== DefaultStatusType.deleted && (
                             <button type="button" className="btn bg-gradient-dark mb-0" onClick={onEditButton}>
                                 <FontAwesomeIcon icon={faEdit} className="me-1" size="lg" />
                                 Edit
                             </button>
                         )}
+                        <button type="button" className="btn btn-link text-secondary mb-0" onClick={onHide}>
+                            Close
+                        </button>
                     </div>
                 </div>
             </Modal.Footer>

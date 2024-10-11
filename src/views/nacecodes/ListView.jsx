@@ -11,6 +11,7 @@ import AryPagination from "../../components/AryPagination/AryPagination";
 import NaceTableList from "./components/NaceTableList";
 import ToolbarForm from "./components/ToolbarForm";
 import useNacecodesStore from "../../hooks/useNaceCodesStore";
+import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 
 export const ListView = () => {
     const navigate = useNavigate();
@@ -102,12 +103,15 @@ export const ListView = () => {
                             )}
                             <NaceTableList />
                             {!!nacecodesMeta && (
-                                <AryPagination
-                                    currentPage={nacecodesMeta.CurrentPage}
-                                    totalPages={nacecodesMeta.TotalPages}
-                                    onClickGoPage={onClickGoPage}
-                                    className="mt-2"
-                                />
+                                <>
+                                    <AryPagination
+                                        currentPage={nacecodesMeta.CurrentPage}
+                                        totalPages={nacecodesMeta.TotalPages}
+                                        onClickGoPage={onClickGoPage}
+                                        className="mt-2"
+                                    />
+                                    <AryListStatistics meta={ nacecodesMeta } className="my-3" />
+                                </>
                             )}
                         </Card.Body>
                     </Card>

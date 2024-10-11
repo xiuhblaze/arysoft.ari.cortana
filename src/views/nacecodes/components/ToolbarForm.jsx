@@ -130,18 +130,18 @@ export const ToolbarForm = () => {
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">
-                                    <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn bg-gradient-secondary" onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
-                                            <FontAwesomeIcon icon={faXmark} size="lg" />
-                                        </button>
-                                    </div>
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
                                         <button type="submit" className="btn bg-gradient-info d-flex justify-content-center align-items-center">
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
+                                        </button>
+                                    </div>
+                                    <div className="d-grid d-md-block ps-md-2">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={(values) => {
+                                            onCleanSearch(values);
+                                            formik.resetForm(initialValues);
+                                        }}>
+                                            <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>
                                 </div>

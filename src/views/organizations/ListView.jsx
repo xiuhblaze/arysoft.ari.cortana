@@ -103,7 +103,6 @@ const ListView = () => {
                                     <AryPagination
                                         currentPage={organizationsMeta.CurrentPage}
                                         totalPages={organizationsMeta.TotalPages}
-                                        totalCount={organizationsMeta.TotalCount}
                                         onClickGoPage={onClickGoPage}
                                         className="mt-2"
                                     />

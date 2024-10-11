@@ -197,15 +197,15 @@ export const EditView = () => {
                                                                 </p>
                                                             </div>
                                                             <div className="d-flex justify-content-center justify-content-sm-between gap-2">
-                                                                <button type="button" className="btn btn-outline-secondary mb-0" onClick={onCancelButton}>
-                                                                    Cancel
-                                                                </button>
                                                                 <button type="submit"
                                                                     className="btn bg-gradient-dark mb-0"
                                                                     disabled={isNacecodeSaving}
                                                                 >
-                                                                    <FontAwesomeIcon icon={faSave} size="lg" className="me-1" />
+                                                                    <FontAwesomeIcon icon={faSave} size="lg" className="me-2" />
                                                                     Save
+                                                                </button>
+                                                                <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCancelButton}>
+                                                                    Cancel
                                                                 </button>
                                                             </div>
                                                         </Col>

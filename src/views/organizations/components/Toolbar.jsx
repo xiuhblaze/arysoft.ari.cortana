@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
@@ -134,7 +134,22 @@ const Toolbar = () => {
                                                     )}
                                             </AryFormikSelectInput>
                                         </div>
-                                        <div className="col-auto ps-0">
+                                        <div className="col-auto ps-sm-0">
+                                            <div className="p-2 bg-gray-100 border-radius-md">
+                                                <div className="form-check form-switch">
+                                                    <input id="includeDeletedCheck" name="includeDeletedCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        onChange={formik.handleChange}
+                                                        checked={formik.values.includeDeletedCheck}
+                                                    />
+                                                    <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
+                                                        <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* <div className="col-auto ps-0">
                                             <div className="form-check form-switch mt-lg-2 mt-xxl-2">
                                                 <input id="includeDeletedCheck" name="includeDeletedCheck"
                                                     className="form-check-input"
@@ -144,22 +159,22 @@ const Toolbar = () => {
                                                 />
                                                 <label className="form-check-label" htmlFor="includeDeletedCheck">Show deleted records</label>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">
-                                    <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn bg-gradient-secondary" onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
-                                            <FontAwesomeIcon icon={faXmark} size="lg" />
-                                        </button>
-                                    </div>
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
                                         <button type="submit" className="btn bg-gradient-info d-flex justify-content-center align-items-center">
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
+                                        </button>
+                                    </div>
+                                    <div className="d-grid d-md-block ps-md-2">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={(values) => {
+                                            onCleanSearch(values);
+                                            formik.resetForm(initialValues);
+                                        }}>
+                                            <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>
                                 </div>
