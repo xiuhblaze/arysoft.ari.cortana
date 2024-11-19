@@ -179,7 +179,7 @@ export const EditView = () => {
                                                         <hr className="horizontal dark my-3" />
                                                         <Col xs="12">
                                                             <button type="button"
-                                                                className="btn bg-gradient-secondary"
+                                                                className="btn btn-outline-secondary"
                                                                 onClick={onDeleteButton}
                                                                 disabled={isNacecodeDeleting}
                                                             >

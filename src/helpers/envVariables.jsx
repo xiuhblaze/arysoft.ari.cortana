@@ -1,5 +1,6 @@
 const envVariables = () => {
     const APPLICATION_FORM_OPTIONS = 'arysoft-ari-applicationFormOptions';
+    const CONTACTS_OPTIONS = 'arysoft-ari-contactsOptions';
     const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
     const ORGANIZATIONS_OPTIONS = 'arysoft-ari-organizationsOptions';
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
@@ -12,6 +13,7 @@ const envVariables = () => {
         URI_APPLICATIONFORMS,
 
         APPLICATION_FORM_OPTIONS,
+        CONTACTS_OPTIONS,
         NACECODES_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         STANDARDS_OPTIONS,

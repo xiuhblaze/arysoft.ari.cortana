@@ -32,6 +32,11 @@ export const contactsSlice = createSlice({
       state.contacts = action.payload.contacts;
       state.contactsMeta = action.payload.contactsMeta;
     },
+    clearContacts: (state) => {
+      state.isContactsLoading = false;
+      state.contacts = [];
+      state.contactsMeta = null;
+    },
     // Element
     onContactLoading: (state) => {
       state.isContactLoading = true;
@@ -72,6 +77,16 @@ export const contactsSlice = createSlice({
       state.contactDeletedOk = false;
       state.contact = action.payload;
     },
+    clearContact: (state) => {
+      state.isContactLoading = false;
+      state.isContactCreating = false;
+      state.contactCreatedOk = false;
+      state.isContactSaving = false;
+      state.contactSavedOk = false;
+      state.isContactDeleting = false;
+      state.contactDeletedOk = false;
+      state.contact = null;
+    },
     // Misc
     setContactsErrorMessage: (state, action) => {
       state.isContactsLoading = false;
@@ -83,6 +98,9 @@ export const contactsSlice = createSlice({
       state.isContactDeleting = false;
       state.contactDeletedOk = false;
       state.contactErrorMessage = action.payload;
+    },
+    clearContactsErrorMessage: (state) => {
+      state.contactErrorMessage = null;
     }
   }
 });
@@ -91,6 +109,7 @@ export const {
   onContactsLoading,
   isContactsLoaded,
   setContacts,
+  clearContacts,
 
   onContactLoading,
   onContactCreating,
@@ -100,8 +119,10 @@ export const {
   onContactDeleting,
   isContactDeleted,
   setContact,
+  clearContact,
 
   setContactsErrorMessage,  
+  clearContactsErrorMessage,
 } = contactsSlice.actions;
 
 export default contactsSlice;

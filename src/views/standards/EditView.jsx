@@ -175,7 +175,7 @@ const EditView = () => {
                                                         <hr className="horizontal dark my-3" />
                                                         <Col xs="12">
                                                             <button type="button"
-                                                                className="btn bg-gradient-secondary"
+                                                                className="btn btn-outline-secondary"
                                                                 onClick={onDeleteButton}
                                                                 disabled={isStandardDeleting}
                                                             >
@@ -194,15 +194,15 @@ const EditView = () => {
                                                                 </p>
                                                             </div>
                                                             <div className="d-flex justify-content-center justify-content-sm-between gap-2">
-                                                                <button type="button" className="btn btn-outline-secondary mb-0" onClick={onCancelButton}>
-                                                                    Cancel
-                                                                </button>
                                                                 <button type="submit"
                                                                     className="btn bg-gradient-dark mb-0"
                                                                     disabled={isStandardSaving}
                                                                 >
                                                                     <FontAwesomeIcon icon={faSave} size="lg" className="me-1" />
                                                                     Save
+                                                                </button>
+                                                                <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCancelButton}>
+                                                                    Cancel
                                                                 </button>
                                                             </div>
                                                         </Col>
