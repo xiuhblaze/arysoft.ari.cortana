@@ -25,6 +25,7 @@ import envVariables from "../helpers/envVariables";
 import getErrorMessages from "../helpers/getErrorMessages";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
+import getError from "../helpers/getError";
 
 const { VITE_DEFAULT_PAGESIZE } = envVariables();
 
@@ -172,12 +173,44 @@ export const useContactsStore = () => {
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
-            dispatch(isContactSaved(Data));
+            dispatch(isContactSaved());
         } catch (error) {
             const message = getErrorMessages(error);
             setError(message);
         }
     };
+
+    const contactSaveWithFileAsync = async (item, file) => {
+        dispatch(onContactSaving());
+
+        const toSave = {
+            ...item,
+            UpdatedUser: user.username,
+        };
+
+        console.log(file);
+
+        try {
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            };  
+            const data = JSON.stringify(toSave);
+
+            formData.append('data', data);
+            formData.append('file', file);
+
+            const resp = await cortanaApi.put('/contacts/contact-with-file', formData, { headers });
+            const { Data } = await resp.data;
+
+            dispatch(setContact(Data));
+            dispatch(isContactSaved());
+
+        } catch(error) {
+            const infoError = getErrorMessages(error);
+            setError(infoError);
+        }
+    }; // contactSaveWithFileAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -229,6 +262,7 @@ export const useContactsStore = () => {
         contactAsync,
         contactCreateAsync,
         contactSaveAsync,
+        contactSaveWithFileAsync,
         contactDeleteAsync,
         contactClear,
     }

@@ -1,15 +1,19 @@
-import { faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { Button, Col, Image, ListGroup, Modal, Row, Spinner } from "react-bootstrap";
+import { faEdit, faSave, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
-import { Button, Modal, Spinner } from "react-bootstrap";
-import { useContactsStore } from "../../../hooks/useContactStore";
-import enums from "../../../helpers/enums";
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { Form, Formik } from "formik";
+import { useEffect, useState } from "react";
+import * as Yup from 'yup';
+import Swal from 'sweetalert2';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+
 import { AryFormikTextInput } from "../../../components/Forms";
+import { useContactsStore } from "../../../hooks/useContactStore";
+import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import enums from "../../../helpers/enums";
 
 const EditContactModal = ({ id, ...props}) => {
-    const label = !!id ? 'Edit' : 'Add';
+    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
     const { DefaultStatusType } = enums();
 
@@ -35,30 +39,26 @@ const EditContactModal = ({ id, ...props}) => {
         isContactLoading,
         isContactCreating,
         contactCreatedOk,
+        isContactSaving,
+        contactSavedOk,
         contact,
+        contactsAsync,
         contactAsync,
         contactCreateAsync,
+        contactSaveAsync,
+        contactSaveWithFileAsync,
         contactClear,
     } = useContactsStore();
 
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-
-
-
-    // useEffect(() => {
-    //     if (contactCreatedOk && !!contact) {
-    //         console.log(contact);
-    //     }
-
-    // }, [contactCreatedOk]);
 
     useEffect(() => {
         if (!!contact) {
-            console.log(contact);
+            // console.log(contact);
             
             setInitialValues({
                 firstNameInput: contact?.FirstName ?? '',
@@ -74,20 +74,29 @@ const EditContactModal = ({ id, ...props}) => {
         }
     }, [contact]);
     
-    
-
+    useEffect(() => {
+        if (contactSavedOk) {
+            Swal.fire('Contact', `Contact ${ !id ? 'created' : 'updated' } successfully`, 'success');
+            contactsAsync({
+                organizationID: organization.ID,
+                pageSize: 0,
+            })
+            contactClear();
+            setShowModal(false);
+        }
+    }, [contactSavedOk]);
 
     // METHODS
 
     const onShowModal = () => {
 
         if (!id) {
-            console.log('Crear nuevo contacto');
+            // console.log('Crear nuevo contacto');
             contactCreateAsync({
                 OrganizationID: organization.ID,
             });
         } else {
-            console.log('Editar un contacto existente');
+            // console.log('Editar un contacto existente');
             contactAsync(id);
         }
 
@@ -102,8 +111,22 @@ const EditContactModal = ({ id, ...props}) => {
     } // onCloseModal
 
     const onFormSubmit = (values) => {
-        console.log(values);
-    };
+        const toSave = {
+            ID: contact.ID,
+            FirstName: values.firstNameInput, 
+            MiddleName: values.middleNameInput,
+            LastName: values.lastNameInput,
+            Email: values.emailInput,
+            Phone: values.phoneInput,
+            PhoneAlt: values.phoneAltInput,
+            LocationDescription: values.locationDescriptionInput,
+            Position: values.positionInput,
+            Status: contact.Status,
+            
+        };
+
+        contactSaveWithFileAsync(toSave, values.photoFileInput);
+    }; // onFormSubmit
 
     return (
         <>
@@ -115,9 +138,23 @@ const EditContactModal = ({ id, ...props}) => {
             >
                 <FontAwesomeIcon icon={ !!id ? faUserPen : faUserPlus } size="lg" />
             </Button>
-            <Modal show={ showModal } onHide={ onCloseModal }>
+            <Modal show={ showModal } onHide={ onCloseModal } size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>{ label } Contact</Modal.Title>
+                    <Modal.Title>
+                        {
+                            !!id ? (
+                                <>
+                                    <FontAwesomeIcon icon={ faUserPen } className="px-3" />
+                                    Edit contact
+                                </>
+                            ) : (
+                                <>
+                                    <FontAwesomeIcon icon={ faUserPlus } className="px-3" />
+                                    Add contact
+                                </>
+                            )
+                        }
+                    </Modal.Title>
                 </Modal.Header>
                 {
                     isContactCreating || isContactLoading ? (
@@ -133,19 +170,133 @@ const EditContactModal = ({ id, ...props}) => {
                             { formik => (
                                 <Form>
                                     <Modal.Body>
-                                        <AryFormikTextInput name="firstNameInput"
-                                            label="First name"
-                                            placeholder="First Name"
-                                        />
-                                        <AryFormikTextInput name="middleNameInput"
-                                            label="Middle name"
-                                            placeholder="Middle Name"
-                                        />
-                                        <AryFormikTextInput name="lastNameInput"
-                                            label="Last name"
-                                            placeholder="Last Name"
-                                        />
+                                        <Row>
+                                            <Col xs="12" sm="4">
+                                                <label className="form-label">Photo profile</label>
+                                                {
+                                                    !!photoPreview &&
+                                                    <div>
+                                                        <Image src={ photoPreview }
+                                                            thumbnail
+                                                            fluid
+                                                            className="mb-3"
+                                                        />
+                                                    </div>
+                                                }
+                                                <input 
+                                                    type="file"
+                                                    name="photoFile"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const fileReader = new FileReader();
+                                                        fileReader.onload = () => {
+                                                            if (fileReader.readyState === 2) {
+                                                                // formik.setFieldValue('photoFileInput', fileReader.result);
+                                                                setPhotoPreview(fileReader.result);
+                                                            }
+                                                        };
+                                                        fileReader.readAsDataURL(e.target.files[0]);
+                                                        formik.setFieldValue('photoFileInput', e.currentTarget.files[0]);
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col xs="12" sm="8">
+                                                <Row>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="firstNameInput"
+                                                            label="First name"
+                                                            placeholder="First Name"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="middleNameInput"
+                                                            label="Middle name"
+                                                            placeholder="Middle Name"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="lastNameInput"
+                                                            label="Last name"
+                                                            placeholder="Last Name"
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="12">
+                                                <AryFormikTextInput name="positionInput"
+                                                    label="Position"
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="12" sm="6">
+                                                <AryFormikTextInput name="emailInput"
+                                                    label="E-Mail"
+                                                    placeholder="name@example.com"
+                                                />
+                                            </Col>
+                                            <Col xs="12" sm="6">
+                                                <AryFormikTextInput name="phoneInput"
+                                                    label="Phone number"
+                                                    placeholder="000-000-0000"
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="12">
+                                                <AryFormikTextInput name="locationDescriptionInput"
+                                                    label="Address"
+                                                    placeholder="3312 Example Street, City 00000"
+                                                />
+                                            </Col>
+                                        </Row>
+                                        {/* <AryFormikTextInput name="phoneAltInput"
+                                            label="Alternative phone number"
+                                            placeholder="000-000-0000"
+                                        /> */}
                                     </Modal.Body>
+                                    <Modal.Footer>
+                                        <div className="d-flex justify-content-between align-items-center w-100">
+                                            <div>
+                                                {
+                                                    !!contact && (
+                                                        <ListGroup className="opacity-7">
+                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
+                                                                <strong className="me-2">Created:</strong>
+                                                                {/* { formatDistanceToNow(new Date(contact.Created)) } */}
+                                                                { contact.Created.toLocaleString() }
+                                                            </ListGroup.Item>
+                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
+                                                                <strong className="me-2">Updated:</strong>
+                                                                {/* { formatDistanceToNow(new Date(contact.Updated)) } */}
+                                                                { contact.Updated.toLocaleString() }
+                                                            </ListGroup.Item>
+                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
+                                                                <strong className="me-2">Updated by:</strong>
+                                                                { contact.UpdatedUser }
+                                                            </ListGroup.Item>
+                                                        </ListGroup>
+                                                    )
+                                                }
+                                            </div>
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button type="submit" 
+                                                    className="btn bg-gradient-dark mb-0"
+                                                    disabled={ isContactSaving}
+                                                >
+                                                    <FontAwesomeIcon icon={faSave} className="me-1" size="lg" />
+                                                    Save
+                                                </button>
+                                                <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCloseModal}>
+                                                    {/* <FontAwesomeIcon icon={faArrowRightToBracket} className="me-1" size="lg" /> */}
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Modal.Footer>
                                 </Form>
                             )}
                         </Formik>
