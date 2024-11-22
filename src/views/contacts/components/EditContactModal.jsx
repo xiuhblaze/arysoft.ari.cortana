@@ -1,5 +1,5 @@
 import { Button, Col, Image, ListGroup, Modal, Row, Spinner } from "react-bootstrap";
-import { faEdit, faSave, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faEdit, faRotateRight, faSave, faTrash, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -11,10 +11,13 @@ import { AryFormikTextInput } from "../../../components/Forms";
 import { useContactsStore } from "../../../hooks/useContactStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
+import { ViewLoading } from "../../../components/Loaders";
 
 const EditContactModal = ({ id, ...props}) => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
+    const { VITE_FILES_URI } = envVariables();
     const { DefaultStatusType } = enums();
 
     const formDefaultValues = {
@@ -27,6 +30,7 @@ const EditContactModal = ({ id, ...props}) => {
         locationDescriptionInput: '',
         positionInput: '',
         photoFileInput: '',
+        statusCheck: false,
     };
 
     // CUSTOM HOOKS
@@ -47,6 +51,7 @@ const EditContactModal = ({ id, ...props}) => {
         contactCreateAsync,
         contactSaveAsync,
         contactSaveWithFileAsync,
+        contactDeleteFileAsync,
         contactClear,
     } = useContactsStore();
 
@@ -54,7 +59,9 @@ const EditContactModal = ({ id, ...props}) => {
 
     const [showModal, setShowModal] = useState(false);
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [newPhoto, setNewPhoto] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [activeAccount, setActiveAccount] = useState(false);
 
     useEffect(() => {
         if (!!contact) {
@@ -70,7 +77,11 @@ const EditContactModal = ({ id, ...props}) => {
                 locationDescriptionInput: contact?.LocationDescription ?? '',
                 positionInput: contact?.Position ?? '',
                 photoFileInput: '',
+                statusCheck: contact?.Status === DefaultStatusType.active,
             });
+
+            setActiveAccount(contact?.Status === DefaultStatusType.active);
+            setNewPhoto(!contact.PhotoFilename);
         }
     }, [contact]);
     
@@ -121,12 +132,23 @@ const EditContactModal = ({ id, ...props}) => {
             PhoneAlt: values.phoneAltInput,
             LocationDescription: values.locationDescriptionInput,
             Position: values.positionInput,
-            Status: contact.Status,
-            
+            Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive, //contact.Status,
         };
 
         contactSaveWithFileAsync(toSave, values.photoFileInput);
     }; // onFormSubmit
+
+    const onDeleteFile = () => {
+        
+         contactDeleteFileAsync(contact.ID)
+            .then( data => {
+                if (!!data) {
+                    setNewPhoto(true);
+                }
+            }).catch( err => {
+                console.log(err);
+            });
+    }; // onDeleteFile
 
     return (
         <>
@@ -158,9 +180,7 @@ const EditContactModal = ({ id, ...props}) => {
                 </Modal.Header>
                 {
                     isContactCreating || isContactLoading ? (
-                        <Spinner anumation="border" variant="info" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </Spinner>
+                        <ViewLoading />
                     ) : !!contact ? (
                         <Formik
                             initialValues={ initialValues }
@@ -172,34 +192,85 @@ const EditContactModal = ({ id, ...props}) => {
                                     <Modal.Body>
                                         <Row>
                                             <Col xs="12" sm="4">
-                                                <label className="form-label">Photo profile</label>
+                                                <div className="d-flex justify-content-between">
+                                                    <label className="form-label">Photo profile</label>
+                                                    {
+                                                        !newPhoto && !!contact.PhotoFilename &&
+                                                        <div className="d-flex justify-content-end gap-3">
+                                                            <button 
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={ () => { setNewPhoto(true) }}
+                                                                title="Upload new photo profile"
+                                                            >
+                                                                <FontAwesomeIcon icon={ faRotateRight } size="lg" />
+                                                            </button>
+                                                            <button 
+                                                                type="button"
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={ onDeleteFile }
+                                                                title="Delete photo profile"
+                                                            >
+                                                                <FontAwesomeIcon icon={ faTrash } size="lg" />
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        !!newPhoto && !!contact.PhotoFilename &&
+                                                        <div className="text-end">
+                                                            <button type="button"
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={ () => { 
+                                                                    setNewPhoto(false);
+                                                                    formik.setFieldValue('photoFileInput', '');
+                                                                }}
+                                                                title="Cancel upload new file"
+                                                            >
+                                                                <FontAwesomeIcon icon={ faBan } size="lg" />
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </div>
                                                 {
-                                                    !!photoPreview &&
-                                                    <div>
-                                                        <Image src={ photoPreview }
-                                                            thumbnail
-                                                            fluid
-                                                            className="mb-3"
-                                                        />
-                                                    </div>
-                                                }
-                                                <input 
-                                                    type="file"
-                                                    name="photoFile"
-                                                    accept="image/*"
-                                                    className="form-control"
-                                                    onChange={(e) => {
-                                                        const fileReader = new FileReader();
-                                                        fileReader.onload = () => {
-                                                            if (fileReader.readyState === 2) {
-                                                                // formik.setFieldValue('photoFileInput', fileReader.result);
-                                                                setPhotoPreview(fileReader.result);
+                                                    !!newPhoto ? (
+                                                        <>
+                                                            {
+                                                                !!photoPreview &&
+                                                                <div>
+                                                                    <Image src={ photoPreview }
+                                                                        thumbnail
+                                                                        fluid
+                                                                        className="mb-3"
+                                                                    />
+                                                                </div>
                                                             }
-                                                        };
-                                                        fileReader.readAsDataURL(e.target.files[0]);
-                                                        formik.setFieldValue('photoFileInput', e.currentTarget.files[0]);
-                                                    }}
-                                                />
+                                                            <input 
+                                                                type="file"
+                                                                name="photoFile"
+                                                                accept="image/*"
+                                                                className="form-control"
+                                                                onChange={(e) => {
+                                                                    const fileReader = new FileReader();
+                                                                    fileReader.onload = () => {
+                                                                        if (fileReader.readyState === 2) {
+                                                                            // formik.setFieldValue('photoFileInput', fileReader.result);
+                                                                            setPhotoPreview(fileReader.result);
+                                                                        }
+                                                                    };
+                                                                    fileReader.readAsDataURL(e.target.files[0]);
+                                                                    formik.setFieldValue('photoFileInput', e.currentTarget.files[0]);
+                                                                }}
+                                                            />
+                                                        </>
+                                                    ) : !!contact.PhotoFilename && 
+                                                        <div>
+                                                            <Image src={`${VITE_FILES_URI}/contacts/${contact.PhotoFilename}`}
+                                                                thumbnail
+                                                                fluid
+                                                                className="mb-3"
+                                                            />
+                                                        </div>
+                                                    
+                                                }
                                             </Col>
                                             <Col xs="12" sm="8">
                                                 <Row>
@@ -257,6 +328,24 @@ const EditContactModal = ({ id, ...props}) => {
                                             label="Alternative phone number"
                                             placeholder="000-000-0000"
                                         /> */}
+                                        <Row>
+                                            <Col xs="12">
+                                                <div className="form-check form-switch">
+                                                    <input id="statusCheck" name="statusCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        onChange={ formik.handleChange }
+                                                        checked={ formik.values.statusCheck }
+                                                    />
+                                                    <label 
+                                                        className="form-check-label text-secondary mb-0"
+                                                        htmlFor="statusCheck"
+                                                    >
+                                                        Active account TODO: Aqui voy!
+                                                    </label>
+                                                </div>
+                                            </Col>
+                                        </Row>
                                     </Modal.Body>
                                     <Modal.Footer>
                                         <div className="d-flex justify-content-between align-items-center w-100">
@@ -266,13 +355,13 @@ const EditContactModal = ({ id, ...props}) => {
                                                         <ListGroup className="opacity-7">
                                                             <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
                                                                 <strong className="me-2">Created:</strong>
-                                                                {/* { formatDistanceToNow(new Date(contact.Created)) } */}
-                                                                { contact.Created.toLocaleString() }
+                                                                { formatDistanceToNow(new Date(contact.Created)) }
+                                                                {/* { contact.Created.toLocaleString() } */}
                                                             </ListGroup.Item>
                                                             <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
                                                                 <strong className="me-2">Updated:</strong>
-                                                                {/* { formatDistanceToNow(new Date(contact.Updated)) } */}
-                                                                { contact.Updated.toLocaleString() }
+                                                                { formatDistanceToNow(new Date(contact.Updated)) }
+                                                                {/* { contact.Updated.toLocaleString() } */}
                                                             </ListGroup.Item>
                                                             <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
                                                                 <strong className="me-2">Updated by:</strong>

@@ -61,7 +61,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                             <span className="visually-hidden">Loading...</span>
                         </Spinner>
                     ) : !!contacts ? (
-                        <ListGroup>
+                        <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                             {
                                 contacts.map( item => {
                                     const fileName = `/files/contacts/${ item.PhotoFilename ?? 'nocontactphoto.png' }`;

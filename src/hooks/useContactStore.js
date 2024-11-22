@@ -27,6 +27,7 @@ import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 
+const CONTACT_URI = '/contacts';
 const { VITE_DEFAULT_PAGESIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -92,7 +93,7 @@ export const useContactsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`/contacts${query}`);
+            const resp = await cortanaApi.get(`${CONTACT_URI}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setContacts({
@@ -123,7 +124,7 @@ export const useContactsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`/contacts/${id}`);
+            const resp = await cortanaApi.get(`${CONTACT_URI}/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -146,7 +147,7 @@ export const useContactsStore = () => {
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post('/contacts', params);
+            const resp = await cortanaApi.post(CONTACT_URI, params);
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -169,7 +170,7 @@ export const useContactsStore = () => {
             UpdatedUser: user.username,
         }
         try {
-            const resp = await cortanaApi.put(`/contacts/${toSave.ID}`, toSave);
+            const resp = await cortanaApi.put(`${CONTACT_URI}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -200,7 +201,7 @@ export const useContactsStore = () => {
             formData.append('data', data);
             formData.append('file', file);
 
-            const resp = await cortanaApi.put('/contacts/contact-with-file', formData, { headers });
+            const resp = await cortanaApi.put(`${CONTACT_URI}/contact-with-file`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -225,7 +226,7 @@ export const useContactsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`/contacts/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${CONTACT_URI}/${id}`, { data: toDelete });
             dispatch(isContactDeleted());
         } catch (error) {
             //console.log(error);
@@ -233,6 +234,33 @@ export const useContactsStore = () => {
             setError(message);
         }
     }
+
+    const contactDeleteFileAsync = async (id) => {
+
+        const toDeleteFile = {
+            ID: id,
+            UpdatedUser: user.username,
+        };
+
+        try {
+            const resp = await cortanaApi.delete(`${CONTACT_URI}/delete-file/${id}`, { data: toDeleteFile });
+            const { Data } = await resp.data;
+
+            if (!!Data) {
+                setContact({
+                    ...contact,
+                    PhotoFilename: null,
+                })
+            }
+            
+            return Data;
+        } catch (error) {
+            const message = getErrorMessages(error);
+            setError(message);
+        }
+
+        return null;
+    }; // contactDeleteFileAsync
 
     const contactClear = () => {
         dispatch(clearContact());
@@ -264,6 +292,7 @@ export const useContactsStore = () => {
         contactSaveAsync,
         contactSaveWithFileAsync,
         contactDeleteAsync,
+        contactDeleteFileAsync,
         contactClear,
     }
 };

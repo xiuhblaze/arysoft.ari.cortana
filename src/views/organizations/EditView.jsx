@@ -81,7 +81,7 @@ const EditView = () => {
     // METHODS
 
     const onFormSubmit = (values) => {
-        console.log(values);
+        // console.log(values);
 
         const itemToSave = {
             ID: organization.ID,
