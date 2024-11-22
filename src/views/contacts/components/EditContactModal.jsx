@@ -30,6 +30,7 @@ const EditContactModal = ({ id, ...props}) => {
         locationDescriptionInput: '',
         positionInput: '',
         photoFileInput: '',
+        isMainContactCheck: false,
         statusCheck: false,
     };
 
@@ -62,6 +63,7 @@ const EditContactModal = ({ id, ...props}) => {
     const [newPhoto, setNewPhoto] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [activeAccount, setActiveAccount] = useState(false);
+    const [isMainContactCheck, setIsMainContactCheck] = useState(false);
 
     useEffect(() => {
         if (!!contact) {
@@ -77,10 +79,12 @@ const EditContactModal = ({ id, ...props}) => {
                 locationDescriptionInput: contact?.LocationDescription ?? '',
                 positionInput: contact?.Position ?? '',
                 photoFileInput: '',
+                isMainContactCheck: contact?.IsMainContact ?? false,
                 statusCheck: contact?.Status === DefaultStatusType.active,
             });
 
             setActiveAccount(contact?.Status === DefaultStatusType.active);
+            setIsMainContactCheck(contact?.IsMainContact ?? false);
             setNewPhoto(!contact.PhotoFilename);
         }
     }, [contact]);
@@ -132,6 +136,7 @@ const EditContactModal = ({ id, ...props}) => {
             PhoneAlt: values.phoneAltInput,
             LocationDescription: values.locationDescriptionInput,
             Position: values.positionInput,
+            IsMainContact: values.isMainContactCheck,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive, //contact.Status,
         };
 
@@ -329,19 +334,48 @@ const EditContactModal = ({ id, ...props}) => {
                                             placeholder="000-000-0000"
                                         /> */}
                                         <Row>
-                                            <Col xs="12">
+                                            <Col xs="12" sm="4">
+                                                <div className="form-check form-switch">
+                                                    <input id="isMainContactCheck" name="isMainContactCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        onChange={ (e) => {
+                                                            const isChecked = e.target.checked;
+                                                            formik.setFieldValue('isMainContactCheck', isChecked);
+                                                            setIsMainContactCheck(isChecked);
+                                                        }}
+                                                        checked={ formik.values.isMainContactCheck }
+                                                    />
+                                                    <label
+                                                        className="form-check-label text-secondary mb-0"
+                                                        htmlFor="isMainContactCheck"
+                                                    >
+                                                        {
+                                                            isMainContactCheck ? 'Is main contact' : 'Is alternative contact'
+                                                        }
+                                                    </label>
+                                                </div>
+                                            </Col>
+                                            <Col xs="12" sm="4">
                                                 <div className="form-check form-switch">
                                                     <input id="statusCheck" name="statusCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
-                                                        onChange={ formik.handleChange }
+                                                        // onChange={ formik.handleChange }
+                                                        onChange= { (e) => {
+                                                            const isChecked = e.target.checked;
+                                                            formik.setFieldValue('statusCheck', isChecked);
+                                                            setActiveAccount(isChecked);
+                                                        }} 
                                                         checked={ formik.values.statusCheck }
                                                     />
                                                     <label 
                                                         className="form-check-label text-secondary mb-0"
                                                         htmlFor="statusCheck"
                                                     >
-                                                        Active account TODO: Aqui voy!
+                                                        { 
+                                                            activeAccount ? 'Active account' : 'Inactive account'
+                                                        }
                                                     </label>
                                                 </div>
                                             </Col>

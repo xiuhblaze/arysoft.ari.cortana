@@ -76,16 +76,16 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                                     <img className="border-radius-lg shadow" src={ fileName } />
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
-                                                    <h6 className="mb-0 text-sm">{ item.FullName }</h6>
+                                                    <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-primary' : '' }` }>{ item.FullName }</h6>
                                                     <p className="mb-0 text-xs d-flex flex-column">
                                                         { 
                                                             !!item.Email ? (
-                                                                <a className="text-secondary" href={`mailto:${item.Email}`}>{ item.Email }</a>
+                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`mailto:${item.Email}`}>{ item.Email }</a>
                                                             ) : null
                                                         }
                                                         {
                                                             !!item.Phone ? (
-                                                                <a className="text-secondary" href={`tel:${ item.Phone }`}>{ item.Phone }</a>
+                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`tel:${ item.Phone }`}>{ item.Phone }</a>
                                                             ) : null
                                                         }
                                                     </p>
