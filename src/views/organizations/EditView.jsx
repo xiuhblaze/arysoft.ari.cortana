@@ -19,6 +19,7 @@ import bgHead from '../../assets/img/bgTrianglesBW.jpg';
 import { Button } from "react-bootstrap";
 import EditContactModal from "../contacts/components/EditContactModal";
 import ContactsCard from "../contacts/components/ContactsCard";
+import SitesCard from "../sites/components/SitesCard";
 
 const EditView = () => {
     const { id } = useParams();
@@ -262,15 +263,6 @@ const EditView = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col xs={12}>
-                                                            {/* <div className="form-check form-switch mb-0">
-                                <input id="activeCheck" name="activeCheck"
-                                  className="form-check-input"
-                                  type="checkbox"
-                                  onChange={ formik.handleChange }
-                                  checked={ formik.values.activeCheck }
-                                />
-                                <label className="form-check-label" htmlFor="activaCheck">Is active</label>
-                              </div> */}
                                                             <span className="text-secondary">(aquí van las opciones de cambio de status)</span>
                                                             <hr className="horizontal dark my-3" />
                                                         </Col>
@@ -332,14 +324,7 @@ const EditView = () => {
                     <ContactsCard />
                 </Col>
                 <Col xs={12} sm={4}>
-                    <Card className="h-100">
-                        <Card.Header className="pb-0 p-3">
-                            <h6 className="mb-0">Sites</h6>
-                        </Card.Header>
-                        <Card.Body className="p-3">
-                            Lorem ipsum
-                        </Card.Body>
-                    </Card>
+                    <SitesCard />
                 </Col>
                 <Col xs={12} sm={4}>
                     <Card className="h-100">

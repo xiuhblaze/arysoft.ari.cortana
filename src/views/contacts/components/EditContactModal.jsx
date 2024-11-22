@@ -27,7 +27,7 @@ const EditContactModal = ({ id, ...props}) => {
         emailInput: '',
         phoneInput: '',
         phoneAltInput: '',
-        locationDescriptionInput: '',
+        addressInput: '',
         positionInput: '',
         photoFileInput: '',
         isMainContactCheck: false,
@@ -76,7 +76,7 @@ const EditContactModal = ({ id, ...props}) => {
                 emailInput: contact?.Email ?? '',
                 phoneInput: contact?.Phone ?? '',
                 phoneAltInput: contact?.PhoneAlt ?? '',
-                locationDescriptionInput: contact?.LocationDescription ?? '',
+                addressInput: contact?.Address ?? '',
                 positionInput: contact?.Position ?? '',
                 photoFileInput: '',
                 isMainContactCheck: contact?.IsMainContact ?? false,
@@ -134,7 +134,7 @@ const EditContactModal = ({ id, ...props}) => {
             Email: values.emailInput,
             Phone: values.phoneInput,
             PhoneAlt: values.phoneAltInput,
-            LocationDescription: values.locationDescriptionInput,
+            Address: values.addressInput,
             Position: values.positionInput,
             IsMainContact: values.isMainContactCheck,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive, //contact.Status,
@@ -323,16 +323,12 @@ const EditContactModal = ({ id, ...props}) => {
                                         </Row>
                                         <Row>
                                             <Col xs="12">
-                                                <AryFormikTextInput name="locationDescriptionInput"
+                                                <AryFormikTextInput name="addressInput"
                                                     label="Address"
                                                     placeholder="3312 Example Street, City 00000"
                                                 />
                                             </Col>
                                         </Row>
-                                        {/* <AryFormikTextInput name="phoneAltInput"
-                                            label="Alternative phone number"
-                                            placeholder="000-000-0000"
-                                        /> */}
                                         <Row>
                                             <Col xs="12" sm="4">
                                                 <div className="form-check form-switch">

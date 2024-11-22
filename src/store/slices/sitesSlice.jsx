@@ -17,7 +17,7 @@ export const sitesSlice = createSlice({
     siteDeletedOk: false,
     site: null,
 
-    siteErrorMessage: null,
+    sitesErrorMessage: null,
   },
   reducers: {
     // Collection
@@ -31,6 +31,11 @@ export const sitesSlice = createSlice({
       state.isSitesLoading = false;
       state.sites = action.payload.sites;
       state.sitesMeta = action.payload.sitesMeta;
+    },
+    clearSites: (state) => {
+      state.isSitesLoading = false;
+      state.sites = [];
+      state.sitesMeta = null;
     },
     // Element
     onSiteLoading: (state) => {
@@ -72,6 +77,16 @@ export const sitesSlice = createSlice({
       state.siteDeletedOk = false;
       state.site = action.payload;
     },
+    clearSite: (state) => {
+      state.isSiteLoading = false;
+      state.isSiteCreating = false;
+      state.siteCreatedOk = false;
+      state.isSiteSaving = false;
+      state.siteSavedOk = false;
+      state.isSiteDeleting = false;
+      state.siteDeletedOk = false;
+      state.site = null;
+    },
     // Misc
     setSitesErrorMessage: (state, action) => {
       state.isSitesLoading = false;
@@ -82,7 +97,10 @@ export const sitesSlice = createSlice({
       state.siteSavedOk = false;
       state.isSiteDeleting = false;
       state.siteDeletedOk = false;
-      state.siteErrorMessage = action.payload;
+      state.sitesErrorMessage = action.payload;
+    },
+    clearSitesErrorMessage: (state) => {
+      state.sitesErrorMessage = null;
     }
   }
 });
@@ -91,6 +109,7 @@ export const {
   onSitesLoading,
   isSitesLoaded,
   setSites,
+  clearSites,
 
   onSiteLoading,
   onSiteCreating,
@@ -100,8 +119,10 @@ export const {
   onSiteDeleting,
   isSiteDeleted,
   setSite,
+  clearSite,
 
-  setSitesErrorMessage,  
+  setSitesErrorMessage, 
+  clearSitesErrorMessage 
 } = sitesSlice.actions;
 
 export default sitesSlice;

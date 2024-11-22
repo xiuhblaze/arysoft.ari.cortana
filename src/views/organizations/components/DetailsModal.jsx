@@ -14,6 +14,7 @@ import { ViewLoading } from "../../../components/Loaders";
 import Status from "./Status";
 
 import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
+import ContactsCard from "../../contacts/components/ContactsCard";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -120,51 +121,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
 
                             <Row className="mt-4">
                                 <Col xs="12" sm={4}>
-                                    <Card className="h-100">
-                                        <Card.Header className="pb-0 p-3">
-                                            <h6 className="mb-0">Contacts</h6>
-                                        </Card.Header>
-                                        <Card.Body className="p-3">
-                                            <ListGroup>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="avatar me-3">
-                                                        <img className="border-radius-lg shadow" src="/files/contacts/contact (4).jpg" />
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">Anne Marie</h6>
-                                                        <p className="mb-0 text-xs">
-                                                            <a href="mailto:anne@organization.com">anne@organization.com</a><br />
-                                                            <a href="tel:3410000000">341 000 0000 ext 000</a>
-                                                        </p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="avatar me-3">
-                                                        <img className="border-radius-lg shadow" src="/files/contacts/contact (1).jpg" />
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">Peter Norton</h6>
-                                                        <p className="mb-0 text-xs">
-                                                            <a href="mailto:anne@organization.com">peter@organization.com</a><br />
-                                                            <a href="tel:3410000000">341 000 0000 ext 000</a>
-                                                        </p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2 opacity-6">
-                                                    <div className="avatar me-3">
-                                                        <img className="border-radius-lg shadow" src="/files/contacts/contact (2).jpg" />
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">Grace Old Contact</h6>
-                                                        <p className="mb-0 text-xs">
-                                                            <a href="mailto:anne@organization.com">grace@organization.com</a><br />
-                                                            <a href="tel:3410000000">341 000 0000 ext 000</a>
-                                                        </p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                            </ListGroup>
-                                        </Card.Body>
-                                    </Card>
+                                    <ContactsCard readOnly />
                                 </Col>
                                 <Col xs="12" sm="4">
                                     <Card className="h-100">

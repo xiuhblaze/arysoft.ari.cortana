@@ -70,29 +70,30 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                     return (
                                         <ListGroup.Item key={ item.ID }
                                             className={ itemStyle }
+                                            title={ item.IsMainContact ? 'Is main contact' : '' }
                                         >
                                             <div className="d-flex align-items-center me-2">
                                                 <div className="avatar me-3">
                                                     <img className="border-radius-lg shadow" src={ fileName } />
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
-                                                    <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-primary' : '' }` }>{ item.FullName }</h6>
-                                                    <p className="mb-0 text-xs d-flex flex-column">
+                                                    <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>{ item.FullName }</h6>
+                                                    <p className="mb-0 text-xs d-flex flex-column gap-1">
                                                         { 
                                                             !!item.Email ? (
-                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`mailto:${item.Email}`}>{ item.Email }</a>
+                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`mailto:${item.Email}`} title="Send mail">{ item.Email }</a>
                                                             ) : null
                                                         }
                                                         {
                                                             !!item.Phone ? (
-                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`tel:${ item.Phone }`}>{ item.Phone }</a>
+                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`tel:${ item.Phone }`} title="Use to call">{ item.Phone }</a>
                                                             ) : null
                                                         }
                                                     </p>
                                                 </div>
                                             </div>
                                             <div>
-                                                <EditContactModal id={ item.ID } />
+                                                { !readOnly && <EditContactModal id={ item.ID } /> }
                                             </div>
                                             
                                         </ListGroup.Item>
