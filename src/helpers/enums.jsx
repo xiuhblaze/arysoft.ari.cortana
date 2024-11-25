@@ -36,10 +36,10 @@ const enums = () => {
     const ContactOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
-        lastName: 2,
+        isMainContact: 2,
         updated: 3,
         firstNameDesc: 4,
-        lastNameDesc: 5,
+        isMainContactDesc: 5,
         updatedDesc: 6,
     });
 

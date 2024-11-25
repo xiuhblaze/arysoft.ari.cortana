@@ -3,6 +3,10 @@ import { Card, ListGroup } from 'react-bootstrap'
 import { useSitesStore } from '../../../hooks/useSiteStore'
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
 import { ViewLoading } from '../../../components/Loaders'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBuilding, faEdit } from '@fortawesome/free-solid-svg-icons'
+import EditSiteModal from './EditSiteModal'
+import enums from '../../../helpers/enums'
 
 const SitesCard = ({ readonly = false, ...props }) => {
     const statusStyle = [
@@ -11,6 +15,8 @@ const SitesCard = ({ readonly = false, ...props }) => {
         'opacity-6',
         'bg-light opacity-6',
     ];
+
+    const { SiteOrderType } = enums();
 
     // CUSTOM HOOKS
 
@@ -31,6 +37,7 @@ const SitesCard = ({ readonly = false, ...props }) => {
             sitesAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
+                order: SiteOrderType.isMainSiteDesc,
             });
         }
     }, [organization]);
@@ -42,7 +49,7 @@ const SitesCard = ({ readonly = false, ...props }) => {
                 <div className="d-flex justify-content-between align-items-center">
                     <h6>Sites</h6>
                     {
-                        !readonly && <div>EditSiteModal</div>
+                        !readonly && <EditSiteModal />
                     }
                 </div>
             </Card.Header>
@@ -62,8 +69,20 @@ const SitesCard = ({ readonly = false, ...props }) => {
                                             title={ item.IsMainSite ? 'Is main site' : '' }
                                         >
                                             <div className="d-flex align-items-center me-2">
-                                                { item.Description }
-                                                { item.Address }
+                                                <div>
+                                                    <div className="icon icon-sm icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center me-3">
+                                                        <FontAwesomeIcon icon={ faBuilding } size="lg" className="opacity-10 text-white" aria-hidden="true" />
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex align-items-start flex-column justify-content-center">
+                                                    <h6 className="mb-0 text-sm">{ item.Description }</h6>
+                                                    <p className="mb-0 text-xs d-flex flex-column gap-1">{ item.Address }</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                {
+                                                    !readonly && <EditSiteModal id={ item.ID } />
+                                                }
                                             </div>
                                         </ListGroup.Item>
                                     );

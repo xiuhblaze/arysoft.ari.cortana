@@ -18,7 +18,10 @@ const EditContactModal = ({ id, ...props}) => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
     const { VITE_FILES_URI } = envVariables();
-    const { DefaultStatusType } = enums();
+    const { 
+        DefaultStatusType,
+        ContactOrderType,
+    } = enums();
 
     const formDefaultValues = {
         firstNameInput: '',
@@ -95,6 +98,7 @@ const EditContactModal = ({ id, ...props}) => {
             contactsAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
+                order: ContactOrderType.isMainContactDesc,
             })
             contactClear();
             setShowModal(false);

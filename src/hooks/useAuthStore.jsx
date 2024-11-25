@@ -4,6 +4,8 @@ import { clearAuthErrorMessage, onChecking, onLogin, onLogout, setAuthErrorMessa
 import cortanaApi from '../api/cortanaApi';
 import { jwtDecode } from "jwt-decode";
 import getErrorMessages from "../helpers/getErrorMessages";
+import getError from "../helpers/getError";
+import { compareAsc } from "date-fns";
 
 
 const { VITE_TOKEN } = envVariables();
@@ -35,11 +37,15 @@ export const useAuthStore = () => {
             id: userInfo.userid,
             username: userInfo.username,
             givename: userInfo.username,
+            useremail: userInfo.useremail,
             role: 'admin',
+            exp: new Date(userInfo.exp * 1000).getTime(),
         };
 
         return user;
-    };
+    }; // setUserInfo
+
+    //* Export Methods
 
     const checkAuthToken = () => {
         const token = localStorage.getItem(VITE_TOKEN) || null;
@@ -48,6 +54,10 @@ export const useAuthStore = () => {
 
         try {
             const user = setUserInfo(token);
+
+            if (compareAsc(user.exp, new Date().getTime()) < 0) {
+                throw new Error('La sesión ha expirado, ingrese nuevamente sus credenciales');
+            }
 
             // TODO: Falta refrescar el token
             if (!user) {
@@ -59,7 +69,7 @@ export const useAuthStore = () => {
 
         } catch (error) {
             console.log(error);
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
             dispatch(onLogout());
         }

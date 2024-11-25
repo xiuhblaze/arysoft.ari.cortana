@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import enums from "../../../helpers/enums";
 
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
@@ -14,6 +15,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
         'opacity-6',
         'bg-light opacity-6',
     ];
+    const { ContactOrderType } = enums();
 
     // CUSTOM HOOKS
 
@@ -34,6 +36,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
             contactsAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
+                order: ContactOrderType.isMainContactDesc,
             })
         }
     }, [organization]);
