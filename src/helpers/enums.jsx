@@ -33,6 +33,22 @@ const enums = () => {
         createdDesc: 4,
     });
 
+    const AuditorOrderType = Object.freeze({
+        nothing: 0,
+        firstName: 1,
+        isLeader: 2,
+        updated: 3,
+        firstNameDesc: 4,
+        isLeaderDesc: 5,
+        updatedDesc: 6,
+    });
+
+    const AuditorIsLeaderType = Object.freeze({
+        nothing: 0,
+        leader: 1,
+        regular: 2,
+    });
+
     const ContactOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
@@ -74,14 +90,23 @@ const enums = () => {
         updatedDesc: 8,
     });
 
-    const StandardOrderType = Object.freeze({
+    const ShiftOrderType = Object.freeze({
         nothing: 0,
-        name: 1,
-        status: 2,
-        update: 3,
-        nameDesc: 4,
-        statusDesc: 5,
-        updateDesc: 6,
+        type: 1,
+        noEmployees: 2,
+        status: 3,
+        updated: 4,
+        typeDesc: 5,
+        noEmployeesDesc: 6,
+        statusDesc: 7,
+        updatedDesc: 8
+    });
+
+    const ShiftType = Object.freeze({
+        nothing: 0,
+        morning: 1,
+        evening: 2,
+        night: 3,
     });
 
     const SiteOrderType = Object.freeze({
@@ -96,15 +121,29 @@ const enums = () => {
         updatedDesc: 8,
     });
 
+    const StandardOrderType = Object.freeze({
+        nothing: 0,
+        name: 1,
+        status: 2,
+        update: 3,
+        nameDesc: 4,
+        statusDesc: 5,
+        updateDesc: 6,
+    });
+
     return {
         DefaultStatusType,
 
-        ApplicationFormStatusType,
         ApplicationFormOrderType,
+        ApplicationFormStatusType,
+        AuditorOrderType,
+        AuditorIsLeaderType,
         ContactOrderType,
         NacecodeOrderType,
-        OrganizationStatusType,
         OrganizationOrderType,
+        OrganizationStatusType,
+        ShiftOrderType,
+        ShiftType,
         SiteOrderType,
         StandardOrderType,
     }

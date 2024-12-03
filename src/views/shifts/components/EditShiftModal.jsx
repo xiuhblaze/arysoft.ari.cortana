@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import envVariables from '../../../helpers/envVariables';
-import * as Yup from 'yup';
-import Swal from 'sweetalert2';
-import enums from '../../../helpers/enums';
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useEffect, useState } from 'react'
+import enums from '../../../helpers/enums'
+import { useShiftsStore } from '../../../hooks/useShiftsStore';
 import { useSitesStore } from '../../../hooks/useSiteStore';
+import Swal from 'sweetalert2';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
@@ -13,111 +11,122 @@ import { ViewLoading } from '../../../components/Loaders';
 import { Form, Formik } from 'formik';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import ShiftsCard from '../../shifts/components/ShiftsCard';
 
-const EditSiteModal = ({ id, ...props }) => {
-    
-    const { 
-        DefaultStatusType, 
-        SiteOrderType,
+
+const EditShiftModal = ({ id, ...props }) => {
+    const {
+        DefaultStatusType,
+        ShiftOrderType,
+        ShiftType,
     } = enums();
 
     const formDefaultValues = {
-        descriptionInput: '',
-        addressInput: '',
-        isMainSiteCheck: false,
+        typeSelect: '',
+        noEmployeesInput: '',
+        shiftStartInput: '',
+        shiftEndInput: '',
+        activitiesDescriptionInput: '',
         statusCheck: false,
     };
 
     // CUSTOM HOOKS
 
     const {
-        organization
-    } = useOrganizationsStore();
+        site
+    } = useSitesStore();
 
     const {
-        isSiteLoading,
-        isSiteCreating,
-        isSiteSaving,
-        siteSavedOk,
-        site,
-        siteAsync,
-        sitesAsync,
-        siteCreateAsync,
-        siteSaveAsync,
-        siteClear,
-    } = useSitesStore();
+        isShiftLoading,
+        isShiftCreating,
+        isShiftSaving,
+        shiftSavedOk,
+        shift,
+        shiftAsync,
+        shiftsAsync,
+        shiftCreateAsync,
+        shiftSaveAsync,
+        shiftClear
+    } = useShiftsStore();
 
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-    const [activeSite, setActiveSite] = useState(false);
-    const [isMainSiteCheck, setIsMainSiteCheck] = useState(false);
+    const [activeShift, setActiveShift] = useState(false);
 
     useEffect(() => {
-        
-        if (!!site) {
+console.log(shift)
+
+        if (!!shift) {
+
+console.log('setInitialValues')
             setInitialValues({
-                descriptionInput: site?.Description ?? '',
-                addressInput: site?.Address ?? '',
-                isMainSiteCheck: site?.IsMainSite ?? false,
-                statusCheck: site?.Status === DefaultStatusType.active,
+                ...initialValues,
+                // typeSelect: shift?.Type ?? '',
+                noEmployeesInput: shift?.NoEmployees ?? '',
+                shiftStartInput: shift?.ShiftStart ?? '',
+                shiftEndInput: shift?.ShiftEnd ?? '',
+                activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
+                // statusCheck: shift?.Status == DefaultStatusType.active,
             });
 
-            setActiveSite(site?.Status === DefaultStatusType.active);
-            setIsMainSiteCheck(site?.IsMainSite ?? false);
+            // setActiveShift(shift?.Status === DefaultStatusType.active);
+            setShowModal(true);
         }
-    }, [site]);
-
+    }, [shift]);
+    
     useEffect(() => {
-        if (siteSavedOk) {
-            Swal.fire('Site', `Site ${ !id ? 'created' : 'updated' } successfully`, 'success');
-            sitesAsync({
-                organizationID: organization.ID,
+        if(shiftSavedOk) {
+            Swal.fire('Shift', `Shift ${ !id ? 'created' : 'updated' } successfully`, 'success');
+            shiftsAsync({
+                siteID: site.ID,
                 pageSize: 0,
-                order: SiteOrderType.isMainSiteDesc,
-            });
-            siteClear();
+                order: ShiftOrderType.type,
+            })
+            shiftClear();
             setShowModal(false);
         }
-    }, [siteSavedOk]);
+    }, [shiftSavedOk]);
+
+    useEffect(() => {
+        console.log(showModal);
+    }, [showModal]);
+    
 
     // METHODS
 
     const onShowModal = () => {
 
-        if (!id) { // nuevo
-            siteCreateAsync({
-                OrganizationID: organization.ID,
-            });
-        } else { // editar
-            siteAsync(id);
-        }
-
         setShowModal(true);
+        
+        if (!id) {
+            shiftCreateAsync({
+                SiteID: site.ID,
+            });
+        } else {
+            shiftAsync(id);
+        }
     }; // onShowModal
 
     const onCloseModal = () => {
-        
-        siteClear();
+        shiftClear();
         setShowModal(false);
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
-        // console.log(values);
-
         const toSave = {
-            ID: site.ID,
-            Description: values.descriptionInput,
-            Address: values.addressInput,
-            IsMainSite: values.isMainSiteCheck,
+            ID: shift.ID,
+            Type: values.typeSelect,
+            NoEmployees: values.noEmployeesInput,
+            ShiftStart: values.shiftStartInput,
+            ShiftEnd: values.shiftEndInput,
+            ActivitiesDescription: values.activitiesDescriptionInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        // console.log(toSave);
+        console.log(toSave);
 
-        siteSaveAsync(toSave);
+        // shiftSaveAsync(toSave);
     }; // onFormSubmit
 
     return (
@@ -126,32 +135,24 @@ const EditSiteModal = ({ id, ...props }) => {
                 variant="link"
                 className="text-dark p-0 mb-0"
                 onClick={ onShowModal }
-                title={ !!id ? 'Edit site' : 'Add site' }
+                title={ !!id ? 'Edit shift' : 'Add shift' }
             >
                 <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } size="xl" />
             </Button>
-            <Modal show={ showModal} onHide={ onCloseModal } >
+            <Modal show={ showModal } onHide={ onCloseModal }>
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
-                            !!id ? (
-                                <>
-                                    <FontAwesomeIcon icon={ faEdit } className="px-3" />
-                                    Edit site
-                                </>
-                            ) : (
-                                <>
-                                    <FontAwesomeIcon icon={ faSquarePlus } className="px-3" />
-                                    Add site
-                                </>
-                            )
+                            !!id 
+                                ? ( <><FontAwesomeIcon icon={ faEdit } className="px-3" /> Edit shift</> ) 
+                                : ( <><FontAwesomeIcon icon={ faSquarePlus } className="px-3" /> Add shift</> )
                         }
                     </Modal.Title>
                 </Modal.Header>
                 {
-                    isSiteCreating ||  isSiteLoading ? (
+                    isShiftCreating || isShiftLoading ? (
                         <ViewLoading />
-                    ) : !!site ? (
+                    ) : !!shift ? (
                         <Formik
                             initialValues={ initialValues }
                             onSubmit={ onFormSubmit }
@@ -162,55 +163,34 @@ const EditSiteModal = ({ id, ...props }) => {
                                     <Modal.Body>
                                         <Row>
                                             <Col xs="12">
-                                                <AryFormikTextInput name="descriptionInput"
-                                                    label="Description"
-                                                />
-                                            </Col>
-                                            <Col xs="12">
-                                                <AryFormikTextInput name="addressInput"
-                                                    label="Address"
-                                                    placeholder="3312 Example Street, City 00000"
+                                                <AryFormikTextInput name="noEmployeesInput"
+                                                    type="text"
+                                                    label="Employees"
                                                 />
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12">
-                                                {/* <ShiftsCard /> */}
+                                            <Col xs="6">
+                                                <AryFormikTextInput name="shiftStartInput"
+                                                    label="Start"
+                                                />
+                                            </Col>
+                                            <Col xs="6">
+                                                <AryFormikTextInput name="shiftEndInput"
+                                                    label="End"
+                                                />
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12" sm="4">
-                                                <div className="form-check form-switch">
-                                                    <input id="isMainSiteCheck" name="isMainSiteCheck"
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        onChange={ (e) => {
-                                                            const isChecked = e.target.checked;
-                                                            formik.setFieldValue('isMainSiteCheck', isChecked);
-                                                            setIsMainSiteCheck(isChecked);
-                                                        }}
-                                                        checked={ formik.values.isMainSiteCheck }
-                                                    />
-                                                    <label
-                                                        className="form-check-label text-secondary mb-0"
-                                                        htmlFor="isMainSiteCheck"
-                                                    >
-                                                        {
-                                                            isMainSiteCheck ? 'Is main site' : 'Is secondary site'
-                                                        }
-                                                    </label>
-                                                </div>
-                                            </Col>
                                             <Col xs="12" sm="4">
                                                 <div className="form-check form-switch">
                                                     <input id="statusCheck" name="statusCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
-                                                        // onChange={ formik.handleChange }
                                                         onChange= { (e) => {
                                                             const isChecked = e.target.checked;
                                                             formik.setFieldValue('statusCheck', isChecked);
-                                                            setActiveSite(isChecked);
+                                                            setActiveShift(isChecked);
                                                         }} 
                                                         checked={ formik.values.statusCheck }
                                                     />
@@ -219,7 +199,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                                         htmlFor="statusCheck"
                                                     >
                                                         { 
-                                                            activeSite ? 'Active site' : 'Inactive site'
+                                                            activeShift ? 'Active shift' : 'Inactive shift'
                                                         }
                                                     </label>
                                                 </div>
@@ -230,18 +210,18 @@ const EditSiteModal = ({ id, ...props }) => {
                                         <div className="d-flex justify-content-between align-items-center w-100">
                                             <div className="text-secondary">
                                                 {
-                                                    !!site && 
+                                                    !!shift && 
                                                     <AryLastUpdatedInfo
-                                                        created={ site.Created }
-                                                        updated={ site.Updated }
-                                                        updatedUser={ site.UpdatedUser }
+                                                        created={ shift.Created }
+                                                        updated={ shift.Updated }
+                                                        updatedUser={ shift.UpdatedUser }
                                                     />
                                                 }
                                             </div>
                                             <div className="d-flex justify-content-end gap-2">
                                                 <button type="submit"
                                                     className="btn bg-gradient-dark mb-0"
-                                                    disabled={ isSiteSaving }
+                                                    disabled={ isShiftSaving }
                                                 >
                                                     <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
                                                     Save
@@ -258,12 +238,16 @@ const EditSiteModal = ({ id, ...props }) => {
                                 </Form>
                             )}
                         </Formik>
-                    ) : null
+                    ) : (
+                        <Modal.Body>
+                            <p className="text-sm text-secondary text-center my-5">(register not found)</p>
+                        </Modal.Body>
+                    )
+
                 }
-                <ShiftsCard />
             </Modal>
         </>
     )
 }
 
-export default EditSiteModal
+export default EditShiftModal

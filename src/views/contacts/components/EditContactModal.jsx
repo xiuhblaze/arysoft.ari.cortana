@@ -13,6 +13,7 @@ import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
 import { ViewLoading } from "../../../components/Loaders";
+import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
 const EditContactModal = ({ id, ...props}) => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
@@ -383,26 +384,14 @@ const EditContactModal = ({ id, ...props}) => {
                                     </Modal.Body>
                                     <Modal.Footer>
                                         <div className="d-flex justify-content-between align-items-center w-100">
-                                            <div>
+                                            <div className="text-secondary">
                                                 {
-                                                    !!contact && (
-                                                        <ListGroup className="opacity-7">
-                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
-                                                                <strong className="me-2">Created:</strong>
-                                                                { formatDistanceToNow(new Date(contact.Created)) }
-                                                                {/* { contact.Created.toLocaleString() } */}
-                                                            </ListGroup.Item>
-                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
-                                                                <strong className="me-2">Updated:</strong>
-                                                                { formatDistanceToNow(new Date(contact.Updated)) }
-                                                                {/* { contact.Updated.toLocaleString() } */}
-                                                            </ListGroup.Item>
-                                                            <ListGroup.Item className="border-0 py-0 ps-0 text-xs text-secondary">
-                                                                <strong className="me-2">Updated by:</strong>
-                                                                { contact.UpdatedUser }
-                                                            </ListGroup.Item>
-                                                        </ListGroup>
-                                                    )
+                                                    !!contact && 
+                                                    <AryLastUpdatedInfo
+                                                        created={ contact.Created }
+                                                        updated={ contact.Updated }
+                                                        updatedUser={ contact.UpdatedUser}
+                                                    />
                                                 }
                                             </div>
                                             <div className="d-flex justify-content-end gap-2">

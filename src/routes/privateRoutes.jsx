@@ -1,9 +1,10 @@
 
-import { faCity, faClipboard, faHome, faLandmark } from "@fortawesome/free-solid-svg-icons";
+import { faCity, faClipboard, faHome, faLandmark, faUsers } from "@fortawesome/free-solid-svg-icons";
 
 import { lazy } from "react";
 
 const lazyApplicationForm = lazy(() => import('../views/applicationForms'));
+const lazyAuditors = lazy(() => import('../views/auditors'));
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyOrganizations = lazy(() => import('../views/organizations'));
@@ -26,6 +27,14 @@ const privateRoute = [
         path: '/application-forms/*',
         icon: faClipboard,
         element: lazyApplicationForm
+    },
+    {
+        type: 'collapse',
+        title: 'Auditors',
+        key: 'auditors',
+        path: '/auditors/*',
+        icon: faUsers,
+        element: lazyAuditors
     },
     {
         type: 'collapse',

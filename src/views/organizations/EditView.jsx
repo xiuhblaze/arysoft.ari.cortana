@@ -20,6 +20,7 @@ import { Button } from "react-bootstrap";
 import EditContactModal from "../contacts/components/EditContactModal";
 import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
+import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
 const EditView = () => {
     const { id } = useParams();
@@ -289,11 +290,12 @@ const EditView = () => {
                                                     </Row>
                                                     <Row>
                                                         <Col className="d-flex flex-column flex-sm-row justify-content-between">
-                                                            <div className="d-flex align-items-center">
-                                                                <p className="text-xs mb-sm-0">
-                                                                    <strong>Last updated: </strong> {new Date(organization.Updated).toLocaleDateString()}<br />
-                                                                    <strong>By: </strong> {organization.UpdatedUser}
-                                                                </p>
+                                                            <div className="text-secondary">
+                                                                <AryLastUpdatedInfo 
+                                                                    created={ organization.Created }
+                                                                    updated={ organization.Updated }
+                                                                    updatedUser={ organization.UpdatedUser }
+                                                                />
                                                             </div>
                                                             <div className="d-flex justify-content-center justify-content-sm-between gap-2">
                                                                 <button type="submit"

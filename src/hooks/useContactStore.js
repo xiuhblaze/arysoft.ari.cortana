@@ -189,7 +189,7 @@ export const useContactsStore = () => {
             UpdatedUser: user.username,
         };
 
-        console.log(file);
+        //console.log(file);
 
         try {
             const formData = new FormData();

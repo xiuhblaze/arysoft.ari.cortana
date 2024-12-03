@@ -15,6 +15,7 @@ import Status from "./Status";
 
 import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
 import ContactsCard from "../../contacts/components/ContactsCard";
+import SitesCard from "../../sites/components/SitesCard";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -124,48 +125,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                     <ContactsCard readOnly />
                                 </Col>
                                 <Col xs="12" sm="4">
-                                    <Card className="h-100">
-                                        <Card.Header className="pb-0 p-3">
-                                            <h6 className="mb-0">Sites</h6>
-                                        </Card.Header>
-                                        <Card.Body className="p-3">
-                                            <ListGroup>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="me-3">
-                                                        <div className="icon icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center">
-                                                            <FontAwesomeIcon icon={faBuilding} size="lg" className="text-white mx-3" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">Arysoft headquarters</h6>
-                                                        <p className="mb-0 text-xs">Adolfo Ruiz Cortinez 701, Los Olivos, Ciudad Guzmán</p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="me-3">
-                                                        <div className="icon icon-shape bg-gradient-secondary border-radius-md d-flex align-items-center justify-content-center">
-                                                            <FontAwesomeIcon icon={faBuilding} size="lg" className="text-white mx-3" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">Arysoft studios</h6>
-                                                        <p className="mb-0 text-xs">Nombr de la calle 122, Centro, Colima</p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="me-3">
-                                                        <div className="icon icon-shape bg-gradient-light border-radius-md d-flex align-items-center justify-content-center">
-                                                            <FontAwesomeIcon icon={faBuildingCircleXmark} size="lg" className="text-white mx-3" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center opacity-6">
-                                                        <h6 className="mb-0 text-sm">Arysoft old</h6>
-                                                        <p className="mb-0 text-xs">Federico del Toro 130 int 303, Centro, Ciudada Guzmán</p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                            </ListGroup>
-                                        </Card.Body>
-                                    </Card>
+                                    <SitesCard readOnly />
                                 </Col>
                                 <Col xs="12" sm="4">
                                     <Card className="h-100">
