@@ -78,9 +78,9 @@ const SitesCard = ({ readOnly = false, ...props }) => {
                                             className={ itemStyle }
                                             title={ item.IsMainSite ? 'Is main site' : '' }
                                         >
-                                            <div className="d-flex align-items-center me-2">
+                                            <div className="d-flex align-items-top me-2">
                                                 <div>
-                                                    <div className={`icon icon-sm icon-shape ${iconBg} border-radius-md d-flex align-items-center justify-content-center me-3`}>
+                                                    <div className={`icon icon-md icon-shape ${iconBg} border-radius-md d-flex align-items-center justify-content-center me-3`}>
                                                         <FontAwesomeIcon icon={ faBuilding } size="lg" className="opacity-10 text-white" aria-hidden="true" />
                                                     </div>
                                                 </div>

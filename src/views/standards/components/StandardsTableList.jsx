@@ -12,6 +12,7 @@ import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
 import DetailsModal from "./DetailsModal";
 import Status from "./Status";
+import AryDefaultStatusBadge from "../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge";
 
 const StandardsTableList = ({ onOrder }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -146,7 +147,8 @@ const StandardsTableList = ({ onOrder }) => {
                                             </div>
                                         </td>
                                         <td className="align-middle text-center text-sm">
-                                            <Status value={item.Status} />
+                                            {/* <Status value={item.Status} /> */}
+                                            <AryDefaultStatusBadge value={item.Status} />
                                         </td>
                                         <td>
                                             <div className="d-flex flex-column align-items-start">

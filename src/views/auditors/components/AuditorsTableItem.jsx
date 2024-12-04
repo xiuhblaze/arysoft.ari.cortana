@@ -3,37 +3,31 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClone, faEdit, faEnvelope, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faPhone } from '@fortawesome/free-solid-svg-icons'
 
 import envVariables from '../../../helpers/envVariables'
+import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge'
 
 const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
     const { URI_AUDITOR_FILES } = envVariables();
     const pathPhotoFilename = `${URI_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}`;
 
-    const statusStyle = [
-        { label: '-', bgColor: 'bg-gradient-light' },
-        { label: 'Active', bgColor: 'bg-gradient-success' },
-        { label: 'Inactive', bgColor: 'bg-gradient-secondary' },
-        { label: 'Deleted', bgColor: 'bg-gradient-danger' },
-    ];
-
     const validityStatusStyle = [
         { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-        { icon: faFileCircleCheck , label: 'All documents are current', color: 'text-success', bgColor: 'bg-gradient-success' },
-        { icon: faFileCircleExclamation ,label: 'At least one document is close to expired', color: 'text-warning', bgColor: 'bg-gradient-warning' },
-        { icon: faFileCircleXmark , label: 'At least one document has expired', color: 'text-danger', bgColor: 'bg-gradient-danger' },
+        { icon: faFileCircleCheck , label: 'All documents are current', color: 'text-success shadow-xs', bgColor: 'bg-gradient-success' },
+        { icon: faFileCircleExclamation ,label: 'At least one document is close to expired', color: 'text-warning shadow-xs', bgColor: 'bg-gradient-warning' },
+        { icon: faFileCircleXmark , label: 'At least one document has expired', color: 'text-danger shadow-xs', bgColor: 'bg-gradient-danger' },
     ];
 
     const requiredStatusStyle = [
         { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-        { icon: faFileCircleCheck, label: 'All required documents are up to date', color: 'text-success', bgColor: 'bg-gradient-success' },
-        { icon: faFileCircleXmark, lable: 'At least one required document is missing', color: 'text-danger', bgColor: 'bg-gradient-danger' },
+        { icon: faFileCircleCheck, label: 'All required documents are up to date', color: 'text-info shadow-xs', bgColor: 'bg-gradient-info' },
+        { icon: faFileCircleXmark, label: 'At least one required document is missing', color: 'text-secondary shadow-xs', bgColor: 'bg-gradient-secondary' },
     ];
     
     return (
         <tr { ...props }>
             <td>
                 <div className="d-flex align-items-center me-2">
-                    <div className="avatar m-3">
-                        <img className="border-radius-lg shadow" src={ pathPhotoFilename } />
+                    <div className="avatar m-3" style={{ minWidth: '48px' }}>
+                        <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">
                         <h6 className={`mb-0 text-sm ${ item.IsLeadAuditor ? 'text-info text-gradient' : '' }`}>{ item.FullName }</h6>
@@ -63,14 +57,12 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
             </td>
             <td>
                 <div className="d-flex justify-content-center gap-1">
-                    
                     <FontAwesomeIcon 
                         icon={ validityStatusStyle[item.ValidityStatus].icon } 
                         className={ validityStatusStyle[item.ValidityStatus].color } 
                         size="lg" 
                         title={ validityStatusStyle[item.ValidityStatus].label }
                     />
-                    
                     <FontAwesomeIcon 
                         icon={ requiredStatusStyle[item.RequiredStatus].icon } 
                         className={ requiredStatusStyle[item.RequiredStatus].color } 
@@ -79,12 +71,8 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
                     />
                 </div>
             </td>
-            <td>
-                <div className="d-flex justify-content-center gap-1">
-                    <span className={`badge badge-sm ${ statusStyle[item.Status].bgColor }`}>
-                        { statusStyle[item.Status].label }
-                    </span>
-                </div>
+            <td className="align-middle text-center text-sm">
+                <AryDefaultStatusBadge value={ item.Status } />
             </td>
             {
                 !hideActions && 

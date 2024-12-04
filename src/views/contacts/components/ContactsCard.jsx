@@ -75,9 +75,9 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                             className={ itemStyle }
                                             title={ item.IsMainContact ? 'Is main contact' : '' }
                                         >
-                                            <div className="d-flex align-items-center me-2">
-                                                <div className="avatar me-3">
-                                                    <img className="border-radius-lg shadow" src={ fileName } />
+                                            <div className="d-flex align-items-top me-2">
+                                                <div className="avatar me-3" style={{ minWidth: '48px' }}>
+                                                    <img className="border-radius-md shadow" src={ fileName } />
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
                                                     <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>{ item.FullName }</h6>

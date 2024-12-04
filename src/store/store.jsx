@@ -5,6 +5,7 @@ import applicationFormClientSlice from "./slices/applicationFormClientSlice";
 import applicationFormsSlice from "./slices/applicationFormsSlice";
 import auditorsSlice from "./slices/auditorsSlice";
 import authSlice from "./slices/authslice";
+import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
 import contactsSlice from "./slices/contactsSlice";
 import nacecodesSlice from "./slices/nacecodesSlice";
 import organizationsSlice from "./slices/organizationsSlice";
@@ -18,6 +19,7 @@ export const store = configureStore({
     applicationForms: applicationFormsSlice.reducer,
     auditors: auditorsSlice.reducer,
     auth: authSlice.reducer,
+    catAuditorDocuments: catAuditorDocumentsSlice.reducer,
     contacts: contactsSlice.reducer,
     nacecodes: nacecodesSlice.reducer,
     organizations: organizationsSlice.reducer,

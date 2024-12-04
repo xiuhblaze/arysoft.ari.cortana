@@ -49,6 +49,56 @@ const enums = () => {
         regular: 2,
     });
 
+    const AuditorDocumentType = Object.freeze({
+        nothing: 0,
+        exam: 1,
+        other: 2,
+    });
+
+    const AuditorDocumentValidityType = Object.freeze({
+        nothing: 0,
+        success: 1,    // Toda la documentacion esta en orden
+        warning: 2,    // Al menos un documento esta por vencer
+        danger: 3      // Al menos un documento esta vencido
+    });
+
+    const AuditorDocumentRequiredType = Object.freeze({
+        nothing: 0,
+        success: 1,    // Toda la documentación requerida se encuentra
+        danger: 2      // Falta al menos un documento requerido
+    });
+
+    const CatAuditorDocumentType = Object.freeze({
+        nothing: 0,
+        hiring: 1,
+        evaluation: 2,
+        training: 3
+    });
+   
+    const CatAuditorDocumentSubCategoryType = Object.freeze({
+        nothing: 0,
+        civ: 1,
+        k: 2,
+        l: 3
+    });
+   
+    const CatAuditorDocumentPeriodicityType = Object.freeze({
+        nothing: 0,
+        days: 1,
+        months: 2,
+        years: 3
+    });
+
+    const CatAuditorDocumentOrderType = Object.freeze({
+        nothing: 0,
+        documentType: 1,
+        order: 2,
+        updated: 3,
+        documentTypeDesc: 4,
+        orderDesc: 5,
+        updatedDesc: 6,
+    });
+
     const ContactOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
@@ -138,6 +188,13 @@ const enums = () => {
         ApplicationFormStatusType,
         AuditorOrderType,
         AuditorIsLeaderType,
+        AuditorDocumentType,
+        AuditorDocumentValidityType,
+        AuditorDocumentRequiredType,
+        CatAuditorDocumentType,
+        CatAuditorDocumentSubCategoryType,
+        CatAuditorDocumentPeriodicityType,
+        CatAuditorDocumentOrderType,
         ContactOrderType,
         NacecodeOrderType,
         OrganizationOrderType,

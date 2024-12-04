@@ -6,7 +6,7 @@ import AuditorDetailsModal from './AuditorDetailsModal';
 
 const AuditorsTable = () => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
-    
+
     // CUSTOM HOOKS
 
     const {
@@ -50,8 +50,8 @@ const AuditorsTable = () => {
                                     <th className={headStyle}>
                                         Contact info
                                     </th>
-                                    <th className={ `text-center ${headStyle}`}>
-                                        Documents
+                                    <th className={ `text-center ${headStyle}`} title="FSSC Auditor Documents checklist">
+                                        FSSC Checklist
                                     </th>
                                     <th className={ `text-center ${headStyle}`}>
                                         Status

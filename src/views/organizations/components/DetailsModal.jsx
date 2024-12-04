@@ -31,7 +31,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
 
     useEffect(() => {
         if (organizationSavedOk) {
-            Swal.fire('Standards', 'Successful restoration');
+            Swal.fire('Standards', 'Successful restoration', 'success');
             organizationClear();
             onHide();
         }
