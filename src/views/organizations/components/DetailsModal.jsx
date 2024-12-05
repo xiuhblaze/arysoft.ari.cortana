@@ -79,7 +79,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                             >
                                 <span className={`mask bg-gradient-${statusProps[organization.Status].bgColor} opacity-6`}></span>
                             </div>
-                            <div className="card card-body blur shadow-blur mx-4 mt-n5 overflow-hidden">
+                            <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
                                 <div className="row gx-4">
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">

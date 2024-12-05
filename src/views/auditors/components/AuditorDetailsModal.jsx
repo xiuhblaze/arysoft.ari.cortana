@@ -14,6 +14,7 @@ import { faArrowRotateLeft, faEdit, faEnvelope, faPhone, faShare } from '@fortaw
 import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
 import AuditorDocumentsCard from './AuditorDocumentsCard';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import { getFullName } from '../../../helpers/getFullName';
 
 const AuditorDetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -40,17 +41,8 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
 
     // METHODS
 
-    const getFullName = (item) => {
-        let fullName = item.FirstName;
-
-        if (!isNullOrEmpty(item.MiddleName)) fullName += ' ' + item.MiddleName;
-        if (!isNullOrEmpty(item.LastName)) fullName += ' ' + item.LastName;
-
-        return fullName;
-    };
-
     const onEditButton = () => {
-        console.log('onEditButton');
+        navigate(`/auditors/${auditor.ID}`);
     };
 
     const onRestoreButton = () => {
@@ -74,7 +66,7 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
                             >
                                 <span className={`mask bg-gradient-${defaultStatusProps[auditor.Status].bgColor} opacity-6`} />
                             </div>
-                            <div className="card card-body blur shadow-blur mx-4 mt-n5 overflow-hidden">
+                            <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
                                 <Row className="gx-4">
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">
@@ -135,11 +127,7 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
                 <div className="d-flex justify-content-between align-items-center w-100">
                     <div>
                         { !!auditor && 
-                            <AryLastUpdatedInfo
-                                created={ auditor.Created }
-                                updated={ auditor.Updated }
-                                updatedUser={ auditor.UpdatedUser }
-                            />
+                            <AryLastUpdatedInfo item={auditor} />
                         }
                     </div>
                     <div className="d-flex justify-content-end gap-2">

@@ -6,18 +6,17 @@ import Swal from 'sweetalert2';
 
 import enums from "../../helpers/enums";
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
-import { Card, Col, Container, Image, ListGroup, Row } from "react-bootstrap";
+import { Card, Col, Container, Image, Row } from "react-bootstrap";
 import { ViewLoading } from "../../components/Loaders";
 import Status from "./components/Status";
 import { Form, Formik } from "formik";
 import { AryFormikTextInput } from "../../components/Forms";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckDouble, faSave, faTrashCan, faUserGear, faUserPen, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCheckDouble, faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import statusProps from "./helpers/StatusProps";
 
 import bgHead from '../../assets/img/bgTrianglesBW.jpg';
 import { Button } from "react-bootstrap";
-import EditContactModal from "../contacts/components/EditContactModal";
 import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
 import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
@@ -107,8 +106,7 @@ const EditView = () => {
         console.log('onApproveButton');
     }; // onApproveButton
 
-    // const onActiveButton //! Aqui voy
-
+    // const onActiveButton //! Aqui voy... y ahi me quede jojojo!
     const onDeleteButton = () => {
 
         Swal.fire({
@@ -139,7 +137,7 @@ const EditView = () => {
                                 <>
                                     <Card.Body>
                                         <div
-                                            className="page-header min-height-100 border-radius-lg"
+                                            className="page-header min-height-150 border-radius-lg"
                                             style={{
                                                 backgroundImage: `url(${bgHead})`,
                                                 backgroundPositionY: '50%'
@@ -147,11 +145,11 @@ const EditView = () => {
                                         >
                                             <span className={`mask bg-gradient-${statusProps[organization.Status].bgColor} opacity-6`}></span>
                                         </div>
-                                        <div className="card card-body blur shadow-blur mx-4 mt-n5 overflow-hidden">
+                                        <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
                                             <div className="row gx-4">
                                                 <div className="col-auto">
                                                     <div className="avatar avatar-xl position-relative">
-                                                        <img src={avatarPreview} alt="profile_image" className="w-100 border-radius-lg shadow-sm" />
+                                                        <img src={avatarPreview} alt="Organization logotype" className="w-100 border-radius-lg shadow-sm" />
                                                     </div>
                                                 </div>
                                                 <div className="col-auto my-auto">
@@ -291,11 +289,7 @@ const EditView = () => {
                                                     <Row>
                                                         <Col className="d-flex flex-column flex-sm-row justify-content-between">
                                                             <div className="text-secondary">
-                                                                <AryLastUpdatedInfo 
-                                                                    created={ organization.Created }
-                                                                    updated={ organization.Updated }
-                                                                    updatedUser={ organization.UpdatedUser }
-                                                                />
+                                                                <AryLastUpdatedInfo item={ organization } />
                                                             </div>
                                                             <div className="d-flex justify-content-center justify-content-sm-between gap-2">
                                                                 <button type="submit"

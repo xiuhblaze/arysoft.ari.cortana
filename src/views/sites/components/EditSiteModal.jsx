@@ -230,12 +230,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                         <div className="d-flex justify-content-between align-items-center w-100">
                                             <div className="text-secondary">
                                                 {
-                                                    !!site && 
-                                                    <AryLastUpdatedInfo
-                                                        created={ site.Created }
-                                                        updated={ site.Updated }
-                                                        updatedUser={ site.UpdatedUser }
-                                                    />
+                                                    !!site && <AryLastUpdatedInfo item={ site } />
                                                 }
                                             </div>
                                             <div className="d-flex justify-content-end gap-2">

@@ -1,115 +1,122 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Form, Formik } from "formik";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuditorsStore } from "../../../hooks/useAuditorsStore"
 import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
-
 import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Form, Formik } from "formik";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 
-const Toolbar = () => {
+const AuditorsToolbar = () => {
     const formDefaultData = {
         textInput: '',
+        isLeaderSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
-    const { OrganizationOrderType, OrganizationStatusType } = enums();
+    const { 
+        AuditorIsLeaderType,
+        AuditorOrderType,
+        DefaultStatusType
+    } = enums();
     const {
-        ORGANIZATIONS_OPTIONS,
+        AUDITORS_OPTIONS,
         VITE_PAGE_SIZE
     } = envVariables();
 
     // CUSTOM HOOKS
 
     const {
-        isOrganizationCreating,
-        organizationCreatedOk,
-        organization,
-        organizationsAsync,
-        organizationCreateAsync,
-    } = useOrganizationsStore();
-    
+        isAuditorCreating,
+        auditorCreatedOk,
+        auditor,
+        auditorsAsync,
+        auditorCreateAsync,
+    } = useAuditorsStore();
+
     // HOOKS
-    
+
     const navigate = useNavigate();
 
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch.text ?? '',
+                isLeaderSelect: savedSearch.isLeader ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
     }, []);
-
+    
     useEffect(() => {
-        if (organizationCreatedOk) {
-            navigate(`/organizations/${organization.ID}`);
+        if (auditorCreatedOk) {
+            navigate(`/auditors/${auditor.ID}`);
         }
-    }, [organizationCreatedOk]);
+    }, [auditorCreatedOk]);    
 
     // METHODS
 
     const onNewItem = () => {
-        organizationCreateAsync();
-    };
+        auditorCreateAsync();
+    }; // onNewItem
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
             text: values.textInput,
+            isLeader: values.isLeaderSelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
 
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+        //console.log(search);
+
+        auditorsAsync(search);
+        localStorage.setItem(AUDITORS_OPTIONS, JSON.stringify(search));
+    }; // onSearchSubmit
 
     const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
         const search = {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
-            order: OrganizationOrderType.name,
+            order: AuditorOrderType.firstName,
         };
 
         setInitialValues(formDefaultData);
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+        auditorsAsync(search);
+        localStorage.setItem(AUDITORS_OPTIONS, JSON.stringify(search));
+    }; // onCleanSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
                 <button
                     className="btn bg-gradient-dark d-flex justify-content-center align-items-center mb-0"
-                    onClick={onNewItem}
-                    title="New organization"
-                    disabled={isOrganizationCreating}
+                    onClick={ onNewItem }
+                    title="New auditor"
+                    disabled={ isAuditorCreating }
                 >
-                    <FontAwesomeIcon icon={faPlus} className="me-1" />
+                    <FontAwesomeIcon icon={ faPlus } className="me-1" />
                     Add
                 </button>
             </div>
             <div className="flex-fill">
                 <Formik
-                    initialValues={initialValues}
+                    initialValues={ initialValues }
                     onSubmit={onSearchSubmit}
                     enableReinitialize
                 >
-                    {(formik) => (
+                    { formik => (
                         <Form>
                             <div className="d-flex flex-column flex-md-row">
                                 <div className="flex-md-grow-1 me-md-3">
@@ -122,15 +129,29 @@ const Toolbar = () => {
                                             />
                                         </div>
                                         <div className="col-12 col-sm-auto">
-                                            <AryFormikSelectInput name="statusSelect">
+                                            <AryFormikSelectInput name="isLeaderSelect">
                                                 {
-                                                    Object.keys(OrganizationStatusType).map(key =>
+                                                    Object.keys(AuditorIsLeaderType).map(key =>
                                                         <option
                                                             key={key}
-                                                            value={OrganizationStatusType[key]}
+                                                            value={AuditorIsLeaderType[key]}
                                                             className="text-capitalize"
                                                         >
-                                                            {key === 'nothing' ? '(all)' : key}
+                                                            {key === 'nothing' ? '(auditor)' : key}
+                                                        </option>
+                                                    )}
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-auto">
+                                            <AryFormikSelectInput name="statusSelect">
+                                                {
+                                                    Object.keys(DefaultStatusType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={DefaultStatusType[key]}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {key === 'nothing' ? '(status)' : key}
                                                         </option>
                                                     )}
                                             </AryFormikSelectInput>
@@ -150,31 +171,22 @@ const Toolbar = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* <div className="col-auto ps-0">
-                                            <div className="form-check form-switch mt-lg-2 mt-xxl-2">
-                                                <input id="includeDeletedCheck" name="includeDeletedCheck"
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    onChange={formik.handleChange}
-                                                    checked={formik.values.includeDeletedCheck}
-                                                />
-                                                <label className="form-check-label" htmlFor="includeDeletedCheck">Show deleted records</label>
-                                            </div>
-                                        </div> */}
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info d-flex justify-content-center align-items-center">
+                                        <button type="submit" className="btn bg-gradient-info">
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-outline-secondary" onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
+                                        <button type="button" className="btn btn-link text-secondary"
+                                            onClick={ (values) => {
+                                                onCleanSearch(values);
+                                                formik.resetForm(initialValues);
+                                            }}
+                                        >
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>
@@ -188,4 +200,4 @@ const Toolbar = () => {
     )
 }
 
-export default Toolbar
+export default AuditorsToolbar;

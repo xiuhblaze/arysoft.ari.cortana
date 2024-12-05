@@ -385,14 +385,7 @@ const EditContactModal = ({ id, ...props}) => {
                                     <Modal.Footer>
                                         <div className="d-flex justify-content-between align-items-center w-100">
                                             <div className="text-secondary">
-                                                {
-                                                    !!contact && 
-                                                    <AryLastUpdatedInfo
-                                                        created={ contact.Created }
-                                                        updated={ contact.Updated }
-                                                        updatedUser={ contact.UpdatedUser}
-                                                    />
-                                                }
+                                                <AryLastUpdatedInfo item={contact} />
                                             </div>
                                             <div className="d-flex justify-content-end gap-2">
                                                 <button type="submit" 

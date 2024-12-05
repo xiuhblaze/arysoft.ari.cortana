@@ -1,21 +1,25 @@
-import { Card, ListGroup } from 'react-bootstrap'
-import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore'
-import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
 import { useEffect } from 'react';
-import enums from '../../../helpers/enums';
-import { ViewLoading } from '../../../components/Loaders';
+import { Alert, Card, ListGroup } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileCircleCheck, faUserCheck, faUserGraduate, faUserPen } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faCircleCheck, faCircleExclamation, faCircleXmark, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faUserCheck, faUserGraduate, faUserPen } from '@fortawesome/free-solid-svg-icons';
+
+import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
+import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore'
+import { ViewLoading } from '../../../components/Loaders';
 import AuditorDocumentsCardItem from './AuditorDocumentsCardItem';
+import enums from '../../../helpers/enums';
 
 const AuditorDocumentsCard = () => {
     const titleStyle = "bg-light p-2 border-radius-md mb-2";
 
     const { 
+        AuditorDocumentValidityType,
         DefaultStatusType,
         CatAuditorDocumentType,
         CatAuditorDocumentOrderType
     } = enums();
+
+    // CUSTOM HOOKS
 
     const {
         isAuditorLoading,
@@ -28,6 +32,8 @@ const AuditorDocumentsCard = () => {
         catAuditorDocumentsAsync,
     } = useCatAuditorDocumentsStore();
 
+    // HOOKS
+
     useEffect(() => {
 
         catAuditorDocumentsAsync({
@@ -36,14 +42,23 @@ const AuditorDocumentsCard = () => {
             order: CatAuditorDocumentOrderType.documentType,
         });
     }, []);
-    
+
+    const showAlert = !!auditor 
+        ? auditor.ValidityStatus != AuditorDocumentValidityType.success
+        : false;
+    const infoAlert = [
+        { icon: faCircle, iconTitle: faFile, label: '-', variant: 'light' },
+        { icon: faCircleCheck, iconTitle: faFileCircleCheck, label: 'All updated', variant: 'success' },
+        { icon: faCircleExclamation, iconTitle: faFileCircleExclamation, label: 'At least one document is close to expired', variant: 'warning' },
+        { icon: faCircleXmark, iconTitle: faFileCircleXmark, label: 'At least one document has expired', variant: 'danger' },
+    ];
 
     return (
         <Card className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">
-                        <FontAwesomeIcon icon={ faFileCircleCheck } size="lg" className="text-success me-3" />
+                        <FontAwesomeIcon icon={ infoAlert[auditor.ValidityStatus].iconTitle } size="lg" className={`text-${ infoAlert[auditor.ValidityStatus].variant } me-2`} />
                         FSSC Auditor Documents checklist
                     </h5>
                 </div>
@@ -54,9 +69,13 @@ const AuditorDocumentsCard = () => {
                         <ViewLoading />
                     ) : !!auditor && !!catAuditorDocuments && (
                         <>
-                            <div className="alert alert-info text-white">
-                                Aqui wa mostrar cuando al menos un documento este por expirar o haya expirado
-                            </div>
+                            {
+                                showAlert && 
+                                <Alert variant={ infoAlert[auditor.ValidityStatus].variant } className="text-white text-xs" closeVariant="white" closeLabel="Close" dismissible>
+                                    <FontAwesomeIcon icon={ infoAlert[auditor.ValidityStatus].icon } size="xl" className="me-2" />
+                                    { infoAlert[auditor.ValidityStatus].label }
+                                </Alert>
+                            }
                             <h6 className={ titleStyle }>
                                 <FontAwesomeIcon icon={ faUserPen } size="lg" className="me-2" />
                                 Hiring documents
@@ -80,7 +99,6 @@ const AuditorDocumentsCard = () => {
                                     })
                                 }
                             </ListGroup>
-                            <hr className="horizontal dark my-3" />
                             <h6 className={ titleStyle }>
                                 <FontAwesomeIcon icon={ faUserCheck } size="lg" className="me-2" />
                                 Category, sub-category document evaluation
@@ -98,7 +116,6 @@ const AuditorDocumentsCard = () => {
                                     })
                                 }
                             </ListGroup>
-                            <hr className="horizontal dark my-3" />
                             <h6 className={ titleStyle }>
                             <FontAwesomeIcon icon={ faUserGraduate } size="lg" className="me-2" />
                                 Training

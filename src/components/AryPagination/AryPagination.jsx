@@ -18,19 +18,20 @@ export const AryPagination = ({ currentPage, totalPages, onClickGoPage, ...props
 
     if (currentPage < 1 || currentPage > totalPages) return;
 
-    useEffect(() => {
-        const onMiniPagination = () => {
-            const currentWidth = containerRef.current.clientWidth;
-            setMaxElements(currentWidth < 576 ? PAGINATION_MIN : PAGINATION_MAX);
-        };
+    //! Deshabilitado temporalmente porque causa conflictos - xBlaze: 20241205
+    // useEffect(() => {
+    //     const onMiniPagination = () => {
+    //         const currentWidth = containerRef.current.clientWidth;
+    //         setMaxElements(currentWidth < 576 ? PAGINATION_MIN : PAGINATION_MAX);
+    //     };
 
-        window.addEventListener('resize', onMiniPagination);
-        onMiniPagination();
+    //     window.addEventListener('resize', onMiniPagination);
+    //     onMiniPagination();
         
-        return () => {
-            window.removeEventListener('resize', onMiniPagination);
-        }
-    });
+    //     return () => {
+    //         window.removeEventListener('resize', onMiniPagination);
+    //     }
+    // });
 
     let i = 0;
     do { i += maxElements; } while (i < currentPage);
