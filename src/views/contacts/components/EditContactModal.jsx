@@ -15,6 +15,8 @@ import envVariables from "../../../helpers/envVariables";
 import { ViewLoading } from "../../../components/Loaders";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
+import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
+
 const EditContactModal = ({ id, ...props}) => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
@@ -55,9 +57,9 @@ const EditContactModal = ({ id, ...props}) => {
         contactAsync,
         contactCreateAsync,
         contactSaveAsync,
-        contactSaveWithFileAsync,
         contactDeleteFileAsync,
         contactClear,
+        contactsErrorMessage,
     } = useContactsStore();
 
     // HOOKS
@@ -145,7 +147,7 @@ const EditContactModal = ({ id, ...props}) => {
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive, //contact.Status,
         };
 
-        contactSaveWithFileAsync(toSave, values.photoFileInput);
+        contactSaveAsync(toSave, values.photoFileInput);
     }; // onFormSubmit
 
     const onDeleteFile = () => {
@@ -273,7 +275,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                         </>
                                                     ) : !!contact.PhotoFilename && 
                                                         <div>
-                                                            <Image src={`${VITE_FILES_URI}/contacts/${contact.PhotoFilename}`}
+                                                            <Image src={`${VITE_FILES_URI}/contacts/${contact.ID}/${contact.PhotoFilename}`}
                                                                 thumbnail
                                                                 fluid
                                                                 className="mb-3"

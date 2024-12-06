@@ -17,7 +17,7 @@ export const auditorsSlice = createSlice({
         auditorDeletedOk: false,
         auditor: null,
 
-        auditorErrorMessage: null,
+        auditorsErrorMessage: null,
     },
     reducers: {
         // Collection
@@ -97,10 +97,10 @@ export const auditorsSlice = createSlice({
             state.auditorSavedOk = false;
             state.isAuditorDeleting = false;
             state.auditorDeletedOk = false;
-            state.auditorErrorMessage = action.payload;
+            state.auditorsErrorMessage = action.payload;
         },
         clearAuditorsErrorMessage: (state) => {
-            state.auditorErrorMessage = null;
+            state.auditorsErrorMessage = null;
         }
     }
 });

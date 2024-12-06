@@ -9,6 +9,8 @@ import isString from "./isString";
 export const getError = (error) => {
     let message = '';
 
+    // console.log(error);
+
     if (!!error.response && !!error.response.data && !!error.response.data.validation) {
         const { validation } = error.response.data;
 
@@ -27,6 +29,15 @@ export const getError = (error) => {
                 message,
                 status: 400
             };
+        }
+    }
+
+    if (!!error.response && !!error.response.data && error.response.data.Detail) {
+        const { Detail } = error.response.data;
+        
+        return {
+            message: Detail,
+            status: 400
         }
     }
 

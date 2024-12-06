@@ -23,9 +23,9 @@ import {
 
 import envVariables from "../helpers/envVariables";
 import getErrorMessages from "../helpers/getErrorMessages";
-import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const CONTACT_URI = '/contacts';
 const { VITE_DEFAULT_PAGESIZE } = envVariables();
@@ -65,22 +65,25 @@ export const useContactsStore = () => {
     } = useSelector(state => state.contacts)
 
     const { user } = useSelector(state => state.auth);
-    const {
-        EstatusType,
-        ContactsOrdenType
-    } = enums();
-
+    
     // Methods
 
-    const setError = (message) => {
+    const setError = (value) => {
 
-        if (message.length === 0) return;
+        if (isString(value)) {
+            dispatch(setContactsErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setContactsErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }
 
-        dispatch(setContactsErrorMessage(message));
+        // dispatch(setContactsErrorMessage(message));
         setTimeout(() => {
             dispatch(clearContactsErrorMessage());
         }, 10);
-    };
+    }; // setError
 
     //* Export Methods
 
@@ -158,38 +161,36 @@ export const useContactsStore = () => {
         }
     };
 
-    /**
-     * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-     * @param {ID, Name, Description, Status, UpdatedUser} item Objeto tipo Contact
-     */
-    const contactSaveAsync = async (item) => {
-        dispatch(onContactSaving());
+    // /**
+    //  * Llama al endpoint para actualizar la información de un registro existente en la base de datos
+    //  * @param {ID, Name, Description, Status, UpdatedUser} item Objeto tipo Contact
+    //  */
+    // const contactSaveAsync = async (item) => {
+    //     dispatch(onContactSaving());
 
-        const toSave = {
-            ...item,
-            UpdatedUser: user.username,
-        }
-        try {
-            const resp = await cortanaApi.put(`${CONTACT_URI}/${toSave.ID}`, toSave);
-            const { Data } = await resp.data;
+    //     const toSave = {
+    //         ...item,
+    //         UpdatedUser: user.username,
+    //     }
+    //     try {
+    //         const resp = await cortanaApi.put(`${CONTACT_URI}/${toSave.ID}`, toSave);
+    //         const { Data } = await resp.data;
 
-            dispatch(setContact(Data));
-            dispatch(isContactSaved());
-        } catch (error) {
-            const message = getErrorMessages(error);
-            setError(message);
-        }
-    };
+    //         dispatch(setContact(Data));
+    //         dispatch(isContactSaved());
+    //     } catch (error) {
+    //         const message = getErrorMessages(error);
+    //         setError(message);
+    //     }
+    // };
 
-    const contactSaveWithFileAsync = async (item, file) => {
+    const contactSaveAsync = async (item, file) => {
         dispatch(onContactSaving());
 
         const toSave = {
             ...item,
             UpdatedUser: user.username,
         };
-
-        //console.log(file);
 
         try {
             const formData = new FormData();
@@ -201,17 +202,17 @@ export const useContactsStore = () => {
             formData.append('data', data);
             formData.append('file', file);
 
-            const resp = await cortanaApi.put(`${CONTACT_URI}/contact-with-file`, formData, { headers });
+            const resp = await cortanaApi.put(`${CONTACT_URI}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
             dispatch(isContactSaved());
 
         } catch(error) {
-            const infoError = getErrorMessages(error);
+            const infoError = getError(error);
             setError(infoError);
         }
-    }; // contactSaveWithFileAsync
+    }; // contactSaveAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -227,9 +228,11 @@ export const useContactsStore = () => {
 
         try {
             const resp = await cortanaApi.delete(`${CONTACT_URI}/${id}`, { data: toDelete });
+
+            console.log('contactDeleteAsync.resp', resp);
+
             dispatch(isContactDeleted());
         } catch (error) {
-            //console.log(error);
             const message = getErrorMessages(error);
             setError(message);
         }
@@ -243,8 +246,10 @@ export const useContactsStore = () => {
         };
 
         try {
-            const resp = await cortanaApi.delete(`${CONTACT_URI}/delete-file/${id}`, { data: toDeleteFile });
+            const resp = await cortanaApi.delete(`${CONTACT_URI}/${id}/photofile`, { data: toDeleteFile });
             const { Data } = await resp.data;
+
+            console.log('contactDeleteFileAsync.Data', Data)
 
             if (!!Data) {
                 setContact({
@@ -255,8 +260,8 @@ export const useContactsStore = () => {
             
             return Data;
         } catch (error) {
-            const message = getErrorMessages(error);
-            setError(message);
+            const infoError = getError(error);
+            setError(infoError);
         }
 
         return null;
@@ -290,7 +295,7 @@ export const useContactsStore = () => {
         contactAsync,
         contactCreateAsync,
         contactSaveAsync,
-        contactSaveWithFileAsync,
+        // contactSaveWithFileAsync,
         contactDeleteAsync,
         contactDeleteFileAsync,
         contactClear,

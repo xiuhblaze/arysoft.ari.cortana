@@ -66,11 +66,17 @@ export const useAuditorsStore = () => {
     
     // Methods
 
-    const setError = (message) => {
+    const setError = (value) => {
 
-        if (message.length === 0) return;
-
-        dispatch(setAuditorsErrorMessage(message));
+        if (isString(value)) {
+            dispatch(setContactsErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setContactsErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }
+        
         setTimeout(() => {
             dispatch(clearAuditorsErrorMessage());
         }, 10);
@@ -218,9 +224,10 @@ export const useAuditorsStore = () => {
 
         try {
             const resp = await cortanaApi.delete(`${AUDITOR_URI}/${id}`, { data: toDelete });
+
+            console.log('auditorDeleteAsync.resp', resp);
             dispatch(isAuditorDeleted());
         } catch (error) {
-            //console.log(error);
             const message = getError(error);
             setError(message);
         }
@@ -234,8 +241,10 @@ export const useAuditorsStore = () => {
         };
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITOR_URI}/delete-file/${id}`, { data: toDeleteFile });
+            const resp = await cortanaApi.delete(`${AUDITOR_URI}/${id}/photofile`, { data: toDeleteFile });
             const { Data } = await resp.data;
+
+            console.log('auditorDeleteFileAsync.Data', Data)
 
             if (!!Data) {
                 setAuditor({

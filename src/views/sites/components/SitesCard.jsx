@@ -4,9 +4,10 @@ import { useSitesStore } from '../../../hooks/useSiteStore'
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
 import { ViewLoading } from '../../../components/Loaders'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBuilding, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faBuilding } from '@fortawesome/free-solid-svg-icons'
 import EditSiteModal from './EditSiteModal'
 import enums from '../../../helpers/enums'
+import Swal from 'sweetalert2'
 
 const SitesCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -27,7 +28,8 @@ const SitesCard = ({ readOnly = false, ...props }) => {
     const { 
         isSitesLoading, 
         sites,
-        sitesAsync
+        sitesAsync,
+        sitesErrorMessage,
     } = useSitesStore();
 
     // HOOKS
@@ -51,7 +53,11 @@ const SitesCard = ({ readOnly = false, ...props }) => {
         }
     }, [sites]);
     
-    
+    useEffect(() => {
+        if (!!sitesErrorMessage) {
+            Swal.fire('Sites', sitesErrorMessage, 'error');
+        }
+    }, [sitesErrorMessage]);
 
     return (
         <Card className="h-100">

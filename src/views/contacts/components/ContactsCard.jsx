@@ -3,10 +3,10 @@ import EditContactModal from "./EditContactModal"
 import { useContactsStore } from "../../../hooks/useContactStore"
 import { useEffect } from "react";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import enums from "../../../helpers/enums";
+import Swal from "sweetalert2";
 
+import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -26,7 +26,8 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
     const {
         isContactsLoading,
         contacts,
-        contactsAsync
+        contactsAsync,
+        contactsErrorMessage,
     } = useContactsStore();
 
     // HOOKS
@@ -41,12 +42,15 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
         }
     }, [organization]);
 
-    
-    
+    useEffect(() => {
+        if (!!contactsErrorMessage) {
+            Swal.fire('Contacts', contactsErrorMessage, 'error');
+        }
+    }, [contactsErrorMessage]);
     
 
     return (
-        <Card className="h-100">
+        <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h6 className="mb-0">Contacts</h6>
@@ -67,7 +71,9 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                         <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                             {
                                 contacts.map( item => {
-                                    const fileName = `/files/contacts/${ item.PhotoFilename ?? 'nocontactphoto.png' }`;
+                                    const fileName = !!item.PhotoFilename
+                                        ? `/files/contacts/${item.ID}/${ item.PhotoFilename }`
+                                        : defaultProfile ;
                                     const itemStyle= `border-0 d-flex justify-content-between align-items-center px-0 mb-2 ${ statusStyle[item.Status] }`;
 
                                     return (

@@ -3,11 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClone, faEdit, faEnvelope, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faPhone } from '@fortawesome/free-solid-svg-icons'
 
 import envVariables from '../../../helpers/envVariables'
-import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge'
+import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
+import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
     const { URI_AUDITOR_FILES } = envVariables();
-    const pathPhotoFilename = `${URI_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}`;
+    const pathPhotoFilename = !!item.PhotoFilename 
+        ? `${URI_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}` 
+        : defaultProfile;
 
     const validityStatusStyle = [
         { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },

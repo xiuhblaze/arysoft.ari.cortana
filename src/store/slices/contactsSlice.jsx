@@ -17,7 +17,7 @@ export const contactsSlice = createSlice({
         contactDeletedOk: false,
         contact: null,
 
-        contactErrorMessage: null,
+        contactsErrorMessage: null,
     },
     reducers: {
         // Collection
@@ -97,10 +97,10 @@ export const contactsSlice = createSlice({
             state.contactSavedOk = false;
             state.isContactDeleting = false;
             state.contactDeletedOk = false;
-            state.contactErrorMessage = action.payload;
+            state.contactsErrorMessage = action.payload;
         },
         clearContactsErrorMessage: (state) => {
-            state.contactErrorMessage = null;
+            state.contactsErrorMessage = null;
         }
     }
 });

@@ -71,11 +71,16 @@ export const useSitesStore = () => {
 
     // Methods
 
-    const setError = (message) => {
+    const setError = (value) => {
 
-        if (message.length === 0) return;
-
-        dispatch(setSitesErrorMessage(message));
+        if (isString(value)) {
+            dispatch(setSitesErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setSitesErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }
         setTimeout(() => {
             dispatch(clearSitesErrorMessage());
         }, 10);
