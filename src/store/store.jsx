@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import applicationFormClientSlice from "./slices/applicationFormClientSlice";
 import applicationFormsSlice from "./slices/applicationFormsSlice";
+import auditorDocumentsSlice from "./slices/auditorDocumentsSlice";
 import auditorsSlice from "./slices/auditorsSlice";
 import authSlice from "./slices/authslice";
 import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
@@ -17,6 +18,7 @@ export const store = configureStore({
   reducer: {
     applicationFormClient: applicationFormClientSlice.reducer,
     applicationForms: applicationFormsSlice.reducer,
+    auditorDocuments: auditorDocumentsSlice.reducer,
     auditors: auditorsSlice.reducer,
     auth: authSlice.reducer,
     catAuditorDocuments: catAuditorDocumentsSlice.reducer,

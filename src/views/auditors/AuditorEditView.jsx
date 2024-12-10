@@ -6,7 +6,7 @@ import enums from '../../helpers/enums';
 import { useAuditorsStore } from '../../hooks/useAuditorsStore';
 import { getFullName } from '../../helpers/getFullName';
 import Swal from 'sweetalert2';
-import { Card, Col, Container, Image, Row } from 'react-bootstrap';
+import { Card, Col, Container, Image, Nav, Row } from 'react-bootstrap';
 import { ViewLoading } from '../../components/Loaders';
 
 import defaultStatusProps from '../../helpers/defaultStatusProps';
@@ -17,13 +17,14 @@ import { Form, Formik } from 'formik';
 import * as Yup from "yup";
 import { AryFormikTextInput } from '../../components/Forms';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBan, faEnvelope, faHome, faPhone, faRotateRight, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faEnvelope, faHome, faLandmark, faPhone, faRotateRight, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AryLastUpdatedInfo from '../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 
 import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
 import defaultProfile from '../../assets/img/phoDefaultProfile.jpg';
 import envVariables from '../../helpers/envVariables';
 import AuditorDocumentsCard from './components/AuditorDocumentsCard';
+import auditorValidityProps from './helpers/auditorValidityProps';
 
 const AuditorEditView = () => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
@@ -31,6 +32,7 @@ const AuditorEditView = () => {
     const {
         DefaultStatusType,
         AuditorIsLeaderType,
+        AuditorDocumentValidityType,
     } = enums();
 
     const formDefaultValues = {
@@ -71,10 +73,10 @@ const AuditorEditView = () => {
                 test: (value, ctx) => {
                     if (!!value) {
                         const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
-                        const validTypes = ['pdf', 'jpg', 'jpeg', 'png'];
+                        const validTypes = ['jpg', 'jpeg', 'png'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
-                                message: 'Only files with png, jpg and pdf extensions are allowed'
+                                message: 'Only files with png or jpg extensions are allowed'
                             });
                         }
                     }
@@ -82,7 +84,6 @@ const AuditorEditView = () => {
                 }
             }),
     });
-
 
     // CUSTOM HOOKS
 
@@ -114,6 +115,7 @@ const AuditorEditView = () => {
     const [newPhoto, setNewPhoto] = useState(false);
     const [activeAccountCheck, setActiveAccountCheck] = useState(false);
     const [isLeadAuditorCheck, setIsLeadAuditorCheck] = useState(false);
+    const [navOptions, setNavOptions] = useState("documents")
 
     const [fullName, setFullName] = useState("(new auditor)");
 
@@ -229,14 +231,6 @@ const AuditorEditView = () => {
                                             <Row className="gx-4">
                                                 <div className="col-auto">
                                                     <div className="avatar avatar-xl position-relative">
-                                                        {/* <img 
-                                                            src={ isNullOrEmpty(auditor.PhotoFilename) //! Aun a esto le falta algo, que pasa si selecciono una nueva imagen?
-                                                                ? defaultProfile
-                                                                : `/files/auditors/${auditor.ID}/${auditor.PhotoFilename}`
-                                                            } 
-                                                            className="border-radius-md"
-                                                            alt="Profile photo"
-                                                        /> */}
                                                         <Image
                                                             src={!!photoPreview
                                                                 ? photoPreview
@@ -255,7 +249,7 @@ const AuditorEditView = () => {
                                                             {fullName}
                                                         </h5>
                                                         <p className="mb-0 font-weight-bold text-sm">
-                                                            Update data
+                                                            Update auditor's profile
                                                         </p>
                                                     </div>
                                                 </div>
@@ -264,18 +258,16 @@ const AuditorEditView = () => {
                                                 </div>
                                             </Row>
                                         </div>
-                                    </Card.Body>
-                                    <Formik
-                                        initialValues={initialValues}
-                                        validationSchema={validationSchema}
-                                        enableReinitialize
-                                        onSubmit={onFormSubmit}
-                                    >
-                                        {formik => (
-                                            <Form>
-                                                <Card.Body className="pt-0">
-                                                    <Row>
-                                                        <Col xs="12" sm="6">
+                                        <Row className="mt-4">
+                                            <Col xs="12" sm="6">
+                                                <Formik
+                                                    initialValues={initialValues}
+                                                    validationSchema={validationSchema}
+                                                    enableReinitialize
+                                                    onSubmit={onFormSubmit}
+                                                >
+                                                    {formik => (
+                                                        <Form>
                                                             <Row>
                                                                 <Col xs="12" sm="4">
                                                                     <div className="d-flex justify-content-between">
@@ -412,7 +404,7 @@ const AuditorEditView = () => {
                                                                         placeholder="3312 Example Street, City 00000"
                                                                     />
                                                                 </Col>
-                                                                <Col xd="12" sm="4">
+                                                                <Col xs="12" md="6" xxl="4">
                                                                     <div className="form-check form-switch">
                                                                         <input id="isLeadAuditorCheck" name="isLeadAuditorCheck"
                                                                             className="form-check-input"
@@ -434,7 +426,7 @@ const AuditorEditView = () => {
                                                                         </label>
                                                                     </div>
                                                                 </Col>
-                                                                <Col xd="12" sm="4">
+                                                                <Col xs="12" md="6" xxl="4">
                                                                     <div className="form-check form-switch">
                                                                         <input id="statusCheck" name="statusCheck"
                                                                             className="form-check-input"
@@ -455,51 +447,73 @@ const AuditorEditView = () => {
                                                                     </div>
                                                                 </Col>
                                                             </Row>
-                                                        </Col>
-                                                        <Col xs="12" sm="6">
-                                                            <AuditorDocumentsCard />
-                                                        </Col>
-                                                    </Row>
-
-                                                </Card.Body>
-                                                <Card.Footer>
-                                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                                        <div className="text-secondary">
-                                                            <AryLastUpdatedInfo item={auditor} />
-                                                        </div>
-                                                        <div className="d-flex justify-content-end gap-2">
-                                                            <button type="submit"
-                                                                className="btn bg-gradient-dark mb-0"
-                                                                disabled={isAuditorSaving}
+                                                            <hr className="horizontal dark my-4" />
+                                                            <Row>
+                                                                <Col xs="12">
+                                                                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                                                                        <div className="text-secondary mb-3 mb-sm-0">
+                                                                            <AryLastUpdatedInfo item={auditor} />
+                                                                        </div>
+                                                                        <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                                                            <button type="submit"
+                                                                                className="btn bg-gradient-dark mb-0"
+                                                                                disabled={isAuditorSaving}
+                                                                            >
+                                                                                <FontAwesomeIcon icon={faSave} className="me-1" size="lg" />
+                                                                                Save
+                                                                            </button>
+                                                                            <button type="button"
+                                                                                className="btn btn-link text-secondary mb-0"
+                                                                                onClick={onCancelButton}>
+                                                                                Close
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </Col>
+                                                            </Row>
+                                                        </Form>
+                                                    )}
+                                                </Formik>
+                                            </Col>
+                                            <Col xs="12" sm="6">
+                                                <div className="nav-wrapper position-relative end-0 mb-3">
+                                                    <Nav
+                                                        activeKey={ navOptions }
+                                                        onSelect={ (selectedKey) => setNavOptions(selectedKey) }
+                                                        variant="pills"
+                                                        className="nav-fill p-1"
+                                                        role="tablist"
+                                                    >
+                                                        <Nav.Item>
+                                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="documents"
+                                                                title={ auditorValidityProps[auditor.ValidityStatus].label }
                                                             >
-                                                                <FontAwesomeIcon icon={faSave} className="me-1" size="lg" />
-                                                                Save
-                                                            </button>
-                                                            <button type="button"
-                                                                className="btn btn-link text-secondary mb-0"
-                                                                onClick={onCancelButton}>
-                                                                Close
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </Card.Footer>
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                    {/* </Card.Body> */}
+                                                                <FontAwesomeIcon 
+                                                                    icon={ auditorValidityProps[auditor.ValidityStatus].iconFile } 
+                                                                    className={`me-2 text-${ auditorValidityProps[auditor.ValidityStatus].variant }`}
+                                                                />
+                                                                FSSC Checklist
+                                                            </Nav.Link>
+                                                        </Nav.Item>
+                                                        <Nav.Item>
+                                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="nacecodes">
+                                                                <FontAwesomeIcon icon={ faLandmark } className="me-2" />
+                                                                Nace Codes
+                                                            </Nav.Link>
+                                                        </Nav.Item>
+                                                    </Nav>
+                                                </div>
+                                                { navOptions == "documents" && <AuditorDocumentsCard /> }
+                                                { navOptions == "nacecodes" && <div>NACE Codes</div> }
+                                            </Col>
+                                        </Row>
+                                    </Card.Body>
                                 </>
                             )
                         }
                     </Card>
                 </Col>
             </Row>
-            {/* <Row className="mt-4">
-                <Col xs="12" sm="6">
-                {
-                    !!auditor && <AuditorDocumentsCard />
-                }
-                </Col>
-            </Row> */}
         </Container>
     )
 }

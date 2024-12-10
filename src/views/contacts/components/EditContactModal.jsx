@@ -210,6 +210,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                         !newPhoto && !!contact.PhotoFilename &&
                                                         <div className="d-flex justify-content-end gap-3">
                                                             <button 
+                                                                type="button"
                                                                 className="btn btn-link p-0 mb-0 text-secondary"
                                                                 onClick={ () => { setNewPhoto(true) }}
                                                                 title="Upload new photo profile"

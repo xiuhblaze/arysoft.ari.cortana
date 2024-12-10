@@ -116,7 +116,7 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
 
                             <Row className="mt-4">
                                 <Col xs="12">
-                                    <AuditorDocumentsCard />
+                                    <AuditorDocumentsCard readOnly />
                                 </Col>
                             </Row>
                         </>

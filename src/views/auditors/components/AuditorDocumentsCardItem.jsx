@@ -5,8 +5,10 @@ import { ListGroupItem } from 'react-bootstrap'
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import enums from '../../../helpers/enums';
 import { format } from 'date-fns';
+import AuditorDocumentsEditItem from './AuditorDocumentsEditItem';
+import auditorValidityProps from '../helpers/auditorValidityProps';
 
-const AuditorDocumentsCardItem = ({ item, document, ...props }) => {
+const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }) => {
     const { 
         AuditorDocumentValidityType,
         AuditorDocumentRequiredType,
@@ -19,13 +21,6 @@ const AuditorDocumentsCardItem = ({ item, document, ...props }) => {
         { label: 'CIV' },
         { label: 'K' },
         { label: 'L' },
-    ];
-
-    const validityStatusStyle = [
-        { icon: faFile, label: 'No document', color: 'text-light', bgColor: 'bg-gradient-light' },
-        { icon: faFileCircleCheck , label: 'Updated document', color: 'text-success', bgColor: 'bg-gradient-success' },
-        { icon: faFileCircleExclamation ,label: 'The document is close to expired', color: 'text-warning', bgColor: 'bg-gradient-warning' },
-        { icon: faFileCircleXmark , label: 'The document has expired', color: 'text-danger', bgColor: 'bg-gradient-danger' },
     ];
 
     const requiredStatusStyle = [
@@ -49,10 +44,10 @@ const AuditorDocumentsCardItem = ({ item, document, ...props }) => {
             <div className="d-flex align-items-center me-2">
                 <div>
                     <div 
-                        className={`icon icon-sm icon-shape ${ validityStatusStyle[validityStatus].bgColor } border-radius-md d-flex align-items-center justify-content-center me-2`}
-                        title={ validityStatusStyle[validityStatus].label }
+                        className={`icon icon-sm icon-shape bg-gradient-${ auditorValidityProps[validityStatus].variant } border-radius-md d-flex align-items-center justify-content-center me-2`}
+                        title={ auditorValidityProps[validityStatus].singularLabel }
                     >
-                        <FontAwesomeIcon icon={ validityStatusStyle[validityStatus].icon } className="opacity-10 text-white" aria-hidden="true" />
+                        <FontAwesomeIcon icon={ auditorValidityProps[validityStatus].iconFile } className="opacity-10 text-white" aria-hidden="true" />
                     </div>
                 </div>
                 <div className="d-flex align-items-start flex-column justify-content-top">
@@ -81,7 +76,7 @@ const AuditorDocumentsCardItem = ({ item, document, ...props }) => {
                             <FontAwesomeIcon icon={ faPlay } className="me-1" />
                             { format(new Date(document.StartDate), 'yyyy-MM-dd') }
                         </p>
-                        <p className={`text-end text-xs mb-0 ${ validityStatusStyle[validityStatus].color }`} title="Next update">
+                        <p className={`text-end text-xs mb-0 text-${ auditorValidityProps[validityStatus].variant }`} title="Next update">
                             <FontAwesomeIcon icon={ faRotate } className="me-1" />
                             { format(new Date(document.DueDate), 'yyyy-MM-dd') }
                         </p>
@@ -106,6 +101,15 @@ const AuditorDocumentsCardItem = ({ item, document, ...props }) => {
                             <FontAwesomeIcon icon={ faFile } size="lg" />
                         </a>
                     ) : <FontAwesomeIcon icon={ faFile } size="lg" className="text-secondary" />
+                }
+                {
+                    !readOnly && 
+                    <div className="ms-2">
+                        <AuditorDocumentsEditItem  
+                            catAuditorDocumentID={ item.ID } 
+                            auditorDocumentID={ !!document ? document.ID : null } 
+                        />
+                    </div>
                 }
             </div>
         </ListGroupItem>

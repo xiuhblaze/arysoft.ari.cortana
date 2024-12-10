@@ -8,8 +8,9 @@ import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumen
 import { ViewLoading } from '../../../components/Loaders';
 import AuditorDocumentsCardItem from './AuditorDocumentsCardItem';
 import enums from '../../../helpers/enums';
+import auditorValidityProps from '../helpers/auditorValidityProps';
 
-const AuditorDocumentsCard = () => {
+const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
     const titleStyle = "bg-light p-2 border-radius-md mb-2";
 
     const { 
@@ -43,22 +44,12 @@ const AuditorDocumentsCard = () => {
         });
     }, []);
 
-    const showAlert = !!auditor 
-        ? auditor.ValidityStatus != AuditorDocumentValidityType.success
-        : false;
-    const infoAlert = [
-        { icon: faCircle, iconTitle: faFile, label: '-', variant: 'light' },
-        { icon: faCircleCheck, iconTitle: faFileCircleCheck, label: 'All updated', variant: 'success' },
-        { icon: faCircleExclamation, iconTitle: faFileCircleExclamation, label: 'At least one document is close to expired', variant: 'warning' },
-        { icon: faCircleXmark, iconTitle: faFileCircleXmark, label: 'At least one document has expired', variant: 'danger' },
-    ];
-
     return (
-        <Card className="h-100">
+        <Card { ...props }>
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">
-                        <FontAwesomeIcon icon={ infoAlert[auditor.ValidityStatus].iconTitle } size="lg" className={`text-${ infoAlert[auditor.ValidityStatus].variant } me-2`} />
+                        <FontAwesomeIcon icon={ auditorValidityProps[auditor.ValidityStatus].iconFile } size="lg" className={`text-${ auditorValidityProps[auditor.ValidityStatus].variant } me-2`} />
                         FSSC Auditor Documents checklist
                     </h5>
                 </div>
@@ -70,10 +61,10 @@ const AuditorDocumentsCard = () => {
                     ) : !!auditor && !!catAuditorDocuments && (
                         <>
                             {
-                                showAlert && 
-                                <Alert variant={ infoAlert[auditor.ValidityStatus].variant } className="text-white text-xs" closeVariant="white" closeLabel="Close" dismissible>
-                                    <FontAwesomeIcon icon={ infoAlert[auditor.ValidityStatus].icon } size="xl" className="me-2" />
-                                    { infoAlert[auditor.ValidityStatus].label }
+                                !!auditor && auditor.ValidityStatus != AuditorDocumentValidityType.success && 
+                                <Alert variant={ auditorValidityProps[auditor.ValidityStatus].variant } className="text-white text-xs" closeVariant="white" closeLabel="Close" dismissible>
+                                    <FontAwesomeIcon icon={ auditorValidityProps[auditor.ValidityStatus].icon } size="xl" className="me-2" />
+                                    { auditorValidityProps[auditor.ValidityStatus].label }
                                 </Alert>
                             }
                             <h6 className={ titleStyle }>
@@ -91,10 +82,13 @@ const AuditorDocumentsCard = () => {
                                             d.CatAuditorDocumentID == item.ID
                                             && d.Status == DefaultStatusType.active
                                         );
-
-                                        // console.log(currentDocument);
                                         return (
-                                            <AuditorDocumentsCardItem key={ item.ID } item={item} document={ findDocument } />
+                                            <AuditorDocumentsCardItem 
+                                                key={ item.ID }
+                                                item={ item }
+                                                document={ findDocument }
+                                                readOnly={ readOnly }
+                                            />
                                         )
                                     })
                                 }
@@ -110,8 +104,17 @@ const AuditorDocumentsCard = () => {
                                         .sort((a, b) => a.Order - b.Order)
                                         .map(item =>
                                     {
+                                        const findDocument = auditor.Documents.find(d => 
+                                            d.CatAuditorDocumentID == item.ID
+                                            && d.Status == DefaultStatusType.active
+                                        );
                                         return (
-                                            <AuditorDocumentsCardItem key={ item.ID } item={item} />
+                                            <AuditorDocumentsCardItem 
+                                                key={ item.ID }
+                                                item={item}
+                                                document={ findDocument }
+                                                readOnly={ readOnly }
+                                            />
                                         )
                                     })
                                 }
@@ -128,8 +131,17 @@ const AuditorDocumentsCard = () => {
                                         .sort((a, b) => a.Order - b.Order)
                                         .map(item =>
                                     {
+                                        const findDocument = auditor.Documents.find(d => 
+                                            d.CatAuditorDocumentID == item.ID
+                                            && d.Status == DefaultStatusType.active
+                                        );
                                         return (
-                                            <AuditorDocumentsCardItem key={ item.ID } item={item} />
+                                            <AuditorDocumentsCardItem
+                                                key={ item.ID }
+                                                item={item}
+                                                document={ findDocument }
+                                                readOnly={ readOnly } 
+                                            />
                                         )
                                     })
                                 }
