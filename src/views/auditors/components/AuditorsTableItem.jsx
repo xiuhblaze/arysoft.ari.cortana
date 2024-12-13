@@ -5,6 +5,8 @@ import { faClone, faEdit, faEnvelope, faFile, faFileCircleCheck, faFileCircleExc
 import envVariables from '../../../helpers/envVariables'
 import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
+import auditorValidityProps from '../helpers/auditorValidityProps';
+import auditorRequiredProps from '../helpers/auditorRequiredProps';
 
 const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
     const { URI_AUDITOR_FILES } = envVariables();
@@ -12,18 +14,18 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
         ? `${URI_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}` 
         : defaultProfile;
 
-    const validityStatusStyle = [
-        { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-        { icon: faFileCircleCheck , label: 'All documents are current', color: 'text-success shadow-xs', bgColor: 'bg-gradient-success' },
-        { icon: faFileCircleExclamation ,label: 'At least one document is close to expired', color: 'text-warning shadow-xs', bgColor: 'bg-gradient-warning' },
-        { icon: faFileCircleXmark , label: 'At least one document has expired', color: 'text-danger shadow-xs', bgColor: 'bg-gradient-danger' },
-    ];
+    // const validityStatusStyle = [
+    //     { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
+    //     { icon: faFileCircleCheck , label: 'All documents are current', color: 'text-success shadow-xs', bgColor: 'bg-gradient-success' },
+    //     { icon: faFileCircleExclamation ,label: 'At least one document is close to expired', color: 'text-warning shadow-xs', bgColor: 'bg-gradient-warning' },
+    //     { icon: faFileCircleXmark , label: 'At least one document has expired', color: 'text-danger shadow-xs', bgColor: 'bg-gradient-danger' },
+    // ];
 
-    const requiredStatusStyle = [
-        { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-        { icon: faFileCircleCheck, label: 'All required documents are up to date', color: 'text-info shadow-xs', bgColor: 'bg-gradient-info' },
-        { icon: faFileCircleXmark, label: 'At least one required document is missing', color: 'text-secondary shadow-xs', bgColor: 'bg-gradient-secondary' },
-    ];
+    // const requiredStatusStyle = [
+    //     { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
+    //     { icon: faFileCircleCheck, label: 'All required documents are up to date', color: 'text-dark shadow-xs', bgColor: 'bg-gradient-dark' },
+    //     { icon: faFileCircleXmark, label: 'At least one required document is missing', color: 'text-secondary shadow-xs', bgColor: 'bg-gradient-secondary' },
+    // ];
     
     return (
         <tr { ...props }>
@@ -61,16 +63,16 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
             <td>
                 <div className="d-flex justify-content-center gap-1">
                     <FontAwesomeIcon 
-                        icon={ validityStatusStyle[item.ValidityStatus].icon } 
-                        className={ validityStatusStyle[item.ValidityStatus].color } 
+                        icon={ auditorValidityProps[item.ValidityStatus].iconFile } 
+                        className={ `text-${auditorValidityProps[item.ValidityStatus].variant}` } 
                         size="lg" 
-                        title={ validityStatusStyle[item.ValidityStatus].label }
+                        title={ auditorValidityProps[item.ValidityStatus].label }
                     />
                     <FontAwesomeIcon 
-                        icon={ requiredStatusStyle[item.RequiredStatus].icon } 
-                        className={ requiredStatusStyle[item.RequiredStatus].color } 
+                        icon={ auditorRequiredProps[item.RequiredStatus].icon } 
+                        className={ `text-${auditorRequiredProps[item.RequiredStatus].variant}` } 
                         size="lg"
-                        title={ requiredStatusStyle[item.RequiredStatus].label } 
+                        title={ auditorRequiredProps[item.RequiredStatus].label } 
                     />
                 </div>
             </td>

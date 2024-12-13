@@ -1,4 +1,4 @@
-import { faExclamation, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faPlay, faRotate } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faExclamation, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faPlay, faRotate, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react'
 import { ListGroupItem } from 'react-bootstrap'
@@ -7,14 +7,20 @@ import enums from '../../../helpers/enums';
 import { format } from 'date-fns';
 import AuditorDocumentsEditItem from './AuditorDocumentsEditItem';
 import auditorValidityProps from '../helpers/auditorValidityProps';
+import auditorRequiredProps from '../helpers/auditorRequiredProps';
+import AuditorDocumentsHistoryList from './AuditorDocumentsHistoryList';
 
-const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }) => {
+const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistory = false, ...props }) => {
     const { 
+        AuditorDocumentType,
         AuditorDocumentValidityType,
         AuditorDocumentRequiredType,
-        CatAuditorDocumentSubCategoryType
+        CatAuditorDocumentSubCategoryType,
+        DefaultStatusType
     } = enums();
-    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0`;
+    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0${ !!document && document.Status == DefaultStatusType.inactive ? ' opacity-6' : '' }`;
+
+    // console.log(item.Status, document?.Status);
 
     const subCategory = [
         { label: '-' },
@@ -23,10 +29,10 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }
         { label: 'L' },
     ];
 
-    const requiredStatusStyle = [
-        { color: 'text-secondary', label: '-'},
-        { color: 'text-success', label: 'Current document'},
-        { color: 'text-danger', label: 'The document is required'},
+    const documentTypeProps = [
+        { label: '' },
+        { label: 'Exam' },
+        { label: 'Other' }
     ];
 
     const validityStatus = !!document 
@@ -34,7 +40,7 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }
         : AuditorDocumentValidityType.nothing;
 
     const requiredStatus = item.IsRequired 
-        ? !!document 
+        ? !!document && document.Status == DefaultStatusType.active
             ? AuditorDocumentRequiredType.success 
             : AuditorDocumentRequiredType.danger
         : AuditorDocumentRequiredType.nothing;
@@ -72,12 +78,19 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }
                 {
                     !!document &&
                     <div className="d-flex flex-column me-2">
-                        <p className="text-end text-xs mb-0" title="Date updated">
-                            <FontAwesomeIcon icon={ faPlay } className="me-1" />
+                        {
+                            !!document.Type && document.Type != AuditorDocumentType.nothing &&
+                            <p className="d-flex flex-row text-xs font-weight-bold justify-content-start mb-0" title="Document type">
+                                <FontAwesomeIcon icon={ faFile } className="me-1" fixedWidth />
+                                { documentTypeProps[document.Type].label }
+                            </p>
+                        }
+                        <p className="d-flex flex-row justify-content-start text-xs mb-0" title="Date updated">
+                            <FontAwesomeIcon icon={ faPlay } className="me-1" fixedWidth />
                             { format(new Date(document.StartDate), 'yyyy-MM-dd') }
                         </p>
-                        <p className={`text-end text-xs mb-0 text-${ auditorValidityProps[validityStatus].variant }`} title="Next update">
-                            <FontAwesomeIcon icon={ faRotate } className="me-1" />
+                        <p className={`d-flex flex-row justify-content-start text-xs mb-0 text-${ auditorValidityProps[validityStatus].variant }`} title="Next update">
+                            <FontAwesomeIcon icon={ faRotate } className="me-1" fixedWidth />
                             { format(new Date(document.DueDate), 'yyyy-MM-dd') }
                         </p>
                     </div>
@@ -87,9 +100,8 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }
                     <FontAwesomeIcon 
                         icon={ faExclamation } 
                         size="lg" 
-                        className={ requiredStatusStyle[requiredStatus].color }
-                        title={ requiredStatusStyle[requiredStatus].label }
-
+                        className={ `text-${auditorRequiredProps[requiredStatus].variant}` }
+                        title={ auditorRequiredProps[requiredStatus].label }
                     />
                 }
                 {
@@ -102,15 +114,23 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, ...props }
                         </a>
                     ) : <FontAwesomeIcon icon={ faFile } size="lg" className="text-secondary" />
                 }
-                {
-                    !readOnly && 
-                    <div className="ms-2">
-                        <AuditorDocumentsEditItem  
-                            catAuditorDocumentID={ item.ID } 
-                            auditorDocumentID={ !!document ? document.ID : null } 
-                        />
-                    </div>
-                }
+                <div className="d-flex justify-content-end align-items-center ms-2 gap-2">
+                    { 
+                        !!document && !isNullOrEmpty(document.Observations) 
+                            ? <FontAwesomeIcon icon={ faStickyNote } className="text-warning" title={ document.Observations } />
+                            : <FontAwesomeIcon icon={ faStickyNote } className="text-secondary" title="No observations" />
+                    }
+                    {
+                        !readOnly && 
+                            <AuditorDocumentsEditItem  
+                                catAuditorDocumentID={ item.ID } 
+                                auditorDocumentID={ !!document ? document.ID : null } 
+                            />
+                    }
+                    {
+                        !hideHistory && <AuditorDocumentsHistoryList catAuditorDocumentID={ item.ID } />
+                    }
+                </div>
             </div>
         </ListGroupItem>
     )

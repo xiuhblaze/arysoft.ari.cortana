@@ -3,8 +3,6 @@ import BasicLayout from '../../layouts/basic/BasicLayout';
 
 import imgHombreNegocios from '../../assets/img/hombre-negocios-usado-su-movil.jpg';
 import { Col, Container, ListGroup, Row } from 'react-bootstrap';
-import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NewsItem from './components/NewsItem';
 
 import news from './data/newsData';

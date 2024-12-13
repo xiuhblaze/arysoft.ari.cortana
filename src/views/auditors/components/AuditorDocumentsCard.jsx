@@ -9,12 +9,14 @@ import { ViewLoading } from '../../../components/Loaders';
 import AuditorDocumentsCardItem from './AuditorDocumentsCardItem';
 import enums from '../../../helpers/enums';
 import auditorValidityProps from '../helpers/auditorValidityProps';
+import auditorRequiredProps from '../helpers/auditorRequiredProps';
 
 const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
     const titleStyle = "bg-light p-2 border-radius-md mb-2";
 
     const { 
         AuditorDocumentValidityType,
+        AuditorDocumentRequiredType,
         DefaultStatusType,
         CatAuditorDocumentType,
         CatAuditorDocumentOrderType
@@ -50,6 +52,7 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                 <div className="d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">
                         <FontAwesomeIcon icon={ auditorValidityProps[auditor.ValidityStatus].iconFile } size="lg" className={`text-${ auditorValidityProps[auditor.ValidityStatus].variant } me-2`} />
+                        <FontAwesomeIcon icon={ auditorRequiredProps[auditor.RequiredStatus].icon } size="lg" className={ `text-${ auditorRequiredProps[auditor.RequiredStatus].variant} me-2` } />
                         FSSC Auditor Documents checklist
                     </h5>
                 </div>
@@ -67,6 +70,13 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     { auditorValidityProps[auditor.ValidityStatus].label }
                                 </Alert>
                             }
+                            {
+                                !!auditor && auditor.RequiredStatus != AuditorDocumentRequiredType.success &&
+                                <Alert variant={ auditorRequiredProps[auditor.RequiredStatus].variant } className="text-white text-xs" closeVariant="white" dismissible>
+                                    <FontAwesomeIcon icon={ auditorRequiredProps[auditor.RequiredStatus].icon } size="xl" className="me-2" />
+                                    { auditorRequiredProps[auditor.RequiredStatus].label }
+                                </Alert>
+                            }
                             <h6 className={ titleStyle }>
                                 <FontAwesomeIcon icon={ faUserPen } size="lg" className="me-2" />
                                 Hiring documents
@@ -76,21 +86,23 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     catAuditorDocuments
                                         .filter(i => i.DocumentType == CatAuditorDocumentType.hiring)
                                         .sort((a, b) => a.Order - b.Order)
-                                        .map(item =>
-                                    {
-                                        const findDocument = auditor.Documents.find(d => 
-                                            d.CatAuditorDocumentID == item.ID
-                                            && d.Status == DefaultStatusType.active
-                                        );
-                                        return (
-                                            <AuditorDocumentsCardItem 
-                                                key={ item.ID }
-                                                item={ item }
-                                                document={ findDocument }
-                                                readOnly={ readOnly }
-                                            />
-                                        )
-                                    })
+                                        .map(item => {
+                                            const findDocument = auditor.Documents == null 
+                                                ? null
+                                                : auditor.Documents
+                                                    .find(d => 
+                                                        d.CatAuditorDocumentID == item.ID
+                                                        && (d.Status == DefaultStatusType.active || d.Status == DefaultStatusType.inactive)
+                                                    );
+                                            return (
+                                                <AuditorDocumentsCardItem 
+                                                    key={ item.ID }
+                                                    item={ item }
+                                                    document={ findDocument }
+                                                    readOnly={ readOnly }
+                                                />
+                                            )
+                                        })
                                 }
                             </ListGroup>
                             <h6 className={ titleStyle }>
@@ -106,7 +118,7 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     {
                                         const findDocument = auditor.Documents.find(d => 
                                             d.CatAuditorDocumentID == item.ID
-                                            && d.Status == DefaultStatusType.active
+                                            && (d.Status == DefaultStatusType.active || d.Status == DefaultStatusType.inactive)
                                         );
                                         return (
                                             <AuditorDocumentsCardItem 
@@ -133,7 +145,7 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     {
                                         const findDocument = auditor.Documents.find(d => 
                                             d.CatAuditorDocumentID == item.ID
-                                            && d.Status == DefaultStatusType.active
+                                            && (d.Status == DefaultStatusType.active || d.Status == DefaultStatusType.inactive)
                                         );
                                         return (
                                             <AuditorDocumentsCardItem

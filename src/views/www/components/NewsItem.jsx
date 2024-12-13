@@ -24,18 +24,18 @@ export const NewsItem = ({ title, subtitle, children, ...props }) => {
         </div>
       </ListGroupItem>
 
-      <Modal show={ showModal } onHide={ onClose } size="lg">
+      <Modal show={ showModal } onHide={ onClose } size="xl">
         {/* <Modal.Header closeButton>
           <Modal.Title>{ title }</Modal.Title>
         </Modal.Header> */}
         <Modal.Body className="mx-4">
           <h2 className="text-center my-4">{ title }</h2>
-          <div className="overflow-y-scroll" style={{ maxHeight: '50vh' }}>
+          <div style={{ maxHeight: '65vh', overflowY: 'auto' }}>
             { children }
           </div>
         </Modal.Body>
         <Modal.Footer className="text-end pe-4">
-          <button className="btn bg-gradient-dark" onClick={ onClose }>Close</button>
+          <button className="btn btn-link text-secondary" onClick={ onClose }>Close</button>
         </Modal.Footer>
       </Modal>
     </>

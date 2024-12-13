@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react'
-import { faEdit, faFileCirclePlus, faSave } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Col, Modal, Row } from 'react-bootstrap';
-import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
-import { useAuditorDocumentsStore } from '../../../hooks/useAuditorDocumentsStore';
-import { ViewLoading } from '../../../components/Loaders';
-import { Form, Formik } from 'formik';
-import * as Yup from "yup";
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
-import getISODate from '../../../helpers/getISODate';
-import enums from '../../../helpers/enums';
+import { Alert, Col, Modal, Row } from 'react-bootstrap';
+import { faEdit, faFile, faFileCirclePlus, faSave, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Form, Formik } from 'formik';
+import { useAuditorDocumentsStore } from '../../../hooks/useAuditorDocumentsStore';
+import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
 import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore';
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
+import { useEffect, useState } from 'react'
+import { ViewLoading } from '../../../components/Loaders';
+import * as Yup from "yup";
+import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import enums from '../../../helpers/enums';
+import getISODate from '../../../helpers/getISODate';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
+import auditorValidityProps from '../helpers/auditorValidityProps';
 
 const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...props }) => {
     const NEW_ITEM = 'auditorDocument.new';
@@ -21,6 +23,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
 
     const { 
         AuditorDocumentType,
+        AuditorDocumentValidityType,
         CatAuditorDocumentSubCategoryType,
         DefaultStatusType,
     } = enums();
@@ -67,7 +70,6 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                     return true;
                 }
             }),
-
     });
 
     // CUSTOM HOOKS
@@ -157,14 +159,15 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
             setCurrentAction(NEW_ITEM);
         }
 
-        catAuditorDocumentAsync(catAuditorDocumentID);
+        if (!catAuditorDocument || catAuditorDocument.ID !== catAuditorDocumentID)
+            catAuditorDocumentAsync(catAuditorDocumentID);
     }; // onShowModal
 
     const onCloseModal = () => {
 
         setShowModal(false);
-        catAuditorDocumentClear();
-        auditorDocumentClear();
+        //catAuditorDocumentClear();
+        //auditorDocumentClear();
     }; // onCloseModal
 
     const onAddDocument = () => {
@@ -188,28 +191,40 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        console.log(toSave, values.documentFileInput);
-//! AQUI VOY, HAY QUE PROBAR ESTO Y MOSTRAR el campo Type
+        // console.log(toSave, values.documentFileInput);
         auditorDocumentSaveAsync(toSave, values.documentFileInput);
     }; // onFormSubmit
 
     return (
         <div { ...props }>
             <button
+                type="button"
                 className="btn btn-link mb-0 p-0 text-lg"
                 onClick={onShowModal}
+                title={ !!currentAction ? (currentAction === NEW_ITEM ? 'New document' : 'Edit document') : '-'}
             >
                 <FontAwesomeIcon icon={faEdit} className="text-dark" />
             </button>
             <Modal show={ showModal } onHide={ onCloseModal } >
                 <Modal.Header>
                     <Modal.Title>
+                        {
+                            !!auditorDocument &&
+                            <FontAwesomeIcon 
+                                icon={ auditorValidityProps[auditorDocument.ValidityStatus].iconFile } 
+                                size="lg" 
+                                className={ `text-${ auditorValidityProps[auditorDocument.ValidityStatus].variant} me-2` }
+                            />
+                        }
                         { 
                             !!currentAction 
                                 ? (currentAction === NEW_ITEM ? 'New document' : 'Edit document') 
                                 : 'Loading...'
                         }
                     </Modal.Title>
+                    {
+                        !!auditorDocument && <AryDefaultStatusBadge value={ auditorDocument.Status } />
+                    }
                 </Modal.Header>
                 {
                     isAuditorDocumentLoading || isAuditorDocumentCreating ? (
@@ -250,7 +265,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                 <Col xs="4" sm="2" className="text-end">
                                                     <button 
                                                         type="button"
-                                                        className="btn btn-link text-lg p-0 mb-0" 
+                                                        className="btn btn-link text-dark text-lg p-0 mb-0" 
                                                         title="New document" 
                                                         onClick={ onAddDocument }
                                                     >
@@ -258,8 +273,22 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     </button>
                                                 </Col>
                                             }
+                                            {
+                                                auditorDocument.ValidityStatus != AuditorDocumentValidityType.success &&
+                                                <Col xs="12" className="mt-3 mb-0">
+                                                    <Alert 
+                                                        variant={ auditorValidityProps[auditorDocument.ValidityStatus].variant }
+                                                        className="text-white text-xs mb-0"
+                                                        closeVariant="white"
+                                                        dismissible
+                                                    >
+                                                        <FontAwesomeIcon icon={ auditorValidityProps[auditorDocument.ValidityStatus].icon } size="xl" className="me-2" />
+                                                        { auditorValidityProps[auditorDocument.ValidityStatus].singularLabel }
+                                                    </Alert>
+                                                </Col>
+                                            }
                                             <Col xs="12">
-                                                <hr className="horizontal dark mt-4" />
+                                                <hr className="horizontal dark mt-3" />
                                             </Col>
                                         </Row>
                                         <Row>
@@ -300,24 +329,43 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                             </Col>
                                             <Col xs="12" className="mb-3">
                                                 <label className="form-label" htmlFor="documentFile">Document file</label>
-                                                <input
-                                                    id="documentFile"
-                                                    type="file"
-                                                    name="documentFile"
-                                                    accept="image/jpeg,image/png,application/pdf"
-                                                    className="form-control"
-                                                    onChange={(e) => {
-                                                        formik.setFieldValue('documentFileInput', e.currentTarget.files[0]);
-                                                    }}
-                                                />
-                                                {
-                                                    formik.touched.documentFileInput && formik.errors.photoFileInput &&
-                                                    <span className="text-danger text-xs">{formik.errors.photoFileInput}</span>
-                                                }
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    {
+                                                        !isNullOrEmpty(auditorDocument.Filename) && (
+                                                            <div>
+                                                                <a 
+                                                                    href={`/files/auditors/${auditor.ID}/${auditorDocument.Filename}`}
+                                                                    target="_blank"
+                                                                    className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
+                                                                    title="View file"
+                                                                >
+                                                                    <FontAwesomeIcon icon={ faFile } size="lg" />
+                                                                </a>
+                                                            </div>
+                                                        )
+                                                    }
+                                                    <div className="w-100">
+                                                        <input
+                                                            id="documentFile"
+                                                            type="file"
+                                                            name="documentFile"
+                                                            accept="image/jpeg,image/png,application/pdf"
+                                                            className="form-control"
+                                                            onChange={(e) => {
+                                                                formik.setFieldValue('documentFileInput', e.currentTarget.files[0]);
+                                                            }}
+                                                        />
+                                                        <div className="text-xs text-secondary mt-1 me-2">If a file exists, the new one will overwrite the current one</div>
+                                                        {
+                                                            formik.touched.documentFileInput && formik.errors.photoFileInput &&
+                                                            <span className="text-danger text-xs">{formik.errors.photoFileInput}</span>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </Col>
-                                            <Col xs="12" md="6" xxl="4" className="mb-3">
+                                            <Col xs="12" md="6" className="mb-3">
                                                 <div className="form-check form-switch">
-                                                    <input id="statusCheck" name="statusCheck"
+                                                    <input id="auditorDocumentStatusCheck" name="statusCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
                                                         onChange={(e) => {
@@ -329,7 +377,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     />
                                                     <label
                                                         className="form-check-label text-secondary mb-0"
-                                                        htmlFor="statusCheck"
+                                                        htmlFor="auditorDocumentStatusCheck"
                                                     >
                                                         Active document
                                                     </label>

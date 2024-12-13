@@ -68,6 +68,14 @@ const enums = () => {
         danger: 2      // Falta al menos un documento requerido
     });
 
+    const AuditorDocumentOrderType = Object.freeze({
+        nothing: 0,
+        startDate: 1,
+        updated: 2,
+        startDateDesc: 3,
+        updatedDesc : 4,
+    });
+
     const CatAuditorDocumentType = Object.freeze({
         nothing: 0,
         hiring: 1,
@@ -191,6 +199,7 @@ const enums = () => {
         AuditorDocumentType,
         AuditorDocumentValidityType,
         AuditorDocumentRequiredType,
+        AuditorDocumentOrderType,
         CatAuditorDocumentType,
         CatAuditorDocumentSubCategoryType,
         CatAuditorDocumentPeriodicityType,
