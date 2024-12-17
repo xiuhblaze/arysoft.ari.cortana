@@ -23,16 +23,17 @@ import {
 } from "../store/slices/standardsSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
+import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
   let query = '';
 
-  query = `?pagesize=${ options?.pageSize ?? VITE_DEFAULT_PAGESIZE }`;
+  query = `?pagesize=${ options?.pageSize ?? VITE_PAGE_SIZE }`;
   query += options?.pageNumber ? `&pagenumber=${ options.pageNumber }` : '&pagenumber=1';
 
   query += options?.text ? `&text=${ options.text }` : '';
@@ -72,15 +73,28 @@ export const useStandardsStore = () => {
 
   // Methods
 
-  const setError = (message) => {
+  // const setError = (message) => {
 
-    if (message.length === 0) return;
+  //   if (message.length === 0) return;
 
-    dispatch(setStandardsErrorMessage(message));
-    setTimeout(() => {
-      dispatch(clearStandardsErrorMessage());
-    }, 10);
-  };
+  //   dispatch(setStandardsErrorMessage(message));
+  //   setTimeout(() => {
+  //     dispatch(clearStandardsErrorMessage());
+  //   }, 10);
+  // };
+  const setError = (value) => {  
+          if (isString(value)) {
+              dispatch(setStandardsErrorMessage(value));    
+          } else if (isString(value.message)) {
+              dispatch(setStandardsErrorMessage(value.message));
+          } else {
+              console.error('Unknow error data: ', value);
+              return null;
+          }          
+          setTimeout(() => {
+              dispatch(clearStandardsErrorMessage());
+          }, 10);
+      }; // setError
 
   //* Export Methods
 
@@ -100,7 +114,7 @@ export const useStandardsStore = () => {
         standards: Data,
         standardsMeta: Meta }));
     } catch (error) {
-      const message = getErrorMessages(error);
+      const message = getError(error);
       setError(message);
     }
   };
@@ -146,7 +160,7 @@ export const useStandardsStore = () => {
 
       dispatch(setStandard(Data));
     } catch (error) {
-      const message = getErrorMessages(error);
+      const message = getError(error);
       setError(message);
     }
   };
@@ -168,7 +182,7 @@ export const useStandardsStore = () => {
       dispatch(setStandard(Data));
       dispatch(isStandardCreated());
     } catch (error) {
-      const message = getErrorMessages(error);
+      const message = getError(error);
       setError(message);
     }
   };
@@ -191,7 +205,7 @@ export const useStandardsStore = () => {
       dispatch(setStandard(Data));
       dispatch(isStandardSaved(Data));
     } catch (error) {
-      const message = getErrorMessages(error);
+      const message = getError(error);
       setError(message);
     }
   };
@@ -213,7 +227,7 @@ export const useStandardsStore = () => {
       dispatch(isStandardDeleted());
     } catch (error) {
       //console.log(error);
-      const message = getErrorMessages(error);
+      const message = getError(error);
       setError(message);
     }
   }

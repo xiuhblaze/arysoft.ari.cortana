@@ -20,19 +20,20 @@ import {
 } from "../store/slices/applicationFormsSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
+import isString from "../helpers/isString";
+import getError from "../helpers/getError";
 
 const { 
-    VITE_DEFAULT_PAGESIZE,
+    VITE_PAGE_SIZE,
     URI_APPLICATIONFORMS
 } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text ? `&text=${options.text}` : '';
@@ -78,15 +79,30 @@ export const useApplicationFormsStore = () => {
 
     // Methods
 
-    const setError = (message) => {
+    // const setError = (message) => {
 
-        if (message.length === 0) return;
+    //     if (message.length === 0) return;
 
-        dispatch(setApplicationFormsErrorMessage(message));
-        setTimeout(() => {
-            dispatch(clearApplicationFormsErrorMessage());
-        }, 10);
-    };
+    //     dispatch(setApplicationFormsErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(clearApplicationFormsErrorMessage());
+    //     }, 10);
+    // };
+    const setError = (value) => {
+    
+            if (isString(value)) {
+                dispatch(setApplicationFormsErrorMessage(value));    
+            } else if (isString(value.message)) {
+                dispatch(setApplicationFormsErrorMessage(value.message));
+            } else {
+                console.error('Unknow error data: ', value);
+                return null;
+            }
+            
+            setTimeout(() => {
+                dispatch(clearApplicationFormsErrorMessage());
+            }, 10);
+        }; // setError
 
     //* Export Methods
 
@@ -108,7 +124,7 @@ export const useApplicationFormsStore = () => {
                 applicationFormsMeta: Meta
             }));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -132,7 +148,7 @@ export const useApplicationFormsStore = () => {
 
             dispatch(setApplicationForm(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -154,7 +170,7 @@ export const useApplicationFormsStore = () => {
             dispatch(setApplicationForm(Data));
             dispatch(isApplicationFormCreated());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -177,7 +193,7 @@ export const useApplicationFormsStore = () => {
             dispatch(setApplicationForm(Data));
             dispatch(isApplicationFormSaved(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -199,7 +215,7 @@ export const useApplicationFormsStore = () => {
             dispatch(isApplicationFormDeleted());
         } catch (error) {
             //console.log(error);
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     }

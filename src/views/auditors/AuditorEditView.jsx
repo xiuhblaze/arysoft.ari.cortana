@@ -138,7 +138,7 @@ const AuditorEditView = () => {
                 phoneInput: auditor?.Phone ?? '',
                 addressInput: auditor?.Address ?? '',
                 photoFileInput: '',
-                isLeadAuditorCheck: auditor?.IsLeadAuditor,
+                isLeadAuditorCheck: auditor?.IsLeadAuditor ?? false,
                 statusCheck: auditor?.Status === DefaultStatusType.active,
             });
 
@@ -150,14 +150,11 @@ const AuditorEditView = () => {
 
     useEffect(() => {
         if (!!auditorSavedOk) {
-            Swal.fire('Auditor', 'Auditor created|updated successfully', 'success');
+            Swal.fire('Auditor', 'Changes made successfully', 'success');
             auditorClear();
             navigate('/auditors/');
         }
     }, [auditorSavedOk]);
-
-
-    //* Aqui faltan useEffects...
 
     useEffect(() => {
         if (!!auditorsErrorMessage) {

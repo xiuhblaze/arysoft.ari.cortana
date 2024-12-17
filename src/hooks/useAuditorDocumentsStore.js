@@ -22,18 +22,17 @@ import {
 } from "../store/slices/auditorDocumentsSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
 const AUDITORDOCUMENTS_URI = '/auditordocuments';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text ? `&text=${options.text}` : '';
@@ -81,8 +80,6 @@ export const useAuditorDocumentsStore = () => {
             console.error('Unknow error data: ', value);
             return null;
         }
-
-        // dispatch(setAuditorDocumentsErrorMessage(message));
         setTimeout(() => {
             dispatch(clearAuditorDocumentsErrorMessage());
         }, 10);
@@ -107,7 +104,7 @@ export const useAuditorDocumentsStore = () => {
                 auditorDocumentsMeta: Meta
             }));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -135,7 +132,7 @@ export const useAuditorDocumentsStore = () => {
 
             dispatch(setAuditorDocument(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -159,7 +156,7 @@ export const useAuditorDocumentsStore = () => {
             dispatch(setAuditorDocument(Data));
             dispatch(isAuditorDocumentCreated());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -213,7 +210,7 @@ export const useAuditorDocumentsStore = () => {
 
             dispatch(isAuditorDocumentDeleted());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     }

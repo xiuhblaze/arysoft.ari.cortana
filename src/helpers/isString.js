@@ -4,7 +4,9 @@
  * @returns valoor booleano que determina si el objeto recibido es de tipo string (true)
  */
 export const isString = (value) => {
-    return typeof value === 'string' || value instanceof String;
+    return typeof value === 'string' 
+      || value instanceof String 
+      || Object.prototype.toString.call(value) === '[object String]';
   }
   
   export default isString;

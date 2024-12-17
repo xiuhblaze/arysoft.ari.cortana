@@ -16,6 +16,8 @@ import getISODate from '../../../helpers/getISODate';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
 import auditorValidityProps from '../helpers/auditorValidityProps';
+import { addDays, addMonths, addYears, format } from 'date-fns';
+import catAuditorDocumentPeriodicityProps from '../../catAuditorDocuments/helpers/catAuditorDocumentPeriodicityProps';
 
 const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...props }) => {
     const NEW_ITEM = 'auditorDocument.new';
@@ -25,6 +27,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
         AuditorDocumentType,
         AuditorDocumentValidityType,
         CatAuditorDocumentSubCategoryType,
+        CatAuditorDocumentPeriodicityType,
         DefaultStatusType,
     } = enums();
 
@@ -250,7 +253,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                 { 
                                                     !isNullOrEmpty(catAuditorDocument.Name) && 
                                                     <h6 className="text-sm text-dark mb-0">
-                                                        { catAuditorDocument.SubCategory != CatAuditorDocumentSubCategoryType.nothing ? (
+                                                        { !!catAuditorDocument.SubCategory && catAuditorDocument.SubCategory != CatAuditorDocumentSubCategoryType.nothing ? (
                                                             <span>Sub-Category { subCategory[catAuditorDocument.SubCategory].label } - </span>
                                                         ) : null }
                                                         { catAuditorDocument.Name }
@@ -297,6 +300,26 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     name="startDateInput"
                                                     type="date"
                                                     label="Start date"
+                                                    onBlur={(e) => {
+                                                        formik.handleBlur(e);
+                                                        // console.log(e.currentTarget.value);
+                                                        // console.log('Sugerir due date si esta vacio');
+                                                        // console.log(catAuditorDocument)
+                                                        // console.log('Due date actual: ', formik.values.dueDateInput);
+                                                        if (isNullOrEmpty(formik.values.dueDateInput) && !!catAuditorDocument.UpdateEvery 
+                                                            && !!catAuditorDocument.UpdatePeriodicity 
+                                                            && catAuditorDocument.UpdatePeriodicity != CatAuditorDocumentPeriodicityType.nothing) {
+                                                                //console.log('Existen los datos para calcular due date y este está vacio');
+                                                                const dueDate = catAuditorDocument.UpdatePeriodicity == CatAuditorDocumentPeriodicityType.days
+                                                                    ? addDays(new Date(e.currentTarget.value), catAuditorDocument.UpdateEvery)
+                                                                    : catAuditorDocument.UpdatePeriodicity == CatAuditorDocumentPeriodicityType.months
+                                                                        ? addMonths(new Date(e.currentTarget.value), catAuditorDocument.UpdateEvery)
+                                                                        : addYears(new Date(e.currentTarget.value), catAuditorDocument.UpdateEvery)
+                                                                // console.log(format(dueDate, 'yyyy-MM-dd'));
+                                                                // console.log(getISODate(dueDate)); // .toISOString().split('T')[0]);                                                                
+                                                                formik.setFieldValue('dueDateInput', dueDate.toISOString().split('T')[0]);
+                                                        }
+                                                    }}
                                                 />
                                             </Col>
                                             <Col xs="12" sm="6">
@@ -304,6 +327,12 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     name="dueDateInput"
                                                     type="date"
                                                     label="Due date"
+                                                    helpText={ !!catAuditorDocument.UpdateEvery 
+                                                        && !!catAuditorDocument.UpdatePeriodicity 
+                                                        && catAuditorDocument.UpdatePeriodicity != CatAuditorDocumentPeriodicityType.nothing
+                                                            ? `Update every ${catAuditorDocument.UpdateEvery} ${ catAuditorDocumentPeriodicityProps[catAuditorDocument.UpdatePeriodicity].label }${ catAuditorDocument.UpdateEvery > 1 ? 's' : ''}`
+                                                            : 'No period to update established'
+                                                    }
                                                 />
                                             </Col>
                                             <Col xs="12">

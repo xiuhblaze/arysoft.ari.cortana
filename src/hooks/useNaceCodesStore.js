@@ -20,15 +20,16 @@ import {
 
 import enums from "../helpers/enums";
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
+import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const NACECODES_URI = '/nacecodes';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearhQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text?.length > 0 ? `&text=${options.text}` : '';
@@ -63,13 +64,26 @@ export const useNacecodesStore = () => {
 
     // METHODS
 
-    const setError = (message) => {
-        if (message.length === 0) return;
-        dispatch(setNacecodesErrorMessage(message));
-        setTimeout(() => {
-            dispatch(setNacecodesErrorMessage(null));
-        }, 10);
-    };
+    // const setError = (message) => {
+    //     if (message.length === 0) return;
+    //     dispatch(setNacecodesErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(setNacecodesErrorMessage(null));
+    //     }, 10);
+    // };
+    const setError = (value) => {    
+            if (isString(value)) {
+                dispatch(setNacecodesErrorMessage(value));    
+            } else if (isString(value.message)) {
+                dispatch(setNacecodesErrorMessage(value.message));
+            } else {
+                console.error('Unknow error data: ', value);
+                return null;
+            }            
+            setTimeout(() => {
+                dispatch(setNacecodesErrorMessage(null));
+            }, 10);
+        }; // setError
 
     //* Export Methods
 
@@ -95,7 +109,7 @@ export const useNacecodesStore = () => {
                 nacecodesMeta: Meta,
             }));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -116,7 +130,7 @@ export const useNacecodesStore = () => {
 
             dispatch(setNacecode(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -142,7 +156,7 @@ export const useNacecodesStore = () => {
             dispatch(setNacecode(Data));
             dispatch(isNacecodeCreated());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -167,7 +181,7 @@ export const useNacecodesStore = () => {
             dispatch(setNacecode(Data));
             dispatch(isNacecodeSaved());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -188,7 +202,7 @@ export const useNacecodesStore = () => {
             await cortanaApi.delete(`${NACECODES_URI}/${id}`, { data: toDelete });
             dispatch(isNacecodeDeleted());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };

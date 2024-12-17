@@ -10,14 +10,19 @@ import { useEffect, useState } from 'react';
 import { ViewLoading } from '../../components/Loaders';
 import AryDefaultStatusBadge from '../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
 import { Form, Formik } from 'formik';
-import { AryFormikTextInput } from '../../components/Forms';
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../components/Forms';
 import AryLastUpdatedInfo from '../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Swal from 'sweetalert2';
+import isNullOrEmpty from '../../helpers/isNullOrEmpty';
 
 const CatAuditorDocumentEditView = () => {
 
     const {
+        CatAuditorDocumentType,
+        CatAuditorDocumentSubCategoryType,
+        CatAuditorDocumentPeriodicityType,
         DefaultStatusType
     } = enums();
 
@@ -64,7 +69,8 @@ const CatAuditorDocumentEditView = () => {
 
     const {
         isCatAuditorDocumentLoading,
-        isCatAuditorDocumentSaving,catAuditorDocumentSavedOk,
+        isCatAuditorDocumentSaving,
+        catAuditorDocumentSavedOk,
         catAuditorDocument,
         catAuditorDocumentsErrorMessage,
 
@@ -91,33 +97,64 @@ const CatAuditorDocumentEditView = () => {
             setInitialValues({
                 nameInput: catAuditorDocument?.Name ?? '',
                 descriptionInput: catAuditorDocument?.Description ?? '',
-                documentTypeSelect: '',
-                subCategorySelect: '',
-                warningEveryInput: '',
-                warningPeriodicitySelect: '',
-                updateEveryInput: '',
-                updatePeriodicitySelect: '',
-                isRequiredCheck: false,
-                orderInput: '',
-                statusCheck: false, 
+                documentTypeSelect: catAuditorDocument?.DocumentType ?? '',
+                subCategorySelect: catAuditorDocument?.SubCategory ?? '',
+                warningEveryInput: catAuditorDocument?.WarningEvery ?? '',
+                warningPeriodicitySelect: catAuditorDocument?.WarningPeriodicity ?? '',
+                updateEveryInput: catAuditorDocument?.UpdateEvery ?? '',
+                updatePeriodicitySelect: catAuditorDocument?.UpdatePeriodicity ?? '',
+                isRequiredCheck: catAuditorDocument?.IsRequired ?? false,
+                orderInput: catAuditorDocument?.Order ?? '',
+                statusCheck: catAuditorDocument?.Status === DefaultStatusType.active, 
             });
+
+            let title = !isNullOrEmpty(catAuditorDocument.Name) ? catAuditorDocument.Name : '';
+
+
+            
         }
     }, [catAuditorDocument]);
+
+    useEffect(() => {
+        if (!!catAuditorDocumentSavedOk) {
+            Swal.fire('Auditor document', 'Changes made successfully', 'success');
+            catAuditorDocumentClear();
+            navigate('/auditors-documents/');
+        }
+    }, [catAuditorDocumentSavedOk]);
+    
     
     // METHODS
 
     const onFormSubmit = (values) => {
-        console.log(values);
-    };
+        
+        const toSave = {
+            ID: catAuditorDocument.ID,
+            Name: values.nameInput,
+            Description: values.descriptionInput,
+            DocumentType: values.documentTypeSelect,
+            SubCategory: values.subCategorySelect,
+            UpdateEvery: values.updateEveryInput,
+            UpdatePeriodicity: values.updatePeriodicitySelect,
+            WarningEvery: values.warningEveryInput,
+            WarningPeriodicity: values.warningPeriodicitySelect,
+            IsRequired: values.isRequiredCheck,
+            Order: values.orderInput,
+            Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
+        };
+
+        catAuditorDocumentSaveAsync(toSave);
+    }; // onFormSubmit
 
     const onCancelButton = () => {
-        console.log('onCancelButton');
+        catAuditorDocumentClear();
+        navigate('/auditors-documents/');
     };
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
             <Row>
-                <Col xs="8">
+                <Col xs="12" sm="8" xxl="6">
                     <Card>
                         {
                             isCatAuditorDocumentLoading ? (
@@ -147,10 +184,133 @@ const CatAuditorDocumentEditView = () => {
                                                             />
                                                         </Col>
                                                         <Col xs="12">
-                                                            <AryFormikTextInput name="descriptionInput"
+                                                            <AryFormikTextArea name="descriptionInput"
                                                                 label="Description"
-                                                                type="text"
                                                             />
+                                                        </Col>
+                                                        <Col xs="12" md="4">
+                                                            <AryFormikSelectInput name="documentTypeSelect"
+                                                                label="Type"
+                                                            >
+                                                                {
+                                                                    Object.keys(CatAuditorDocumentType).map(key =>
+                                                                        <option
+                                                                            key={key}
+                                                                            value={CatAuditorDocumentType[key]}
+                                                                            className="text-capitalize"
+                                                                        >
+                                                                            {key === 'nothing' ? '(select)' : key}
+                                                                        </option>
+                                                                )}
+                                                            </AryFormikSelectInput>
+                                                        </Col>
+                                                        <Col xs="12" md="4">
+                                                            <AryFormikTextInput name="orderInput"
+                                                                label="Order"
+                                                                type="text"
+                                                                helpText="Apparience order relative to Type"
+                                                            />
+                                                        </Col>
+                                                        <Col xs="12" md="4">
+                                                            <AryFormikSelectInput name="subCategorySelect"
+                                                                label="Sub Category"
+                                                            >
+                                                                {
+                                                                    Object.keys(CatAuditorDocumentSubCategoryType).map(key =>
+                                                                        <option
+                                                                            key={key}
+                                                                            value={CatAuditorDocumentSubCategoryType[key]}
+                                                                            className="text-uppercase"
+                                                                        >
+                                                                            {key === 'nothing' ? '(select)' : key}
+                                                                        </option>
+                                                                )}
+                                                            </AryFormikSelectInput>
+                                                        </Col>
+
+                                                        <div className="bg-gray-100 border-radius-md mb-3">
+                                                            <Row>
+                                                            <Col xs="4">
+                                                                <AryFormikTextInput name="warningEveryInput"
+                                                                    label="Warn"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="4">
+                                                                <AryFormikSelectInput name="warningPeriodicitySelect"
+                                                                    label="Periodicity"
+                                                                >
+                                                                    {
+                                                                        Object.keys(CatAuditorDocumentPeriodicityType).map(key =>
+                                                                            <option
+                                                                                key={key}
+                                                                                value={CatAuditorDocumentPeriodicityType[key]}
+                                                                                className="text-capitalize"
+                                                                            >
+                                                                                {key === 'nothing' ? '(select)' : key}
+                                                                            </option>
+                                                                    )}
+                                                                </AryFormikSelectInput>
+                                                            </Col>
+                                                            <Col xs="4" className="text-sm font-weight-bold align-self-end mb-4">Before</Col>
+                                                            </Row>
+                                                        </div>
+
+                                                        <div className="bg-light border-radius-md mb-3">
+                                                            <Row>
+                                                                <Col xs="4">
+                                                                    <AryFormikTextInput name="updateEveryInput"
+                                                                        label="Update every"
+                                                                    />
+                                                                </Col>
+                                                                <Col xs="4">
+                                                                    <AryFormikSelectInput name="updatePeriodicitySelect"
+                                                                        label="Periodicity"
+                                                                    >
+                                                                        {
+                                                                            Object.keys(CatAuditorDocumentPeriodicityType).map(key =>
+                                                                            <option
+                                                                                key={key}
+                                                                                value={CatAuditorDocumentPeriodicityType[key]}
+                                                                                className="text-capitalize"
+                                                                            >
+                                                                                {key === 'nothing' ? '(select)' : key}
+                                                                            </option>
+                                                                        )}
+                                                                    </AryFormikSelectInput>
+                                                                </Col>
+                                                            </Row>
+                                                        </div>
+                                                        <Col xs="12" md="6" xxl="4">
+                                                            <div className="form-check form-switch mb-3">
+                                                                <input id="isRequiredCheck" name="isRequiredCheck"
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    onChange={ formik.handleChange }
+                                                                    checked={ formik.values.isRequiredCheck }
+                                                                />
+                                                                <label 
+                                                                    className="form-check-label text-secondary mb-0" 
+                                                                    htmlFor="isRequiredCheck"
+                                                                >
+                                                                    Is Required
+                                                                </label>
+                                                            </div>
+                                                        </Col>
+                                                        <Col xs="12" md="6" xxl="4">
+                                                            <div className="form-check form-switch mb-3">
+                                                                <input id="statusCheck" name="statusCheck"
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    onChange={ formik.handleChange }
+                                                                    checked={ formik.values.statusCheck }
+                                                                />
+                                                                <label 
+                                                                    className="form-check-label text-secondary mb-0" 
+                                                                    htmlFor="statusCheck"
+                                                                >
+                                                                    Active
+                                                                </label>
+                                                            </div>
                                                         </Col>
                                                     </Row>
                                                 </Card.Body>

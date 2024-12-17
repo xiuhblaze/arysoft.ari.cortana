@@ -21,16 +21,17 @@ import {
 } from "../store/slices/organizationsSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
+import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text ? `&text=${options.text}` : '';
@@ -70,13 +71,26 @@ export const useOrganizationsStore = () => {
 
     // Methods
 
-    const setError = (message) => {
-        if (message.length === 0) return;
-        dispatch(setOrganizationsErrorMessage(message));
+    // const setError = (message) => {
+    //     if (message.length === 0) return;
+    //     dispatch(setOrganizationsErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(setOrganizationsErrorMessage(null));
+    //     }, 10);
+    // };
+    const setError = (value) => {    
+        if (isString(value)) {
+            dispatch(setOrganizationsErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setOrganizationsErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }
         setTimeout(() => {
             dispatch(setOrganizationsErrorMessage(null));
         }, 10);
-    };
+    }; // setError
 
     //* Export Methods
 
@@ -97,7 +111,7 @@ export const useOrganizationsStore = () => {
                 organizationsMeta: Meta
             }));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -143,7 +157,7 @@ export const useOrganizationsStore = () => {
 
             dispatch(setOrganization(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -165,7 +179,7 @@ export const useOrganizationsStore = () => {
             dispatch(setOrganization(Data));
             dispatch(isOrganizationCreated());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -188,7 +202,7 @@ export const useOrganizationsStore = () => {
             dispatch(setOrganization(Data));
             dispatch(isOrganizationSaved(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -210,7 +224,7 @@ export const useOrganizationsStore = () => {
             dispatch(isOrganizationDeleted());
         } catch (error) {
             //console.log(error);
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     }

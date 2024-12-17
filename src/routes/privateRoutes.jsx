@@ -53,7 +53,7 @@ const privateRoute = [
         type: 'collapse',
         title: 'Auditor Documents',
         key: 'catAuditorDocuments',
-        path: '/auditors/auditors-documents/*',
+        path: '/auditors-documents/*',
         icon: faFileCircleCheck,
         element: lazrCatAuditorDocuments
     },

@@ -24,14 +24,15 @@ import envVariables from "../helpers/envVariables";
 // import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const AUDITOR_URI = '/auditors';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text ? `&text=${options.text}` : '';
@@ -69,9 +70,9 @@ export const useAuditorsStore = () => {
     const setError = (value) => {
 
         if (isString(value)) {
-            dispatch(setContactsErrorMessage(value));    
+            dispatch(setAuditorsErrorMessage(value));    
         } else if (isString(value.message)) {
-            dispatch(setContactsErrorMessage(value.message));
+            dispatch(setAuditorsErrorMessage(value.message));
         } else {
             console.error('Unknow error data: ', value);
             return null;
@@ -80,7 +81,7 @@ export const useAuditorsStore = () => {
         setTimeout(() => {
             dispatch(clearAuditorsErrorMessage());
         }, 10);
-    };
+    }; // setError
 
     //* Export Methods
 

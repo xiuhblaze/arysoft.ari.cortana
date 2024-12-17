@@ -22,18 +22,17 @@ import {
 } from "../store/slices/contactsSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
 const CONTACT_URI = '/contacts';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
@@ -69,7 +68,6 @@ export const useContactsStore = () => {
     // Methods
 
     const setError = (value) => {
-
         if (isString(value)) {
             dispatch(setContactsErrorMessage(value));    
         } else if (isString(value.message)) {
@@ -78,8 +76,6 @@ export const useContactsStore = () => {
             console.error('Unknow error data: ', value);
             return null;
         }
-
-        // dispatch(setContactsErrorMessage(message));
         setTimeout(() => {
             dispatch(clearContactsErrorMessage());
         }, 10);
@@ -104,7 +100,7 @@ export const useContactsStore = () => {
                 contactsMeta: Meta
             }));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -132,7 +128,7 @@ export const useContactsStore = () => {
 
             dispatch(setContact(Data));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -156,7 +152,7 @@ export const useContactsStore = () => {
             dispatch(setContact(Data));
             dispatch(isContactCreated());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     };
@@ -179,7 +175,7 @@ export const useContactsStore = () => {
     //         dispatch(setContact(Data));
     //         dispatch(isContactSaved());
     //     } catch (error) {
-    //         const message = getErrorMessages(error);
+    //         const message = getError(error);
     //         setError(message);
     //     }
     // };
@@ -233,7 +229,7 @@ export const useContactsStore = () => {
 
             dispatch(isContactDeleted());
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
         }
     }

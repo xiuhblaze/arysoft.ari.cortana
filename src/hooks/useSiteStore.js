@@ -21,18 +21,17 @@ import {
 } from "../store/slices/sitesSlice";
 
 import envVariables from "../helpers/envVariables";
-import getErrorMessages from "../helpers/getErrorMessages";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 
 const SITE_URI = '/sites';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
@@ -72,7 +71,6 @@ export const useSitesStore = () => {
     // Methods
 
     const setError = (value) => {
-
         if (isString(value)) {
             dispatch(setSitesErrorMessage(value));    
         } else if (isString(value.message)) {

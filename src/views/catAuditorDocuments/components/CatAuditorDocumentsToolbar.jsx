@@ -65,7 +65,7 @@ const CatAuditorDocumentsToolbar = () => {
 
     useEffect(() => {
         if (catAuditorDocumentCreatedOk) {
-            navigate(`/auditor/auditor-documents/${catAuditorDocument.ID}`);
+            navigate(`/auditors-documents/${catAuditorDocument.ID}`);
         }
     }, [catAuditorDocumentCreatedOk]);
     
@@ -86,9 +86,7 @@ const CatAuditorDocumentsToolbar = () => {
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
-
-        console.log(search)
-
+        
         catAuditorDocumentsAsync(search);
         localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit

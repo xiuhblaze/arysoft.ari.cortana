@@ -47,7 +47,7 @@ const EditView = () => {
 
     useEffect(() => {
         if (standardSavedOk) {
-            Swal.fire('Standards', 'The changes were made successfully', 'success');
+            Swal.fire('Standards', 'Changes made successfully', 'success');
             standardClear();
             navigate('/standards/');
         }
@@ -169,7 +169,7 @@ const EditView = () => {
                                                                     onChange={formik.handleChange}
                                                                     checked={formik.values.activeCheck}
                                                                 />
-                                                                <label className="form-check-label" htmlFor="activaCheck">Is active</label>
+                                                                <label className="form-check-label" htmlFor="activeCheck">Is active</label>
                                                             </div>
                                                             {/* <p className="text-xs text-secondary"><strong>Activar como administración actual</strong>, deshabilita cualquier otra que este marcada como activa.</p> */}
                                                         </Col>

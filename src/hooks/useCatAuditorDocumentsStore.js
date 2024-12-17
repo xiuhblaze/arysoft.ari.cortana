@@ -23,6 +23,7 @@ import {
 import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const CATAUDITORDOCUMENT_URI = '/catAuditorDocuments';
 const { VITE_PAGE_SIZE } = envVariables();
@@ -66,15 +67,28 @@ export const useCatAuditorDocumentsStore = () => {
 
     // Methods
 
-    const setError = (message) => {
+    // const setError = (message) => {
 
-        if (message.length === 0) return;
+    //     if (message.length === 0) return;
 
-        dispatch(setCatAuditorDocumentsErrorMessage(message));
-        setTimeout(() => {
-            dispatch(clearCatAuditorDocumentsErrorMessage());
-        }, 10);
-    };
+    //     dispatch(setCatAuditorDocumentsErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(clearCatAuditorDocumentsErrorMessage());
+    //     }, 10);
+    // };
+    const setError = (value) => {    
+            if (isString(value)) {
+                dispatch(setCatAuditorDocumentsErrorMessage(value));    
+            } else if (isString(value.message)) {
+                dispatch(setCatAuditorDocumentsErrorMessage(value.message));
+            } else {
+                console.error('Unknow error data: ', value);
+                return null;
+            }            
+            setTimeout(() => {
+                dispatch(clearCatAuditorDocumentsErrorMessage());
+            }, 10);
+        }; // setError
 
     //* Export Methods
 

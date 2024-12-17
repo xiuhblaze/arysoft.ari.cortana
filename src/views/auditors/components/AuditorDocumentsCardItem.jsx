@@ -61,7 +61,7 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
                     {
                         !isNullOrEmpty(item.Name) &&
                         <h6 className="mb-0 text-sm text-dark text-gradient">
-                            { item.SubCategory != CatAuditorDocumentSubCategoryType.nothing ? (
+                            { !!item.SubCategory && item.SubCategory != CatAuditorDocumentSubCategoryType.nothing ? (
                                 <span>Sub-Category {catAuditorDocumentSubCategoryProps[item.SubCategory].label} - </span>
                             ) : null }
                             { item.Name }

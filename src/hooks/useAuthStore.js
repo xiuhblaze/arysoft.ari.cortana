@@ -3,9 +3,9 @@ import envVariables from "../helpers/envVariables";
 import { clearAuthErrorMessage, onChecking, onLogin, onLogout, setAuthErrorMessage } from "../store/slices/authslice";
 import cortanaApi from '../api/cortanaApi';
 import { jwtDecode } from "jwt-decode";
-import getErrorMessages from "../helpers/getErrorMessages";
 import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
+import isString from "../helpers/isString";
 
 
 const { VITE_TOKEN } = envVariables();
@@ -23,13 +23,26 @@ export const useAuthStore = () => {
 
     // METHODS
 
-    const setError = (message) => {
-        if (message.length === 0) return;
-        dispatch(setAuthErrorMessage(message));
+    // const setError = (message) => {
+    //     if (message.length === 0) return;
+    //     dispatch(setAuthErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(clearAuthErrorMessage())
+    //     }, 10);
+    // };
+    const setError = (value) => {    
+        if (isString(value)) {
+            dispatch(setAuthErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setAuthErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }            
         setTimeout(() => {
-            dispatch(clearAuthErrorMessage())
+            dispatch(clearAuthErrorMessage());
         }, 10);
-    };
+    }; // setError
 
     const setUserInfo = (token) => {
         const userInfo = jwtDecode(token);
@@ -85,7 +98,7 @@ export const useAuthStore = () => {
             localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
             dispatch(onLogin(user));
         } catch (error) {
-            const message = getErrorMessages(error);
+            const message = getError(error);
             setError(message);
             dispatch(onLogout());
         }

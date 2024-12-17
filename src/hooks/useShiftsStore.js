@@ -24,14 +24,15 @@ import envVariables from "../helpers/envVariables";
 //import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const SHIFT_URI = '/shifts';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.siteID ? `&siteid=${options.siteID}` : '';
@@ -70,15 +71,28 @@ export const useShiftsStore = () => {
 
     // Methods
 
-    const setError = (message) => {
+    // const setError = (message) => {
 
-        if (message.length === 0) return;
+    //     if (message.length === 0) return;
 
-        dispatch(setShiftsErrorMessage(message));
+    //     dispatch(setShiftsErrorMessage(message));
+    //     setTimeout(() => {
+    //         dispatch(clearShiftsErrorMessage());
+    //     }, 10);
+    // };
+    const setError = (value) => {    
+        if (isString(value)) {
+            dispatch(setShiftsErrorMessage(value));    
+        } else if (isString(value.message)) {
+            dispatch(setShiftsErrorMessage(value.message));
+        } else {
+            console.error('Unknow error data: ', value);
+            return null;
+        }            
         setTimeout(() => {
             dispatch(clearShiftsErrorMessage());
         }, 10);
-    };
+    }; // setError
 
     //* Export Methods
 
