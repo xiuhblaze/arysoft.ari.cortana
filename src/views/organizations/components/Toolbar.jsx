@@ -9,6 +9,7 @@ import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 
 const Toolbar = () => {
     const formDefaultData = {
@@ -21,6 +22,11 @@ const Toolbar = () => {
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE
     } = envVariables();
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS,
+    } = defaultCSSClasses();
 
     // CUSTOM HOOKS
 
@@ -94,7 +100,7 @@ const Toolbar = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
                 <button
-                    className="btn bg-gradient-dark d-flex justify-content-center align-items-center mb-0"
+                    className={ BUTTON_ADD_CLASS }
                     onClick={onNewItem}
                     title="New organization"
                     disabled={isOrganizationCreating}
@@ -150,30 +156,21 @@ const Toolbar = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* <div className="col-auto ps-0">
-                                            <div className="form-check form-switch mt-lg-2 mt-xxl-2">
-                                                <input id="includeDeletedCheck" name="includeDeletedCheck"
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    onChange={formik.handleChange}
-                                                    checked={formik.values.includeDeletedCheck}
-                                                />
-                                                <label className="form-check-label" htmlFor="includeDeletedCheck">Show deleted records</label>
-                                            </div>
-                                        </div> */}
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info d-flex justify-content-center align-items-center">
+                                        <button type="submit" className={ BUTTON_SEARCH_CLASS }>
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-outline-secondary" onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
+                                        <button type="button" 
+                                            className={ BUTTON_CLEAR_SEARCH_CLASS }
+                                            onClick={(values) => {
+                                                onCleanSearch(values);
+                                                formik.resetForm(initialValues);
                                         }}>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>

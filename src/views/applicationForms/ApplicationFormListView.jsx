@@ -11,7 +11,7 @@ import ApplicationFormTableList from "./components/ApplicationFormTableList";
 const ApplicationFormListView = () => {
     const { 
         APPLICATION_FORM_OPTIONS,
-        VITE_DEFAULT_PAGESIZE
+        VITE_PAGE_SIZE
     } = envVariables();
     const { ApplicationFormOrderType } = enums();
 
@@ -30,7 +30,7 @@ const ApplicationFormListView = () => {
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(APPLICATION_FORM_OPTIONS)) || null;
         const newSearch = {
-            pageSize: VITE_DEFAULT_PAGESIZE,
+            pageSize: VITE_PAGE_SIZE,
             pageNumber: 1,
             order: savedSearch?.order ? savedSearch.order : ApplicationFormOrderType.createdDesc
         };

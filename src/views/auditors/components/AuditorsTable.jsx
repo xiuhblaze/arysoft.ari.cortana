@@ -23,13 +23,13 @@ const AuditorsTable = () => {
     // METHODS
 
     const onShowModal = (id) => {
-        console.log('onShowModal');
+        //console.log('onShowModal');
         setShowModal(true);
         auditorAsync(id);
     }; // onShowModal
 
     const onCloseModal = () => {
-        console.log('onCloseModal');
+        //console.log('onCloseModal');
         setShowModal(false);
         auditorClear();
     };

@@ -9,6 +9,7 @@ import AuditorDocumentsEditItem from './AuditorDocumentsEditItem';
 import auditorValidityProps from '../helpers/auditorValidityProps';
 import auditorRequiredProps from '../helpers/auditorRequiredProps';
 import AuditorDocumentsHistoryList from './AuditorDocumentsHistoryList';
+import catAuditorDocumentSubCategoryProps from '../../catAuditorDocuments/helpers/catAuditorDocumentSubCategoryProps';
 
 const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistory = false, ...props }) => {
     const { 
@@ -19,15 +20,15 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
         DefaultStatusType
     } = enums();
     const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0${ !!document && document.Status == DefaultStatusType.inactive ? ' opacity-6' : '' }`;
-
+    
     // console.log(item.Status, document?.Status);
 
-    const subCategory = [
-        { label: '-' },
-        { label: 'CIV' },
-        { label: 'K' },
-        { label: 'L' },
-    ];
+    // const subCategory = [
+    //     { label: '-' },
+    //     { label: 'CIV' },
+    //     { label: 'K' },
+    //     { label: 'L' },
+    // ];
 
     const documentTypeProps = [
         { label: '' },
@@ -61,7 +62,7 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
                         !isNullOrEmpty(item.Name) &&
                         <h6 className="mb-0 text-sm text-dark text-gradient">
                             { item.SubCategory != CatAuditorDocumentSubCategoryType.nothing ? (
-                                <span>Sub-Category {subCategory[item.SubCategory].label} - </span>
+                                <span>Sub-Category {catAuditorDocumentSubCategoryProps[item.SubCategory].label} - </span>
                             ) : null }
                             { item.Name }
                         </h6>
@@ -87,11 +88,11 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
                         }
                         <p className="d-flex flex-row justify-content-start text-xs mb-0" title="Date updated">
                             <FontAwesomeIcon icon={ faPlay } className="me-1" fixedWidth />
-                            { format(new Date(document.StartDate), 'yyyy-MM-dd') }
+                            { format(new Date(document.StartDate), 'dd-MM-yyyy') }
                         </p>
                         <p className={`d-flex flex-row justify-content-start text-xs mb-0 text-${ auditorValidityProps[validityStatus].variant }`} title="Next update">
                             <FontAwesomeIcon icon={ faRotate } className="me-1" fixedWidth />
-                            { format(new Date(document.DueDate), 'yyyy-MM-dd') }
+                            { format(new Date(document.DueDate), 'dd-MM-yyyy') }
                         </p>
                     </div>
                 }
@@ -128,7 +129,7 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
                             />
                     }
                     {
-                        !hideHistory && <AuditorDocumentsHistoryList catAuditorDocumentID={ item.ID } />
+                        !hideHistory && <AuditorDocumentsHistoryList catAuditorDocumentID={ item.ID } readOnly={ readOnly } />
                     }
                 </div>
             </div>

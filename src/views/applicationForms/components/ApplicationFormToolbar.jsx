@@ -7,6 +7,7 @@ import { faPlus, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 import { AryFormikTextInput } from '../../../components/Forms'
 import { useApplicationFormsStore } from '../../../hooks/useApplicationFormsStore'
+import defaultCSSClasses from '../../../helpers/defaultCSSClasses'
 
 const ApplicationFormToolbar = () => {
     const formDefaultData = {
@@ -19,6 +20,11 @@ const ApplicationFormToolbar = () => {
         statusSelect: '',
         includeDeletedCheck: false,
     };
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS,
+    } = defaultCSSClasses();
 
     // CUSTOM HOOKS
 
@@ -60,7 +66,7 @@ const ApplicationFormToolbar = () => {
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <button
-                className="btn bg-gradient-dark"
+                className={ BUTTON_ADD_CLASS }
                 onClick={ onNewItem }
             >
                 <FontAwesomeIcon icon={ faPlus } className="me-1" />
@@ -85,22 +91,22 @@ const ApplicationFormToolbar = () => {
                                     </div>
 
                                 </div>
-                                <div className="d-flex justify-content-between gap-2">
+                                <div className="d-flex justify-content-between gap-2 mb-3">
+                                    <div className="d-grid d-md-block ps-md-2">
+                                        <button type="submit" className={BUTTON_SEARCH_CLASS}>
+                                            <FontAwesomeIcon icon={ faSearch } className="me-1" />
+                                            Search
+                                        </button>
+                                    </div>
                                     <div className="d-grid d-md-block ps-md-2">
                                         <button type="button" 
-                                            className="btn bg-gradient-secondary"
+                                            className={BUTTON_CLEAR_SEARCH_CLASS}
                                             onClick={ values => {
                                                 onCleanSearch(values);
                                                 formik.resetForm(initialValues);
                                             }}
                                         >
                                             <FontAwesomeIcon icon={ faXmark } size="lg" />
-                                        </button>
-                                    </div>
-                                    <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info">
-                                            <FontAwesomeIcon icon={ faSearch } className="me-1" />
-                                            Search
                                         </button>
                                     </div>
                                 </div>

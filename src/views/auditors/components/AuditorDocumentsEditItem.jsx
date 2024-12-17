@@ -1,6 +1,6 @@
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { Alert, Col, Modal, Row } from 'react-bootstrap';
-import { faEdit, faFile, faFileCirclePlus, faSave, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faFile, faFileCirclePlus, faPlus, faSave, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Form, Formik } from 'formik';
 import { useAuditorDocumentsStore } from '../../../hooks/useAuditorDocumentsStore';
@@ -201,7 +201,8 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                 type="button"
                 className="btn btn-link mb-0 p-0 text-lg"
                 onClick={onShowModal}
-                title={ !!currentAction ? (currentAction === NEW_ITEM ? 'New document' : 'Edit document') : '-'}
+                // title={ !!currentAction ? (currentAction === NEW_ITEM ? 'New document' : 'Edit document') : '-'}
+                title="Edit or add new document"
             >
                 <FontAwesomeIcon icon={faEdit} className="text-dark" />
             </button>
@@ -243,8 +244,8 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                     <Modal.Body>
                                         <Row>
                                             <Col 
-                                                xs={ !!currentAction && currentAction == UPDATE_ITEM ? '8' : '12'} 
-                                                sm={ !!currentAction && currentAction == UPDATE_ITEM ? '10' : '12'} 
+                                                xs={ !!currentAction && currentAction == UPDATE_ITEM ? '6' : '12'} 
+                                                sm={ !!currentAction && currentAction == UPDATE_ITEM ? '8' : '12'} 
                                             >
                                                 { 
                                                     !isNullOrEmpty(catAuditorDocument.Name) && 
@@ -262,14 +263,15 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                             </Col>
                                             {
                                                 !!currentAction && currentAction == UPDATE_ITEM &&
-                                                <Col xs="4" sm="2" className="text-end">
+                                                <Col xs="6" sm="4" className="text-end">
                                                     <button 
                                                         type="button"
-                                                        className="btn btn-link text-dark text-lg p-0 mb-0" 
+                                                        className="btn bg-gradient-dark mb-0"
                                                         title="New document" 
                                                         onClick={ onAddDocument }
                                                     >
-                                                        <FontAwesomeIcon icon={ faFileCirclePlus } size="lg" />
+                                                        <FontAwesomeIcon icon={ faPlus } className="me-1" />
+                                                        Add
                                                     </button>
                                                 </Col>
                                             }
@@ -287,10 +289,8 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     </Alert>
                                                 </Col>
                                             }
-                                            <Col xs="12">
-                                                <hr className="horizontal dark mt-3" />
-                                            </Col>
                                         </Row>
+                                        <hr className="horizontal dark mt-3" />
                                         <Row>
                                             <Col xs="12" sm="6">
                                                 <AryFormikTextInput
@@ -337,7 +337,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                                     href={`/files/auditors/${auditor.ID}/${auditorDocument.Filename}`}
                                                                     target="_blank"
                                                                     className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
-                                                                    title="View file"
+                                                                    title="View current file"
                                                                 >
                                                                     <FontAwesomeIcon icon={ faFile } size="lg" />
                                                                 </a>

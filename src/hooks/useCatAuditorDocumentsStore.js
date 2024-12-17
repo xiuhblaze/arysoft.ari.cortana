@@ -25,12 +25,12 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 
 const CATAUDITORDOCUMENT_URI = '/catAuditorDocuments';
-const { VITE_DEFAULT_PAGESIZE } = envVariables();
+const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
 
-    query = `?pagesize=${options?.pageSize ?? VITE_DEFAULT_PAGESIZE}`;
+    query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.text ? `&text=${options.text}` : '';

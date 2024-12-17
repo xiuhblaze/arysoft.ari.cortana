@@ -1,5 +1,5 @@
 
-import { faCity, faClipboard, faHome, faLandmark, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faCity, faClipboard, faFileCircleCheck, faHome, faLandmark, faUsers } from "@fortawesome/free-solid-svg-icons";
 
 import { lazy } from "react";
 
@@ -9,7 +9,7 @@ const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyOrganizations = lazy(() => import('../views/organizations'));
 const lazyStandards = lazy(() => import('../views/standards'));
-// const lazyList = lazy(() => import('../views/examples/ListView'));
+const lazrCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
 
 const privateRoute = [
     {
@@ -51,6 +51,14 @@ const privateRoute = [
     },
     {
         type: 'collapse',
+        title: 'Auditor Documents',
+        key: 'catAuditorDocuments',
+        path: '/auditors/auditors-documents/*',
+        icon: faFileCircleCheck,
+        element: lazrCatAuditorDocuments
+    },
+    {
+        type: 'collapse',
         title: 'Standards',
         key: 'standards',
         path: '/standards/*',
@@ -65,14 +73,6 @@ const privateRoute = [
         icon: faLandmark,
         element: lazyNacecodes
     },
-    // { 
-    //   type: 'collapse',
-    //   title: 'List example',
-    //   key: 'list',
-    //   path: '/examples/list',
-    //   icon: faList,
-    //   element: lazyList
-    // },
     // {
     //   type: 'title',
     //   title: 'Account',

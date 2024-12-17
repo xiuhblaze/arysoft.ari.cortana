@@ -13,6 +13,7 @@ import { AryFormikTextInput } from "../../components/Forms";
 import Status from "./components/Status";
 import { ViewLoading } from "../../components/Loaders";
 import { useStandardsStore } from "../../hooks/useStandardsStore";
+import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
 const EditView = () => {
     const { id } = useParams();
@@ -185,25 +186,23 @@ const EditView = () => {
                                                         </Col>
                                                     </Row>
                                                     <Row>
-                                                        <Col className="d-flex flex-column flex-sm-row justify-content-between">
-                                                            <div className="d-flex align-items-center">
-                                                                <p className="text-xs mb-sm-0">
-                                                                    <strong>Created: </strong> {new Date(standard.Created).toLocaleDateString()}<br />
-                                                                    <strong>Last updated: </strong> {new Date(standard.Updated).toLocaleDateString()}<br />
-                                                                    <strong>By: </strong> {standard.UpdatedUser}
-                                                                </p>
-                                                            </div>
-                                                            <div className="d-flex justify-content-center justify-content-sm-between gap-2">
-                                                                <button type="submit"
-                                                                    className="btn bg-gradient-dark mb-0"
-                                                                    disabled={isStandardSaving}
-                                                                >
-                                                                    <FontAwesomeIcon icon={faSave} size="lg" className="me-1" />
-                                                                    Save
-                                                                </button>
-                                                                <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCancelButton}>
-                                                                    Cancel
-                                                                </button>
+                                                        <Col xs="12">
+                                                            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                                                                <div className="text-secondary mb-3 mb-sm-0">
+                                                                    <AryLastUpdatedInfo item={standard} />
+                                                                </div>
+                                                                <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                                                    <button type="submit"
+                                                                        className="btn bg-gradient-dark mb-0"
+                                                                        disabled={isStandardSaving}
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faSave} size="lg" className="me-1" />
+                                                                        Save
+                                                                    </button>
+                                                                    <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCancelButton}>
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </Col>
                                                     </Row>

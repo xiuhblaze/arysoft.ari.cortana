@@ -1,39 +1,47 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useAuditorsStore } from "../../../hooks/useAuditorsStore"
-import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
-import enums from "../../../helpers/enums";
-import envVariables from "../../../helpers/envVariables";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Form, Formik } from "formik";
-import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import React, { useEffect, useState } from 'react'
+import enums from '../../../helpers/enums';
+import envVariables from '../../../helpers/envVariables';
+import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore';
+import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faSearch, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { Form, Formik } from 'formik';
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
 
-const AuditorsToolbar = () => {
+const CatAuditorDocumentsToolbar = () => {
     const formDefaultData = {
         textInput: '',
-        isLeaderSelect: '',
+        documentTypeSelect: '',
+        subCategorySelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
-    const { 
-        AuditorIsLeaderType,
-        AuditorOrderType,
+    const {
+        CatAuditorDocumentType,
+        CatAuditorDocumentSubCategoryType,
+        CatAuditorDocumentOrderType,
         DefaultStatusType
     } = enums();
     const {
-        AUDITORS_OPTIONS,
-        VITE_PAGE_SIZE
+        CATAUDITORDOCUMENTS_OPTIONS,
+        VITE_PAGE_SIZE,
     } = envVariables();
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS,
+    } = defaultCSSClasses();
 
     // CUSTOM HOOKS
 
     const {
-        isAuditorCreating,
-        auditorCreatedOk,
-        auditor,
-        auditorsAsync,
-        auditorCreateAsync,
-    } = useAuditorsStore();
+        isCatAuditorDocumentCreating,
+        catAuditorDocumentCreatedOk,
+        catAuditorDocument,
+        catAuditorDocumentsAsync,
+        catAuditorDocumentCreateAsync,
+    } = useCatAuditorDocumentsStore();
 
     // HOOKS
 
@@ -42,69 +50,71 @@ const AuditorsToolbar = () => {
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch.text ?? '',
-                isLeaderSelect: savedSearch.isLeader ?? '',
+                documentTypeSelect: savedSearch.documentType ?? '',
+                subCategorySelect: savedSearch.subCategory ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
     }, []);
-    
-    useEffect(() => {
-        if (auditorCreatedOk) {
-            navigate(`/auditors/${auditor.ID}`);
-        }
-    }, [auditorCreatedOk]);    
 
+    useEffect(() => {
+        if (catAuditorDocumentCreatedOk) {
+            navigate(`/auditor/auditor-documents/${catAuditorDocument.ID}`);
+        }
+    }, [catAuditorDocumentCreatedOk]);
+    
     // METHODS
 
     const onNewItem = () => {
-        auditorCreateAsync();
+        catAuditorDocumentCreateAsync();
     }; // onNewItem
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
             text: values.textInput,
-            isLeader: values.isLeaderSelect,
+            documentType: values.documentTypeSelect,
+            subCategory: values.subCategorySelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
 
-        //console.log(search);
+        console.log(search)
 
-        auditorsAsync(search);
-        localStorage.setItem(AUDITORS_OPTIONS, JSON.stringify(search));
+        catAuditorDocumentsAsync(search);
+        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
 
     const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(AUDITORS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
         const search = {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
-            order: AuditorOrderType.firstName,
+            order: CatAuditorDocumentOrderType.documentType,
         };
 
         setInitialValues(formDefaultData);
-        auditorsAsync(search);
-        localStorage.setItem(AUDITORS_OPTIONS, JSON.stringify(search));
+        catAuditorDocumentsAsync(search);
+        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
     }; // onCleanSearch
 
     return (
-        <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
+        <div className="d-flex flex-column flex-md-row justifiy-content-between gap-2">
             <div>
                 <button
-                    className="btn bg-gradient-dark text-nowrap mb-0"
+                    className={ BUTTON_ADD_CLASS }
                     onClick={ onNewItem }
-                    title="New auditor"
-                    disabled={ isAuditorCreating }
+                    title="New auditor document type"
+                    disabled={ isCatAuditorDocumentCreating }
                 >
                     <FontAwesomeIcon icon={ faPlus } className="me-1" />
                     Add
@@ -113,7 +123,7 @@ const AuditorsToolbar = () => {
             <div className="flex-fill">
                 <Formik
                     initialValues={ initialValues }
-                    onSubmit={onSearchSubmit}
+                    onSubmit={ onSearchSubmit }
                     enableReinitialize
                 >
                     { formik => (
@@ -129,17 +139,31 @@ const AuditorsToolbar = () => {
                                             />
                                         </div>
                                         <div className="col-12 col-sm-auto">
-                                            <AryFormikSelectInput name="isLeaderSelect">
+                                            <AryFormikSelectInput name="documentTypeSelect">
                                                 {
-                                                    Object.keys(AuditorIsLeaderType).map(key =>
+                                                    Object.keys(CatAuditorDocumentType).map(key =>
                                                         <option
                                                             key={key}
-                                                            value={AuditorIsLeaderType[key]}
+                                                            value={CatAuditorDocumentType[key]}
                                                             className="text-capitalize"
                                                         >
-                                                            {key === 'nothing' ? '(auditor)' : key}
+                                                            {key === 'nothing' ? '(type)' : key}
                                                         </option>
-                                                    )}
+                                                )}
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-auto">
+                                            <AryFormikSelectInput name="subCategorySelect">
+                                                {
+                                                    Object.keys(CatAuditorDocumentSubCategoryType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={CatAuditorDocumentSubCategoryType[key]}
+                                                            className="text-uppercase"
+                                                        >
+                                                            {key === 'nothing' ? '(sub-category)' : key}
+                                                        </option>
+                                                )}
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
@@ -153,7 +177,7 @@ const AuditorsToolbar = () => {
                                                         >
                                                             {key === 'nothing' ? '(status)' : key}
                                                         </option>
-                                                    )}
+                                                )}
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-auto ps-sm-0">
@@ -171,17 +195,17 @@ const AuditorsToolbar = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> {/* row */}
                                 </div>
-                                <div className="d-flex justify-content-between gap-2">
+                                <div className="d-flex justify-content-between gap-2 mb-3">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info">
+                                        <button type="submit" className={BUTTON_SEARCH_CLASS}>
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-link text-secondary"
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS}
                                             onClick={ (values) => {
                                                 onCleanSearch(values);
                                                 formik.resetForm(initialValues);
@@ -200,4 +224,4 @@ const AuditorsToolbar = () => {
     )
 }
 
-export default AuditorsToolbar;
+export default CatAuditorDocumentsToolbar

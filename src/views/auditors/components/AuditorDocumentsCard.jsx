@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Alert, Card, ListGroup } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faCircleCheck, faCircleExclamation, faCircleXmark, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faUserCheck, faUserGraduate, faUserPen } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faUserGraduate, faUserPen } from '@fortawesome/free-solid-svg-icons';
 
 import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
 import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore'

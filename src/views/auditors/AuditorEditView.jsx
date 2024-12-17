@@ -190,9 +190,9 @@ const AuditorEditView = () => {
         navigate('/auditors/');
     }; // onCancelButton
 
-    const onDismissButton = () => {
-        console.log('onDismissButton');
-    };
+    // const onDismissButton = () => {
+    //     console.log('onDismissButton');
+    // };
 
     const onDeleteFile = () => {
 

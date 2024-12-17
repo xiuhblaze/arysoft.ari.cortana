@@ -13,7 +13,7 @@ import AryListStatistics from '../../components/AryListStatistics/AryListStatist
 const AuditorsListView = () => {
     const { 
         AUDITORS_OPTIONS,
-        VITE_PAGE_PAGESIZE,
+        VITE_PAGE_SIZE,
     } = envVariables();
 
     const { AuditorOrderType } = enums();
@@ -34,7 +34,7 @@ const AuditorsListView = () => {
         const newSearch = {
             pageSize: savedSearch?.pageSize 
                 ? savedSearch.pageSize 
-                : VITE_PAGE_PAGESIZE,
+                : VITE_PAGE_SIZE,
             pageNumber: 1,
             order: savedSearch?.order 
                 ? savedSearch.order

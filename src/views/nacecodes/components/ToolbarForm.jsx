@@ -9,20 +9,33 @@ import enums from "../../../helpers/enums";
 
 import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 
 export const ToolbarForm = () => {
     const { DefaultStatusType, NacecodeOrderType } = enums();
-    const { NACECODES_OPTIONS, VITE_PAGE_PAGESIZE } = envVariables();
-    const [initialValues, setInitialValues] = useState({
-        textInput: '',
-        statusSelect: '',
-        includeDeletedCheck: false,
-    })
+    const { NACECODES_OPTIONS, VITE_PAGE_SIZE } = envVariables();
+
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS,
+    } = defaultCSSClasses();
+
+    // CUSTOM HOOKS
+
     const {
         isNacecodeCreating,
         nacecodesAsync,
         nacecodeCreateAsync
     } = useNacecodesStore();
+    
+    // HOOKS
+    
+    const [initialValues, setInitialValues] = useState({
+        textInput: '',
+        statusSelect: '',
+        includeDeletedCheck: false,
+    })
 
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
@@ -60,7 +73,7 @@ export const ToolbarForm = () => {
 
         const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_PAGESIZE,
+            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
             order: NacecodeOrderType.sector,
@@ -80,7 +93,7 @@ export const ToolbarForm = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
                 <button
-                    className="btn bg-gradient-dark d-flex justify-content-center align-items-center mb-0"
+                    className={ BUTTON_ADD_CLASS }
                     onClick={onNewItem}
                     title="New NACE code"
                     disabled={isNacecodeCreating}
@@ -113,7 +126,7 @@ export const ToolbarForm = () => {
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-auto ps-sm-0">
-                                            <div className="p-2 bg-gray-100 border-radius-md">
+                                            <div className="p-2 bg-gray-100 border-radius-md mb-3">
                                                 <div className="form-check form-switch">
                                                     <input id="includeDeletedCheck" name="includeDeletedCheck"
                                                         className="form-check-input"
@@ -129,15 +142,15 @@ export const ToolbarForm = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex justify-content-between gap-2">
+                                <div className="d-flex justify-content-between gap-2 mb-3">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info d-flex justify-content-center align-items-center">
+                                        <button type="submit" className={BUTTON_SEARCH_CLASS}>
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-outline-secondary" onClick={(values) => {
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={(values) => {
                                             onCleanSearch(values);
                                             formik.resetForm(initialValues);
                                         }}>

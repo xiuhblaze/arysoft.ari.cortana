@@ -10,7 +10,7 @@ import { useAuditorDocumentsStore } from '../../../hooks/useAuditorDocumentsStor
 import { ViewLoading } from '../../../components/Loaders'
 import AuditorDocumentsCardItem from './AuditorDocumentsCardItem'
 
-const AuditorDocumentsHistoryList = ({ catAuditorDocumentID, ...props }) => {
+const AuditorDocumentsHistoryList = ({ catAuditorDocumentID, readOnly = false, ...props }) => {
 
     const { 
         AuditorDocumentOrderType,
@@ -98,6 +98,7 @@ const AuditorDocumentsHistoryList = ({ catAuditorDocumentID, ...props }) => {
                                                 item={ catAuditorDocument }
                                                 document={ item }
                                                 hideHistory
+                                                readOnly={ readOnly }
                                             />
                                         )) }
                                     </ListGroup>
