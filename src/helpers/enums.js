@@ -51,8 +51,10 @@ const enums = () => {
 
     const AuditorDocumentType = Object.freeze({
         nothing: 0,
-        exam: 1,
-        other: 2,
+        certificate: 1,
+        course : 2,
+        exam: 3,
+        other: 4,
     });
 
     const AuditorDocumentValidityType = Object.freeze({

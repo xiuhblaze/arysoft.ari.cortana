@@ -493,15 +493,15 @@ const AuditorEditView = () => {
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                         <Nav.Item>
-                                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="nacecodes">
+                                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="standards">
                                                                 <FontAwesomeIcon icon={ faLandmark } className="me-2" />
-                                                                Nace Codes
+                                                                Standards
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     </Nav>
                                                 </div>
                                                 { navOptions == "documents" && <AuditorDocumentsCard /> }
-                                                { navOptions == "nacecodes" && <div>NACE Codes</div> }
+                                                { navOptions == "standards" && <div>Standards goes here</div> }
                                             </Col>
                                         </Row>
                                     </Card.Body>

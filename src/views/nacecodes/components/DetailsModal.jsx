@@ -66,7 +66,7 @@ export const DetailsModal = ({ show, onHide, ...props }) => {
                 ) : !!nacecode ? (
                     <>
                         <h6>{nacecode.Description}</h6>
-                        <hr className="horizontal gray-light my-2" />
+                        <hr className="horizontal dark my-4" />
                         <ListGroup>
                             <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
                                 <ListGroupItemData label="Code" icon={ faLayerGroup }>

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore'
 import { ViewLoading } from '../../../components/Loaders';
 import CatAuditorDocumentsTableItem from './CatAuditorDocumentsTableItem';
+import CatAuditorDocumentDetailsModal from './CatAuditorDocumentDetailsModal';
 
 const CatAuditorDocumentsTable = () => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -45,7 +46,7 @@ const CatAuditorDocumentsTable = () => {
                                     <th className={ headStyle }>Warning</th>
                                     <th className={ headStyle }>Update</th>
                                     <th className={ headStyle }>Order</th>
-                                    <th className={ headStyle }>Status</th>
+                                    <th className={ `text-center ${headStyle}`}>Status</th>
                                     <th className={ headStyle }>Actions</th>
                                 </tr>
                             </thead>
@@ -53,14 +54,18 @@ const CatAuditorDocumentsTable = () => {
                                 {
                                     catAuditorDocuments.map(item => {
                                         return (
-                                            <CatAuditorDocumentsTableItem key={item.ID} item={ item } />
+                                            <CatAuditorDocumentsTableItem 
+                                                key={item.ID} 
+                                                item={ item } 
+                                                onShowModal={ () => onShowModal(item.ID) }
+                                            />
                                         )
                                     })
                                 }
                             </tbody>
                         </table>
                     </div>
-
+                    <CatAuditorDocumentDetailsModal show={ showModal } onHide={ onCloseModal } />
                 </>
             } 
         </div>

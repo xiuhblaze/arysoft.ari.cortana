@@ -11,6 +11,7 @@ import { ViewLoading } from "../../../components/Loaders";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import Status from "./Status";
 import ListGroupItemData from "../../../components/ListGroup/ListGroupItemData";
+import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -113,16 +114,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                 <div className="d-flex justify-content-between align-items-center w-100">
                     <div>
                         {!!standard && (
-                            <ul className="list-group opacity-7">
-                                <li className="list-group-item border-0 py-0 ps-0 text-xs text-secondary">
-                                    <strong className="me-2">Last updated:</strong>
-                                    {getFriendlyDate(standard.Updated)}
-                                </li>
-                                <li className="list-group-item border-0 py-0 ps-0 text-xs text-secondary">
-                                    <strong className="me-2">By:</strong>
-                                    {standard.UpdatedUser}
-                                </li>
-                            </ul>
+                            <AryLastUpdatedInfo item={ standard } />
                         )}
                     </div>
                     <div className="d-flex justify-content-end gap-2">
