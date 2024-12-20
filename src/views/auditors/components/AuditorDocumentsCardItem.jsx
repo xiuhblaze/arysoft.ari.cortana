@@ -11,8 +11,13 @@ import auditorRequiredProps from '../helpers/auditorRequiredProps';
 import AuditorDocumentsHistoryList from './AuditorDocumentsHistoryList';
 import catAuditorDocumentSubCategoryProps from '../../catAuditorDocuments/helpers/catAuditorDocumentSubCategoryProps';
 import auditorDocumentTypeProps from '../helpers/auditorDocumentTypeProps';
+import envVariables from '../../../helpers/envVariables';
 
 const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistory = false, ...props }) => {
+    const { 
+        VITE_FILES_URL,
+        URL_AUDITOR_FILES,
+    } = envVariables();
     const { 
         AuditorDocumentType,
         AuditorDocumentValidityType,
@@ -94,7 +99,7 @@ const AuditorDocumentsCardItem = ({ item, document, readOnly = false, hideHistor
                 }
                 {
                     !!document ? (
-                        <a href={`/files/auditors/${ document.AuditorID }/${ document.Filename }`}
+                        <a href={`${VITE_FILES_URL}${URL_AUDITOR_FILES}/${ document.AuditorID }/${ document.Filename }`}
                             alt="View file"
                             target="_blank"
                         >

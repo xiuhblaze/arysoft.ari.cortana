@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { formatISO } from "date-fns";
 
 import {
     onApplicationFormsLoading,
@@ -27,7 +26,7 @@ import getError from "../helpers/getError";
 
 const { 
     VITE_PAGE_SIZE,
-    URI_APPLICATIONFORMS
+    URL_APPLICATIONFORMS
 } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -72,22 +71,9 @@ export const useApplicationFormsStore = () => {
     } = useSelector(state => state.applicationForms)
 
     const { user } = useSelector(state => state.auth);
-    const {
-        EstatusType,
-        ApplicationFormsOrdenType
-    } = enums();
-
+    
     // Methods
 
-    // const setError = (message) => {
-
-    //     if (message.length === 0) return;
-
-    //     dispatch(setApplicationFormsErrorMessage(message));
-    //     setTimeout(() => {
-    //         dispatch(clearApplicationFormsErrorMessage());
-    //     }, 10);
-    // };
     const setError = (value) => {
     
             if (isString(value)) {
@@ -116,7 +102,7 @@ export const useApplicationFormsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${ URI_APPLICATIONFORMS }${query}`);
+            const resp = await cortanaApi.get(`${ URL_APPLICATIONFORMS }${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setApplicationForms({
@@ -143,7 +129,7 @@ export const useApplicationFormsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${ URI_APPLICATIONFORMS }/${id}`);
+            const resp = await cortanaApi.get(`${ URL_APPLICATIONFORMS }/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setApplicationForm(Data));
@@ -164,7 +150,7 @@ export const useApplicationFormsStore = () => {
             const params = {
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(URI_APPLICATIONFORMS, params);
+            const resp = await cortanaApi.post(URL_APPLICATIONFORMS, params);
             const { Data } = await resp.data;
 
             dispatch(setApplicationForm(Data));
@@ -187,7 +173,7 @@ export const useApplicationFormsStore = () => {
             UpdatedUser: user.username,
         }
         try {
-            const resp = await cortanaApi.put(`${ URI_APPLICATIONFORMS }/${toSave.id}`, toSave);
+            const resp = await cortanaApi.put(`${ URL_APPLICATIONFORMS }/${toSave.id}`, toSave);
             const { Data } = await resp.data;
 
             dispatch(setApplicationForm(Data));
@@ -211,7 +197,7 @@ export const useApplicationFormsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${ URI_APPLICATIONFORMS }/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${ URL_APPLICATIONFORMS }/${id}`, { data: toDelete });
             dispatch(isApplicationFormDeleted());
         } catch (error) {
             //console.log(error);

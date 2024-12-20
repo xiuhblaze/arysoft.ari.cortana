@@ -21,12 +21,11 @@ import {
 } from "../store/slices/auditorsSlice";
 
 import envVariables from "../helpers/envVariables";
-// import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const AUDITOR_URI = '/auditors';
+const AUDITOR_ROUTE = '/auditors';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -94,7 +93,7 @@ export const useAuditorsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${AUDITOR_URI}${query}`);
+            const resp = await cortanaApi.get(`${AUDITOR_ROUTE}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setAuditors({
@@ -125,7 +124,7 @@ export const useAuditorsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${AUDITOR_URI}/${id}`);
+            const resp = await cortanaApi.get(`${AUDITOR_ROUTE}/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setAuditor(Data));
@@ -145,7 +144,7 @@ export const useAuditorsStore = () => {
             const params = {
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(AUDITOR_URI, params);
+            const resp = await cortanaApi.post(AUDITOR_ROUTE, params);
             const { Data } = await resp.data;
 
             dispatch(setAuditor(Data));
@@ -156,29 +155,11 @@ export const useAuditorsStore = () => {
         }
     };
 
-    // /**
-    //  * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-    //  * @param {ID, FirstName, MiddleName, LastName, Email, Phone, Address, Status, UpdatedUser} item Objeto tipo Auditor
-    //  */
-    // const auditorSaveAsync = async (item) => {
-    //     dispatch(onAuditorSaving());
-
-    //     const toSave = {
-    //         ...item,
-    //         UpdatedUser: user.username,
-    //     }
-    //     try {
-    //         const resp = await cortanaApi.put(`${AUDITOR_URI}/${toSave.ID}`, toSave);
-    //         const { Data } = await resp.data;
-
-    //         dispatch(setAuditor(Data));
-    //         dispatch(isAuditorSaved());
-    //     } catch (error) {
-    //         const message = getError(error);
-    //         setError(message);
-    //     }
-    // };
-
+    /**
+     * Llama al endpoint para actualizar la información de un registro existente en la base de datos
+     * @param {ID, FirstName, MiddleName, LastName, Email, Phone, Address, Status, UpdatedUser} item Objeto tipo Auditor
+     * @param { object } file Contiene un archivo en binario o algo así
+     */
     const auditorSaveAsync = async (item, file) => {
         dispatch(onAuditorSaving());
 
@@ -199,7 +180,7 @@ export const useAuditorsStore = () => {
             formData.append('data', data);
             formData.append('file', file);
 
-            const resp = await cortanaApi.put(`${AUDITOR_URI}`, formData, { headers });
+            const resp = await cortanaApi.put(`${AUDITOR_ROUTE}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setAuditor(Data));
@@ -224,7 +205,7 @@ export const useAuditorsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITOR_URI}/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${AUDITOR_ROUTE}/${id}`, { data: toDelete });
 
             console.log('auditorDeleteAsync.resp', resp);
             dispatch(isAuditorDeleted());
@@ -234,15 +215,19 @@ export const useAuditorsStore = () => {
         }
     }
 
+    /**
+     * 
+     * @param {guid} id identificador del registro propietario del archivo
+     * @returns 
+     */
     const auditorDeleteFileAsync = async (id) => {
-
         const toDeleteFile = {
             ID: id,
             UpdatedUser: user.username,
         };
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITOR_URI}/${id}/photofile`, { data: toDeleteFile });
+            const resp = await cortanaApi.delete(`${AUDITOR_ROUTE}/${id}/photofile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
             console.log('auditorDeleteFileAsync.Data', Data)

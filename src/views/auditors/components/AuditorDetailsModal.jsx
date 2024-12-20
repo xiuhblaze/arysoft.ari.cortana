@@ -15,10 +15,15 @@ import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/Ary
 import AuditorDocumentsCard from './AuditorDocumentsCard';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import { getFullName } from '../../../helpers/getFullName';
+import envVariables from '../../../helpers/envVariables';
 
 const AuditorDetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
     const { DefaultStatusType } = enums();
+    const {
+        VITE_FILES_URL,
+        URL_AUDITOR_FILES,
+    } = envVariables();
     
     // CUSTOM HOOKS
 
@@ -71,7 +76,7 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">
                                             <img 
-                                                src={`/files/auditors/${ auditor.ID }/${ auditor.PhotoFilename }`} 
+                                                src={`${VITE_FILES_URL}${URL_AUDITOR_FILES}/${ auditor.ID }/${ auditor.PhotoFilename }`} 
                                                 alt="Profile pic" 
                                                 className="w-100 border-radius-lg shadow-sm"
                                             />

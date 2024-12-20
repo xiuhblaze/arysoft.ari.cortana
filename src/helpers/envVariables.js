@@ -6,15 +6,15 @@ const envVariables = () => {
     const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
     const ORGANIZATIONS_OPTIONS = 'arysoft-ari-organizationsOptions';
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
-
-    const URI_APPLICATIONFORMS = '/applications';
-    const URI_AUDITOR_FILES = '/files/auditors';
+    
+    const URL_APPLICATIONFORMS = '/applications';
+    const URL_AUDITOR_FILES = '/auditors';
 
     return {
         ...import.meta.env,
 
-        URI_APPLICATIONFORMS,
-        URI_AUDITOR_FILES,
+        URL_APPLICATIONFORMS,
+        URL_AUDITOR_FILES,
 
         APPLICATION_FORM_OPTIONS,
         AUDITORS_OPTIONS,

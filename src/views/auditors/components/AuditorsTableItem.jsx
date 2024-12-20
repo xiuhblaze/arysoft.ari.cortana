@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClone, faEdit, faEnvelope, faFile, faFileCircleCheck, faFileCircleExclamation, faFileCircleXmark, faPhone } from '@fortawesome/free-solid-svg-icons'
+import { faCertificate, faClone, faEdit, faEnvelope, faPhone, faSplotch } from '@fortawesome/free-solid-svg-icons'
 
 import envVariables from '../../../helpers/envVariables'
 import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
@@ -9,24 +9,14 @@ import auditorValidityProps from '../helpers/auditorValidityProps';
 import auditorRequiredProps from '../helpers/auditorRequiredProps';
 
 const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
-    const { URI_AUDITOR_FILES } = envVariables();
+    const { 
+        URL_AUDITOR_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const pathPhotoFilename = !!item.PhotoFilename 
-        ? `${URI_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}` 
+        ? `${VITE_FILES_URL}${URL_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}` 
         : defaultProfile;
 
-    // const validityStatusStyle = [
-    //     { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-    //     { icon: faFileCircleCheck , label: 'All documents are current', color: 'text-success shadow-xs', bgColor: 'bg-gradient-success' },
-    //     { icon: faFileCircleExclamation ,label: 'At least one document is close to expired', color: 'text-warning shadow-xs', bgColor: 'bg-gradient-warning' },
-    //     { icon: faFileCircleXmark , label: 'At least one document has expired', color: 'text-danger shadow-xs', bgColor: 'bg-gradient-danger' },
-    // ];
-
-    // const requiredStatusStyle = [
-    //     { icon: faFile, label: '-', color: 'text-light', bgColor: 'bg-gradient-light' },
-    //     { icon: faFileCircleCheck, label: 'All required documents are up to date', color: 'text-dark shadow-xs', bgColor: 'bg-gradient-dark' },
-    //     { icon: faFileCircleXmark, label: 'At least one required document is missing', color: 'text-secondary shadow-xs', bgColor: 'bg-gradient-secondary' },
-    // ];
-    
     return (
         <tr { ...props }>
             <td>
@@ -35,8 +25,13 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">
-                        <h6 className={`mb-0 text-sm ${ item.IsLeadAuditor ? 'text-info text-gradient' : '' }`}>{ item.FullName }</h6>
-                        <p className="mb-0 text-xs d-flex flex-column gap-1">
+                        <h6 className={`mb-0 text-sm`}>
+                            { item.FullName }
+                            { item.IsLeadAuditor &&
+                                <FontAwesomeIcon icon={ faSplotch } className="text-warning ms-1" title="Is lead auditor" />
+                            }
+                        </h6>
+                        <p className="text-xs mb-0">
                             { item.Address }
                         </p>
                     </div>

@@ -28,7 +28,10 @@ import auditorValidityProps from './helpers/auditorValidityProps';
 
 const AuditorEditView = () => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-    const { VITE_FILES_URI } = envVariables();
+    const { 
+        URL_AUDITOR_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const {
         DefaultStatusType,
         AuditorIsLeaderType,
@@ -177,7 +180,7 @@ const AuditorEditView = () => {
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        console.log('onFormSubmit', toSave);
+        //console.log('onFormSubmit', toSave);
 
         auditorSaveAsync(toSave, values.photoFileInput);
     }; // onFormSubmit
@@ -232,7 +235,7 @@ const AuditorEditView = () => {
                                                             src={!!photoPreview
                                                                 ? photoPreview
                                                                 : !!auditor.PhotoFilename
-                                                                    ? `/files/auditors/${auditor.ID}/${auditor.PhotoFilename}`
+                                                                    ? `${VITE_FILES_URL}${URL_AUDITOR_FILES}/${auditor.ID}/${auditor.PhotoFilename}`
                                                                     : defaultProfile
                                                             }
                                                             className="border-radius-md"
@@ -344,7 +347,7 @@ const AuditorEditView = () => {
                                                                             </>
                                                                         ) : !!auditor.PhotoFilename && (
                                                                             <div>
-                                                                                <Image src={`${VITE_FILES_URI}/auditors/${auditor.ID}/${auditor.PhotoFilename}`}
+                                                                                <Image src={`${VITE_FILES_URL}${URL_AUDITOR_FILES}/${auditor.ID}/${auditor.PhotoFilename}`}
                                                                                     thumbnail
                                                                                     fluid
                                                                                     className="mb-3"

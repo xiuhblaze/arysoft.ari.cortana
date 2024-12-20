@@ -26,7 +26,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const AUDITORDOCUMENTS_URI = '/auditordocuments';
+const AUDITORDOCUMENTS_ROUTE = '/auditordocuments';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -96,7 +96,7 @@ export const useAuditorDocumentsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${AUDITORDOCUMENTS_URI}${query}`);
+            const resp = await cortanaApi.get(`${AUDITORDOCUMENTS_ROUTE}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setAuditorDocuments({
@@ -127,7 +127,7 @@ export const useAuditorDocumentsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${AUDITORDOCUMENTS_URI}/${id}`);
+            const resp = await cortanaApi.get(`${AUDITORDOCUMENTS_ROUTE}/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setAuditorDocument(Data));
@@ -146,11 +146,10 @@ export const useAuditorDocumentsStore = () => {
 
         try {
             const params = {
-                //OrganizationID: item.OrganizationID,
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(AUDITORDOCUMENTS_URI, params);
+            const resp = await cortanaApi.post(AUDITORDOCUMENTS_ROUTE, params);
             const { Data } = await resp.data;
 
             dispatch(setAuditorDocument(Data));
@@ -179,7 +178,7 @@ export const useAuditorDocumentsStore = () => {
             formData.append('data', data);
             formData.append('file', file);
 
-            const resp = await cortanaApi.put(`${AUDITORDOCUMENTS_URI}`, formData, { headers });
+            const resp = await cortanaApi.put(`${AUDITORDOCUMENTS_ROUTE}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setAuditorDocument(Data));
@@ -204,7 +203,7 @@ export const useAuditorDocumentsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_URI}/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_ROUTE}/${id}`, { data: toDelete });
 
             console.log('auditorDocumentDeleteAsync.resp', resp);
 
@@ -223,7 +222,7 @@ export const useAuditorDocumentsStore = () => {
         };
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_URI}/${id}/documentfile`, { data: toDeleteFile });
+            const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_ROUTE}/${id}/documentfile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
             console.log('auditorDocumentDeleteFileAsync.Data', Data)
