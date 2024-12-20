@@ -11,6 +11,7 @@ import imgCertified9001 from '../../assets/img/9001-Certified Management System.
 import imgCertified14001 from '../../assets/img/14001-Certified Management System.png';
 import imgCertified22000 from '../../assets/img/22000-Certified Management System.png';
 import imgCertified45001 from '../../assets/img/45001-Certified Management System.png';
+import imgCertifiedHaccp from '../../assets/img/HACCP-Certified-Management-System.png';
 
 const Iso45001Content = () => {
   return (
@@ -184,6 +185,20 @@ const Iso9001Content = () => {
   );
 };
 
+const HaccpContent = () => {
+  return (
+    <>
+      <p>
+        This standard is for the Hazard Analysis based on Alimentarius CODEX to identify Hazard: Physical, 
+        Chemical, Biological, Radiological, and is based on "A preventive and systematic approachaimed at 
+        the prevention and control of biological, chemical and physical hazards, by means of anticipation 
+        and prevention, rather than inspection and testing on final products. <strong>"Benefits Prevention 
+        rather than inspection and testing on final products."</strong>
+      </p>
+    </>
+  );
+};
+
 const GlobalMarkets = () => {
   return (
     <>
@@ -288,6 +303,17 @@ export const ServicesView = () => {
                 image={ imgCertified9001 }
               >
                 <Iso9001Content />
+              </ServicesCard>
+            </Col>
+            <Col lg="4" className="mb-4">
+              <ServicesCard
+                title="HACCP"
+                subtitle="HAZARD ANALISYS AND CRITICAL CONTROL POINTS"
+                accredited="(Accredited service)"
+                desc="This standard is for the Hazard Analysis based on Alimentarius CODEX to identify Hazard..."
+                image={ imgCertifiedHaccp }
+              >
+                <HaccpContent />
               </ServicesCard>
             </Col>
             <Col lg="4" className="mb-4">

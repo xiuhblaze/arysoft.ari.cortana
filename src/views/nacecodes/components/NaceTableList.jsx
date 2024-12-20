@@ -30,7 +30,7 @@ export const NaceTableList = () => {
   useEffect(() => {
     if (!!nacecodes) {
       const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-      setCurrentOrder(savedSearch.order);
+      setCurrentOrder(savedSearch?.order ?? NacecodeOrderType.sector);
     }
   }, [nacecodes]);
   
@@ -64,7 +64,7 @@ export const NaceTableList = () => {
             </thead>
             <tbody>
               { nacecodes.map( item => (
-                <tr key={ item.NaceCodeID } className={ item.Status === DefaultStatusType.deleted ? 'opacity-6' : ''}>
+                <tr key={ item.ID } className={ item.Status === DefaultStatusType.deleted ? 'opacity-6' : ''}>
                   <td className="text-sm text-secondary font-weight-bold text-end">
                     <Code 
                       sector={ item.Sector }
@@ -79,11 +79,11 @@ export const NaceTableList = () => {
                   <td className="text-sm text-center"><Status value={ item.Status } /></td>
                   <td>
                     <div className="d-flex justify-content-center gap-2">
-                      <a href="#" onClick={ () => onShowModal(item.NaceCodeID) } title="Details">
+                      <a href="#" onClick={ () => onShowModal(item.ID) } title="Details">
                         <FontAwesomeIcon icon={ faClone } />
                       </a>
                       { item.Status !== DefaultStatusType.deleted && (
-                        <Link to={ `${ item.NaceCodeID }` } title="Edit">
+                        <Link to={ `${ item.ID }` } title="Edit">
                           <FontAwesomeIcon icon={ faEdit } />
                         </Link>
                       )}

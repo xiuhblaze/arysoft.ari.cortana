@@ -5,7 +5,7 @@ import { DashboardLayout } from '../../layouts/dashboard';
 import ListView from './ListView';
 import EditView from './EditView';
 
-export const Nacecodes = () => {
+export const Standards = () => {
   return (
     <DashboardLayout>
       <Routes>
@@ -17,4 +17,4 @@ export const Nacecodes = () => {
   )
 }
 
-export default Nacecodes;
+export default Standards;

@@ -1,6 +1,189 @@
 const news = [
-  { 
+  {
     key: 1,
+    title: 'Webinars 2025',
+    subtitle: 'Check out the webinars we offer in 2025 (spanish)',
+    content: (
+      <>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Enero 10, 2025</h5>
+                <p className="text-sm">Ciclo de vida del producto – ISO 14001, ISO 9001 (Comité técnico 176 - Future Concepts) - ISO 9001:2015/Amd 1:2024</p>
+                <p className="text-sm"><strong>Enfoque automotriz</strong></p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Entender como documentar la metodología de ciclo de vida, en un entorno automotriz</li>
+                    <li className="text-xs">Partes interesadas - Ejemplos de implementación de Organizaciones Internacionales</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Enero 17, 2025</h5>
+                <p className="text-sm">Cambio Climático - Expectativas de cumplimiento</p>
+                <p className="text-sm">Objetivos de desarrollo sustentable</p>
+                <p className="text-sm">Comunicado IAF-ISO febrero 2024. Aplicable a todas las Organizaciones certificadas</p>
+                <p className="text-sm">Partes interesadas – Organizaciones que están implementando acciones a sus proveedores</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Entender cómo se está desarrollando el cambio climático a nivel global</li>
+                    <li className="text-xs">Partes interesadas</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Enero 21, 2025</h5>
+                <p className="text-sm"><strong>FSSC – Control de calidad</strong></p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Puntos clave y requisitos específicos</li>
+                    <li className="text-xs">Expectativas de cumplimiento como Organismo de Certificación</li>
+                    <li className="text-xs">Tips de herramientas desarrolladas desde la perspectiva de un Auditor de 3ra parte</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Febrero 28, 2025</h5>
+                <p className="text-sm">FSSC Requisito adicional – Fraude Alimentario + Defensa Alimentaria</p>
+                <p className="text-sm">Plan Builder FDA, PASS 96, SSAFE y otros esquemas</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Puntos clave y requisitos específicos</li>
+                    <li className="text-xs">Expectativas de cumplimiento como Organismo de Certificación</li>
+                    <li className="text-xs">Tips de herramientas desarrolladas desde la perspectiva de un Auditor de 3ra parte</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Marzo 10 - 14, 2025</h5>
+                <p className="text-sm"><strong>FSSC Auditor Líder</strong> – Exemplar Global (curso on-line)</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Curso con registro internacional</li>
+                    <li className="text-xs">Ejercicios prácticos para mejor entendimiento y aplicación</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Marzo 28, 2025</h5>                
+                <p className="text-sm">No Conformidades & Acciones correctivas</p>
+                <p className="text-sm">Estadísticas de reincidencia</p>
+                <p className="text-sm">Causas Raíz aceptables</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Puntos clave y requisitos específicos</li>
+                    <li className="text-xs">Expectativas de cumplimiento como Organismo de Certificación</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Abril 11, 2025</h5> 
+                <p className="text-sm">Mejora Continua</p>
+                <p className="text-sm">Enfoque a resultados</p>
+                <p className="text-sm">Control estadístico de procesos</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Fortalecer el concepto de mejora en las Organizaciones, para vayan mejorando su enfoque a resultados con impactos positivos.</li>
+                    <li className="text-xs">No se trata solo de Medir, se trata de Mejorar</li>
+                    <li className="text-xs">Expectativas de cumplimiento como Organismo de Certificación</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="card bg-gradient-light mb-5">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-4">
+                <img src="/images/icoWebinarARI.svg" alt="Webinar" className="img-fluid" />
+              </div>
+              <div className="col-8">
+                <h5 className="text-ari text-gradient">Mayo 8, 2025</h5>
+                <p className="text-sm">Gestión de la Energía</p>
+                <p className="text-sm">Enlace con producción, productividad, impacto en aspectos ambientales, salud y seguridad</p>
+                <p className="text-sm">Enlace en impacto en el negocio y enfoque en resultados</p>
+                <div className="bg-ari border-radius-md p-3">
+                  <h6 className="text-white">Descripción</h6>
+                  <ul>
+                    <li className="text-xs">Puntos clave y requisitos específicos</li>
+                    <li className="text-xs">Expectativas de cumplimiento como Organismo de Certificación</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  },
+  { 
+    key: 2,
     title: 'Service Providers Are Now Eligible for GFSI- recognised Certification',
     subtitle: 'GFSI Benchmarking Requirements Add New Scope',
     content: (
@@ -54,7 +237,7 @@ const news = [
     )
   },
   { 
-    key: 2,
+    key: 3,
     title: 'GFSI Welcomes Four New Members into Coalition of Action!',
     subtitle: 'Develey, Kerry, Spinneys and Sysco Showcase Commitment to Delivering Safe Food to People Everywhere',
     content: (
@@ -140,7 +323,7 @@ const news = [
     )
   },
   { 
-    key: 3,
+    key: 4,
     title: 'Remote Audits during the COVID-19 Pandemic',
     subtitle: 'As a result of the health contingency due to COVID-19, uncertainty has arisen in certified companies...',
     content: (
@@ -209,7 +392,7 @@ const news = [
     )
   },
   { 
-    key: 4,
+    key: 5,
     title: 'ISO 31010 Management System Tools',
     subtitle: 'During the years Management System Tools are develop to help organization to Manage Risks...',
     content: (
@@ -250,7 +433,7 @@ const news = [
     )
   },
   { 
-    key: 5,
+    key: 6,
     title: 'AIAG & VDA FMEA Handbook',
     subtitle: 'Developed with a global team of OEM and Tier 1 supplier subject matter experts...',
     content: (
@@ -275,7 +458,7 @@ const news = [
     )
   },
   { 
-    key: 6,
+    key: 7,
     title: 'Expected Outcomes Document for certification to ISO 22000, a Food Safety Management System (FSMS).',
     subtitle: null,
     content: (
@@ -373,7 +556,7 @@ const news = [
     )
   },
   { 
-    key: 7,
+    key: 8,
     title: 'How does conformity assessment help the circular economy?',
     subtitle: 'Conformity assessment provides assurance that specified needs or expectations are being met.',
     content: (
@@ -468,7 +651,7 @@ const news = [
     )
   },
   { 
-    key: 8,
+    key: 9,
     title: 'Newly developed version 5 of the FSSC 22000 certification scheme',
     subtitle: null,
     content: (
@@ -491,7 +674,7 @@ const news = [
     )
   },
   { 
-    key: 9,
+    key: 10,
     title: 'ISO 31000:2018, Risk management',
     subtitle: 'Guidelines, provides principles, framework and a process for managing risk...',
     content: (

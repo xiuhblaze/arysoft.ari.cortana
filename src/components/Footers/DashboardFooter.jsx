@@ -13,8 +13,8 @@ export const DashboardFooter = () => {
             <Col lg="6" className="mb-lg-0 mb-4">
               <div className="copyright text-center text-sm text-muted text-lg-start">
                 <FontAwesomeIcon icon={ faCopyright } className="me-1" />
-                2023, dev by <strong>Arysoft</strong> for 
-                <span className="text-primary text-gradient"> ARI American Registration Inc.</span>
+                2024, all rights reserved
+                <span className="text-info text-gradient"> ARI - American Registration Inc.</span>
               </div>
             </Col>
             <Col lg="6">

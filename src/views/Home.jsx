@@ -14,7 +14,12 @@ import bgAnalist from '../assets/img/bg-analisis-papel.jpg';
 import lgoARI from '../assets/img/lgoARI.png';
 import lgoARIblanco from '../assets/img/lgoAriBlanco.png';
 import imgWhyUs from '../assets/img/why-us.jpg';
+import imgCiudad01 from '../assets/img/imgCiudad01.jpg';
 import imgPeopleWork from '../assets/img/people-at-work-first-plane.jpg';
+
+
+
+import news from './www/data/newsData';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -187,6 +192,31 @@ export const Home = () => {
                 </Row>
               </Container>
           </div>
+        </Container>
+      </section>
+      <section>
+        <Container className="mt-sm-5">
+        <div className="page-header min-vh-50 my-sm-3 mb-3 border-radius-xl"
+            style={{ backgroundImage: `url(${ imgCiudad01 })`}}>
+              <span className="mask bg-gradient-ari"></span>
+              <Container>
+              <Row>
+                <Row className="my-sm-3 mt-3">
+                  <Col xs="12" className="mx-auto">
+                    <h2 className="text-white text-center mb-0">Webinars</h2>
+                    <h4 className="text-white text-center mb-0">in 2025</h4>
+                    <p className="lead text-light text-center">Check out the webinars we offer in 2025 (spanish)</p>
+                    <p className="text-center">
+                      <a href="/news" className="btn bg-gradient-ari text-white mb-0">Read more</a>
+                      <br />
+                      <span className="text-light text-sm">View more in the top new</span>
+                    </p>
+                  </Col>
+                </Row>
+              </Row>
+
+              </Container>
+            </div>
         </Container>
       </section>
     </BasicLayout>
