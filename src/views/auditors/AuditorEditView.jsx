@@ -249,7 +249,7 @@ const AuditorEditView = () => {
                                                             {fullName}
                                                         </h5>
                                                         <p className="mb-0 font-weight-bold text-sm">
-                                                            Update auditor's profile
+                                                            Auditor's profile
                                                         </p>
                                                     </div>
                                                 </div>

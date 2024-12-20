@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCertificate, faClone, faEdit, faEnvelope, faPhone, faSplotch } from '@fortawesome/free-solid-svg-icons'
+import { faClone, faEdit, faEnvelope, faPhone, faSplotch } from '@fortawesome/free-solid-svg-icons'
 
 import envVariables from '../../../helpers/envVariables'
 import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';

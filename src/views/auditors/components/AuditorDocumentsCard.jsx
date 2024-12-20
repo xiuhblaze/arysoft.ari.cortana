@@ -77,6 +77,7 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     { auditorRequiredProps[auditor.RequiredStatus].label }
                                 </Alert>
                             }
+                            <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                             <h6 className={ titleStyle }>
                                 <FontAwesomeIcon icon={ faUserPen } size="lg" className="me-2" />
                                 Hiring documents
@@ -158,6 +159,7 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                     })
                                 }
                             </ListGroup>
+                            </div>
                         </>
                     )
                 }
