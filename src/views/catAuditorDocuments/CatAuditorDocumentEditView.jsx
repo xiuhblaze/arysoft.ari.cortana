@@ -16,6 +16,7 @@ import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Swal from 'sweetalert2';
 import isNullOrEmpty from '../../helpers/isNullOrEmpty';
+import { useStandardsStore } from '../../hooks/useStandardsStore';
 
 const CatAuditorDocumentEditView = () => {
 
@@ -23,10 +24,12 @@ const CatAuditorDocumentEditView = () => {
         CatAuditorDocumentType,
         CatAuditorDocumentSubCategoryType,
         CatAuditorDocumentPeriodicityType,
-        DefaultStatusType
+        DefaultStatusType,
+        StandardOrderType
     } = enums();
 
     const formDefaultValues = {
+        standardSelect: '',
         nameInput: '',
         descriptionInput: '',
         documentTypeSelect: '',
@@ -79,6 +82,13 @@ const CatAuditorDocumentEditView = () => {
         catAuditorDocumentClear,
     } = useCatAuditorDocumentsStore();
 
+    const {
+        isStandardsLoading,
+        standards,
+        standardsAsync,
+        standardsErrorMessage
+    } = useStandardsStore();
+
     // HOOKS
 
     const { id } = useParams();
@@ -95,6 +105,7 @@ const CatAuditorDocumentEditView = () => {
         if (!!catAuditorDocument) {
 
             setInitialValues({
+                standardSelect: catAuditorDocument?.StandardID ?? '',
                 nameInput: catAuditorDocument?.Name ?? '',
                 descriptionInput: catAuditorDocument?.Description ?? '',
                 documentTypeSelect: catAuditorDocument?.DocumentType ?? '',
@@ -110,7 +121,12 @@ const CatAuditorDocumentEditView = () => {
 
             let title = !isNullOrEmpty(catAuditorDocument.Name) ? catAuditorDocument.Name : '';
 
-
+            standardsAsync({
+                status: DefaultStatusType.active,
+                pageSize: 0,
+                includeDeleted: false,
+                order: StandardOrderType.name,
+            });
             
         }
     }, [catAuditorDocument]);
@@ -130,6 +146,7 @@ const CatAuditorDocumentEditView = () => {
         
         const toSave = {
             ID: catAuditorDocument.ID,
+            StandardID: values.standardSelect,
             Name: values.nameInput,
             Description: values.descriptionInput,
             DocumentType: values.documentTypeSelect,
@@ -142,7 +159,7 @@ const CatAuditorDocumentEditView = () => {
             Order: values.orderInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
-
+console.log('onFormSubmit', toSave);
         catAuditorDocumentSaveAsync(toSave);
     }; // onFormSubmit
 
@@ -177,6 +194,24 @@ const CatAuditorDocumentEditView = () => {
                                             <Form>
                                                 <Card.Body>
                                                     <Row>
+                                                        <Col xs="12">
+                                                            <AryFormikSelectInput name="standardSelect"
+                                                                label="Standard"
+                                                            >
+                                                                <option value="">(select)</option>
+                                                                {
+                                                                    standards.map(item =>
+                                                                        <option
+                                                                            key={item.ID}
+                                                                            value={item.ID}
+                                                                            className="text-capitalize"
+                                                                        >
+                                                                            {item.Name}
+                                                                        </option>
+                                                                    )
+                                                                }
+                                                            </AryFormikSelectInput>
+                                                        </Col>
                                                         <Col xs="12">
                                                             <AryFormikTextInput name="nameInput"
                                                                 label="Name"

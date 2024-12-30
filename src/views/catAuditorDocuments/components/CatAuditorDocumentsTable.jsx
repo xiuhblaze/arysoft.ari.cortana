@@ -42,7 +42,7 @@ const CatAuditorDocumentsTable = () => {
                             <thead>
                                 <tr>
                                     <th className={ headStyle }>Document</th>
-                                    <th className={ headStyle }>Type</th>
+                                    <th className={ headStyle }>Info</th>
                                     <th className={ headStyle }>Warning</th>
                                     <th className={ headStyle }>Update</th>
                                     <th className={ headStyle }>Order</th>

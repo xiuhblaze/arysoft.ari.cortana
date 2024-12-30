@@ -88,13 +88,13 @@ const AuditorDocumentsCard = ({ readOnly = false, ...props }) => {
                                         .filter(i => i.DocumentType == CatAuditorDocumentType.hiring)
                                         .sort((a, b) => a.Order - b.Order)
                                         .map(item => {
-                                            const findDocument = auditor.Documents == null 
+                                            const findDocuments = auditor.Documents == null
                                                 ? null
                                                 : auditor.Documents
-                                                    .find(d => 
-                                                        d.CatAuditorDocumentID == item.ID
-                                                        && (d.Status == DefaultStatusType.active || d.Status == DefaultStatusType.inactive)
-                                                    );
+                                                    .filter(d => d.CatAuditorDocumentID == item.ID 
+                                                        && (d.Status == DefaultStatusType.active || d.Status == DefaultStatusType.inactive))
+                                                    .sort((a, b) => a.Status - b.Status);
+                                            const findDocument = findDocuments.length > 0 ? findDocuments[0] : null;
                                             return (
                                                 <AuditorDocumentsCardItem 
                                                     key={ item.ID }

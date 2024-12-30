@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Card, Col, Modal, Row } from 'react-bootstrap'
+import { Col, Modal, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import enums from '../../../helpers/enums';
 import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
@@ -8,7 +8,6 @@ import { ViewLoading } from '../../../components/Loaders';
 
 import bgHeadModal from '../../../assets/img/bgWavesWhite.jpg';
 import defaultStatusProps from '../../../helpers/defaultStatusProps';
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRotateLeft, faEdit, faEnvelope, faPhone, faShare } from '@fortawesome/free-solid-svg-icons';
 import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
@@ -16,6 +15,8 @@ import AuditorDocumentsCard from './AuditorDocumentsCard';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import { getFullName } from '../../../helpers/getFullName';
 import envVariables from '../../../helpers/envVariables';
+
+import defaultProfilePhoto from '../../../assets/img/phoDefaultProfile.jpg';
 
 const AuditorDetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -76,7 +77,10 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">
                                             <img 
-                                                src={`${VITE_FILES_URL}${URL_AUDITOR_FILES}/${ auditor.ID }/${ auditor.PhotoFilename }`} 
+                                                src={ !!auditor.PhotoFilename
+                                                    ? `${VITE_FILES_URL}${URL_AUDITOR_FILES}/${ auditor.ID }/${ auditor.PhotoFilename }`
+                                                    : defaultProfilePhoto
+                                                } 
                                                 alt="Profile pic" 
                                                 className="w-100 border-radius-lg shadow-sm"
                                             />

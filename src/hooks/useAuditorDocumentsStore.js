@@ -225,7 +225,7 @@ export const useAuditorDocumentsStore = () => {
             const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_ROUTE}/${id}/documentfile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
-            console.log('auditorDocumentDeleteFileAsync.Data', Data)
+            // console.log('auditorDocumentDeleteFileAsync.Data', Data)
 
             if (!!Data) {
                 setAuditorDocument({

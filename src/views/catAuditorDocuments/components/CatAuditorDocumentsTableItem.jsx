@@ -46,6 +46,9 @@ const CatAuditorDocumentsTableItem = ({ item, className, onShowModal, hideAction
                 </div>
             </td>
             <td>
+                <p className="text-xs font-weight-bold text-wrap mb-0">
+                    { !isNullOrEmpty(item.StandardName) ? item.StandardName : 'General' }
+                </p>
                 <p className="text-xs text-wrap mb-0">
                     { catAuditorDocumentTypeProps[item.DocumentType].label }
                 </p>

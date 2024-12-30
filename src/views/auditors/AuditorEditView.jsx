@@ -25,6 +25,7 @@ import defaultProfile from '../../assets/img/phoDefaultProfile.jpg';
 import envVariables from '../../helpers/envVariables';
 import AuditorDocumentsCard from './components/AuditorDocumentsCard';
 import auditorValidityProps from './helpers/auditorValidityProps';
+import AuditorStandardsCard from './components/AuditorStandardsCard';
 
 const AuditorEditView = () => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
@@ -497,14 +498,14 @@ const AuditorEditView = () => {
                                                         </Nav.Item>
                                                         <Nav.Item>
                                                             <Nav.Link className="mb-0 px-0 py-1" eventKey="standards">
-                                                                <FontAwesomeIcon icon={ faLandmark } className="me-2" />
+                                                                <FontAwesomeIcon icon={ faLandmark } className="text-info me-2" />
                                                                 Standards
                                                             </Nav.Link>
                                                         </Nav.Item>
                                                     </Nav>
                                                 </div>
                                                 { navOptions == "documents" && <AuditorDocumentsCard /> }
-                                                { navOptions == "standards" && <div>Standards goes here</div> }
+                                                { navOptions == "standards" && <AuditorStandardsCard /> }
                                             </Col>
                                         </Row>
                                     </Card.Body>
