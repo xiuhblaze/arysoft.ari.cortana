@@ -5,7 +5,7 @@ import applicationFormClientSlice from "./slices/applicationFormClientSlice";
 import applicationFormsSlice from "./slices/applicationFormsSlice";
 import auditorDocumentsSlice from "./slices/auditorDocumentsSlice";
 import auditorsSlice from "./slices/auditorsSlice";
-import auditorStandardsSlice from "./slices/auditorStandardsSilice";
+import auditorStandardsSlice from "./slices/auditorStandardsSlice";
 import authSlice from "./slices/authslice";
 import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
 import contactsSlice from "./slices/contactsSlice";

@@ -37,11 +37,7 @@ const AuditorStandardCardItem = ({ item, readOnly = false, ...props }) => {
                                     title="No comments"
                                     />
                         }
-                        {!readOnly &&
-                            <AuditorStandardEditItem
-                                auditorStandardID={item.ID}
-                            />
-                        }
+                        { !readOnly && <AuditorStandardEditItem id={item.ID} /> }
                     </div>
                 </div>
         </ListGroup.Item>

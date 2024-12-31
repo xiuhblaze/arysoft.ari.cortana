@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLandmark, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import AuditorStandardCardItem from './AuditorStandardCardItem';
+import AuditorStandardEditItem from './AuditorStandardEditItem';
 
 const AuditorStandardsCard = ({ readOnly = false, ...props }) => {
     const titleStyle = "bg-light p-2 border-radius-md mb-2";
@@ -28,6 +29,7 @@ const AuditorStandardsCard = ({ readOnly = false, ...props }) => {
                         <FontAwesomeIcon icon={ faLandmark } size="lg" className="text-info me-2" />
                         Standards
                     </h5>
+                    <AuditorStandardEditItem />
                 </div>
             </Card.Header>
             <Card.Body className="p-3"> 

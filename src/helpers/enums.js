@@ -33,6 +33,16 @@ const enums = () => {
         createdDesc: 4,
     });
 
+    const AuditorStandardOrderType = Object.freeze({
+        nothing: 0,
+        auditor: 1,
+        standard: 2,
+        updated: 3,
+        auditorDesc: 4,
+        standardDesc: 5,
+        updatedDesc: 6
+    });
+
     const AuditorOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
@@ -196,6 +206,7 @@ const enums = () => {
 
         ApplicationFormOrderType,
         ApplicationFormStatusType,
+        AuditorStandardOrderType,
         AuditorOrderType,
         AuditorIsLeaderType,
         AuditorDocumentType,
