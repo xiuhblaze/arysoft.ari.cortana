@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { setNavbarTitle, useArysoftUIController } from '../../context/context';
 import enums from '../../helpers/enums';
@@ -23,6 +23,8 @@ import AuditorDocumentsCard from './components/AuditorDocumentsCard';
 import auditorValidityProps from './helpers/auditorValidityProps';
 import AuditorStandardsCard from './components/AuditorStandardsCard';
 import AuditorEditCard from './components/AuditorEditCard';
+import { useCatAuditorDocumentsStore } from '../../hooks/useCatAuditorDocumentsStore';
+import auditorRequiredProps from './helpers/auditorRequiredProps';
 
 const AuditorEditView = () => {
     const {
@@ -30,6 +32,7 @@ const AuditorEditView = () => {
         VITE_FILES_URL,
     } = envVariables();
     const {
+        CatAuditorDocumentOrderType,
         DefaultStatusType,
     } = enums();
 
@@ -45,16 +48,27 @@ const AuditorEditView = () => {
         auditorAsync,
     } = useAuditorsStore();
 
+    const {
+        catAuditorDocumentsAsync,
+    } = useCatAuditorDocumentsStore();
+
     // HOOKS
 
     const { id } = useParams();
 
     const [photoPreview, setPhotoPreview] = useState(null);
-    const [navOptions, setNavOptions] = useState("documents");
+    const [navOptions, setNavOptions] = useState("standards-list");
     const [fullName, setFullName] = useState("(new auditor)");
 
     useEffect(() => {
-        if (!!id) auditorAsync(id);
+        if (!!id) {
+            auditorAsync(id);
+            catAuditorDocumentsAsync({
+                status: DefaultStatusType.active,
+                pageSize: 0,
+                order: CatAuditorDocumentOrderType.documentType,
+            });
+        }
     }, [id]);
 
     useEffect(() => {
@@ -82,7 +96,7 @@ const AuditorEditView = () => {
         <>
             <Container fluid>
                 <div
-                    className="page-header min-height-150 border-radius-lg"
+                    className="page-header min-height-200 border-radius-lg"
                     style={{
                         background: `url(${imgHeaderBackground})`,
                         backgroundPositionY: '50%'
@@ -90,7 +104,7 @@ const AuditorEditView = () => {
                 >
                     <span className={`mask bg-gradient-${isAuditorLoading || !auditor ? 'dark' : defaultStatusProps[auditor.Status].bgColor} opacity-6`} />
                 </div>
-                <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
+                <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
                     <Row className="gx-4">
                         <div className="col-auto">
                             <div className="avatar avatar-xl position-relative">
@@ -128,12 +142,12 @@ const AuditorEditView = () => {
                         <ViewLoading />
                     ) : !!auditor && (
                         <Row>
-                            <Col xs="12" sm="6">
+                            <Col xs="12" sm="6" xxl="4">
                                 <AuditorEditCard
                                     actualizarPhotoPreview={actualizarPhotoPreview}
                                 />
                             </Col>
-                            <Col xs="12" sm="6">
+                            <Col xs="12" sm="6" xxl="8">
                                 <div className="nav-wrapper position-relative end-0 mb-3">
                                     <Nav
                                         activeKey={navOptions}
@@ -143,26 +157,30 @@ const AuditorEditView = () => {
                                         role="tablist"
                                     >
                                         <Nav.Item>
-                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="documents"
-                                                title={auditorValidityProps[auditor.ValidityStatus].label}
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={auditorValidityProps[auditor.ValidityStatus].iconFile}
-                                                    className={`me-2 text-${auditorValidityProps[auditor.ValidityStatus].variant}`}
-                                                />
-                                                FSSC Checklist
+                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="standards-list">
+                                                <FontAwesomeIcon icon={faLandmark} className="text-dark me-2" />
+                                                Standards
                                             </Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="standards">
-                                                <FontAwesomeIcon icon={faLandmark} className="text-info me-2" />
-                                                Standards
+                                            <Nav.Link className="mb-0 px-0 py-1" eventKey="document-checklist">
+                                                <FontAwesomeIcon
+                                                    icon={auditorValidityProps[auditor.ValidityStatus].iconFile}
+                                                    className={`me-2 text-${auditorValidityProps[auditor.ValidityStatus].variant}`}
+                                                    title={auditorValidityProps[auditor.ValidityStatus].label}
+                                                />
+                                                <FontAwesomeIcon
+                                                    icon={auditorRequiredProps[auditor.RequiredStatus].icon}
+                                                    className={`me-2 text-${auditorRequiredProps[auditor.RequiredStatus].variant}`}
+                                                    title={auditorRequiredProps[auditor.RequiredStatus].label}
+                                                />
+                                                Documents Checklist
                                             </Nav.Link>
                                         </Nav.Item>
                                     </Nav>
                                 </div>
-                                {navOptions == "documents" && <AuditorDocumentsCard />}
-                                {navOptions == "standards" && <AuditorStandardsCard />}
+                                { navOptions == "standards-list" && <AuditorStandardsCard /> }
+                                { navOptions == "document-checklist" && <AuditorDocumentsCard /> }
                             </Col>
                         </Row>
                     )

@@ -12,11 +12,13 @@ const AuditorsToolbar = () => {
     const formDefaultData = {
         textInput: '',
         isLeaderSelect: '',
+        validitySelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
     const { 
         AuditorIsLeaderType,
+        AuditorDocumentValidityType,
         AuditorOrderType,
         DefaultStatusType
     } = enums();
@@ -48,6 +50,7 @@ const AuditorsToolbar = () => {
             setInitialValues({
                 textInput: savedSearch.text ?? '',
                 isLeaderSelect: savedSearch.isLeader ?? '',
+                validitySelect: savedSearch.validity ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
@@ -72,6 +75,7 @@ const AuditorsToolbar = () => {
             ...savedSearch,
             text: values.textInput,
             isLeader: values.isLeaderSelect,
+            validity: values.validitySelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
@@ -138,6 +142,20 @@ const AuditorsToolbar = () => {
                                                             className="text-capitalize"
                                                         >
                                                             {key === 'nothing' ? '(auditor)' : key}
+                                                        </option>
+                                                    )}
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-auto">
+                                            <AryFormikSelectInput name="validitySelect">
+                                                {
+                                                    Object.keys(AuditorDocumentValidityType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={AuditorDocumentValidityType[key]}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {key === 'nothing' ? '(documentation)' : key}
                                                         </option>
                                                     )}
                                             </AryFormikSelectInput>

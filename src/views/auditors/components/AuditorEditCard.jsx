@@ -157,7 +157,7 @@ const AuditorEditCard = ({ actualizarPhotoPreview, ...props }) => {
         <Card>
             <Card.Header className="pb-0">
                 <Card.Title>
-                    <FontAwesomeIcon icon={faUserPen} size="lg" className="text-info me-2" />
+                    <FontAwesomeIcon icon={faUserPen} size="lg" className="text-dark me-2" />
                     Edit profile
                 </Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">Edit auditor's general information</Card.Subtitle>

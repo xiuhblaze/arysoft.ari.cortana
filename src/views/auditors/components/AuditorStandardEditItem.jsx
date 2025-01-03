@@ -153,7 +153,7 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                             !!id ? (
                                 <>
                                     <FontAwesomeIcon icon={faEdit} className="px-3" />
-                                    Edit standard assigned
+                                    Edit assigned standard
                                 </>
                             ) : (
                                 <>
@@ -186,23 +186,30 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                                                 label="Standard"
                                                 disabled={!!id}
                                             >
-                                                <option value="">(select)</option>
+                                                { !id && <option value="">(select)</option> }
                                                 {
-                                                    standards.map(item =>
-                                                        <option
-                                                            key={item.ID}
-                                                            value={item.ID}
-                                                            className="text-capitalize"
-                                                        >
-                                                            {item.Name}
-                                                        </option>
-                                                    )
+                                                    standards
+                                                        .filter(item => (
+                                                            !!id
+                                                                ? item.ID === auditorStandard.StandardID
+                                                                : !auditor.Standards.find(x => x.StandardID === item.ID)
+                                                        ))
+                                                        .map(item =>
+                                                            <option
+                                                                key={item.ID}
+                                                                value={item.ID}
+                                                                className="text-capitalize"
+                                                            >
+                                                                {item.Name}
+                                                            </option>
+                                                        )
                                                 }
                                             </AryFormikSelectInput>
                                         </Col>
                                         <Col xs="12">
                                             <AryFormikTextArea name="commentsInput"
                                                 label="Comments"
+                                                rows="5"
                                             />
                                         </Col>
                                         <Col xs="12" md="6">

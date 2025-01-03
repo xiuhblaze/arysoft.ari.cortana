@@ -50,8 +50,11 @@ const AuditorsTable = () => {
                                     <th className={headStyle}>
                                         Contact info
                                     </th>
+                                    <th className={headStyle}>
+                                        Standards
+                                    </th>
                                     <th className={ `text-center ${headStyle}`} title="FSSC Auditor Documents checklist">
-                                        FSSC Checklist
+                                        Document Checklist
                                     </th>
                                     <th className={ `text-center ${headStyle}`}>
                                         Status

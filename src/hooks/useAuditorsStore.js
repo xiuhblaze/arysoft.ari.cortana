@@ -36,6 +36,7 @@ const getSearchQuery = (options = {}) => {
 
     query += options?.text ? `&text=${options.text}` : '';
     query += options?.isLeader ? `&isleader=${options.isLeader}` : '';
+    query += options?.validity ? `&documentstatus=${options.validity}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
