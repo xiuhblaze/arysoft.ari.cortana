@@ -13,20 +13,20 @@ export const DashboardFooter = () => {
             <Col lg="6" className="mb-lg-0 mb-4">
               <div className="copyright text-center text-sm text-muted text-lg-start">
                 <FontAwesomeIcon icon={ faCopyright } className="me-1" />
-                2024, all rights reserved
-                <span className="text-info text-gradient"> ARI - American Registration Inc.</span>
+                { new Date().getFullYear() }, all rights reserved
+                <span className="text-ari text-gradient"> ARI - American Registration Inc.</span>
               </div>
             </Col>
             <Col lg="6">
-              <ul className="nav nav-footer justify-content-center justify-content-lg-end">
+              {/* <ul className="nav nav-footer justify-content-center justify-content-lg-end">
                 <li className="nav-item">
                   <Link to="/home" className="nav-link text-muted">
                     Home
-                  </Link>
+                  </Link> */}
                   {/* <a className="nav-link text-muted" href="/home">
                     Inicio
                   </a> */}
-                </li>
+                {/* </li>
                 <li className="nav-item">
                   <Link to="/contact" className="nav-link text-muted">
                     Contact
@@ -37,7 +37,7 @@ export const DashboardFooter = () => {
                     About Us
                   </Link>
                 </li>
-              </ul>
+              </ul> */}
             </Col>
           </Row>
         </Container>

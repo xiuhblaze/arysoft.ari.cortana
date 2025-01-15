@@ -17,21 +17,21 @@ export const BasicLayout = ({children}) => {
         <Container>
           <Row>
             <Col lg="8" className="mb-4 mx-auto text-center">
-              <Link to="/contact"                
+              <Link to="https://aarrin.com" target="_blank" rel="noreferrer"
                 className="text-secondary me-xl-5 me-3 mb-sm-0 mb-2"
               >
-                Contact Us
+                aarrin.com
               </Link>
-              <Link to="/about" className="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
+              {/* <Link to="/about" className="text-secondary me-xl-5 me-3 mb-sm-0 mb-2">
                 About Us
-              </Link>
+              </Link> */}
             </Col>
           </Row>
           <Row>
             <Col lg="8" className="mx-auto text-center mt-1">
               <p className="mb-0 text-secondary text-sm">
                 <FontAwesomeIcon icon={ faCopyright } className="me-1" />
-                2023, dev by <strong>Arysoft</strong> for <span className="text-ari text-gradient">ARI American Registration Inc.</span>
+                 { new Date().getFullYear() }, {/* dev by <strong>Arysoft</strong> for*/} <span className="text-ari text-gradient">ARI American Registration Inc.</span>
               </p>
             </Col>
           </Row>
