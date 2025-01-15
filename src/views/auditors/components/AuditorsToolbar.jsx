@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Form, Formik } from "formik";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 
 const AuditorsToolbar = () => {
     const formDefaultData = {
@@ -16,6 +17,11 @@ const AuditorsToolbar = () => {
         statusSelect: '',
         includeDeletedCheck: false,
     };
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS
+    } =defaultCSSClasses();
     const { 
         AuditorIsLeaderType,
         AuditorDocumentValidityType,
@@ -105,7 +111,7 @@ const AuditorsToolbar = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
                 <button
-                    className="btn bg-gradient-dark text-nowrap mb-0"
+                    className={ BUTTON_ADD_CLASS }
                     onClick={ onNewItem }
                     title="New auditor"
                     disabled={ isAuditorCreating }
@@ -191,15 +197,15 @@ const AuditorsToolbar = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex justify-content-between gap-2">
+                                <div className="d-flex justify-content-between gap-2 mb-3">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info">
+                                        <button type="submit" className={ BUTTON_SEARCH_CLASS}>
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-link text-secondary"
+                                        <button type="button" className={ BUTTON_CLEAR_SEARCH_CLASS }
                                             onClick={ (values) => {
                                                 onCleanSearch(values);
                                                 formik.resetForm(initialValues);

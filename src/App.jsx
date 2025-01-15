@@ -52,9 +52,10 @@ function App() {
                     </>
                 ) : (
                     <>
-                        {renderRoutes(publicRoute)}
+                        {/* {renderRoutes(publicRoute)} */}
                         <Route path="/login" element={<Login />} />
-                        <Route path="/*" element={<Navigate to={publicRoute[0].path} />} />
+                        {/* <Route path="/*" element={<Navigate to={publicRoute[0].path} />} /> */}
+                        <Route path="/*" element={<Navigate to={ '/login' } />} />
                     </>
                 )
             }

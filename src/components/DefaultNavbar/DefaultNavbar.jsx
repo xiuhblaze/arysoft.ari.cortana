@@ -36,7 +36,7 @@ export const DefaultNavbar = () => {
               </Navbar.Toggle>
               <Navbar.Collapse id="navbarScroll">
                 <Nav className="mx-auto">
-                  <Link to="/about" className="nav-link text-dark d-flex align-items-center me-2">
+                  {/* <Link to="/about" className="nav-link text-dark d-flex align-items-center me-2">
                     <FontAwesomeIcon icon={ faUserGroup } className="opacity-6 text-dark me-1" />
                     About Us
                   </Link>
@@ -51,26 +51,26 @@ export const DefaultNavbar = () => {
                   <Link to="/news" className="nav-link text-dark d-flex align-items-center me-2">
                     <FontAwesomeIcon icon={ faNewspaper } className="opacity-6 text-dark me-1" />
                     News
-                  </Link>
-                  <NavDropdown 
+                  </Link> */}
+                  {/* <NavDropdown 
                     title={ <>
                       <FontAwesomeIcon icon={ faCertificate } className="opacity-6 text-dark me-1" />
                       Certificates
                     </> } 
                     id="certificate-nav-dropdown" 
                     bsPrefix="dropdown-toggle nav-link text-dark"
-                  >
+                  > */}
                     {/* <NavDropdown.Item href="/about">Accreditation Certificate</NavDropdown.Item>
                     <NavDropdown.Item href="/">Certificate Status</NavDropdown.Item> */}
-                    <Link to="/accreditation" className="dropdown-item">
+                    {/* <Link to="/accreditation" className="dropdown-item">
                       <FontAwesomeIcon icon={ faCircleCheck } className="opacity-6 text-dark me-2" />
                       Accreditation Certificate
                     </Link>
                     <Link to="/certificate-status" className="dropdown-item">
                       <FontAwesomeIcon icon={ faListCheck } className="opacity-6 text-dark me-2" />
                       Certificate Status
-                    </Link>
-                  </NavDropdown>
+                    </Link> */}
+                  {/* </NavDropdown> */}
                   {/* <Nav.Link href="http://www.lictus.com.mx" target="_blank" className="ms-2">
                     <img src={ lgoLictus } height="20" />
                   </Nav.Link>
@@ -90,11 +90,11 @@ export const DefaultNavbar = () => {
                       </Link>
                     </>
                   ) : null }
-                  <Link to="/contact" className="nav-link text-dark d-flex align-items-center me-2">
+                  {/* <Link to="/contact" className="nav-link text-dark d-flex align-items-center me-2">
                     <FontAwesomeIcon icon={ faEnvelope } className="opacity-6 text-dark me-1" />
                     Contact Us
-                  </Link>
-                {
+                  </Link> */}
+                {/* {
                   status === 'not-authenticated' ? (
                     <Link to="/login" className="nav-link text-dark">
                       <FontAwesomeIcon icon={ faRightToBracket } className="opacity-6 text-dark me-1" />
@@ -106,7 +106,7 @@ export const DefaultNavbar = () => {
                       Logout
                     </Nav.Link>
                   )
-                }
+                } */}
                 </Nav>
               </Navbar.Collapse>
             </Container>
