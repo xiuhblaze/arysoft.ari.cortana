@@ -62,7 +62,7 @@ const enums = () => {
     const AuditorDocumentType = Object.freeze({
         nothing: 0,
         certificate: 1,
-        course : 2,
+        course: 2,
         exam: 3,
         other: 4,
     });
@@ -85,7 +85,7 @@ const enums = () => {
         startDate: 1,
         updated: 2,
         startDateDesc: 3,
-        updatedDesc : 4,
+        updatedDesc: 4,
     });
 
     const CatAuditorDocumentType = Object.freeze({
@@ -94,14 +94,14 @@ const enums = () => {
         evaluation: 2,
         training: 3
     });
-   
+
     const CatAuditorDocumentSubCategoryType = Object.freeze({
         nothing: 0,
         civ: 1,
         k: 2,
         l: 3
     });
-   
+
     const CatAuditorDocumentPeriodicityType = Object.freeze({
         nothing: 0,
         days: 1,
@@ -119,11 +119,29 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    const CertificateFilterDateType = Object.freeze({
+        nothing: 0,
+        startDate: 1,
+        dueDate: 2,
+        prevAuditDate: 3,
+        nextAuditDate: 4,
+    });
+
     const CertificateValidityStatusType = Object.freeze({
         nothing: 0,
         success: 1,    // Todos los certificados activos son vigentes
         warning: 2,    // Al menos un certificado esta por vencer
         danger: 3      // Al menos un certificado esta vencido
+    });
+
+    const CertificateOrderType = Object.freeze({
+        nothing: 0,
+        date: 1,
+        status: 2,
+        expireStatus: 3,
+        dateDesc: 4,
+        statusDesc: 5,
+        expireStatusDesc: 6,
     });
 
     const ContactOrderType = Object.freeze({
@@ -224,7 +242,9 @@ const enums = () => {
         CatAuditorDocumentSubCategoryType,
         CatAuditorDocumentPeriodicityType,
         CatAuditorDocumentOrderType,
+        CertificateFilterDateType,
         CertificateValidityStatusType,
+        CertificateOrderType,
         ContactOrderType,
         NacecodeOrderType,
         OrganizationOrderType,

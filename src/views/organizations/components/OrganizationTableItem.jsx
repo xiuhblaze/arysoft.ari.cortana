@@ -10,7 +10,7 @@ import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Status from './Status';
 
-const OrganizationTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
+const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hideActions = false, ...props }) => {
 
     const {
         URL_ORGANIZATION_FILES,
@@ -34,6 +34,10 @@ const OrganizationTableItem = ({ item, className, onShowModal, hideActions = fal
                     <div className="d-flex align-items-start flex-column justify-content-center">
                         <h6 className="mb-0 text-sm">{ item.Name }</h6>
                         <p className="text-xs mb-0">{ item.LegalEntity}</p>
+                        {
+                            !isNullOrEmpty(item.COID) &&
+                            <p className="text-xs mb-0">COID: <strong>{ item.COID }</strong></p>
+                        }
                     </div>
                 </div>
             </td>
@@ -44,7 +48,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, hideActions = fal
                         <div className="d-flex flex-row justify-content-start align-items-center mb-1">
                             <div className="me-1">
                                 { !isNullOrEmpty(item.SiteLocationURL) 
-                                    ? <a href={ item.SiteLocationURL } title="Visit url in maps" target='_blank'>
+                                    ? <a href={ item.SiteLocationURL } title="See address in maps" target='_blank'>
                                         <FontAwesomeIcon icon={ faLocationDot } className="text-dark" fixedWidth />
                                       </a>
                                     : <FontAwesomeIcon icon={ faLocationPin } className="text-secondary" title="No location" fixedWidth />
@@ -57,7 +61,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, hideActions = fal
                     }
                 { !!item.Website && 
                     <p className="text-xs font-weight-bold mb-0">
-                        <a href={`http://${item.Website}`} title="Visit url" target='_blank'>
+                        <a href={`https://${item.Website}`} title="Visit url" target='_blank'>
                             <FontAwesomeIcon icon={ faGlobe } className="me-1" fixedWidth />
                             { item.Website }
                         </a>
@@ -83,14 +87,18 @@ const OrganizationTableItem = ({ item, className, onShowModal, hideActions = fal
                     }
                     { !!item.ContactEmail &&
                         <p className="text-xs text-secondary mb-0">
-                            <FontAwesomeIcon icon={ faEnvelope } fixedWidth className="me-1" />
-                            { item.ContactEmail}
+                            <a href={ `mailto:${item.ContactEmail}` } title="Send email">
+                                <FontAwesomeIcon icon={ faEnvelope } fixedWidth className="me-1" />
+                                { item.ContactEmail}
+                            </a>
                         </p>
                     }
                     { !!item.ContactPhone &&
                         <p className="text-xs text-secondary mb-0">
-                            <FontAwesomeIcon icon={ faPhone } fixedWidth className="me-1" />
-                            { item.ContactPhone}
+                            <a href={ `tel:${item.ContactPhone}` } title="Call">
+                                <FontAwesomeIcon icon={ faPhone } fixedWidth className="me-1" />
+                                { item.ContactPhone}
+                            </a>
                         </p>
                     }
                 </div>
@@ -103,6 +111,19 @@ const OrganizationTableItem = ({ item, className, onShowModal, hideActions = fal
                         size="lg"
                         title={ certificateValidityStatusProps[item.CertificatesValidityStatus].label }
                     />
+                </div>
+            </td>
+            <td>
+                <div className="align-middle text-center text-sm">
+                { !!item.QRFile && 
+                    <img 
+                        src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.QRFile}`} 
+                        style={{ maxWidth: '48px', cursor: 'pointer' }}
+                        className="img-fluid" 
+                        alt="QR code"
+                        onClick={() => onShowQRModal()}
+                    />
+                }
                 </div>
             </td>
             <td>

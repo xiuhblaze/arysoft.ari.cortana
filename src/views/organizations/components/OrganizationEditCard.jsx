@@ -15,6 +15,7 @@ import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUp
 
 const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const {
+        COID_REGEX,
         PHONE_REGEX,
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
@@ -27,6 +28,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         phoneInput: '',
         logoInputFile: '',
         qrcodeInputFile: '',
+        coidInput: '',
     };
     const validationSchema = Yup.object({
         nameInput: Yup.string()
@@ -40,6 +42,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         phoneInput: Yup.string()
             .max(25, 'Phone number must be at most 25 characters')
             .matches(PHONE_REGEX, 'Phone number is not valid'),
+        coidInput: Yup.string()
+            .max(20, 'COID number must be at most 20 characters')
+            .matches(COID_REGEX, 'COID number is not valid'),
         logoInputFile: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -106,12 +111,13 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 legalEntityInput: organization?.LegalEntity ?? '',
                 websiteInput: organization?.Website ?? '',
                 phoneInput: organization?.Phone ?? '',
+                coidInput: organization?.COID ?? '',
                 logoInputFile: '',
                 qrcodeInputFile: '',
             });
 
             setNewLogo(isNullOrEmpty(organization.LogoFile));
-            setNewQRCode(isNullOrEmpty(organization.QRCodeFile));
+            setNewQRCode(isNullOrEmpty(organization.QRFile));
         }
     }, [organization]);
 
@@ -131,24 +137,29 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             Name: values.nameInput,
             LegalEntity: values.legalEntityInput,
             Website: values.websiteInput,
-            Phone: values.phoneInput,            
+            Phone: values.phoneInput,
+            COID: values.coidInput,
             Status: organization.Status,
         };
 
         organizationSaveAsync(toSave, values.logoInputFile, values.qrcodeInputFile);
-    };
+    }; // onFormSubmit
 
     const onCancelButton = () => {
         organizationClear();
         navigate('/organizations/');
-    };
+    }; // onCancelButton
+
+    const onDeleteFile = (file) => {
+
+    }; // onDeleteFile
 
     return (
         <Card {...props}>
             <Card.Header className="pb-0">
                 <Card.Title>
                     <FontAwesomeIcon icon={ faEdit } size="lg" className="text-dark me-2" />
-                    Edit profile
+                    Edit organization
                 </Card.Title>
             </Card.Header>
             <Formik
@@ -162,94 +173,187 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                         <Card.Body className="py-0">
                             <Row>
                                 <Col xs="12" sm="4">
-                                    <div className="d-flex justify-content-between">
-                                        <label className="form-label">Logotype</label>
-                                        {
-                                            !newLogo && !!organization.LogoFile &&
-                                            <div className="d-flex justify-content-end gap-3">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-link p-0 mb-0 text-secondary"
-                                                    onClick={() => setNewLogo(true)}
-                                                    title="Upload new logotype"
-                                                >
-                                                    <FontAwesomeIcon icon={faRotateRight} size="lg" />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-link p-0 mb-0 text-secondary"
-                                                    onClick={onDeleteFile}
-                                                    title="Delete logotype file"
-                                                >
-                                                    <FontAwesomeIcon icon={faTrash} size="lg" />
-                                                </button>
-                                            </div>
-                                        }
-                                        {
-                                            !!newLogo && !isNullOrEmpty(organization.LogoFile) &&
-                                            <div className="text-end">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-link p-0 mb-0 text-secondary"
-                                                    onClick={() => {
-                                                        setNewLogo(false);
-                                                        setLogoPreview(null);
-                                                        updatePhotoPreview(null);
-                                                        formik.setFieldValue('logoInputFile', '');
-                                                    }}
-                                                    title="Cancel upload new file"
-                                                >
-                                                    <FontAwesomeIcon icon={faBan} size="lg" />
-                                                </button>
-                                            </div>
-                                        }
-                                    </div>
-                                    {
-                                        !!newLogo ? (
-                                            <>
+                                    <Row>
+                                        <Col xs="12">
+                                            <div className="d-flex justify-content-between">
+                                                <label className="form-label">Logotype</label>
                                                 {
-                                                    !!logoPreview &&
+                                                    !newLogo && !!organization.LogoFile &&
+                                                    <div className="d-flex justify-content-end gap-3">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={() => setNewLogo(true)}
+                                                            title="Upload new logotype"
+                                                        >
+                                                            <FontAwesomeIcon icon={faRotateRight} size="lg" />
+                                                        </button>
+                                                        {/* <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={onDeleteFile}
+                                                            title="Delete logotype file"
+                                                        >
+                                                            <FontAwesomeIcon icon={faTrash} size="lg" />
+                                                        </button> */}
+                                                    </div>
+                                                }
+                                                {
+                                                    !!newLogo && !isNullOrEmpty(organization.LogoFile) &&
+                                                    <div className="text-end">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={() => {
+                                                                setNewLogo(false);
+                                                                setLogoPreview(null);
+                                                                updatePhotoPreview(null);
+                                                                formik.setFieldValue('logoInputFile', '');
+                                                            }}
+                                                            title="Cancel upload new logotype"
+                                                        >
+                                                            <FontAwesomeIcon icon={faBan} size="lg" />
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </div>
+                                            {
+                                                !!newLogo ? (
+                                                    <>
+                                                        {
+                                                            !!logoPreview &&
+                                                            <div>
+                                                                <Image src={logoPreview}
+                                                                    thumbnail
+                                                                    fluid
+                                                                    className="mb-3"
+                                                                />
+                                                            </div>
+                                                        }
+                                                        <input
+                                                            type="file"
+                                                            name="logoFile"
+                                                            accept="image/png,image/jpeg,image/jpg"
+                                                            className="form-control mb-3"
+                                                            onChange={(e) => {
+                                                                const fileReader = new FileReader();
+                                                                fileReader.onload = () => {
+                                                                    if (fileReader.readyState === 2) {
+                                                                        setLogoPreview(fileReader.result);
+                                                                        updatePhotoPreview(fileReader.result);
+                                                                    }
+                                                                };
+                                                                fileReader.readAsDataURL(e.target.files[0]);
+                                                                formik.setFieldValue('logoInputFile', e.currentTarget.files[0]);
+                                                            }}
+                                                        />
+                                                        {
+                                                            formik.touched.logoInputFile && formik.errors.logoInputFile &&
+                                                            <span className="text-danger text-xs">{formik.errors.logoInputFile}</span>
+                                                        }
+                                                    </>
+                                                ) : !!organization.LogoFile && (
                                                     <div>
-                                                        <Image src={logoPreview}
+                                                        <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`}
                                                             thumbnail
                                                             fluid
                                                             className="mb-3"
                                                         />
                                                     </div>
-                                                }
-                                                <input
-                                                    type="file"
-                                                    name="logoFile"
-                                                    accept="image/png,image/jpeg,image/jpg"
-                                                    className="form-control"
-                                                    onChange={(e) => {
-                                                        const fileReader = new FileReader();
-                                                        fileReader.onload = () => {
-                                                            if (fileReader.readyState === 2) {
-                                                                // formik.setFieldValue('logoInputFile', fileReader.result);
-                                                                setLogoPreview(fileReader.result);
-                                                                updatePhotoPreview(fileReader.result);
-                                                            }
-                                                        };
-                                                        fileReader.readAsDataURL(e.target.files[0]);
-                                                        formik.setFieldValue('logoInputFile', e.currentTarget.files[0]);
-                                                    }}
-                                                />
+                                                )
+                                            }
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col xs="12">
+                                            <div className="d-flex justify-content-between">
+                                                <label className="form-label">QR Code</label>
                                                 {
-                                                    formik.touched.logoInputFile && formik.errors.logoInputFile &&
-                                                    <span className="text-danger text-xs">{formik.errors.logoInputFile}</span>
+                                                    !newQRCode && !!organization.QRFile &&
+                                                    <div className="d-flex justify-content-end gap-3">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={() => setNewQRCode(true)}
+                                                            title="Upload new QR Code"
+                                                        >
+                                                            <FontAwesomeIcon icon={faRotateRight} size="lg" />
+                                                        </button>
+                                                        {/* <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={onDeleteFile}
+                                                            title="Delete QR code file"
+                                                        >
+                                                            <FontAwesomeIcon icon={faTrash} size="lg" />
+                                                        </button> */}
+                                                    </div>
                                                 }
-                                            </>
-                                        ) : !!organization.LogoFile && (
-                                            <div>
-                                                <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`}
-                                                    thumbnail
-                                                    fluid
-                                                    className="mb-3"
-                                                />
+                                                {
+                                                    !!newQRCode && !isNullOrEmpty(organization.QRFile) &&
+                                                    <div className="text-end">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-link p-0 mb-0 text-secondary"
+                                                            onClick={ () => {
+                                                                setNewQRCode(false);
+                                                                setQrcodePreview(null);
+                                                                formik.setFieldValue("qrcodeInputFile", '');
+                                                            }}
+                                                            title="Cancel upload new QR Code"
+                                                        >
+                                                            <FontAwesomeIcon icon={faBan} size="lg" />
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
-                                        )
-                                    }
+                                            {
+                                                !!newQRCode ? (
+                                                    <>
+                                                        {
+                                                            !!qrcodePreview && 
+                                                            <div>
+                                                                <Image src={qrcodePreview}
+                                                                    thumbnail
+                                                                    fluid
+                                                                    className="mb-3"
+                                                                />
+                                                            </div>
+                                                        }
+                                                        <input
+                                                            type="file"
+                                                            name="qrFile"
+                                                            accept="image/png,image/jpeg,image/jpg"
+                                                            className="form-control mb-3"
+                                                            onChange={(e) => {
+                                                                const fileReader = new FileReader();
+                                                                fileReader.onload = () => {
+                                                                    if (fileReader.readyState === 2) {
+                                                                        setQrcodePreview(fileReader.result);                                                                        
+                                                                    }
+                                                                };
+                                                                fileReader.readAsDataURL(e.target.files[0]);
+                                                                formik.setFieldValue('qrcodeInputFile', e.currentTarget.files[0]);
+                                                            }}
+                                                        />
+                                                        {
+                                                            formik.touched.qrcodeInputFile && formik.errors.qrcodeInputFile &&
+                                                            <span className="text-danger text-xs">{formik.errors.qrcodeInputFile}</span>
+                                                        }
+                                                    </>
+                                                ) : !!organization.QRFile && (
+                                                    <div>
+                                                        <Image 
+                                                            src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.QRFile}`}
+                                                            thumbnail
+                                                            fluid
+                                                            className="mb-3"
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </Col>
+                                    </Row>
                                 </Col>
                                 <Col xs="12" sm="8">
                                     <Row>
@@ -267,18 +371,27 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 type="text"
                                             />
                                         </Col>
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12">
                                             <AryFormikTextInput
                                                 name="websiteInput"
                                                 label="Website"
                                                 type="text"
                                             />
                                         </Col>
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12">
                                             <AryFormikTextInput
                                                 name="phoneInput"
                                                 label="Phone"
                                                 type="text"
+                                            />
+                                        </Col>
+                                        <Col xs="12">
+                                            <AryFormikTextInput
+                                                name="coidInput"
+                                                label="COID number"
+                                                type="text"
+                                                placeholder="MEX-0-0000-000000"
+                                                helpText="Only for FSSC 22000"
                                             />
                                         </Col>
                                     </Row>

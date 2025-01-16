@@ -17,9 +17,16 @@ import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
 import ContactsCard from "../../contacts/components/ContactsCard";
 import SitesCard from "../../sites/components/SitesCard";
 
+import defaultPhoto from '../../../assets/img/icoOrganizationDefault.jpg';
+import envVariables from "../../../helpers/envVariables";
+
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
     const { OrganizationStatusType } = enums();
+    const {
+        URL_ORGANIZATION_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const {
         isOrganizationLoading,
         isOrganizationSaving,
@@ -31,7 +38,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
 
     useEffect(() => {
         if (organizationSavedOk) {
-            Swal.fire('Standards', 'Successful restoration', 'success');
+            Swal.fire('Organization', 'Successful restoration', 'success');
             organizationClear();
             onHide();
         }
@@ -83,7 +90,13 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                 <div className="row gx-4">
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">
-                                            <img src="/files/organizations/lgoArysoft2019.png" alt="profile_image" className="w-100 border-radius-lg shadow-sm" />
+                                            <img 
+                                                src={ !!organization.LogoFile
+                                                    ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`
+                                                    : defaultPhoto }
+                                                alt="Organization logo" 
+                                                className="w-100 border-radius-lg shadow-sm"
+                                            />
                                         </div>
                                     </div>
                                     <div className="col-auto my-auto">

@@ -25,6 +25,7 @@ import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
 import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
 import envVariables from "../../helpers/envVariables";
 import OrganizationEditCard from "./components/OrganizationEditCard";
+import CertificatesCard from "../certificates/components/CertificatesCard";
 
 const EditView = () => {
     const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
@@ -197,7 +198,7 @@ const EditView = () => {
                     <ViewLoading />
                 ) : !!organization && (
                     <Row>
-                        <Col xs="12" sm="6" xxl="4">
+                        <Col xs="12" sm="8" xxl="6">
                             <OrganizationEditCard
                                 updatePhotoPreview={updatePhotoPreview}
                             />
@@ -205,165 +206,7 @@ const EditView = () => {
                     </Row>
                 )
             }
-            <Row>
-                <Col xs={12}>
-                    <Card>
-                        {
-                            isOrganizationLoading ? (
-                                <Card.Body>
-                                    <ViewLoading />
-                                </Card.Body>
-                            ) : !!organization ? (
-                                <>
-                                    <Card.Body>
-                                        <Formik
-                                            initialValues={{
-                                                nameInput: organization?.Name || '',
-                                                legalEntityInput: organization?.LegalEntity || '',
-                                                websiteInput: organization?.Website || '',
-                                                phoneInput: organization?.Phone || '',
-                                                logotipoInputFile: '',
-                                            }}
-                                            onSubmit={onFormSubmit}
-                                            validationSchema={Yup.object({
-                                                nameInput: Yup.string()
-                                                    .required('Name is required')
-                                                    .max(250, 'Name must be at most 250 characters'),
-                                                legalEntityInput: Yup.string()
-                                                    .required('Legal entity is required')
-                                                    .max(250, 'Legal entity must be at most 250 characters'),
-                                                websiteInput: Yup.string()
-                                                    .max(250, 'Web site must be at most 250 characters'),
-                                                phoneInput: Yup.string()
-                                                    .max(25, 'Phone number must be at most 25 characters')
-                                                    .matches(phoneRegExp, 'Phone number is not valid')
-                                            })}
-                                        >
-                                            {(formik) => (
-                                                <Form>
-                                                    <Row className="mt-4">
-                                                        <Col xs={12} sm={8}>
-                                                            <Row>
-                                                                <Col xs={12}>
-                                                                    <AryFormikTextInput name="nameInput"
-                                                                        label="Name"
-                                                                        type="text"
-                                                                    />
-                                                                </Col>
-                                                                <Col xs={12}>
-                                                                    <AryFormikTextInput name="legalEntityInput"
-                                                                        label="Legal entity"
-                                                                        type="text"
-                                                                    />
-                                                                </Col>
-                                                                <Col xs={12} sm="6">
-                                                                    <AryFormikTextInput name="websiteInput"
-                                                                        label="Website"
-                                                                        type="text"
-                                                                    />
-                                                                </Col>
-                                                                <Col xs={12} sm="6">
-                                                                    <AryFormikTextInput name="phoneInput"
-                                                                        label="Phone"
-                                                                        type="text"
-                                                                    />
-                                                                </Col>
-                                                            </Row>
-                                                        </Col>
-                                                        <Col xs={12} sm={4}>
-                                                            <Row>
-                                                                <Col xs={12}>
-                                                                    <div className="mb-3">
-                                                                        <label className="form-label">Logotype</label>
-                                                                        { !!photoPreview && 
-                                                                            <div>
-                                                                                <Image src={ photoPreview }
-                                                                                    thumbnail
-                                                                                    fluid
-                                                                                    className="mb-3"
-                                                                                />
-                                                                            </div>
-                                                                        }
-                                                                        <input
-                                                                            type="file"
-                                                                            name="logotypeFile"
-                                                                            accept="image/*"
-                                                                            className="form-control"
-                                                                            onChange={(e) => {
-                                                                                const fileReader = new FileReader();
-                                                                                fileReader.onload = () => {
-                                                                                    if (fileReader.readyState === 2) {
-                                                                                        formik.setFieldValue('logotipoInputFile', fileReader.result);
-                                                                                        setAvatarPreview(fileReader.result);
-                                                                                        setPhotoPreview(fileReader.result);
-                                                                                    }
-                                                                                };
-                                                                                fileReader.readAsDataURL(e.target.files[0]);
-                                                                                formik.setFieldValue('logotipoInputFile', e.currentTarget.files[0]);
-                                                                                //console.log('onChange', e);
-                                                                            }}
-                                                                        />
-                                                                        <span className="text-xs text-secondary me-2">Enter a logo image</span>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col xs={12}>
-                                                            <span className="text-secondary">(aquí van las opciones de cambio de status)</span>
-                                                            <hr className="horizontal dark my-3" />
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col xs={12} className="d-flex gap-2">
-                                                            <Button type="button" variant="success" className="bg-gradient-success">
-                                                                <FontAwesomeIcon icon={faCheck} size="lg" className="me-1" />
-                                                                Approve
-                                                            </Button>
-                                                            <Button type="button" className="bg-gradient-info">
-                                                                <FontAwesomeIcon icon={faCheckDouble} size="lg" className="me-1" />
-                                                                Active
-                                                            </Button>
-                                                            <button type="button"
-                                                                className="btn bg-gradient-secondary"
-                                                                onClick={onDeleteButton}
-                                                                disabled={isOrganizationDeleting}
-                                                            >
-                                                                <FontAwesomeIcon icon={faTrashCan} size="lg" className="me-1" />
-                                                                Delete
-                                                            </button>
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col className="d-flex flex-column flex-sm-row justify-content-between">
-                                                            <div className="text-secondary">
-                                                                <AryLastUpdatedInfo item={ organization } />
-                                                            </div>
-                                                            <div className="d-flex justify-content-center justify-content-sm-between gap-2">
-                                                                <button type="submit"
-                                                                    className="btn bg-gradient-dark mb-0"
-                                                                    disabled={isOrganizationSaving}
-                                                                >
-                                                                    <FontAwesomeIcon icon={faSave} size="lg" className="me-1" />
-                                                                    Save
-                                                                </button>
-                                                                <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCancelButton}>
-                                                                    Cancel
-                                                                </button>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-                                                </Form>
-                                            )}
-                                        </Formik>
-                                    </Card.Body>
-                                </>
-                            ) : null
-                        }
-                    </Card>
-                </Col>
-            </Row>
+            
             <Row className="mt-4">
                 <Col xs={12} sm={4}>
                     <ContactsCard />
@@ -372,14 +215,7 @@ const EditView = () => {
                     <SitesCard />
                 </Col>
                 <Col xs={12} sm={4}>
-                    <Card className="h-100">
-                        <Card.Header className="pb-0 p-3">
-                            <h6 className="mb-0">Certificates</h6>
-                        </Card.Header>
-                        <Card.Body className="p-3">
-                            Lorem ipsum
-                        </Card.Body>
-                    </Card>
+                    <CertificatesCard />
                 </Col>
             </Row>
         </Container>

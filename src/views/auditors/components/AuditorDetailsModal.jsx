@@ -102,7 +102,7 @@ const AuditorDetailsModal = ({ show, onHide, ...props }) => {
                                                     ? `${VITE_FILES_URL}${URL_AUDITOR_FILES}/${ auditor.ID }/${ auditor.PhotoFilename }`
                                                     : defaultProfilePhoto
                                                 } 
-                                                alt="Profile pic" 
+                                                alt="Profile picture" 
                                                 className="w-100 border-radius-lg shadow-sm"
                                             />
                                         </div>
