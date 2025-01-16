@@ -12,6 +12,7 @@ import Status from "./Status";
 import DetailsModal from "./DetailsModal";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import AryTableSortIcon from "../../../components/AryTableSortIcon/AryTableSortIcon";
+import OrganizationTableItem from "./OrganizationTableItem";
 
 const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) => {
     return (
@@ -80,7 +81,7 @@ const OrganizationsTableList = () => {
                 <ViewLoading />
             ) : !!organizations ? (
                 <div className="table-responsive p-0">
-                    <table className="table align-items-top mb-0">
+                    <table className="table align-items-center mb-0">
                         <thead>
                             <tr>
                                 <th>
@@ -98,6 +99,7 @@ const OrganizationsTableList = () => {
                                 </th>
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
+                                <th className={headStyle}>Certificates</th>
                                 <th>
                                     <div className="d-flex justify-content-center align-items-center gap-1">
                                         <SortItem
@@ -116,6 +118,15 @@ const OrganizationsTableList = () => {
                         </thead>
                         <tbody>
                             {
+                                organizations.map(item => 
+                                    <OrganizationTableItem 
+                                        key={ item.ID } 
+                                        item={ item }
+                                        onShowModal={ () => onShowModal(item.ID) }
+                                    />
+                                )
+                            }
+                            {/* {
                                 organizations.map(item => {
                                     const iconStyle = `icon icon-sm icon-shape ${item.Status === OrganizationStatusType.active ? 'bg-gradient-info' : 'bg-gradient-secondary'} border-radius-md d-flex align-items-center justify-content-center me-3`;
 
@@ -177,12 +188,12 @@ const OrganizationsTableList = () => {
                                             <td className="align-middle text-center text-sm">
                                                 <Status value={item.Status} />
                                             </td>
-                                            {/* <td>
+                                            <td>
                                                 <div className="d-flex flex-column align-items-start">
                                                 <div className="text-xs"><strong>Updated</strong> { getFriendlyDate(item.Updated) } </div>
                                                 <div className="text-xs"><strong>By</strong> { item.UpdatedUser }</div>
                                                 </div>
-                                            </td> */}
+                                            </td>
                                             <td>
                                                 <div className="d-flex justify-content-center gap-2">
                                                     <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
@@ -198,7 +209,7 @@ const OrganizationsTableList = () => {
                                         </tr>
                                     )
                                 })
-                            }
+                            } */}
                         </tbody>
                     </table>
                 </div>

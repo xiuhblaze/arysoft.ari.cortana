@@ -119,6 +119,13 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    const CertificateValidityStatusType = Object.freeze({
+        nothing: 0,
+        success: 1,    // Todos los certificados activos son vigentes
+        warning: 2,    // Al menos un certificado esta por vencer
+        danger: 3      // Al menos un certificado esta vencido
+    });
+
     const ContactOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
@@ -217,6 +224,7 @@ const enums = () => {
         CatAuditorDocumentSubCategoryType,
         CatAuditorDocumentPeriodicityType,
         CatAuditorDocumentOrderType,
+        CertificateValidityStatusType,
         ContactOrderType,
         NacecodeOrderType,
         OrganizationOrderType,

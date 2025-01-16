@@ -21,12 +21,23 @@ import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
 import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
+import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
+import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
+import envVariables from "../../helpers/envVariables";
+import OrganizationEditCard from "./components/OrganizationEditCard";
+
 const EditView = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [avatarPreview, setAvatarPreview] = useState('/images/icoOfficeBuilding.png')
-    const [controller, dispatch] = useArysoftUIController();
+    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+    const {
+        URL_ORGANIZATION_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const { OrganizationStatusType } = enums();
+    
+    // CUSTOM HOOKS
+    
+    const [controller, dispatch] = useArysoftUIController();
+    
     const {
         isOrganizationLoading,
         isOrganizationSaving,
@@ -35,17 +46,22 @@ const EditView = () => {
         organizationDeletedOk,
         organization,
         organizationsErrorMessage,
-
+        
         organizationAsync,
         organizationSaveAsync,
         organizationDeleteAsync,
         organizationClear,
     } = useOrganizationsStore();
-    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
+    
     // HOOKS
+    
+    const navigate = useNavigate();
 
+    const { id } = useParams();
+    
+    const [avatarPreview, setAvatarPreview] = useState('/images/icoOfficeBuilding.png')
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [qrcodePreview, setQrcodePreview] = useState(null);
 
     useEffect(() => {
         if (!!id) organizationAsync(id);
@@ -54,6 +70,7 @@ const EditView = () => {
     useEffect(() => {
         if (!!organization) {
             setNavbarTitle(dispatch, organization.Name);
+
         }
     }, [organization]);
 
@@ -123,8 +140,71 @@ const EditView = () => {
         });
     };
 
+    const updatePhotoPreview = (value) => {
+        setPhotoPreview(value);
+    };
+
     return (
+        <>
+            <Container fluid>
+                <div
+                    className="page-header min-height-200 border-radius-lg"
+                    style={{
+                        background: `url(${imgHeaderBackground})`,
+                        backgroundPositionY: '50%'
+                    }}
+                >
+                    <span className={`mask bg-gradient-${isOrganizationLoading || !organization ? 'dark' : statusProps[organization.Status].bgColor} opacity-6`} />
+                </div>
+                <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+                    <Row className="gx-4">
+                        <div className="col-auto">
+                            <div className="avatar avatar-xl position-relative">
+                                <Image
+                                    src={!!photoPreview
+                                        ? photoPreview
+                                        : !!organization && !!organization.LogoFile
+                                            ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`
+                                            : defaultPhoto
+                                    }
+                                    className="border-radius-md"
+                                    alt="Profile photo"
+                                />
+                            </div>
+                        </div>
+                        <div className="col-auto my-auto">
+                            <div className="h-100">
+                                <h5 className="mb-1">
+                                    {!!organization ? organization.Name : '(new organization)'}
+                                </h5>
+                                <p className="mb-0 font-weight-bold text-sm">
+                                    {!!organization ? organization.LegalEntity : ''}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
+                            {
+                                !!organization && 
+                                <Status value={organization.Status} />
+                            }
+                        </div>
+                    </Row>
+                </div>
+            </Container>
         <Container fluid className="py-4 px-0 px-sm-4">
+            {
+                isOrganizationLoading ? (
+                    <ViewLoading />
+                ) : !!organization && (
+                    <Row>
+                        <Col xs="12" sm="6" xxl="4">
+                            <OrganizationEditCard
+                                updatePhotoPreview={updatePhotoPreview}
+                            />
+                        </Col>
+                    </Row>
+                )
+            }
             <Row>
                 <Col xs={12}>
                     <Card>
@@ -136,37 +216,6 @@ const EditView = () => {
                             ) : !!organization ? (
                                 <>
                                     <Card.Body>
-                                        <div
-                                            className="page-header min-height-150 border-radius-lg"
-                                            style={{
-                                                backgroundImage: `url(${bgHead})`,
-                                                backgroundPositionY: '50%'
-                                            }}
-                                        >
-                                            <span className={`mask bg-gradient-${statusProps[organization.Status].bgColor} opacity-6`}></span>
-                                        </div>
-                                        <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
-                                            <div className="row gx-4">
-                                                <div className="col-auto">
-                                                    <div className="avatar avatar-xl position-relative">
-                                                        <img src={avatarPreview} alt="Organization logotype" className="w-100 border-radius-lg shadow-sm" />
-                                                    </div>
-                                                </div>
-                                                <div className="col-auto my-auto">
-                                                    <div className="h-100">
-                                                        <h5 className="mb-1">
-                                                            {organization.Name}
-                                                        </h5>
-                                                        <p className="mb-0 font-weight-bold text-sm">
-                                                            {organization.LegalEntity}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 text-end">
-                                                    <Status value={organization.Status} />
-                                                </div>
-                                            </div>
-                                        </div>
                                         <Formik
                                             initialValues={{
                                                 nameInput: organization?.Name || '',
@@ -334,6 +383,7 @@ const EditView = () => {
                 </Col>
             </Row>
         </Container>
+        </>
     )
 }
 

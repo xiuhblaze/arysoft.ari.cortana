@@ -19,8 +19,11 @@ const ListView = () => {
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE,
     } = envVariables();
-    const [controller, dispatch] = useArysoftUIController();
     const { OrganizationOrderType } = enums();
+    
+    // CUSTOM HOOKS
+    
+    const [controller, dispatch] = useArysoftUIController();
     const {
         organizationsMeta,
         organization,
@@ -28,6 +31,8 @@ const ListView = () => {
         organizationsErrorMessage,
         organizationsAsync,
     } = useOrganizationsStore();
+
+    // HOOKS
 
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
@@ -44,12 +49,6 @@ const ListView = () => {
 
         setNavbarTitle(dispatch, null);
     }, []);
-
-    // useEffect(() => {
-    //   if (organizationCreatedOk) {
-    //     navigate(`/organizations/${ organization.OrganizationID }`);
-    //   }
-    // }, [organizationCreatedOk]);
 
     useEffect(() => {
         if (!!organizationsErrorMessage) {
@@ -68,18 +67,18 @@ const ListView = () => {
 
         organizationsAsync(search);
         localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+    }; // onClickGoPage
 
-    const onClickOrderList = (order = OrganizationOrderType.name) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            order: order
-        }
+    // const onClickOrderList = (order = OrganizationOrderType.name) => {
+    //     const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+    //     const search = {
+    //         ...savedSearch,
+    //         order: order
+    //     }
 
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+    //     organizationsAsync(search);
+    //     localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+    // }; // onClickOrderList
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
@@ -97,7 +96,7 @@ const ListView = () => {
                                     onClickGoPage={onClickGoPage}
                                 />
                             )}
-                            <OrganizationsTableList onOrder={onClickOrderList} />
+                            <OrganizationsTableList />
                             {!!organizationsMeta && (
                                 <>
                                     <AryPagination
