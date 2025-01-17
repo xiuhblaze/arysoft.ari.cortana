@@ -18,9 +18,12 @@ import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUp
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const EditContactModal = ({ id, ...props}) => {
-    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+    //const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
-    const { VITE_FILES_URI } = envVariables();
+    const { 
+        VITE_FILES_URI,
+        PHONE_REGEX,
+    } = envVariables();
     const { 
         DefaultStatusType,
         ContactOrderType,

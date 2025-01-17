@@ -60,7 +60,7 @@ const SitesCard = ({ readOnly = false, ...props }) => {
     }, [sitesErrorMessage]);
 
     return (
-        <Card className="h-100">
+        <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h6>Sites</h6>

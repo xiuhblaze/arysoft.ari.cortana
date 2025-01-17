@@ -9,6 +9,7 @@ import { checkFileExists } from '../../../helpers/checkFileExists';
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCertificate, faNoteSticky, faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import CertificateEditModal from './CertificateEditModal';
 
 const CertificatesCard = ({ readOnly = false, ...props }) => {
     const { CertificateOrderType } = enums();
@@ -53,7 +54,7 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h6 className="mb-0">Certificates</h6>
-                    {/* { !readOnly && <EditCertificateModal /> } */}
+                    { !readOnly && <CertificateEditModal /> }
                 </div>
             </Card.Header>
             <Card.Body className='p-3'>
@@ -113,9 +114,9 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
                                                     </p>
                                                 </div>
                                             </div>
-                                            {/* <div>
-                                                {!readOnly && <EditCertificateModal id={item.ID} />}
-                                            </div> */}
+                                            <div>
+                                                {!readOnly && <CertificateEditModal id={item.ID} />}
+                                            </div>
                                         </ListGroup.Item>
                                     )
                                 })

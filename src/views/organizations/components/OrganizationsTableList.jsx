@@ -158,7 +158,7 @@ const OrganizationsTableList = () => {
             <DetailsModal show={showModal} onHide={onCloseModal} />
             <Modal show={showQRModal} onHide={onCloseQRModal} centered>
                 <Modal.Body>
-                    <div className="d-flex justify-content-center align-items-center">
+                    <div className="d-flex justify-content-center align-items-center py-5">
                         { !!qrValues &&
                             <img 
                                 src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${qrValues.ID}/${qrValues.QRFile}`} 
