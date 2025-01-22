@@ -26,6 +26,7 @@ const EditSiteModal = ({ id, ...props }) => {
         descriptionInput: '',
         addressInput: '',
         isMainSiteCheck: false,
+        locationUrlInput: '',
         statusCheck: false,
     };
 
@@ -62,6 +63,7 @@ const EditSiteModal = ({ id, ...props }) => {
                 descriptionInput: site?.Description ?? '',
                 addressInput: site?.Address ?? '',
                 isMainSiteCheck: site?.IsMainSite ?? false,
+                locationUrlInput: site?.LocationURL ?? '',
                 statusCheck: site?.Status === DefaultStatusType.active,
             });
 
@@ -112,6 +114,7 @@ const EditSiteModal = ({ id, ...props }) => {
             Description: values.descriptionInput,
             Address: values.addressInput,
             IsMainSite: values.isMainSiteCheck,
+            LocationURL: values.locationUrlInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
@@ -130,7 +133,7 @@ const EditSiteModal = ({ id, ...props }) => {
             >
                 <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } size="xl" />
             </Button>
-            <Modal show={ showModal} onHide={ onCloseModal } >
+            <Modal show={ showModal} onHide={ onCloseModal } size="lg" >
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -161,68 +164,76 @@ const EditSiteModal = ({ id, ...props }) => {
                                 <Form>
                                     <Modal.Body>
                                         <Row>
-                                            <Col xs="12">
-                                                <AryFormikTextInput name="descriptionInput"
-                                                    label="Description"
-                                                />
+                                            <Col xs="12" sm="6">
+                                                <Row>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="descriptionInput"
+                                                            label="Description"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="addressInput"
+                                                            label="Address"
+                                                            placeholder="3312 Example Street, City 00000"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="locationUrlInput"
+                                                            label="Location Map URL"
+                                                            helpText="URL of the site's location on Google Maps"
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col xs="12" sm="6">
+                                                        <div className="form-check form-switch">
+                                                            <input id="isMainSiteCheck" name="isMainSiteCheck"
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                onChange={ (e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('isMainSiteCheck', isChecked);
+                                                                    setIsMainSiteCheck(isChecked);
+                                                                }}
+                                                                checked={ formik.values.isMainSiteCheck }
+                                                            />
+                                                            <label
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="isMainSiteCheck"
+                                                            >
+                                                                {
+                                                                    isMainSiteCheck ? 'Is main site' : 'Is secondary site'
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs="12" sm="6">
+                                                        <div className="form-check form-switch">
+                                                            <input id="statusCheck" name="statusCheck"
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                // onChange={ formik.handleChange }
+                                                                onChange= { (e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('statusCheck', isChecked);
+                                                                    setActiveSite(isChecked);
+                                                                }} 
+                                                                checked={ formik.values.statusCheck }
+                                                            />
+                                                            <label 
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="statusCheck"
+                                                            >
+                                                                { 
+                                                                    activeSite ? 'Active site' : 'Inactive site'
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
                                             </Col>
-                                            <Col xs="12">
-                                                <AryFormikTextInput name="addressInput"
-                                                    label="Address"
-                                                    placeholder="3312 Example Street, City 00000"
-                                                />
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12">
-                                                {/* <ShiftsCard /> */}
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12" sm="4">
-                                                <div className="form-check form-switch">
-                                                    <input id="isMainSiteCheck" name="isMainSiteCheck"
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        onChange={ (e) => {
-                                                            const isChecked = e.target.checked;
-                                                            formik.setFieldValue('isMainSiteCheck', isChecked);
-                                                            setIsMainSiteCheck(isChecked);
-                                                        }}
-                                                        checked={ formik.values.isMainSiteCheck }
-                                                    />
-                                                    <label
-                                                        className="form-check-label text-secondary mb-0"
-                                                        htmlFor="isMainSiteCheck"
-                                                    >
-                                                        {
-                                                            isMainSiteCheck ? 'Is main site' : 'Is secondary site'
-                                                        }
-                                                    </label>
-                                                </div>
-                                            </Col>
-                                            <Col xs="12" sm="4">
-                                                <div className="form-check form-switch">
-                                                    <input id="statusCheck" name="statusCheck"
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        // onChange={ formik.handleChange }
-                                                        onChange= { (e) => {
-                                                            const isChecked = e.target.checked;
-                                                            formik.setFieldValue('statusCheck', isChecked);
-                                                            setActiveSite(isChecked);
-                                                        }} 
-                                                        checked={ formik.values.statusCheck }
-                                                    />
-                                                    <label 
-                                                        className="form-check-label text-secondary mb-0"
-                                                        htmlFor="statusCheck"
-                                                    >
-                                                        { 
-                                                            activeSite ? 'Active site' : 'Inactive site'
-                                                        }
-                                                    </label>
-                                                </div>
+                                            <Col xs="12" sm="6">
+                                                <ShiftsCard />
                                             </Col>
                                         </Row>
                                     </Modal.Body>
@@ -255,7 +266,7 @@ const EditSiteModal = ({ id, ...props }) => {
                         </Formik>
                     ) : null
                 }
-                <ShiftsCard />
+                {/* <ShiftsCard /> */}
             </Modal>
         </>
     )

@@ -18,10 +18,9 @@ import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUp
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const EditContactModal = ({ id, ...props}) => {
-    //const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
     const { 
-        VITE_FILES_URI,
+        VITE_FILES_URL,
+        URL_ORGANIZATION_FILES,
         PHONE_REGEX,
     } = envVariables();
     const { 
@@ -279,7 +278,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                         </>
                                                     ) : !!contact.PhotoFilename && 
                                                         <div>
-                                                            <Image src={`${VITE_FILES_URI}/contacts/${contact.ID}/${contact.PhotoFilename}`}
+                                                            <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${contact.OrganizationID}/contacts/${contact.ID}/${contact.PhotoFilename}`}
                                                                 thumbnail
                                                                 fluid
                                                                 className="mb-3"

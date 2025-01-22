@@ -32,7 +32,10 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">
-                        <h6 className="mb-0 text-sm">{ item.Name }</h6>
+                        <h6 className="mb-0 text-sm">
+                            <span className="text-danger me-2">{ item.Folio.toString().padStart(4, '0') }</span>
+                            { item.Name }
+                        </h6>
                         <p className="text-xs mb-0">{ item.LegalEntity}</p>
                         {
                             !isNullOrEmpty(item.COID) &&
@@ -101,6 +104,12 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                             </a>
                         </p>
                     }
+                </div>
+            </td>
+            <td>
+                <div className="d-flex flex-column align-items-start">
+                    { !!item.SitesCount && <p className="text-xs font-weight-bold mb-0">Sites: { item.SitesCount }</p> }
+                    { !!item.SitesEmployeesCount && <p className="text-xs text-secondary mb-0">Employees: { item.SitesEmployeesCount }</p> }
                 </div>
             </td>
             <td>

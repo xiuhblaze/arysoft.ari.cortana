@@ -109,6 +109,15 @@ const OrganizationsTableList = () => {
                                 <th>
                                     <div className="d-flex justify-content-start align-items-center gap-1">
                                         <SortItem
+                                            activeAsc={currentOrder === OrganizationOrderType.folio}
+                                            activeDesc={currentOrder === OrganizationOrderType.folioDesc}
+                                            onOrderAsc={() => { onClickOrderList(OrganizationOrderType.folio) }}
+                                            onOrderDesc={() => { onClickOrderList(OrganizationOrderType.folioDesc) }}
+                                        />
+                                        <div className={headStyle}>
+                                            Folio 
+                                        </div>
+                                        <SortItem
                                             activeAsc={currentOrder === OrganizationOrderType.name}
                                             activeDesc={currentOrder === OrganizationOrderType.nameDesc}
                                             onOrderAsc={() => { onClickOrderList(OrganizationOrderType.name) }}
@@ -121,7 +130,18 @@ const OrganizationsTableList = () => {
                                 </th>
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
-                                <th className={headStyle}>Certificates</th>
+                                <th className={headStyle}>Sites</th>
+                                <th className="d-flex justify-content-start align-items-center gap-1">
+                                    <SortItem
+                                        activeAsc={currentOrder === OrganizationOrderType.certificatesValidityStatus}
+                                        activeDesc={currentOrder === OrganizationOrderType.certificatesValidityStatusDesc}
+                                        onOrderAsc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatus) }}
+                                        onOrderDesc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatusDesc) }}
+                                    />
+                                    <div className={headStyle}>
+                                        Certificates
+                                    </div>
+                                </th>
                                 <th className={headStyle}>QR</th>
                                 <th>
                                     <div className="d-flex justify-content-center align-items-center gap-1">

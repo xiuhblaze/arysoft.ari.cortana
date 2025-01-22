@@ -78,7 +78,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                             {
                                 contacts.map( item => {
                                     const url = `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/contacts/${item.ID}`;
-                                    const fileName = !!item.PhotoFilename && checkFileExists(`${url}/${ item.PhotoFilename }`)
+                                    const fileName = !!item.PhotoFilename // && checkFileExists(`${url}/${ item.PhotoFilename }`)
                                         ? `${url}/${ item.PhotoFilename }`
                                         : defaultProfile ;
                                     const itemStyle= `border-0 d-flex justify-content-between align-items-center px-0 mb-2 ${ statusStyle[item.Status] }`;

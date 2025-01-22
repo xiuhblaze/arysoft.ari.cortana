@@ -3,13 +3,12 @@ import envVariables from "../../../helpers/envVariables"
 import enums from "../../../helpers/enums";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { useCertificatesStore } from "../../../hooks/useCertificatesStore";
-import { Button, Col, Modal, ModalBody, Row } from "react-bootstrap";
+import { Button, Col, Modal, Row } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCertificate, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import Status from "../../organizations/components/Status";
 import { Form, Formik } from "formik";
 import { ViewLoading } from "../../../components/Loaders";
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
@@ -24,6 +23,8 @@ const CertificateEditModal = ({ id, ...props }) => {
         VITE_FILES_URL,
     } = envVariables();
     const {
+        CertificateOrderType,
+        CertificateStatusType,
         DefaultStatusType,
         StandardOrderType,
     } = enums();
@@ -38,7 +39,7 @@ const CertificateEditModal = ({ id, ...props }) => {
         nextAuditDateInput: '',
         nextAuditNoteInput: '',
         filenameInput: '',
-        statusCheck: false,
+        statusSelect: '',
     };
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
@@ -77,6 +78,8 @@ const CertificateEditModal = ({ id, ...props }) => {
                     return true;
                 }
             }),
+        statusSelect: Yup.string()
+            .required('Must select a status'),
     });
 
     // CUSTOM HOOKS
@@ -111,6 +114,7 @@ const CertificateEditModal = ({ id, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [statusOptions, setStatusOptions] = useState(null);
 
     useEffect(() => {
         
@@ -125,7 +129,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                 nextAuditDateInput: !!certificate?.NextAuditDate ? getISODate(certificate.NextAuditDate) : '',
                 nextAuditNoteInput: certificate?.NextAuditNote ?? '',
                 certificateFileInput: '',
-                statusCheck: certificate?.Status === DefaultStatusType.active || certificate?.Status === DefaultStatusType.nothing,
+                statusSelect: certificate?.Status ?? ''
             });
 
             standardsAsync({
@@ -134,6 +138,14 @@ const CertificateEditModal = ({ id, ...props }) => {
                 includeDeleted: false,
                 order: StandardOrderType.name,
             });
+
+            setStatusOptions([ //! Ver que cambien las opciones de acuerdo al status actual
+                { label: '(status)', value: '' },
+                { label: 'Active', value: CertificateStatusType.active },
+                { label: 'Suspended', value: CertificateStatusType.suspended },
+                { label: 'Expired', value: CertificateStatusType.expired },
+                { label: 'Canceled', value: CertificateStatusType.canceled },
+            ]);
         }
     }, [certificate]);
 
@@ -143,7 +155,11 @@ const CertificateEditModal = ({ id, ...props }) => {
             certificateClear();
             setShowModal(false);
 
-            certificatesAsync
+            certificatesAsync({
+                organizationID: organization.ID,
+                pageSize: 0,
+                order: CertificateOrderType.dateDesc,
+            });
         }
     }, [certificateSavedOk]);
     
@@ -186,7 +202,7 @@ const CertificateEditModal = ({ id, ...props }) => {
             PrevAuditNote: values.prevAuditNoteInput,
             NextAuditDate: values.nextAuditDateInput,
             NextAuditNote: values.nextAuditNoteInput,
-            Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
+            Status: values.statusSelect,
         };
 
         certificateSaveAsync(toSave, values.certificateFileInput);
@@ -202,7 +218,7 @@ const CertificateEditModal = ({ id, ...props }) => {
             >
                 <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } size="xl" />
             </Button>
-            <Modal show={ showModal } onHide={ onCloseModal }>
+            <Modal show={ showModal } onHide={ onCloseModal } size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>
                         {
@@ -345,25 +361,24 @@ const CertificateEditModal = ({ id, ...props }) => {
                                             </Col>
                                         </Row>
                                         <Row>
-                                        <Col xs="12" md="6" xxl="4">
-                                            <div className="form-check form-switch">
-                                                <input id="statusCheck" name="statusCheck"
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    onChange={(e) => {
-                                                        const isChecked = e.target.checked;
-                                                        formik.setFieldValue('statusCheck', isChecked);
-                                                    }}
-                                                    checked={formik.values.statusCheck}
-                                                />
-                                                <label
-                                                    className="form-check-label text-secondary mb-0"
-                                                    htmlFor="statusCheck"
+                                            <Col xs="12" sm="6">
+                                                <AryFormikSelectInput
+                                                    name="statusSelect"
+                                                    label="Status"
+                                                    // value={certificate.Status}
                                                 >
-                                                    Active certificate
-                                                </label>
-                                            </div>
-                                        </Col>
+                                                    {
+                                                        !!statusOptions && statusOptions.map(item => 
+                                                            <option
+                                                                key={ item.value }
+                                                                value={ item.value }
+                                                            >
+                                                                { item.label }
+                                                            </option>
+                                                        )
+                                                    }
+                                                </AryFormikSelectInput>
+                                            </Col>
                                         </Row>
                                     </Modal.Body>
                                     <Modal.Footer>

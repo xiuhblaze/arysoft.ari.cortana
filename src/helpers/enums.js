@@ -8,6 +8,8 @@ const enums = () => {
         deleted: 3,
     });
 
+    // Application Forms
+
     const ApplicationFormStatusType = Object.freeze({
         nothing: 0,
         new: 1,
@@ -32,6 +34,8 @@ const enums = () => {
         organizationDesc: 3,
         createdDesc: 4,
     });
+
+    // Auditors
 
     const AuditorStandardOrderType = Object.freeze({
         nothing: 0,
@@ -58,6 +62,8 @@ const enums = () => {
         leader: 1,
         regular: 2,
     });
+
+    // Auditors Documents
 
     const AuditorDocumentType = Object.freeze({
         nothing: 0,
@@ -87,6 +93,8 @@ const enums = () => {
         startDateDesc: 3,
         updatedDesc: 4,
     });
+
+    // Categories Auditors Documents
 
     const CatAuditorDocumentType = Object.freeze({
         nothing: 0,
@@ -119,6 +127,8 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    // Certificates 
+
     const CertificateFilterDateType = Object.freeze({
         nothing: 0,
         startDate: 1,
@@ -127,7 +137,7 @@ const enums = () => {
         nextAuditDate: 4,
     });
 
-    const CertificateValidityStatusType = Object.freeze({
+    const CertificatesValidityStatusType = Object.freeze({
         nothing: 0,
         success: 1,    // Todos los certificados activos son vigentes
         warning: 2,    // Al menos un certificado esta por vencer
@@ -144,6 +154,17 @@ const enums = () => {
         expireStatusDesc: 6,
     });
 
+    const CertificateStatusType = Object.freeze({
+        nothing: 0,
+        active: 1,
+        suspended: 2,
+        expired: 3,
+        canceled: 4,
+        deleted: 5,
+    });
+
+    // Contacts
+       
     const ContactOrderType = Object.freeze({
         nothing: 0,
         firstName: 1,
@@ -154,6 +175,8 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    // NACE Codes
+
     const NacecodeOrderType = Object.freeze({
         nothing: 0,
         sector: 1,
@@ -163,6 +186,8 @@ const enums = () => {
         descriptionDesc: 5,
         updatedDesc: 6
     });
+
+    // Organizations
 
     const OrganizationStatusType = Object.freeze({
         nothing: 0,
@@ -175,15 +200,21 @@ const enums = () => {
 
     const OrganizationOrderType = Object.freeze({
         nothing: 0,
-        name: 1,
-        legalEntity: 2,
-        status: 3,
-        updated: 4,
-        nameDesc: 5,
-        legalEntityDesc: 6,
-        statusDesc: 7,
-        updatedDesc: 8,
+        folio: 1,
+        name: 2,
+        legalEntity: 3,
+        status: 4,
+        certificatesValidityStatus: 5,
+        updated: 6,
+        folioDesc: 7,
+        nameDesc: 8,
+        legalEntityDesc: 9,
+        statusDesc: 10,
+        certificatesValidityStatusDesc: 11,
+        updatedDesc: 12,
     });
+
+    // Shifts
 
     const ShiftOrderType = Object.freeze({
         nothing: 0,
@@ -204,6 +235,8 @@ const enums = () => {
         night: 3,
     });
 
+    // Sites
+
     const SiteOrderType = Object.freeze({
         nothing: 0,
         description: 1,
@@ -215,6 +248,8 @@ const enums = () => {
         statusDesc: 7,
         updatedDesc: 8,
     });
+
+    // Standards
 
     const StandardOrderType = Object.freeze({
         nothing: 0,
@@ -231,20 +266,21 @@ const enums = () => {
 
         ApplicationFormOrderType,
         ApplicationFormStatusType,
-        AuditorStandardOrderType,
-        AuditorOrderType,
-        AuditorIsLeaderType,
+        AuditorDocumentOrderType,
+        AuditorDocumentRequiredType,
         AuditorDocumentType,
         AuditorDocumentValidityType,
-        AuditorDocumentRequiredType,
-        AuditorDocumentOrderType,
-        CatAuditorDocumentType,
-        CatAuditorDocumentSubCategoryType,
-        CatAuditorDocumentPeriodicityType,
+        AuditorIsLeaderType,
+        AuditorOrderType,
+        AuditorStandardOrderType,
         CatAuditorDocumentOrderType,
+        CatAuditorDocumentPeriodicityType,
+        CatAuditorDocumentSubCategoryType,
+        CatAuditorDocumentType,
         CertificateFilterDateType,
-        CertificateValidityStatusType,
         CertificateOrderType,
+        CertificateStatusType,
+        CertificatesValidityStatusType,
         ContactOrderType,
         NacecodeOrderType,
         OrganizationOrderType,

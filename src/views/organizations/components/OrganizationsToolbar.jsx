@@ -10,14 +10,21 @@ import envVariables from "../../../helpers/envVariables";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
 
-const Toolbar = () => {
+const OrganizationsToolbar = () => {
     const formDefaultData = {
+        folioInput: '',
         textInput: '',
+        certificatesValidityStatusSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
-    const { OrganizationOrderType, OrganizationStatusType } = enums();
+    const { 
+        CertificatesValidityStatusType,
+        OrganizationOrderType, 
+        OrganizationStatusType 
+    } = enums();
     const {
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE
@@ -49,7 +56,9 @@ const Toolbar = () => {
 
         if (!!savedSearch) {
             setInitialValues({
+                folioInput: savedSearch.folio ?? '',
                 textInput: savedSearch.text ?? '',
+                certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
@@ -72,8 +81,10 @@ const Toolbar = () => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            folio: values.folioInput,
             text: values.textInput,
             status: values.statusSelect,
+            certificatesValidityStatus: values.certificatesValidityStatusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
@@ -88,7 +99,7 @@ const Toolbar = () => {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
-            order: OrganizationOrderType.name,
+            order: OrganizationOrderType.folioDesc,
         };
 
         setInitialValues(formDefaultData);
@@ -120,12 +131,33 @@ const Toolbar = () => {
                             <div className="d-flex flex-column flex-md-row">
                                 <div className="flex-md-grow-1 me-md-3">
                                     <div className="row d-flex justify-content-end">
+                                        <div className="col-12 col-sm-2 col-xxl-1">
+                                            <AryFormikTextInput 
+                                                name="folioInput" 
+                                                type="text" 
+                                                placeholder="folio"
+                                            />
+                                        </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikTextInput
                                                 name="textInput"
                                                 type="text"
                                                 placeholder="search..."
                                             />
+                                        </div>
+                                        <div className="col-12 col-sm-3 col-xxl-2">
+                                            <AryFormikSelectInput name="certificatesValidityStatusSelect">
+                                                {
+                                                    Object.keys(CertificatesValidityStatusType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={CertificatesValidityStatusType[key]}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {key === 'nothing' ? '(certificates validity)' : certificateValidityStatusProps[CertificatesValidityStatusType[key]].label}
+                                                        </option>
+                                                    )}
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput name="statusSelect">
@@ -136,7 +168,7 @@ const Toolbar = () => {
                                                             value={OrganizationStatusType[key]}
                                                             className="text-capitalize"
                                                         >
-                                                            {key === 'nothing' ? '(all)' : key}
+                                                            {key === 'nothing' ? '(status)' : key}
                                                         </option>
                                                     )}
                                             </AryFormikSelectInput>
@@ -185,4 +217,4 @@ const Toolbar = () => {
     )
 }
 
-export default Toolbar
+export default OrganizationsToolbar;

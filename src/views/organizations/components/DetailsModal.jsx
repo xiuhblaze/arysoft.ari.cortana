@@ -19,6 +19,7 @@ import SitesCard from "../../sites/components/SitesCard";
 
 import defaultPhoto from '../../../assets/img/icoOrganizationDefault.jpg';
 import envVariables from "../../../helpers/envVariables";
+import CertificatesCard from "../../certificates/components/CertificatesCard";
 
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -141,26 +142,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                     <SitesCard readOnly />
                                 </Col>
                                 <Col xs="12" sm="4">
-                                    <Card className="h-100">
-                                        <Card.Header className="pb-0 p-3">
-                                            <h6 className="mb-0">Certificates</h6>
-                                        </Card.Header>
-                                        <Card.Body className="p-3">
-                                            <ListGroup>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="me-3">
-                                                        <div className="icon icon-shape bg-gradient-warning border-radius-md d-flex align-items-center justify-content-center">
-                                                            <FontAwesomeIcon icon={faCertificate} size="lg" className="text-white mx-3" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">ISO 9000</h6>
-                                                        <p className="mb-0 text-xs">Expires: 2024/04/23</p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                            </ListGroup>
-                                        </Card.Body>
-                                    </Card>
+                                    <CertificatesCard readOnly />
                                 </Col>
                             </Row>
                         </>

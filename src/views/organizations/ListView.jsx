@@ -10,7 +10,7 @@ import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import OrganizationsTableList from "./components/OrganizationsTableList";
-import Toolbar from "./components/Toolbar";
+import OrganizationsToolbar from "./components/OrganizationsToolbar";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 
 const ListView = () => {
@@ -39,7 +39,7 @@ const ListView = () => {
         const newSearch = {
             pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
             pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.name,
+            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
         };
 
         const search = !!savedSearch ? savedSearch : newSearch;
@@ -86,7 +86,7 @@ const ListView = () => {
                 <Col>
                     <Card className="mb-4">
                         <Card.Header className="pb-0">
-                            <Toolbar />
+                            <OrganizationsToolbar />
                         </Card.Header>
                         <Card.Body className="px-0 pt-0 pb-2">
                             {!!organizationsMeta && (
