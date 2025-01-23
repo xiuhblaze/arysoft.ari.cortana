@@ -64,7 +64,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                     }
                 { !!item.Website && 
                     <p className="text-xs font-weight-bold mb-0">
-                        <a href={`https://${item.Website}`} title="Visit url" target='_blank'>
+                        <a href={item.Website} title="Visit url" target='_blank'>
                             <FontAwesomeIcon icon={ faGlobe } className="me-1" fixedWidth />
                             { item.Website }
                         </a>

@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 import envVariables from "../../../helpers/envVariables";
 import { checkFileExists } from "../../../helpers/checkFileExists";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -94,6 +95,9 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
                                                     <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>{ item.FullName }</h6>
+                                                    { !isNullOrEmpty(item.Position) 
+                                                        && <p className="text-xs font-weight-bold mb-0">{ item.Position }</p> 
+                                                    }
                                                     <p className="mb-0 text-xs d-flex flex-column gap-1">
                                                         { 
                                                             !!item.Email ? (

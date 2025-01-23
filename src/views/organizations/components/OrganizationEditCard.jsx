@@ -20,7 +20,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
     } = envVariables();
-    const { OrganizationStatusType} =enums();
+    const { OrganizationStatusType } =enums();
     const formDefaultValues = {
         nameInput: '',
         legalEntityInput: '',
@@ -86,9 +86,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const {
         isOrganizationSaving,
         organizationSavedOk,
+        organizationDeletedOk,
         organization,
         
-        organizationAsync,
         organizationSaveAsync,
         organizationDeleteAsync,
         organizationClear,
@@ -128,6 +128,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             navigate('/organizations/');
         }
     }, [organizationSavedOk]);
+
+    useEffect(() => {
+        if (organizationDeletedOk) {
+            Swal.fire('Organization', 'Record deleted successfully', 'success');
+            organizationClear();
+            navigate('/organizations/');
+        }
+    }, [organizationDeletedOk]);
     
     // METHODS
 
@@ -153,6 +161,21 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const onDeleteFile = (file) => {
 
     }; // onDeleteFile
+
+    const onDeleteButton = () => {    
+        Swal.fire({
+            title: 'Organizations',
+            text: 'This action will remove the registry. Do you wish to continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then(resp => {
+            if (resp.value) {
+                organizationDeleteAsync(organization.OrganizationID);
+            }
+        });
+    }; // onDeleteButton
 
     return (
         <Card {...props}>
@@ -373,9 +396,11 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                         </Col>
                                         <Col xs="12">
                                             <AryFormikTextInput
+                                                type="text"
                                                 name="websiteInput"
                                                 label="Website"
-                                                type="text"
+                                                placeholder="http[s]://www.example.com"
+                                                helpText="Include http:// or https://"
                                             />
                                         </Col>
                                         <Col xs="12">
@@ -383,6 +408,8 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 name="phoneInput"
                                                 label="Phone"
                                                 type="text"
+                                                placeholder="00-0000-0000"
+                                                helpText="[0000000000] [x0000]"
                                             />
                                         </Col>
                                         <Col xs="12">

@@ -8,7 +8,8 @@ const envVariables = () => {
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
 
     const COID_REGEX = /[A-Z]{3}-\d-[0-9]{4}-[0-9]{6}/;//  /^[A-Z]{3}-\d-\d{4}-\d{6}$/;
-    const PHONE_REGEX = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+    // const PHONE_REGEX = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+    const PHONE_REGEX = /^(((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4})?[ ]?(x[0-9]{3,4})?$/;
     
     const URL_APPLICATIONFORMS = '/applications';
     const URL_AUDITOR_FILES = '/auditors';

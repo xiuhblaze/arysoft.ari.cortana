@@ -1,25 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { setNavbarTitle, useArysoftUIController } from "../../context/context";
-import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 
-import enums from "../../helpers/enums";
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
-import { Card, Col, Container, Image, Row } from "react-bootstrap";
+import { Col, Container, Image, Row } from "react-bootstrap";
 import { ViewLoading } from "../../components/Loaders";
 import Status from "./components/Status";
-import { Form, Formik } from "formik";
-import { AryFormikTextInput } from "../../components/Forms";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckDouble, faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import statusProps from "./helpers/StatusProps";
 
-import bgHead from '../../assets/img/bgTrianglesBW.jpg';
-import { Button } from "react-bootstrap";
 import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
-import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
 import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
 import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
@@ -28,42 +19,29 @@ import OrganizationEditCard from "./components/OrganizationEditCard";
 import CertificatesCard from "../certificates/components/CertificatesCard";
 
 const EditView = () => {
-    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
     const {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
     } = envVariables();
-    const { OrganizationStatusType } = enums();
-    
+
     // CUSTOM HOOKS
     
     const [controller, dispatch] = useArysoftUIController();
     
     const {
         isOrganizationLoading,
-        isOrganizationSaving,
-        organizationSavedOk,
-        isOrganizationDeleting,
-        organizationDeletedOk,
         organization,
         organizationsErrorMessage,
         
         organizationAsync,
-        organizationSaveAsync,
-        organizationDeleteAsync,
-        organizationClear,
     } = useOrganizationsStore();
     
     // HOOKS
     
-    const navigate = useNavigate();
-
     const { id } = useParams();
-    
-    const [avatarPreview, setAvatarPreview] = useState('/images/icoOfficeBuilding.png')
-    const [photoPreview, setPhotoPreview] = useState(null);
-    const [qrcodePreview, setQrcodePreview] = useState(null);
 
+    const [photoPreview, setPhotoPreview] = useState(null);
+    
     useEffect(() => {
         if (!!id) organizationAsync(id);
     }, [id]);
@@ -71,25 +49,8 @@ const EditView = () => {
     useEffect(() => {
         if (!!organization) {
             setNavbarTitle(dispatch, organization.Name);
-
         }
     }, [organization]);
-
-    useEffect(() => {
-        if (organizationSavedOk) {
-            Swal.fire('Organization', 'The changes were made successfully', 'success');
-            organizationClear();
-            navigate('/organizations/');
-        }
-    }, [organizationSavedOk]);
-
-    useEffect(() => {
-        if (organizationDeletedOk) {
-            Swal.fire('Organization', 'Record deleted successfully', 'success');
-            organizationClear();
-            navigate('/organizations/');
-        }
-    }, [organizationDeletedOk]);
 
     useEffect(() => {
         if (!!organizationsErrorMessage) {
@@ -98,48 +59,6 @@ const EditView = () => {
     }, [organizationsErrorMessage]);
 
     // METHODS
-
-    const onFormSubmit = (values) => {
-        // console.log(values);
-
-        const itemToSave = {
-            ID: organization.ID,
-            Name: values.nameInput,
-            LegalEntity: values.legalEntityInput,
-            LogoFile: '',
-            Website: values.websiteInput,
-            Phone: values.phoneInput,
-            Status: organization.Status,
-        };
-        
-        organizationSaveAsync(itemToSave);
-    };
-
-    const onCancelButton = () => {
-        organizationClear();
-        navigate('/organizations/');
-    }
-
-    const onApproveButton = () => {
-        console.log('onApproveButton');
-    }; // onApproveButton
-
-    // const onActiveButton //! Aqui voy... y ahi me quede jojojo!
-    const onDeleteButton = () => {
-
-        Swal.fire({
-            title: 'Organizations',
-            text: 'This action will remove the registry. Do you wish to continue?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel'
-        }).then(resp => {
-            if (resp.value) {
-                organizationDeleteAsync(organization.OrganizationID);
-            }
-        });
-    };
 
     const updatePhotoPreview = (value) => {
         setPhotoPreview(value);
