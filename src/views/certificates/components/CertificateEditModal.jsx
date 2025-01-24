@@ -38,6 +38,11 @@ const CertificateEditModal = ({ id, ...props }) => {
         prevAuditNoteInput: '',
         nextAuditDateInput: '',
         nextAuditNoteInput: '',
+        hasNCsMinorCheck: false,
+        hasNCsMajorCheck: false,
+        hasNCsCriticalCheck: false,
+        actionPlanDateInput: '',
+        actionPlanDeliveredCheck: false,
         filenameInput: '',
         statusSelect: '',
     };
@@ -54,13 +59,27 @@ const CertificateEditModal = ({ id, ...props }) => {
         commentsInput: Yup.string()
             .max(500, 'The comments cannot exceed more than 500 characters'),
         prevAuditDateInput: Yup.date()
-            .typeError('Must be a valid date'),
+            .typeError('Must be a valid date')
+            .when('hasNCsMinorCheck', {
+                is: value => value === true,
+                then: () => Yup.date().required('If a minor NC is present, the previous audit date is required'),
+            })
+            .when('hasNCsMajorCheck', {
+                is: value => value === true,
+                then: () => Yup.date().required('If a major NC is present, the previous audit date is required'),
+            })
+            .when('hasNCsCriticalCheck', {
+                is: value => value === true,
+                then: () => Yup.date().required('If a critical NC is present, the previous audit date is required'),
+            }),
         prevAuditNoteInput: Yup.string()
             .max(100, 'The note cannot exceed more than 100 characters'),
         nextAuditDateInput: Yup.date()
             .typeError('Must be a valid date'),
         nextAuditNoteInput: Yup.string()
             .max(100, 'The note cannot exceed more than 100 characters'),
+        actionPlanDateInput: Yup.date()
+            .typeError('Must be a valid date'),
         certificateFileInput: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -128,6 +147,11 @@ const CertificateEditModal = ({ id, ...props }) => {
                 prevAuditNoteInput: certificate?.PrevAuditNote ?? '',
                 nextAuditDateInput: !!certificate?.NextAuditDate ? getISODate(certificate.NextAuditDate) : '',
                 nextAuditNoteInput: certificate?.NextAuditNote ?? '',
+                hasNCsMinorCheck: !!certificate?.HasNCsMinor ?? false,
+                hasNCsMajorCheck: !!certificate?.HasNCsMajor ?? false,
+                hasNCsCriticalCheck: !!certificate?.HasNCsCritical ?? false,
+                actionPlanDateInput: !!certificate?.ActionPlanDate ? getISODate(certificate.ActionPlanDate) : '',
+                actionPlanDeliveredCheck: !!certificate?.ActionPlanDelivered ?? false,
                 certificateFileInput: '',
                 statusSelect: certificate?.Status ?? ''
             });
@@ -172,6 +196,10 @@ const CertificateEditModal = ({ id, ...props }) => {
     }, [certificatesErrorMessage]);
     
     // METHODS
+
+    const calculateActionPlanDate = (ncType, prevAuditDate) => {
+        console.log('Calcular fecha de action plan: ', ncType, prevAuditDate);
+    }
 
     const onShowModal = () => {
 
@@ -241,7 +269,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                         <Modal.Body>
                             <ViewLoading />
                         </Modal.Body>
-                    ) : !!certificate && (
+                    ) : !!certificate && !!standards && (
                         <Formik
                             initialValues={ initialValues }
                             validationSchema={ validationSchema }
@@ -265,7 +293,6 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                                 key={item.ID}
                                                                 value={item.ID}
                                                                 className="text-capitalize"
-                                                                selected={ item.ID === certificate.StandardID}
                                                             >
                                                                 {item.Name}
                                                             </option>
@@ -325,7 +352,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12" sm="6">
+                                            <Col xs="12" sm="4">
                                                 <Row>
                                                     <Col xs="12">
                                                         <AryFormikTextInput name="prevAuditDateInput"
@@ -342,7 +369,82 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                     </Col>
                                                 </Row>
                                             </Col>
-                                            <Col xs="12" sm="6">
+                                            <Col xs="12" sm="4">
+                                                <label className="form-label">Non Conformities</label>
+                                                <Row>
+                                                    <Col xs="12">
+                                                        <div className="form-check form-switch">
+                                                            <input id="hasNCsMinorCheck" name="hasNCsMinorCheck"
+                                                                type="checkbox" 
+                                                                className="form-check-input"
+                                                                onChange={ (e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('hasNCsMinorCheck', isChecked);
+                                                                    if (isChecked && formik.values.prevAuditDateInput !== '') {
+                                                                        //console.log('Calcular fecha de action plan');
+                                                                        calculateActionPlanDate('minor', formik.values.prevAuditDateInput); 
+                                                                    }
+                                                                }}
+                                                                checked={ formik.values.hasNCsMinorCheck}
+                                                            />
+                                                            <label
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="hasNCsMinorCheck"
+                                                            >Has NCs Minor</label>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <div className="form-check form-switch">
+                                                            <input id="hasNCsMajorCheck" name="hasNCsMajorCheck"
+                                                                type="checkbox" 
+                                                                className="form-check-input"
+                                                                onChange={ (e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('hasNCsMajorCheck', isChecked);
+                                                                    if (isChecked && formik.values.prevAuditDateInput !== '') {
+                                                                        //console.log('Calcular fecha de action plan');
+                                                                        calculateActionPlanDate('major', formik.values.prevAuditDateInput);
+                                                                    }
+                                                                }}
+                                                                checked={ formik.values.hasNCsMajorCheck}
+                                                            />
+                                                            <label
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="hasNCsMajorCheck"
+                                                            >Has NCs Major</label>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <div className="form-check form-switch">
+                                                            <input id="hasNCsCriticalCheck" name="hasNCsCriticalCheck"
+                                                                type="checkbox" 
+                                                                className="form-check-input"
+                                                                onChange={ (e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('hasNCsCriticalCheck', isChecked);
+                                                                    if (isChecked && formik.values.prevAuditDateInput !== '') {
+                                                                        //console.log('Calcular fecha de action plan');
+                                                                        calculateActionPlanDate('critical', formik.values.prevAuditDateInput);
+                                                                    }
+                                                                }}
+                                                                checked={ formik.values.hasNCsCriticalCheck}
+                                                            />
+                                                            <label
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="hasNCsCriticalCheck"
+                                                            >Has NCs Critical (Only FSSC)</label>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="actionPlanDateInput"
+                                                            type="date"
+                                                            label="Action plan date"
+                                                            placeholder="00/00/0000"
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                            <Col xs="12" sm="4">
                                                 <Row>
                                                     <Col xs="12">
                                                         <AryFormikTextInput name="nextAuditDateInput"
