@@ -1,10 +1,10 @@
-import statusProps from "../helpers/StatusProps";
+import organizationStatusProps from "../helpers/organizationStatusProps";
 
 export const Status = ({ value, ...props }) => {
 
   return (
-    <div { ...props } className={ `badge badge-sm bg-gradient-${ statusProps[value].bgColor }` } >
-      { statusProps[value].label }
+    <div { ...props } className={ `badge badge-sm bg-gradient-${ organizationStatusProps[value].bgColor }` } >
+      { organizationStatusProps[value].label }
     </div>
   )
 }

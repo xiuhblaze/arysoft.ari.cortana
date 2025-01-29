@@ -1,5 +1,3 @@
-import { checkFileExists } from "../../../helpers/checkFileExists";
-import { faBackwardStep, faCertificate, faForwardStep, faNoteSticky, faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, ListGroupItem, Row } from "react-bootstrap";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
@@ -8,6 +6,8 @@ import certificateValidityStatusProps from "../helpers/certificateValidityStatus
 import envVariables from "../../../helpers/envVariables";
 import enums from "../../../helpers/enums";
 import { certificateStatusProps } from "../helpers/certificateStatusProps";
+import { faBackwardStep, faCertificate, faForwardStep, faNoteSticky, faStar, faPlay, faStop, faGear, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import certificateActionPLanValidityStatusProps from "../helpers/certificateActionPlanValidityStatusProps";
 
 const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
     const { 
@@ -16,8 +16,16 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
     } = envVariables();
     const { 
         CertificateStatusType,
-        DefaultStatusType
+        DefaultStatusType,
+        DefaultValidityStatusType,
     } = enums();
+
+    // const auditPlanValidityStatusProps = [
+    //     { label: 'No needed action plan', value: DefaultValidityStatusType.nothing, variant: 'secondary' },
+    //     { label: 'The action plan is delivered susccessfully', value: DefaultValidityStatusType.success, variant: 'success' },
+    //     { label: 'Action must be delivered', value: DefaultValidityStatusType.warning, variant: 'warning' },
+    //     { label: 'The action plan is not delivered', value: DefaultValidityStatusType.danger, variant: 'danger' },
+    // ];
 
     // CUSTOM HOOKS
 
@@ -31,10 +39,10 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
     const fileName = !!item.Filename // && !!checkFileExists(`${url}/${item.Filename}`)
         ? `${url}/${item.Filename}`
         : null;
-    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0 mb-2 gap-2 ${ item.Status !== CertificateStatusType.active 
+    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0 mb-2 gap-2 ${ item.Status != CertificateStatusType.active 
         ? 'opacity-6' 
         : '' }`;
-    const itemIconStyle = `icon icon-md icon-shape bg-gradient-${ item.Status === CertificateStatusType.active 
+    const itemIconStyle = `icon icon-md icon-shape bg-gradient-${ item.Status == CertificateStatusType.active 
         ? certificateValidityStatusProps[item.ValidityStatus].variant 
         : certificateStatusProps[item.Status].variant } border-radius-md d-flex align-items-center justify-content-center me-3`;
 
@@ -48,7 +56,7 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
                             <a href={ fileName } target="_blank" title="View certificate file">
                                 <div 
                                     className={ itemIconStyle}
-                                    title={ item.Status === CertificateStatusType.active 
+                                    title={ item.Status == CertificateStatusType.active 
                                         ? certificateValidityStatusProps[item.ValidityStatus].singularLabel 
                                         : certificateStatusProps[item.Status].label }
                                 >
@@ -91,10 +99,12 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
                         <Col xs="12" sm="6">
                             <div 
                                 className="d-flex flex-row justify-content-start align-items-center text-xs gap-1"
-                                title="Due date"
                             >
-                                <FontAwesomeIcon icon={ faStop } className="text-secondary me-1" />
-                                <div>
+                                <FontAwesomeIcon icon={ faStop } className="text-secondary me-1" title="Due date" />
+                                <div 
+                                    className={`text-${ item.Status == DefaultStatusType.active ? certificateValidityStatusProps[item.ValidityStatus].variant : 'secondary' }`}
+                                    title={ certificateValidityStatusProps[item.ValidityStatus].singularLabel }
+                                >
                                     { new Date(item.DueDate).toLocaleDateString() }
                                 </div>
                             </div>
@@ -138,6 +148,42 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
                                     title={ !!item.NextAuditNote ? item.NextAuditNote : '(no note)' }
                                 />
                             </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs="12" sm="6">
+                            <div className="d-flex flex-row justify-content-start align-items-center text-xs gap-1">
+                                NCs: 
+                                <FontAwesomeIcon 
+                                    className={ item.HasNCsMinor ? 'text-warning' : 'text-secondary' }
+                                    icon={ faTriangleExclamation }
+                                    title={ item.HasNCsMinor ? 'Has NCs Minor' : 'Has no NCs Minor' }
+                                />
+                                <FontAwesomeIcon 
+                                    className={ item.HasNCsMajor ? 'text-danger' : 'text-secondary' }
+                                    icon={ faTriangleExclamation }
+                                    title={ item.HasNCsMajor ? 'Has NCs Major' : 'Has no NCs Major' }
+                                />
+                                <FontAwesomeIcon 
+                                    className={ item.HasNCsCritical ? 'text-danger' : 'text-secondary' }
+                                    icon={ faTriangleExclamation }
+                                    title={ item.HasNCsCritical ? 'Has NCs Critical' : 'Has no NCs Critical' }
+                                />
+                            </div>
+                        </Col>
+                        <Col xs="12" sm="6">
+                            <div 
+                                className="d-flex flex-row justify-content-start align-items-center text-xs gap-1"
+                                title={ certificateActionPLanValidityStatusProps[item.AuditPlanValidityStatus].singularLabel }
+                            >
+                                <FontAwesomeIcon icon={ faGear } />
+                                <div 
+                                    className={`d-flex flex-row text-${ item.Status == DefaultStatusType.active ? certificateActionPLanValidityStatusProps[item.AuditPlanValidityStatus].variant : 'secondary' }`}>
+                                    {
+                                        !!item.ActionPlanDate && new Date(item.ActionPlanDate).toLocaleDateString()
+                                    }
+                                </div>
+                            </div>  
                         </Col>
                     </Row>
                 </div>

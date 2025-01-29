@@ -17,6 +17,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
         VITE_FILES_URL,
     } = envVariables();
     const {
+        DefaultStatusType,
         CertificateValidityStatusType,
         OrganizationStatusType
     } = enums();
@@ -32,8 +33,8 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">
-                        <h6 className="mb-0 text-sm">
-                            <span className="text-danger me-2">{ item.Folio.toString().padStart(4, '0') }</span>
+                        <h6 className="mb-0 text-sm text-wrap">
+                            <span className="text-danger me-2">{ !!item.Folio ? item.Folio.toString().padStart(4, '0') : '----' }</span>
                             { item.Name }
                         </h6>
                         <p className="text-xs mb-0">{ item.LegalEntity}</p>
@@ -120,6 +121,18 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                         size="lg"
                         title={ certificateValidityStatusProps[item.CertificatesValidityStatus].label }
                     />
+                    {
+                        !!item.Standards &&
+                        <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                            {
+                                item.Standards.map(i => (
+                                    <div key={i.ID} className={`badge bg-gradient-${i.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-white me-1`}>
+                                        { i.StandardName }
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    }
                 </div>
             </td>
             <td>

@@ -8,7 +8,7 @@ import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleX
 
 import enums from "../../../helpers/enums";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
-import statusProps from "../helpers/StatusProps";
+import organizationStatusProps from "../helpers/organizationStatusProps";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { ViewLoading } from "../../../components/Loaders";
 import Status from "./Status";
@@ -85,7 +85,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                     backgroundPositionY: '50%'
                                 }}
                             >
-                                <span className={`mask bg-gradient-${statusProps[organization.Status].bgColor} opacity-6`}></span>
+                                <span className={`mask bg-gradient-${organizationStatusProps[organization.Status].bgColor} opacity-6`}></span>
                             </div>
                             <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
                                 <div className="row gx-4">

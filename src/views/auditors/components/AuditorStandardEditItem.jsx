@@ -141,7 +141,7 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
             <button
                 type="button"
                 className="btn btn-link mb-0 p-0 text-lg"
-                title={ !!id ? 'Edit standard assigned' : 'Assigned standard' }
+                title={ !!id ? 'Edit standard assigned' : 'Assign standard' }
                 onClick={onShowModal}
             >
                 <FontAwesomeIcon icon={!!id ?faEdit : faPlus} className="text-dark" />

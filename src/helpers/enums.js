@@ -8,6 +8,13 @@ const enums = () => {
         deleted: 3,
     });
 
+    const DefaultValidityStatusType = Object.freeze({
+        nothing: 0,
+        success: 1,
+        warning: 2,
+        danger: 3,
+    });
+
     // Application Forms
 
     const ApplicationFormStatusType = Object.freeze({
@@ -191,11 +198,10 @@ const enums = () => {
 
     const OrganizationStatusType = Object.freeze({
         nothing: 0,
-        new: 1,
-        approved: 2,
-        active: 3,
-        inactive: 4,
-        deleted: 5,
+        prospect: 1,
+        active: 2,
+        inactive: 3,
+        deleted: 4,
     });
 
     const OrganizationOrderType = Object.freeze({
@@ -212,6 +218,16 @@ const enums = () => {
         statusDesc: 10,
         certificatesValidityStatusDesc: 11,
         updatedDesc: 12,
+    });
+
+    const OrganizationStandardOrderType = Object.freeze({
+        nothing: 0,
+        organization: 1,
+        standard: 2,
+        updated: 3,
+        organizationDesc: 4,
+        standardDesc: 5,
+        updatedDesc: 6,
     });
 
     // Shifts
@@ -263,6 +279,7 @@ const enums = () => {
 
     return {
         DefaultStatusType,
+        DefaultValidityStatusType,
 
         ApplicationFormOrderType,
         ApplicationFormStatusType,
@@ -285,6 +302,7 @@ const enums = () => {
         NacecodeOrderType,
         OrganizationOrderType,
         OrganizationStatusType,
+        OrganizationStandardOrderType,
         ShiftOrderType,
         ShiftType,
         SiteOrderType,

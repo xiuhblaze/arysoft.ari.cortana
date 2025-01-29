@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 import { faCertificate, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +17,10 @@ import envVariables from "../../../helpers/envVariables"
 import getISODate from "../../../helpers/getISODate";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import Swal from "sweetalert2";
+import { useNotesStore } from "../../../hooks/useNotesStore";
+import NotesListModal from "../../notes/components/NotesListModal";
+import defaultStatusProps from "../../../helpers/defaultStatusProps";
+import { certificateStatusProps } from "../helpers/certificateStatusProps";
 
 const CertificateEditModal = ({ id, ...props }) => {
     const {
@@ -26,8 +31,30 @@ const CertificateEditModal = ({ id, ...props }) => {
         CertificateOrderType,
         CertificateStatusType,
         DefaultStatusType,
+        // DefaultValidityStatusType,
         StandardOrderType,
     } = enums();
+    // const auditPlanValidityStatusProps = [
+    //     { label: '-', value: DefaultValidityStatusType.nothing, variant: 'secondary' },
+    //     { lable: 'Success', value: DefaultValidityStatusType.success, variant: 'success' },
+    //     { label: 'Warning', value: DefaultValidityStatusType.warning, variant: 'warning' },
+    //     { label: 'Deleted', value: DefaultValidityStatusType.danger, variant: 'danger' },
+    // ];
+
+    const {
+        certificatesAsync,
+        
+        isCertificateLoading,
+        isCertificateCreating,   
+        isCertificateSaving,
+        certificateSavedOk,     
+        certificate,
+        certificateAsync,
+        certificateCreateAsync,
+        certificateSaveAsync,
+        certificateClear,
+        certificatesErrorMessage,
+    } = useCertificatesStore();
 
     const formDefaultValues = {
         standardSelect: '',
@@ -45,6 +72,7 @@ const CertificateEditModal = ({ id, ...props }) => {
         actionPlanDeliveredCheck: false,
         filenameInput: '',
         statusSelect: '',
+        noteInput: '',
     };
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
@@ -60,18 +88,19 @@ const CertificateEditModal = ({ id, ...props }) => {
             .max(500, 'The comments cannot exceed more than 500 characters'),
         prevAuditDateInput: Yup.date()
             .typeError('Must be a valid date')
-            .when('hasNCsMinorCheck', {
-                is: value => value === true,
-                then: () => Yup.date().required('If a minor NC is present, the previous audit date is required'),
-            })
-            .when('hasNCsMajorCheck', {
-                is: value => value === true,
-                then: () => Yup.date().required('If a major NC is present, the previous audit date is required'),
-            })
-            .when('hasNCsCriticalCheck', {
-                is: value => value === true,
-                then: () => Yup.date().required('If a critical NC is present, the previous audit date is required'),
-            }),
+            .required('Must specify previous audit date'),
+            // .when('hasNCsMinorCheck', {
+            //     is: value => value === true,
+            //     then: () => Yup.date().required('If a minor NC is present, the previous audit date is required'),
+            // })
+            // .when('hasNCsMajorCheck', {
+            //     is: value => value === true,
+            //     then: () => Yup.date().required('If a major NC is present, the previous audit date is required'),
+            // })
+            // .when('hasNCsCriticalCheck', {
+            //     is: value => value === true,
+            //     then: () => Yup.date().required('If a critical NC is present, the previous audit date is required'),
+            // }),
         prevAuditNoteInput: Yup.string()
             .max(100, 'The note cannot exceed more than 100 characters'),
         nextAuditDateInput: Yup.date()
@@ -99,6 +128,12 @@ const CertificateEditModal = ({ id, ...props }) => {
             }),
         statusSelect: Yup.string()
             .required('Must select a status'),
+        noteInput: Yup.string()
+            .max(250, 'The note cannot exceed more than 250 characters')
+            .when('statusSelect', {
+                is: value => !!certificate && value != certificate.Status,
+                then: () => Yup.string().required('Must specify a note'),
+            }),
     });
 
     // CUSTOM HOOKS
@@ -115,26 +150,19 @@ const CertificateEditModal = ({ id, ...props }) => {
     } = useStandardsStore();
 
     const {
-        certificatesAsync,
-        
-        isCertificateLoading,
-        isCertificateCreating,   
-        isCertificateSaving,
-        certificateSavedOk,     
-        certificate,
-        certificateAsync,
-        certificateCreateAsync,
-        certificateSaveAsync,
-        certificateClear,
-        certificatesErrorMessage,
-    } = useCertificatesStore();
+        isNoteCreating,
+        noteCreatedOk,
+        note,
+        noteCreateAsync,
+    } =useNotesStore();
 
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [statusOptions, setStatusOptions] = useState(null);
-
+    const [showAddNote, setShowAddNote] = useState(false);
+    
     useEffect(() => {
         
         if (!!certificate && showModal) {
@@ -163,13 +191,47 @@ const CertificateEditModal = ({ id, ...props }) => {
                 order: StandardOrderType.name,
             });
 
-            setStatusOptions([ //! Ver que cambien las opciones de acuerdo al status actual
-                { label: '(status)', value: '' },
-                { label: 'Active', value: CertificateStatusType.active },
-                { label: 'Suspended', value: CertificateStatusType.suspended },
-                { label: 'Expired', value: CertificateStatusType.expired },
-                { label: 'Canceled', value: CertificateStatusType.canceled },
-            ]);
+            switch (certificate?.Status) {
+                case CertificateStatusType.active:
+                    setStatusOptions([
+                        { label: 'Active', value: CertificateStatusType.active },
+                        { label: 'Suspended', value: CertificateStatusType.suspended },
+                        { label: 'Expired', value: CertificateStatusType.expired },
+                        { label: 'Canceled', value: CertificateStatusType.canceled },
+                    ]);
+                    break;
+                case CertificateStatusType.suspended:
+                    setStatusOptions([
+                        { label: 'Active', value: CertificateStatusType.active },
+                        { label: 'Suspended', value: CertificateStatusType.suspended },
+                        { label: 'Expired', value: CertificateStatusType.expired },
+                        { label: 'Canceled', value: CertificateStatusType.canceled },
+                    ]);
+                    break;
+                case CertificateStatusType.expired:
+                    setStatusOptions([
+                        { label: 'Active', value: CertificateStatusType.active },
+                        { label: 'Expired', value: CertificateStatusType.expired },
+                    ]);
+                    break;
+                case CertificateStatusType.canceled:
+                    setStatusOptions([                        
+                        { label: 'Active', value: CertificateStatusType.active },                        
+                        { label: 'Canceled', value: CertificateStatusType.canceled },
+                    ]);
+                    break;
+                default:
+                    setStatusOptions([
+                        { label: '(status)', value: '' },
+                        { label: 'Active', value: CertificateStatusType.active },
+                        { label: 'Suspended', value: CertificateStatusType.suspended },
+                        { label: 'Expired', value: CertificateStatusType.expired },
+                        { label: 'Canceled', value: CertificateStatusType.canceled },
+                    ]);
+                    break;
+            }
+            
+            setShowAddNote(false);
         }
     }, [certificate]);
 
@@ -189,7 +251,7 @@ const CertificateEditModal = ({ id, ...props }) => {
     
     useEffect(() => {
         if (!!certificatesErrorMessage && showModal) {
-            Swal.fire('Certificates', certificatesErrorMessage, 'danger');
+            Swal.fire('Certificates', certificatesErrorMessage, 'error');
             certificateClear();
             setShowModal(false);
         }
@@ -197,9 +259,20 @@ const CertificateEditModal = ({ id, ...props }) => {
     
     // METHODS
 
-    const calculateActionPlanDate = (ncType, prevAuditDate) => {
-        console.log('Calcular fecha de action plan: ', ncType, prevAuditDate);
-    }
+    const calculateActionPlanDate = (prevAuditDate, hasNCsMinor, hasNCsMajor, hasNCsCritical) => {
+
+        if (!!prevAuditDate &&
+            (!!hasNCsMinor || !!hasNCsMajor || !!hasNCsCritical)
+        ) {
+            const days = hasNCsMajor ||  hasNCsCritical
+                ? 15 
+                : hasNCsMinor ? 28 : 0 ;
+            const actionPlanDate = addDays(new Date(prevAuditDate), days);
+            return actionPlanDate ?? null;
+        }
+
+        return null;
+    } // calculateActionPlanDate
 
     const onShowModal = () => {
 
@@ -230,8 +303,21 @@ const CertificateEditModal = ({ id, ...props }) => {
             PrevAuditNote: values.prevAuditNoteInput,
             NextAuditDate: values.nextAuditDateInput,
             NextAuditNote: values.nextAuditNoteInput,
+            hasNCsMinor: values.hasNCsMinorCheck,
+            hasNCsMajor: values.hasNCsMajorCheck,
+            hasNCsCritical: values.hasNCsCriticalCheck,
+            actionPlanDate: values.actionPlanDateInput,
+            actionPlanDelivered: values.actionPlanDeliveredCheck,
             Status: values.statusSelect,
         };
+
+        if (certificate.Status != values.statusSelect) {            
+            const text = "Status changed to " + certificateStatusProps[values.statusSelect].label.toUpperCase();
+            noteCreateAsync({
+                OwnerID: certificate.ID,
+                Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,                    
+            });
+        }
 
         certificateSaveAsync(toSave, values.certificateFileInput);
     }; // onFormSubmit
@@ -359,12 +445,26 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                             type="date"
                                                             label="Prev audit date"
                                                             placeholder="00/00/0000"
+                                                            onBlur={ (e) => {
+                                                                formik.handleBlur(e);
+
+                                                                const actionPlanDate = calculateActionPlanDate(
+                                                                    new Date(e.currentTarget.value),
+                                                                    formik.values.hasNCsMinorCheck,
+                                                                    formik.values.hasNCsMajorCheck,
+                                                                    formik.values.hasNCsCriticalCheck
+                                                                );
+
+                                                                if (!!actionPlanDate) {
+                                                                    formik.setFieldValue('actionPlanDateInput', actionPlanDate.toISOString().split('T')[0]);
+                                                                }
+                                                            }}
                                                         />
                                                     </Col>
                                                     <Col xs="12">
                                                         <AryFormikTextArea name="prevAuditNoteInput"
                                                             label="Prev audit note"
-                                                            rows="3"
+                                                            rows="4"
                                                         />
                                                     </Col>
                                                 </Row>
@@ -381,8 +481,15 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                                     const isChecked = e.target.checked;
                                                                     formik.setFieldValue('hasNCsMinorCheck', isChecked);
                                                                     if (isChecked && formik.values.prevAuditDateInput !== '') {
-                                                                        //console.log('Calcular fecha de action plan');
-                                                                        calculateActionPlanDate('minor', formik.values.prevAuditDateInput); 
+                                                                        const actionPlanDate = calculateActionPlanDate(
+                                                                            formik.values.prevAuditDateInput,
+                                                                            e.currentTarget.value,
+                                                                            formik.values.hasNCsMajorCheck,
+                                                                            formik.values.hasNCsCriticalCheck
+                                                                        );
+                                                                        if (!!actionPlanDate) {
+                                                                            formik.setFieldValue('actionPlanDateInput', actionPlanDate.toISOString().split('T')[0]);
+                                                                        }
                                                                     }
                                                                 }}
                                                                 checked={ formik.values.hasNCsMinorCheck}
@@ -402,8 +509,15 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                                     const isChecked = e.target.checked;
                                                                     formik.setFieldValue('hasNCsMajorCheck', isChecked);
                                                                     if (isChecked && formik.values.prevAuditDateInput !== '') {
-                                                                        //console.log('Calcular fecha de action plan');
-                                                                        calculateActionPlanDate('major', formik.values.prevAuditDateInput);
+                                                                        const actionPlanDate = calculateActionPlanDate(
+                                                                            formik.values.prevAuditDateInput,
+                                                                            formik.values.hasNCsMinorCheck,
+                                                                            e.currentTarget.value,
+                                                                            formik.values.hasNCsCriticalCheck
+                                                                        );
+                                                                        if (!!actionPlanDate) {
+                                                                            formik.setFieldValue('actionPlanDateInput', actionPlanDate.toISOString().split('T')[0]);
+                                                                        }
                                                                     }
                                                                 }}
                                                                 checked={ formik.values.hasNCsMajorCheck}
@@ -423,8 +537,15 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                                     const isChecked = e.target.checked;
                                                                     formik.setFieldValue('hasNCsCriticalCheck', isChecked);
                                                                     if (isChecked && formik.values.prevAuditDateInput !== '') {
-                                                                        //console.log('Calcular fecha de action plan');
-                                                                        calculateActionPlanDate('critical', formik.values.prevAuditDateInput);
+                                                                        const actionPlanDate = calculateActionPlanDate(
+                                                                            formik.values.prevAuditDateInput,
+                                                                            formik.values.hasNCsMinorCheck,
+                                                                            formik.values.hasNCsMajorCheck,
+                                                                            e.currentTarget.value,
+                                                                        )
+                                                                        if (!!actionPlanDate) {
+                                                                            formik.setFieldValue('actionPlanDateInput', actionPlanDate.toISOString().split('T')[0]);
+                                                                        }
                                                                     }
                                                                 }}
                                                                 checked={ formik.values.hasNCsCriticalCheck}
@@ -440,7 +561,28 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                             type="date"
                                                             label="Action plan date"
                                                             placeholder="00/00/0000"
+                                                            helpText="Must be natural days"
                                                         />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <div className="form-check form-switch">
+                                                            <input id="actionPlanDeliveredCheck" name="actionPlanDeliveredCheck"
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                onChange={(e) => {
+                                                                    const isChecked = e.target.checked;
+                                                                    formik.setFieldValue('actionPlanDeliveredCheck', isChecked);
+
+                                                                }}
+                                                                checked={ formik.values.actionPlanDeliveredCheck}
+                                                            />
+                                                            <label
+                                                                className="form-check-label text-secondary mb-0"
+                                                                htmlFor="actionPlanDeliveredCheck"
+                                                            >
+                                                                Action Plan has been delivered
+                                                            </label>
+                                                        </div>
                                                     </Col>
                                                 </Row>
                                             </Col>
@@ -456,18 +598,31 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                     <Col xs="12">
                                                         <AryFormikTextArea name="nextAuditNoteInput"
                                                             label="Next audit note"
-                                                            rows="3"
+                                                            rows="4"
                                                         />
                                                     </Col>
                                                 </Row>
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12" sm="6">
+                                            <Col xs="12" sm="4">
                                                 <AryFormikSelectInput
                                                     name="statusSelect"
                                                     label="Status"
-                                                    // value={certificate.Status}
+                                                    onChange={ (e) => {
+                                                        const selectedValue = e.target.value;
+                                                        formik.setFieldValue('statusSelect', selectedValue);
+                                                        
+                                                        // si cambió de status, solicita añadir nota
+                                                        // console.log(selectedValue, certificate.Status);
+                                                        if (selectedValue != certificate.Status) {
+                                                            // console.log('mostrar nota');
+                                                            setShowAddNote(true);
+                                                        } else {
+                                                            // console.log('no mostrar nota');
+                                                            setShowAddNote(false);
+                                                        }
+                                                    }}
                                                 >
                                                     {
                                                         !!statusOptions && statusOptions.map(item => 
@@ -480,6 +635,19 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                         )
                                                     }
                                                 </AryFormikSelectInput>
+                                                {
+                                                    !!certificate.Notes && certificate.Notes.length > 0 &&
+                                                    <NotesListModal notes={certificate.Notes} buttonLabel="View notes" />
+                                                }
+                                            </Col>
+                                            <Col xs="12" sm="8">
+                                                {
+                                                    showAddNote && 
+                                                    <AryFormikTextArea name="noteInput"
+                                                        label="Note"
+                                                        helpText="Add a note for the status change"
+                                                    />
+                                                }
                                             </Col>
                                         </Row>
                                     </Modal.Body>

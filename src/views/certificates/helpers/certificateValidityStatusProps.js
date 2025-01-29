@@ -1,5 +1,8 @@
 import { faCertificate } from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Contiene los diferentes estados de validez de un certificado
+ */
 const certificateValidityStatusProps = [
     { 
         icon: faCertificate,

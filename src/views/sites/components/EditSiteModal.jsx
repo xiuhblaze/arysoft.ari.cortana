@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import envVariables from '../../../helpers/envVariables';
-import * as Yup from 'yup';
-import Swal from 'sweetalert2';
-import enums from '../../../helpers/enums';
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
-import { useSitesStore } from '../../../hooks/useSiteStore';
+import { AryFormikTextInput } from '../../../components/Forms';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
 import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
-import { ViewLoading } from '../../../components/Loaders';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Formik } from 'formik';
-import { AryFormikTextInput } from '../../../components/Forms';
+import { useEffect, useState } from 'react';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useSitesStore } from '../../../hooks/useSiteStore';
+import { ViewLoading } from '../../../components/Loaders';
+import * as Yup from 'yup';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import enums from '../../../helpers/enums';
 import ShiftsCard from '../../shifts/components/ShiftsCard';
+import Swal from 'sweetalert2';
 
 const EditSiteModal = ({ id, ...props }) => {
     
@@ -29,7 +28,15 @@ const EditSiteModal = ({ id, ...props }) => {
         locationUrlInput: '',
         statusCheck: false,
     };
-
+    const validationSchema = Yup.object({
+        descriptionInput: Yup.string()
+            .required('Description is required')
+            .max(500, 'Description must be less than 500 characters'),
+        addressInput: Yup.string()
+            .max(500, 'Address must be less than 500 characters'),
+        locationUrlInput: Yup.string()
+            .max(250, 'Location URL must be less than 250 characters'),
+    });
     // CUSTOM HOOKS
 
     const {
@@ -53,8 +60,8 @@ const EditSiteModal = ({ id, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-    const [activeSite, setActiveSite] = useState(false);
-    const [isMainSiteCheck, setIsMainSiteCheck] = useState(false);
+    // const [activeSite, setActiveSite] = useState(false);
+    // const [isMainSiteCheck, setIsMainSiteCheck] = useState(false);
 
     useEffect(() => {
         
@@ -67,8 +74,8 @@ const EditSiteModal = ({ id, ...props }) => {
                 statusCheck: site?.Status === DefaultStatusType.active,
             });
 
-            setActiveSite(site?.Status === DefaultStatusType.active);
-            setIsMainSiteCheck(site?.IsMainSite ?? false);
+            // setActiveSite(site?.Status === DefaultStatusType.active);
+            // setIsMainSiteCheck(site?.IsMainSite ?? false);
         }
     }, [site]);
 
@@ -157,6 +164,7 @@ const EditSiteModal = ({ id, ...props }) => {
                     ) : !!site ? (
                         <Formik
                             initialValues={ initialValues }
+                            validationSchema={ validationSchema }
                             onSubmit={ onFormSubmit }
                             enableReinitialize
                         >
@@ -193,7 +201,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                                                 onChange={ (e) => {
                                                                     const isChecked = e.target.checked;
                                                                     formik.setFieldValue('isMainSiteCheck', isChecked);
-                                                                    setIsMainSiteCheck(isChecked);
+                                                                    // setIsMainSiteCheck(isChecked);
                                                                 }}
                                                                 checked={ formik.values.isMainSiteCheck }
                                                             />
@@ -201,9 +209,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                                                 className="form-check-label text-secondary mb-0"
                                                                 htmlFor="isMainSiteCheck"
                                                             >
-                                                                {
-                                                                    isMainSiteCheck ? 'Is main site' : 'Is secondary site'
-                                                                }
+                                                                Is main site
                                                             </label>
                                                         </div>
                                                     </Col>
@@ -216,7 +222,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                                                 onChange= { (e) => {
                                                                     const isChecked = e.target.checked;
                                                                     formik.setFieldValue('statusCheck', isChecked);
-                                                                    setActiveSite(isChecked);
+                                                                    // setActiveSite(isChecked);
                                                                 }} 
                                                                 checked={ formik.values.statusCheck }
                                                             />
@@ -224,9 +230,7 @@ const EditSiteModal = ({ id, ...props }) => {
                                                                 className="form-check-label text-secondary mb-0"
                                                                 htmlFor="statusCheck"
                                                             >
-                                                                { 
-                                                                    activeSite ? 'Active site' : 'Inactive site'
-                                                                }
+                                                                Active site
                                                             </label>
                                                         </div>
                                                     </Col>

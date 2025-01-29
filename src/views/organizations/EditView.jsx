@@ -7,7 +7,7 @@ import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import { Col, Container, Image, Row } from "react-bootstrap";
 import { ViewLoading } from "../../components/Loaders";
 import Status from "./components/Status";
-import statusProps from "./helpers/StatusProps";
+import organizationStatusProps from "./helpers/organizationStatusProps";
 
 import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
@@ -17,12 +17,17 @@ import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
 import envVariables from "../../helpers/envVariables";
 import OrganizationEditCard from "./components/OrganizationEditCard";
 import CertificatesCard from "../certificates/components/CertificatesCard";
+import enums from "../../helpers/enums";
+import OrganizationStandardsCard from "./components/OrganizationStandardsCard";
 
 const EditView = () => {
     const {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
     } = envVariables();
+    const { 
+        OrganizationStatusType
+    } = enums();
 
     // CUSTOM HOOKS
     
@@ -41,7 +46,7 @@ const EditView = () => {
     const { id } = useParams();
 
     const [photoPreview, setPhotoPreview] = useState(null);
-    
+        
     useEffect(() => {
         if (!!id) organizationAsync(id);
     }, [id]);
@@ -49,6 +54,8 @@ const EditView = () => {
     useEffect(() => {
         if (!!organization) {
             setNavbarTitle(dispatch, organization.Name);
+
+            
         }
     }, [organization]);
 
@@ -74,7 +81,7 @@ const EditView = () => {
                         backgroundPositionY: '50%'
                     }}
                 >
-                    <span className={`mask bg-gradient-${isOrganizationLoading || !organization ? 'dark' : statusProps[organization.Status].bgColor} opacity-6`} />
+                    <span className={`mask bg-gradient-${isOrganizationLoading || !organization ? 'dark' : organizationStatusProps[organization.Status].bgColor} opacity-6`} />
                 </div>
                 <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
                     <Row className="gx-4">
@@ -95,6 +102,12 @@ const EditView = () => {
                         <div className="col-auto my-auto">
                             <div className="h-100">
                                 <h5 className="mb-1">
+                                    { !!organization?.Folio 
+                                        ? <span className="text-danger me-2">
+                                            { organization.Folio.toString().padStart(4, '0') }
+                                          </span> 
+                                        : '' 
+                                    }
                                     {!!organization ? organization.Name : '(new organization)'}
                                 </h5>
                                 <p className="mb-0 font-weight-bold text-sm">
@@ -121,6 +134,9 @@ const EditView = () => {
                             <OrganizationEditCard
                                 updatePhotoPreview={updatePhotoPreview}
                             />
+                        </Col>
+                        <Col xs="12" sm="4" xxl="6">
+                            <OrganizationStandardsCard />
                         </Col>
                     </Row>
                 )

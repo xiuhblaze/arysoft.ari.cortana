@@ -11,7 +11,8 @@ import { ViewLoading } from '../../../components/Loaders';
 import { Form, Formik } from 'formik';
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-
+import * as Yup from 'yup';
+import envVariables from '../../../helpers/envVariables';
 
 const EditShiftModal = ({ id, ...props }) => {
     const NEW_ITEM = 'shift.new';
@@ -21,6 +22,9 @@ const EditShiftModal = ({ id, ...props }) => {
         ShiftOrderType,
         ShiftType,
     } = enums();
+    const {
+        HOUR24_REGEX
+    } = envVariables();
 
     const formDefaultValues = {
         typeSelect: '',
@@ -30,6 +34,22 @@ const EditShiftModal = ({ id, ...props }) => {
         activitiesDescriptionInput: '',
         statusCheck: false,
     };
+    const validationSchema = Yup.object({
+        typeSelect: Yup.string()
+            .required('Mus select a shift type'),
+        noEmployeesInput: Yup.number()
+            .typeError('Must be a number')
+            .min(0, 'Must be zero or greater')
+            .required('Must specify the number of employees'),
+        shiftStartInput: Yup.string()
+            .matches(HOUR24_REGEX, 'Must be a valid time')
+            .required('Must specify the start time'),
+        shiftEndInput: Yup.string()
+            .matches(HOUR24_REGEX, 'Must be a valid time')
+            .required('Must specify the end time'),
+        activitiesDescriptionInput: Yup.string()
+            .max(500, 'The description cannot exceed more than 500 characters'),
+    });
 
     // CUSTOM HOOKS
 
@@ -55,7 +75,7 @@ const EditShiftModal = ({ id, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-    const [activeShift, setActiveShift] = useState(false);
+    // const [activeShift, setActiveShift] = useState(false);
     const [currentAction, setCurrentAction] = useState(null);
 
     useEffect(() => {
@@ -63,13 +83,13 @@ const EditShiftModal = ({ id, ...props }) => {
             setInitialValues({
                 typeSelect: shift?.Type ?? '',
                 noEmployeesInput: shift?.NoEmployees ?? '',
-                shiftStartInput: shift?.ShiftStart ?? '',
-                shiftEndInput: shift?.ShiftEnd ?? '',
+                shiftStartInput: shift?.ShiftStart ? shift?.ShiftStart.slice(0, 5) : '',
+                shiftEndInput: shift?.ShiftEnd ? shift?.ShiftEnd.slice(0, 5) : '',
                 activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
                 statusCheck: shift?.Status === DefaultStatusType.active,
             });
 
-            setActiveShift(shift?.Status === DefaultStatusType.active);
+            //setActiveShift(shift?.Status === DefaultStatusType.active);
         }
     }, [shift]);
     
@@ -164,6 +184,7 @@ const EditShiftModal = ({ id, ...props }) => {
                     ) : !!shift && showModal &&
                     <Formik
                         initialValues={ initialValues }
+                        validationSchema={ validationSchema }
                         onSubmit={ onFormSubmit }
                         enableReinitialize
                     >
@@ -224,7 +245,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                                     onChange= { (e) => {
                                                         const isChecked = e.target.checked;
                                                         formik.setFieldValue('statusCheck', isChecked);
-                                                        setActiveShift(isChecked);
+                                                        //setActiveShift(isChecked);
                                                     }} 
                                                     checked={ formik.values.statusCheck }
                                                 />
@@ -232,9 +253,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                                     className="form-check-label text-secondary mb-0"
                                                     htmlFor="statusCheck"
                                                 >
-                                                    { 
-                                                        activeShift ? 'Active shift' : 'Inactive shift'
-                                                    }
+                                                    Active shift
                                                 </label>
                                             </div>
                                         </Col>

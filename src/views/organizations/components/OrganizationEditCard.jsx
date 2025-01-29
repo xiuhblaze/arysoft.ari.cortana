@@ -1,5 +1,5 @@
 import { Card, Col, Image, Row } from 'react-bootstrap'
-import { faBan, faEdit, faRotateRight, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faEdit, faRotateRight, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +10,11 @@ import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
 import { Form, Formik } from 'formik';
-import { AryFormikTextInput } from '../../../components/Forms';
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import organizationStatusProps from '../helpers/organizationStatusProps';
+import { useNotesStore } from '../../../hooks/useNotesStore';
+import NotesListModal from '../../notes/components/NotesListModal';
 
 const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const {
@@ -20,7 +23,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
     } = envVariables();
-    const { OrganizationStatusType } =enums();
+    const { OrganizationStatusType } = enums();
     const formDefaultValues = {
         nameInput: '',
         legalEntityInput: '',
@@ -29,6 +32,8 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         logoInputFile: '',
         qrcodeInputFile: '',
         coidInput: '',
+        statusSelect: '',
+        noteInput: '',
     };
     const validationSchema = Yup.object({
         nameInput: Yup.string()
@@ -79,6 +84,10 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                     return true;
                 }
             }),
+        statusSelect: Yup.string()
+            .required('Must select a status'),
+        noteInput: Yup.string()
+            .max(250, 'The note cannot exceed more than 250 characters'),
     });
 
     // CUSTOM HOOKS
@@ -94,6 +103,13 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         organizationClear,
     } = useOrganizationsStore();
 
+    const {
+        isNoteCreating,
+        noteCreatedOk,
+        note,
+        noteCreateAsync,
+    } = useNotesStore();
+
     // HOOKS
 
     const navigate = useNavigate();
@@ -103,6 +119,8 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const [newLogo, setNewLogo] = useState(false);
     const [qrcodePreview, setQrcodePreview] = useState(null);
     const [newQRCode, setNewQRCode] = useState(false);
+    const [statusOptions, setStatusOptions] = useState(null);
+    const [showAddNote, setShowAddNote] = useState(false);
 
     useEffect(() => {
         if (!!organization) {
@@ -114,10 +132,48 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 coidInput: organization?.COID ?? '',
                 logoInputFile: '',
                 qrcodeInputFile: '',
+                statusSelect: organization?.Status ?? '',
+                noteInput: '',
             });
 
             setNewLogo(isNullOrEmpty(organization.LogoFile));
             setNewQRCode(isNullOrEmpty(organization.QRFile));
+
+            switch (organization.Status) {
+                case OrganizationStatusType.prospect:
+                    setStatusOptions([
+                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Active', value: OrganizationStatusType.active },
+                    ]);
+                    break;
+                case OrganizationStatusType.active:
+                    setStatusOptions([
+                        { label: 'Active', value: OrganizationStatusType.active },
+                        { label: 'Inactive', value: OrganizationStatusType.inactive },
+                    ]);
+                    break;
+                case OrganizationStatusType.inactive:
+                    setStatusOptions([
+                        { label: 'Active', value: OrganizationStatusType.active },
+                        { label: 'Inactive', value: OrganizationStatusType.inactive },
+                    ]);
+                    break;
+                case OrganizationStatusType.deleted:
+                    setStatusOptions([
+                        { label: 'Active', value: OrganizationStatusType.active },
+                        { label: 'Deleted', value: OrganizationStatusType.deleted },
+                    ]);
+                    break;
+                default:
+                    setStatusOptions([
+                        { label: '(status)', value: '' },
+                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Active', value: OrganizationStatusType.active },
+                        { label: 'Inactive', value: OrganizationStatusType.inactive },
+                        { label: 'Deleted', value: OrganizationStatusType.deleted },
+                    ]);
+                    break;
+            }
         }
     }, [organization]);
 
@@ -147,8 +203,16 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             Website: values.websiteInput,
             Phone: values.phoneInput,
             COID: values.coidInput,
-            Status: organization.Status,
+            Status: values.statusSelect,
         };
+
+        if (organization.Status != values.statusSelect) {
+            const text = "Status changed to " + organizationStatusProps[values.statusSelect].label.toUpperCase();
+            noteCreateAsync({
+                OwnerID: organization.ID,
+                Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,
+            });
+        }
 
         organizationSaveAsync(toSave, values.logoInputFile, values.qrcodeInputFile);
     }; // onFormSubmit
@@ -421,6 +485,44 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 helpText="Only for FSSC 22000"
                                             />
                                         </Col>
+                                        <Col xs="12">
+                                            <AryFormikSelectInput
+                                                name="statusSelect"
+                                                label="Status"
+                                                onChange={ (e) => {
+                                                    const selectedValue = e.target.value;
+                                                    formik.setFieldValue('statusSelect', selectedValue);
+                                                    setShowAddNote(selectedValue != organization.Status);
+                                                }}
+                                            >
+                                                {
+                                                    !!statusOptions && statusOptions.map(item => 
+                                                        <option
+                                                            key={ item.value }
+                                                            value={ item.value }
+                                                        >
+                                                            { item.label }
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
+                                        </Col>
+                                        {
+                                            showAddNote &&
+                                            <Col xs="12">
+                                                <AryFormikTextInput
+                                                    name="noteInput"
+                                                    label="Note"
+                                                    helpText="Add a note for the status change"
+                                                />
+                                            </Col>
+                                        }
+                                        { 
+                                            !!organization.Notes && organization.Notes.length > 0 &&
+                                            <Col xs="12">
+                                                <NotesListModal notes={organization.Notes} buttonLabel="View notes" />
+                                            </Col>
+                                        }
                                     </Row>
                                 </Col>
                             </Row>

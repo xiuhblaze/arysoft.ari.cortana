@@ -1,11 +1,10 @@
 
-const statusProps = [
+const organizationStatusProps = [
   { bgColor: "secondary", label: "-" },
-  { bgColor: "warning", label: "New" },
-  { bgColor: "success", label: "Approved" },
+  { bgColor: "warning", label: "Prospect" },
   { bgColor: "info", label: "Active" },
   { bgColor: "secondary", label: "Inactive" },
   { bgColor: "danger", label: "Deleted" },
 ];
 
-export default statusProps; 
+export default organizationStatusProps; 
