@@ -1,60 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import enums from '../../../helpers/enums';
 import * as Yup from "yup";
+import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore';
+import { Col, Modal, Row } from 'react-bootstrap';
+import { ViewLoading } from '../../../components/Loaders';
+import { Form, Formik } from 'formik';
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import { useEffect, useState } from 'react';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import Swal from 'sweetalert2';
 
-import { ViewLoading } from '../../../components/Loaders'
-import { useAuditorStandardsStore } from '../../../hooks/useAuditorStandardsStore'
-import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
-import enums from '../../../helpers/enums';
-import { useStandardsStore } from '../../../hooks/useStandardsStore';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextArea } from '../../../components/Forms';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-
-const AuditorStandardEditItem = ({ id, ...props }) => {
+const OrganizationStandardEditItem = ({ id, ...props }) => {
 
     const {
-        AuditorStandardOrderType,
         DefaultStatusType,
+        OrganizationStandardOrderType,
         StandardOrderType,
     } = enums();
 
-    const formDefaultValues = {
+    const  formDefaultValues = {
         standardSelect: '',
-        comentsInput: '',
+        crnInput: '',
         statusCheck: false,
     };
+
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
             .required('Must select a standard'),
-        comentsInput: Yup.string()
-            .max(1000, 'The comments cannot exceed more than 1000 characters'),
+        crnInput: Yup.string()
+            .max(10, 'Certificate Registration Number must be at most 10 characters'),
     });
 
     // CUSTOM HOOKS
 
     const {
-        auditor,
-        auditorAsync,
-    } = useAuditorsStore();
+        organization,
+    } = useOrganizationsStore();
 
     const {
-        isAuditorStandardLoading,
-        isAuditorStandardCreating,
-        isAuditorStandardSaving,
-        auditorStandardSavedOk,
-        auditorStandard,
-        auditorStandardsErrorMessage,
+        isOrganizationStandardLoading,
+        isOrganizationStandardCreating,
+        isOrganizationStandardSaving,
+        organizationStandardSavedOk,
+        organizationStandard,
+        organizationStandardsErrorMessage,
 
-        auditorStandardAsync,
-        auditorStandardCreateAsync,
-        auditorStandardSaveAsync,
-        auditorStandardClear,
-    } = useAuditorStandardsStore();
+        organizationStandardsAsync,
+        organizationStandardAsync,
+        organizationStandardCreateAsync,
+        organizationStandardSaveAsync,
+        organizationStandardClear,
+    } = useOrganizationStandardsStore();
 
     const {
         isStandardsLoading,
@@ -65,16 +64,15 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
-    const [currentAction, setCurrentAction] = useState(null);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
     useEffect(() => {
       
-        if (!!auditorStandard && showModal) {
+        if (!!organizationStandard && showModal) {
             setInitialValues({
-                standardSelect: auditorStandard?.StandardID ?? '',
-                commentsInput: auditorStandard?.Comments ?? '',
-                statusCheck: auditorStandard.Status === DefaultStatusType.active,
+                standardSelect: organizationStandard?.StandardID ?? '',
+                crnInput: organizationStandard?.CRN ?? '',
+                statusCheck: organizationStandard.Status === DefaultStatusType.active,
             });
 
             standardsAsync({
@@ -84,35 +82,37 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                 order: StandardOrderType.name,
             });
         }
-    }, [auditorStandard]);
+    }, [organizationStandard]);
 
     useEffect(() => {
-        if (!!auditorStandardSavedOk && showModal) {
+        if (!!organizationStandardSavedOk && showModal) {
             Swal.fire('Standard', `Standard ${!id ? 'assigned' : 'updated'} successfully`, 'success');            
-            auditorAsync(auditor.ID);
-            auditorStandardClear();
+            organizationStandardsAsync({
+                organizationID: organization.ID,
+            });
+            organizationStandardClear();
             setShowModal(false);
         }
-    }, [auditorStandardSavedOk]);
+    }, [organizationStandardSavedOk]);
     
     useEffect(() => {
-        if (!!auditorStandardsErrorMessage && showModal) {
-            Swal.fire('Standard', auditorStandardsErrorMessage, 'error');
-            auditorStandardClear();
+        if (!!organizationStandardsErrorMessage && showModal) {
+            Swal.fire('Standard', organizationStandardsErrorMessage, 'error');
+            organizationStandardClear();
             onCloseModal();
         }
-    }, [auditorStandardsErrorMessage]);
+    }, [organizationStandardsErrorMessage]);
     
     // METHODS
 
     const onShowModal = () => {
 
         if (!id) {
-            auditorStandardCreateAsync({
-                AuditorID: auditor.ID,
+            organizationStandardCreateAsync({
+                OrganizationID: organization.ID,
             });
         } else {
-            auditorStandardAsync(id);
+            organizationStandardAsync(id);
         }
 
         setShowModal(true);
@@ -120,20 +120,20 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
 
     const onCloseModal = () => {
 
-        auditorStandardClear();
+        organizationStandardClear();
         setShowModal(false);        
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
 
         const toSave = {
-            ID: auditorStandard.ID,
-            StandardID: !!id ? auditorStandard.StandardID : values.standardSelect,
-            Comments: values.commentsInput,
+            ID: organizationStandard.ID,
+            StandardID: !!id ? organizationStandard.StandardID : values.standardSelect,
+            CRN: values.crnInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        auditorStandardSaveAsync(toSave);
+        organizationStandardSaveAsync(toSave);
     }; // onFormSubmit
 
     return (
@@ -144,9 +144,9 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                 title={ !!id ? 'Edit standard assigned' : 'Assign standard' }
                 onClick={onShowModal}
             >
-                <FontAwesomeIcon icon={!!id ?faEdit : faPlus} className="text-dark" />
+                <FontAwesomeIcon icon={ !!id ? faEdit : faPlus } className="text-dark" />
             </button>
-            <Modal show={showModal} onHide={onCloseModal} >
+            <Modal show={showModal} onHide={onCloseModal}>
                 <Modal.Header>
                     <Modal.Title>
                         {
@@ -165,11 +165,11 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                     </Modal.Title>
                 </Modal.Header>
                 {
-                    isAuditorStandardLoading || isAuditorStandardCreating || isStandardsLoading ? (
+                    isOrganizationStandardLoading || isOrganizationStandardCreating || isStandardsLoading ? (
                         <Modal.Body>
                             <ViewLoading />
                         </Modal.Body>
-                    ) : !!auditorStandard && showModal && 
+                    ) : !!organizationStandard && showModal &&
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
@@ -191,8 +191,8 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                                                     standards
                                                         .filter(item => (
                                                             !!id
-                                                                ? item.ID === auditorStandard.StandardID
-                                                                : !auditor.Standards.find(x => x.StandardID === item.ID)
+                                                                ? item.ID === organizationStandard.StandardID
+                                                                : !organization.Standards.find(x => x.StandardID === item.ID)
                                                         ))
                                                         .map(item =>
                                                             <option
@@ -207,12 +207,11 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                                             </AryFormikSelectInput>
                                         </Col>
                                         <Col xs="12">
-                                            <AryFormikTextArea name="commentsInput"
-                                                label="Comments"
-                                                rows="5"
+                                            <AryFormikTextInput name="crnInput"
+                                                label="Certificate Registration Number"
                                             />
                                         </Col>
-                                        <Col xs="12" md="6">
+                                        <Col xs="12">
                                             <div className="form-check form-switch mb-3">
                                                 <input id="statusCheck" name="statusCheck"
                                                     className="form-check-input"
@@ -233,19 +232,20 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
                                         <div className="text-secondary mb-3 mb-sm-0">
-                                            <AryLastUpdatedInfo item={auditorStandard} />
+                                            <AryLastUpdatedInfo item={ organizationStandard } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <button type="submit"
                                                 className="btn bg-gradient-dark mb-0"
-                                                disabled={isAuditorStandardSaving}
+                                                disabled={ isOrganizationStandardSaving }
                                             >
-                                                <FontAwesomeIcon icon={faSave} className="me-1" size="lg" />
+                                                <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
                                                 Save
                                             </button>
                                             <button type="button"
                                                 className="btn btn-link text-secondary mb-0"
-                                                onClick={onCloseModal}>
+                                                onClick={ onCloseModal }
+                                            >
                                                 Close
                                             </button>
                                         </div>
@@ -260,4 +260,4 @@ const AuditorStandardEditItem = ({ id, ...props }) => {
     )
 }
 
-export default AuditorStandardEditItem
+export default OrganizationStandardEditItem

@@ -17,11 +17,15 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
         'bg-light opacity-6',
     ];
     const shiftText = [
+        '',
         'Morning',
         'Evening',
         'Night'
     ];
-    const { ShiftType } = enums();
+    const { 
+        DefaultStatusType,
+        ShiftType 
+    } = enums();
 
     // CUSTOM HOOKS
 
@@ -30,7 +34,7 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
     } = useSitesStore();
 
     const {
-        isShiftLoading,
+        isShiftsLoading,
         shifts,
         shiftsAsync
     } = useShiftsStore();
@@ -50,7 +54,9 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
 
     useEffect(() => {
         if (!!shifts) {
-            const total = shifts.reduce((sum, item) => sum + item.NoEmployees, 0);
+            const total = shifts
+                .filter(item => item.Status === DefaultStatusType.active)
+                .reduce((sum, item) => sum + item.NoEmployees, 0);
             setTotalEmployees(total);
         }
     }, [shifts]);
@@ -58,7 +64,7 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
     
 
     return (
-        <Card className="text-bg-light mb-3">
+        <Card className="text-bg-light shadow h-100 mb-3">
             <Card.Header className="text-bg-light pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h6 className="mb-0">Shifts</h6>
@@ -69,10 +75,10 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
             </Card.Header>
             <Card.Body className="px-3 py-0">
                 {
-                    isShiftLoading ? (
+                    isShiftsLoading ? (
                         <ViewLoading />
-                    ) : !!shifts ? (
-                        <ListGroup style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                    ) : !!shifts 
+                        && <ListGroup style={{ maxHeight: '220px', overflowY: 'auto' }}>
                             {
                                 shifts.map( item => {
                                     const itemStyle= `bg-transparent border-0 d-flex justify-content-between align-items-center px-0 mb-2 ${ statusStyle[item.Status] }`;
@@ -99,10 +105,9 @@ const ShiftsCard = ({ readOnly = false, ...props }) => {
                                 })
                             }
                         </ListGroup>
-                    ) : null
                 }
             </Card.Body>
-            <Card.Footer className="pt-0">
+            <Card.Footer className="p-3 pt-0">
                 <h6 className="text-sm mb-0">Total employees: {totalEmployees}</h6>
             </Card.Footer>
         </Card>

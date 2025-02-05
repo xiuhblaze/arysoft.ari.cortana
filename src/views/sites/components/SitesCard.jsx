@@ -4,10 +4,11 @@ import { useSitesStore } from '../../../hooks/useSiteStore'
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
 import { ViewLoading } from '../../../components/Loaders'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBuilding } from '@fortawesome/free-solid-svg-icons'
+import { faBuilding, faLocationDot, faLocationPin } from '@fortawesome/free-solid-svg-icons'
 import EditSiteModal from './EditSiteModal'
 import enums from '../../../helpers/enums'
 import Swal from 'sweetalert2'
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
 
 const SitesCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -17,7 +18,10 @@ const SitesCard = ({ readOnly = false, ...props }) => {
         'bg-light opacity-6',
     ];
 
-    const { SiteOrderType } = enums();
+    const {
+        DefaultStatusType,
+        SiteOrderType, 
+    } = enums();
 
     // CUSTOM HOOKS
 
@@ -48,7 +52,9 @@ const SitesCard = ({ readOnly = false, ...props }) => {
 
     useEffect(() => {
         if (!!sites) {
-            const total = sites.reduce((sum, item) => sum + item.NoEmployees, 0);
+            const total = sites
+                .filter(item => item.Status === DefaultStatusType.active)
+                .reduce((sum, item) => sum + item.EmployeesCount, 0);
             setTotalEmployees(total);
         }
     }, [sites]);
@@ -60,7 +66,7 @@ const SitesCard = ({ readOnly = false, ...props }) => {
     }, [sitesErrorMessage]);
 
     return (
-        <Card className="h-100">
+        <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <h6>Sites</h6>
@@ -91,9 +97,17 @@ const SitesCard = ({ readOnly = false, ...props }) => {
                                                     </div>
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
-                                                    <h6 className={`mb-0 text-sm ${ item.IsMainSite ? 'text-info text-gradient' : '' }`}>{ item.Description }</h6>
+                                                    <h6 className={`mb-0 text-sm ${ item.IsMainSite ? 'text-info text-gradient' : '' }`}>
+                                                        { !isNullOrEmpty(item.LocationURL)
+                                                            ? <a href={ item.LocationURL } target="_blank" title="See address in maps">
+                                                                <FontAwesomeIcon icon={ faLocationDot } className="text-dark" fixedWidth />
+                                                            </a>
+                                                            : <FontAwesomeIcon icon={ faLocationPin } className="text-secondary" fixedWidth />
+                                                        }
+                                                        { item.Description }
+                                                    </h6>
                                                     <p className="mb-0 text-xs">{ item.Address }</p>
-                                                    <p className="text-xs font-weight-bold">Employes: { item.NoEmployees } | Shifts: { item.NoShifts }</p>
+                                                    <p className="text-xs font-weight-bold">Employes: { item.EmployeesCount } | Shifts: { item.ShiftsCount }</p>
                                                 </div>
                                             </div>
                                             <div>

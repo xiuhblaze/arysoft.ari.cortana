@@ -26,6 +26,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
+const ORGANIZATIONS_ROUTE = '/organizations';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -34,7 +35,10 @@ const getSearchQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
+    query += options?.standardID ? `&standardid=${options.standardID}` : '';
+    query += options?.folio ? `&folio=${options.folio}` : '';
     query += options?.text ? `&text=${options.text}` : '';
+    query += options?.certificatesValidityStatus ? `&certificatesvaliditystatus=${options.certificatesValidityStatus}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includedeleted=${options.includeDeleted}` : '';
 
@@ -92,6 +96,16 @@ export const useOrganizationsStore = () => {
         }, 10);
     }; // setError
 
+    const renameFile = (file, newName) => {
+        const ext = file.name.split('.').pop();
+        const fullNewName = `${newName}.${ext}`;
+
+        return new File([file], fullNewName, { 
+            type: file.type,
+            lastModified: file.lastModified,
+        });
+    };
+
     //* Export Methods
 
     /**
@@ -103,7 +117,7 @@ export const useOrganizationsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`/organizations${query}`);
+            const resp = await cortanaApi.get(`${ORGANIZATIONS_ROUTE}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setOrganizations({
@@ -129,7 +143,7 @@ export const useOrganizationsStore = () => {
                 orden: OrganizationsOrdenType.name,
             });
 
-            const resp = await cortanaApi.get(`/organizations${query}`);
+            const resp = await cortanaApi.get(`${ORGANIZATIONS_ROUTE}${query}`);
             const { Data } = await resp.data;
 
             dispatch(setOrganizationsFullList({ organizations: Data, }));
@@ -152,7 +166,7 @@ export const useOrganizationsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`/organizations/${id}`);
+            const resp = await cortanaApi.get(`${ORGANIZATIONS_ROUTE}/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setOrganization(Data));
@@ -173,7 +187,7 @@ export const useOrganizationsStore = () => {
             const params = {
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post('/organizations', params);
+            const resp = await cortanaApi.post(ORGANIZATIONS_ROUTE, params);
             const { Data } = await resp.data;
 
             dispatch(setOrganization(Data));
@@ -186,17 +200,37 @@ export const useOrganizationsStore = () => {
 
     /**
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-     * @param {OrganizationID, Name, Description, Status, UpdatedUser} item Objeto tipo Organization
+     * @param {Name, LegalEntity, Website, Phone, COID, Status, UpdatedUser} item Objeto tipo Organization
+     * @param {File} logoFile 
+     * @param {File} qrFile 
      */
-    const organizationSaveAsync = async (item) => {
+    const organizationSaveAsync = async (item, logoFile, qrFile) => {
         dispatch(onOrganizationSaving());
 
         const toSave = {
             ...item,
             UpdatedUser: user.username,
-        }
+        };
+
         try {
-            const resp = await cortanaApi.put(`/organizations/${toSave.ID}`, toSave);
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data',
+            };
+            const data = JSON.stringify(toSave);
+
+            formData.append('data', data);
+
+            if (!!logoFile) {
+                const renamedFile = renameFile(logoFile, 'logotype');
+                formData.append('LogoFile', renamedFile);
+            }
+            if (!!qrFile) {
+                const renamedFile = renameFile(qrFile, 'qrcode');
+                formData.append('QRFile', renamedFile);
+            }
+
+            const resp = await cortanaApi.put(`${ORGANIZATIONS_ROUTE}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setOrganization(Data));
@@ -220,7 +254,7 @@ export const useOrganizationsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`/organizations/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${ORGANIZATIONS_ROUTE}/${id}`, { data: toDelete });
             dispatch(isOrganizationDeleted());
         } catch (error) {
             //console.log(error);

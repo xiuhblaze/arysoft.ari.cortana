@@ -14,8 +14,12 @@ import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUp
 import Swal from 'sweetalert2';
 
 const AuditorEditCard = ({ actualizarPhotoPreview, ...props }) => {
-    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-    const { VITE_FILES_URL, URL_AUDITOR_FILES } = envVariables();
+    //const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+    const { 
+        PHONE_REGEX,
+        URL_AUDITOR_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const { DefaultStatusType } = enums();
     const formDefaultValues = {
         firstNameInput: '',
@@ -45,7 +49,7 @@ const AuditorEditCard = ({ actualizarPhotoPreview, ...props }) => {
             .max(250, 'The email cannot exceed more than 250 characters'),
         phoneInput: Yup.string()
             .max(25, 'The phone number cannot exceed more than 25 characters')
-            .matches(phoneRegExp, 'The phone number has an invalid format'),
+            .matches(PHONE_REGEX, 'The phone number has an invalid format'),
         addressInput: Yup.string()
             .max(500, 'The last name cannot exceed more than 500 characters'),
         photoFileInput: Yup.mixed()
@@ -55,7 +59,7 @@ const AuditorEditCard = ({ actualizarPhotoPreview, ...props }) => {
                 test: (value, ctx) => {
                     if (!!value) {
                         const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
-                        const validTypes = ['jpg', 'jpeg', 'png'];
+                        const validTypes = ['jpg', 'png'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
                                 message: 'Only files with png or jpg extensions are allowed'
@@ -154,7 +158,7 @@ const AuditorEditCard = ({ actualizarPhotoPreview, ...props }) => {
     };
 
     return (
-        <Card>
+        <Card {...props}>
             <Card.Header className="pb-0">
                 <Card.Title>
                     <FontAwesomeIcon icon={faUserPen} size="lg" className="text-dark me-2" />

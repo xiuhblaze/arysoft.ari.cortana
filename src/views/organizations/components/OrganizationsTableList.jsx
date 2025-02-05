@@ -12,6 +12,8 @@ import Status from "./Status";
 import DetailsModal from "./DetailsModal";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import AryTableSortIcon from "../../../components/AryTableSortIcon/AryTableSortIcon";
+import OrganizationTableItem from "./OrganizationTableItem";
+import { Modal } from "react-bootstrap";
 
 const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) => {
     return (
@@ -35,15 +37,27 @@ const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) 
 const OrganizationsTableList = () => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
     const { OrganizationStatusType, OrganizationOrderType } = enums();
-    const [showModal, setShowModal] = useState(false);
-    const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
-    const { ORGANIZATIONS_OPTIONS } = envVariables();
+    const { 
+        ORGANIZATIONS_OPTIONS,
+        VITE_FILES_URL,
+        URL_ORGANIZATION_FILES,
+     } = envVariables();
+    
+    // CUSTOM HOOKS
+    
     const {
         isOrganizationsLoading,
         organizations,
         organizationsAsync,
         organizationAsync,
     } = useOrganizationsStore();
+    
+    // HOOKS
+    
+    const [showModal, setShowModal] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [qrValues, setQRValues] = useState(null);
+    const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
 
     useEffect(() => {
         if (!!organizations) {
@@ -63,6 +77,15 @@ const OrganizationsTableList = () => {
         setShowModal(false);
     };
 
+    const onShowQRModal = (values) => {
+        setQRValues(values);
+        setShowQRModal(true);
+    }
+
+    const onCloseQRModal = () => {
+        setShowQRModal(false);
+    };
+
     const onClickOrderList = (order = OrganizationOrderType.name) => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
         const search = {
@@ -80,11 +103,20 @@ const OrganizationsTableList = () => {
                 <ViewLoading />
             ) : !!organizations ? (
                 <div className="table-responsive p-0">
-                    <table className="table align-items-top mb-0">
+                    <table className="table align-items-center mb-0">
                         <thead>
                             <tr>
                                 <th>
                                     <div className="d-flex justify-content-start align-items-center gap-1">
+                                        <SortItem
+                                            activeAsc={currentOrder === OrganizationOrderType.folio}
+                                            activeDesc={currentOrder === OrganizationOrderType.folioDesc}
+                                            onOrderAsc={() => { onClickOrderList(OrganizationOrderType.folio) }}
+                                            onOrderDesc={() => { onClickOrderList(OrganizationOrderType.folioDesc) }}
+                                        />
+                                        <div className={headStyle}>
+                                            Folio 
+                                        </div>
                                         <SortItem
                                             activeAsc={currentOrder === OrganizationOrderType.name}
                                             activeDesc={currentOrder === OrganizationOrderType.nameDesc}
@@ -98,6 +130,19 @@ const OrganizationsTableList = () => {
                                 </th>
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
+                                <th className={headStyle}>Sites</th>
+                                <th className="d-flex justify-content-start align-items-center gap-1">
+                                    <SortItem
+                                        activeAsc={currentOrder === OrganizationOrderType.certificatesValidityStatus}
+                                        activeDesc={currentOrder === OrganizationOrderType.certificatesValidityStatusDesc}
+                                        onOrderAsc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatus) }}
+                                        onOrderDesc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatusDesc) }}
+                                    />
+                                    <div className={headStyle}>
+                                        Certificates
+                                    </div>
+                                </th>
+                                <th className={headStyle}>QR</th>
                                 <th>
                                     <div className="d-flex justify-content-center align-items-center gap-1">
                                         <SortItem
@@ -116,88 +161,14 @@ const OrganizationsTableList = () => {
                         </thead>
                         <tbody>
                             {
-                                organizations.map(item => {
-                                    const iconStyle = `icon icon-sm icon-shape ${item.Status === OrganizationStatusType.active ? 'bg-gradient-info' : 'bg-gradient-secondary'} border-radius-md d-flex align-items-center justify-content-center me-3`;
-
-                                    return (
-                                        <tr key={item.ID}>
-                                            <td>
-                                                <div className="d-flex px-2 py-1">
-                                                    <div>
-                                                        <div className={iconStyle}>
-                                                            <FontAwesomeIcon icon={faBuilding} size="lg" className="opacity-10 text-white" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">{item.Name}</h6>
-                                                        <p className="text-xs text-secondary mb-0">
-                                                            {item.LegalEntity}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex flex-column align-items-start">
-                                                    {!!item?.Website && (
-                                                        <a href={`http://${item.Website}`} target="_blank" className="text-xs font-weight-bold mb-0">
-                                                            <FontAwesomeIcon icon={faGlobe} fixedWidth className="me-1" />
-                                                            {item.Website}
-                                                        </a>
-                                                    )}
-                                                    {!!item?.Phone && (
-                                                        <a href={`tel:${item.Phone}`} className="text-xs text-secondary mb-0">
-                                                            <FontAwesomeIcon icon={faPhone} fixedWidth className="me-1" />
-                                                            {item.Phone}
-                                                        </a>
-                                                    )}
-                                                </div>
-                                            </td>                                            
-                                            <td>
-                                                <div className="d-flex flex-column align-items-start">
-                                                    { !!item.ContactName && 
-                                                        <p className="text-xs font-weight-bold mb-0">
-                                                            <FontAwesomeIcon icon={ faUser } fixedWidth className="me-1" />
-                                                            { item.ContactName }
-                                                        </p>
-                                                    }
-                                                    { !!item.ContactEmail &&
-                                                        <p className="text-xs text-secondary mb-0">
-                                                            <FontAwesomeIcon icon={ faEnvelope } fixedWidth className="me-1" />
-                                                            { item.ContactEmail}
-                                                        </p>
-                                                    }
-                                                    { !!item.ContactPhone &&
-                                                        <p className="text-xs text-secondary mb-0">
-                                                            <FontAwesomeIcon icon={ faPhone } fixedWidth className="me-1" />
-                                                            { item.ContactPhone}
-                                                        </p>
-                                                    }
-                                                </div>
-                                            </td>
-                                            <td className="align-middle text-center text-sm">
-                                                <Status value={item.Status} />
-                                            </td>
-                                            {/* <td>
-                                                <div className="d-flex flex-column align-items-start">
-                                                <div className="text-xs"><strong>Updated</strong> { getFriendlyDate(item.Updated) } </div>
-                                                <div className="text-xs"><strong>By</strong> { item.UpdatedUser }</div>
-                                                </div>
-                                            </td> */}
-                                            <td>
-                                                <div className="d-flex justify-content-center gap-2">
-                                                    <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                                                        <FontAwesomeIcon icon={faClone} />
-                                                    </a>
-                                                    {item.Status !== OrganizationStatusType.deleted && (
-                                                        <Link to={`${item.ID}`} title="Edit">
-                                                            <FontAwesomeIcon icon={faEdit} />
-                                                        </Link>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })
+                                organizations.map(item => 
+                                    <OrganizationTableItem 
+                                        key={ item.ID } 
+                                        item={ item }
+                                        onShowModal={ () => onShowModal(item.ID) }
+                                        onShowQRModal={ () => onShowQRModal({ID: item.ID, QRFile: item.QRFile}) }
+                                    />
+                                )
                             }
                         </tbody>
                     </table>
@@ -205,6 +176,24 @@ const OrganizationsTableList = () => {
             ) : null
             }
             <DetailsModal show={showModal} onHide={onCloseModal} />
+            <Modal show={showQRModal} onHide={onCloseQRModal} centered>
+                <Modal.Body>
+                    <div className="d-flex justify-content-center align-items-center py-5">
+                        { !!qrValues &&
+                            <img 
+                                src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${qrValues.ID}/${qrValues.QRFile}`} 
+                                alt="QR code"
+                                className="img-fluid w-50"
+                            />
+                        }
+                    </div>
+                    <div className="d-flex justify-content-end align-items-center mt-3">
+                        <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCloseQRModal}>
+                            Close
+                        </button>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }
