@@ -5,6 +5,8 @@ import { faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { ViewLoading } from "../../../components/Loaders";
 import OrganizationStandardsCardItem from "./OrganizationStandardsCardItem";
 import OrganizationStandardEditItem from "./OrganizationStandardEditItem";
+import { useOrganizationStandardsStore } from "../../../hooks/useOrganizationStandardsStore";
+import { useEffect } from "react";
 
 const OrganizationStandardsCard = ({ readOnly = false, ...props }) => {
 
@@ -14,6 +16,20 @@ const OrganizationStandardsCard = ({ readOnly = false, ...props }) => {
         isOrganizationLoading,
         organization,
     } = useOrganizationsStore();
+
+    const {
+        isOrganizationStandardsLoading,
+        organizationStandards,
+        organizationStandardsAsync,
+    } =useOrganizationStandardsStore();
+
+    useEffect(() => {
+        if (!!organization) {
+            organizationStandardsAsync({
+                organizationID: organization.ID,
+            });
+        }
+    }, [organization]);    
 
     return (
         <Card {...props}>
@@ -28,12 +44,12 @@ const OrganizationStandardsCard = ({ readOnly = false, ...props }) => {
             </Card.Header>
             <Card.Body className="p-3">
                 {
-                    isOrganizationLoading ? (
+                    isOrganizationLoading || isOrganizationStandardsLoading ? (
                         <ViewLoading />
-                    ) : !!organization && organization.Standards != null && organization.Standards.length > 0 ? (
+                    ) : !!organization && !!organizationStandards ? (
                         <ListGroup className="mb-3">
                             {
-                                organization.Standards.map(item => (
+                                organizationStandards.map(item => (
                                     <OrganizationStandardsCardItem
                                         key={item.ID}
                                         item={item}

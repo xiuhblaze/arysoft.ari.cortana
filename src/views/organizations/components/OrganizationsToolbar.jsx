@@ -11,11 +11,13 @@ import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
 const OrganizationsToolbar = () => {
     const formDefaultData = {
         folioInput: '',
         textInput: '',
+        standardSelect: '',
         certificatesValidityStatusSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
@@ -23,7 +25,8 @@ const OrganizationsToolbar = () => {
     const { 
         CertificatesValidityStatusType,
         OrganizationOrderType, 
-        OrganizationStatusType 
+        OrganizationStatusType,
+        StandardOrderType,
     } = enums();
     const {
         ORGANIZATIONS_OPTIONS,
@@ -44,6 +47,11 @@ const OrganizationsToolbar = () => {
         organizationsAsync,
         organizationCreateAsync,
     } = useOrganizationsStore();
+
+    const {
+        standards,
+        standardsAsync,
+    } = useStandardsStore();
     
     // HOOKS
     
@@ -58,11 +66,18 @@ const OrganizationsToolbar = () => {
             setInitialValues({
                 folioInput: savedSearch.folio ?? '',
                 textInput: savedSearch.text ?? '',
+                standardSelect: savedSearch.standardID ?? '',
                 certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
+
+        standardsAsync({
+            pageSize: 0,
+            includeDeleted: false,
+            order: StandardOrderType.name,
+        });
     }, []);
 
     useEffect(() => {
@@ -83,6 +98,7 @@ const OrganizationsToolbar = () => {
             ...savedSearch,
             folio: values.folioInput,
             text: values.textInput,
+            standardID: values.standardSelect,
             status: values.statusSelect,
             certificatesValidityStatus: values.certificatesValidityStatusSelect,
             includeDeleted: values.includeDeletedCheck,
@@ -144,6 +160,22 @@ const OrganizationsToolbar = () => {
                                                 type="text"
                                                 placeholder="search..."
                                             />
+                                        </div>
+                                        <div className="col-12 col-sm-auto mb-3">
+                                            <AryFormikSelectInput name="standardSelect">
+                                                <option value="">(standard)</option>
+                                                {
+                                                    standards.map(item =>
+                                                        <option
+                                                            key={item.ID}
+                                                            value={item.ID}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {item.Name}
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-3 col-xxl-2">
                                             <AryFormikSelectInput name="certificatesValidityStatusSelect">

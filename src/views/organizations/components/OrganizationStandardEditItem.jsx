@@ -1,4 +1,4 @@
-import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import enums from '../../../helpers/enums';
 import * as Yup from "yup";
@@ -7,9 +7,11 @@ import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationSta
 import { Col, Modal, Row } from 'react-bootstrap';
 import { ViewLoading } from '../../../components/Loaders';
 import { Form, Formik } from 'formik';
-import { AryFormikSelectInput } from '../../../components/Forms';
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import { useEffect, useState } from 'react';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import Swal from 'sweetalert2';
 
 const OrganizationStandardEditItem = ({ id, ...props }) => {
 
@@ -36,7 +38,6 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
 
     const {
         organization,
-        organizationAsync,
     } = useOrganizationsStore();
 
     const {
@@ -47,6 +48,7 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
         organizationStandard,
         organizationStandardsErrorMessage,
 
+        organizationStandardsAsync,
         organizationStandardAsync,
         organizationStandardCreateAsync,
         organizationStandardSaveAsync,
@@ -85,7 +87,9 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
     useEffect(() => {
         if (!!organizationStandardSavedOk && showModal) {
             Swal.fire('Standard', `Standard ${!id ? 'assigned' : 'updated'} successfully`, 'success');            
-            organizationAsync(organization.ID);
+            organizationStandardsAsync({
+                organizationID: organization.ID,
+            });
             organizationStandardClear();
             setShowModal(false);
         }
@@ -202,8 +206,51 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
                                                 }
                                             </AryFormikSelectInput>
                                         </Col>
+                                        <Col xs="12">
+                                            <AryFormikTextInput name="crnInput"
+                                                label="Certificate Registration Number"
+                                            />
+                                        </Col>
+                                        <Col xs="12">
+                                            <div className="form-check form-switch mb-3">
+                                                <input id="statusCheck" name="statusCheck"
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    onChange={ formik.handleChange }
+                                                    checked={ formik.values.statusCheck }
+                                                />
+                                                <label 
+                                                    className="form-check-label text-secondary mb-0" 
+                                                    htmlFor="statusCheck"
+                                                >
+                                                    Active
+                                                </label>
+                                            </div>
+                                        </Col>
                                     </Row>
                                 </Modal.Body>
+                                <Modal.Footer>
+                                    <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
+                                        <div className="text-secondary mb-3 mb-sm-0">
+                                            <AryLastUpdatedInfo item={ organizationStandard } />
+                                        </div>
+                                        <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                            <button type="submit"
+                                                className="btn bg-gradient-dark mb-0"
+                                                disabled={ isOrganizationStandardSaving }
+                                            >
+                                                <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                Save
+                                            </button>
+                                            <button type="button"
+                                                className="btn btn-link text-secondary mb-0"
+                                                onClick={ onCloseModal }
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Modal.Footer>
                             </Form>
                         )}
                     </Formik>

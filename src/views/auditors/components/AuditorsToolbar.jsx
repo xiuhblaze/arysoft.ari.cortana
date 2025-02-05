@@ -8,10 +8,12 @@ import { useEffect, useState } from "react";
 import { Form, Formik } from "formik";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
 const AuditorsToolbar = () => {
     const formDefaultData = {
         textInput: '',
+        standardSelect: '',
         isLeaderSelect: '',
         validitySelect: '',
         statusSelect: '',
@@ -26,7 +28,8 @@ const AuditorsToolbar = () => {
         AuditorIsLeaderType,
         AuditorDocumentValidityType,
         AuditorOrderType,
-        DefaultStatusType
+        DefaultStatusType,
+        StandardOrderType
     } = enums();
     const {
         AUDITORS_OPTIONS,
@@ -43,6 +46,11 @@ const AuditorsToolbar = () => {
         auditorCreateAsync,
     } = useAuditorsStore();
 
+    const {
+        standards,
+        standardsAsync,
+    } = useStandardsStore();
+
     // HOOKS
 
     const navigate = useNavigate();
@@ -55,12 +63,19 @@ const AuditorsToolbar = () => {
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch.text ?? '',
+                standardSelect: savedSearch.standardID ?? '',
                 isLeaderSelect: savedSearch.isLeader ?? '',
                 validitySelect: savedSearch.validity ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
+
+        standardsAsync({
+            pageSize: 0,
+            includeDeleted: false,
+            order: StandardOrderType.name,
+        });
     }, []);
     
     useEffect(() => {
@@ -80,6 +95,7 @@ const AuditorsToolbar = () => {
         const search = {
             ...savedSearch,
             text: values.textInput,
+            standardID: values.standardSelect,
             isLeader: values.isLeaderSelect,
             validity: values.validitySelect,
             status: values.statusSelect,
@@ -137,6 +153,22 @@ const AuditorsToolbar = () => {
                                                 type="text"
                                                 placeholder="search..."
                                             />
+                                        </div>
+                                        <div className="col-12 col-sm-auto mb-3">
+                                            <AryFormikSelectInput name="standardSelect">
+                                                <option value="">(standard)</option>
+                                                {
+                                                    standards.map(item =>
+                                                        <option
+                                                            key={item.ID}
+                                                            value={item.ID}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {item.Name}
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput name="isLeaderSelect">

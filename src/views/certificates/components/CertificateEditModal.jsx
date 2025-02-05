@@ -1,26 +1,27 @@
 import { addDays } from "date-fns";
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { Button, Col, Modal, Row } from "react-bootstrap";
+import { certificateStatusProps } from "../helpers/certificateStatusProps";
 import { faCertificate, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useCertificatesStore } from "../../../hooks/useCertificatesStore";
 import { useEffect, useState } from "react";
+import { useNotesStore } from "../../../hooks/useNotesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import { useOrganizationStandardsStore } from "../../../hooks/useOrganizationStandardsStore";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { ViewLoading } from "../../../components/Loaders";
 import * as Yup from "yup";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import defaultStatusProps from "../../../helpers/defaultStatusProps";
 import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables"
 import getISODate from "../../../helpers/getISODate";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import Swal from "sweetalert2";
-import { useNotesStore } from "../../../hooks/useNotesStore";
 import NotesListModal from "../../notes/components/NotesListModal";
-import defaultStatusProps from "../../../helpers/defaultStatusProps";
-import { certificateStatusProps } from "../helpers/certificateStatusProps";
+import Swal from "sweetalert2";
 
 const CertificateEditModal = ({ id, ...props }) => {
     const {
@@ -89,14 +90,6 @@ const CertificateEditModal = ({ id, ...props }) => {
         prevAuditDateInput: Yup.date()
             .typeError('Must be a valid date')
             .required('Must specify previous audit date'),
-            // .when('hasNCsMinorCheck', {
-            //     is: value => value === true,
-            //     then: () => Yup.date().required('If a minor NC is present, the previous audit date is required'),
-            // })
-            // .when('hasNCsMajorCheck', {
-            //     is: value => value === true,
-            //     then: () => Yup.date().required('If a major NC is present, the previous audit date is required'),
-            // })
             // .when('hasNCsCriticalCheck', {
             //     is: value => value === true,
             //     then: () => Yup.date().required('If a critical NC is present, the previous audit date is required'),
@@ -143,11 +136,17 @@ const CertificateEditModal = ({ id, ...props }) => {
         organization
     } = useOrganizationsStore();
 
+    // const {
+    //     isStandardsLoading,
+    //     standards,
+    //     standardsAsync,
+    // } = useStandardsStore();
     const {
-        isStandardsLoading,
-        standards,
-        standardsAsync,
-    } = useStandardsStore();
+        isOrganizationStandardsLoading,
+        organizationStandards,
+        organizationStandardsAsync,
+        organizationStandardsErrorMessage,
+    } = useOrganizationStandardsStore();
 
     const {
         isNoteCreating,
@@ -184,12 +183,12 @@ const CertificateEditModal = ({ id, ...props }) => {
                 statusSelect: certificate?.Status ?? ''
             });
 
-            standardsAsync({
-                status: DefaultStatusType.active,
-                pageSize: 0,
-                includeDeleted: false,
-                order: StandardOrderType.name,
-            });
+            // standardsAsync({
+            //     status: DefaultStatusType.active,
+            //     pageSize: 0,
+            //     includeDeleted: false,
+            //     order: StandardOrderType.name,
+            // });
 
             switch (certificate?.Status) {
                 case CertificateStatusType.active:
@@ -230,10 +229,23 @@ const CertificateEditModal = ({ id, ...props }) => {
                     ]);
                     break;
             }
+
+            organizationStandardsAsync({
+                organizationID: organization.ID,
+                status: DefaultStatusType.active,
+                pageSize: 0,
+            });
             
             setShowAddNote(false);
         }
     }, [certificate]);
+
+    useEffect(() => {
+        if (showModal && !!organizationStandards && organizationStandards.length == 0) {
+            Swal.fire('Certificate', `A standard must first have to be assigned`, 'warning');
+        }
+    }, [organizationStandards]);
+    
 
     useEffect(() => {
         if (!!certificateSavedOk && showModal) {
@@ -355,7 +367,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                         <Modal.Body>
                             <ViewLoading />
                         </Modal.Body>
-                    ) : !!certificate && !!standards && (
+                    ) : !!certificate && !!organizationStandards && (
                         <Formik
                             initialValues={ initialValues }
                             validationSchema={ validationSchema }
@@ -371,16 +383,17 @@ const CertificateEditModal = ({ id, ...props }) => {
                                                     name="standardSelect"
                                                     label="Standard"
                                                     disabled={!!id}
+                                                    helpText={ !id ? 'Select a standard to assign' : certificate.Standard.Name }
                                                 >
                                                     { !id && <option value="">(select)</option> }
                                                     {
-                                                        standards.map(item =>
+                                                        organizationStandards.map(item =>
                                                             <option
-                                                                key={item.ID}
-                                                                value={item.ID}
+                                                                key={item.StandardID}
+                                                                value={item.StandardID}
                                                                 className="text-capitalize"
                                                             >
-                                                                {item.Name}
+                                                                {item.StandardName}
                                                             </option>
                                                         )
                                                     }

@@ -35,6 +35,7 @@ const getSearchQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
+    query += options?.standardID ? `&standardid=${options.standardID}` : '';
     query += options?.folio ? `&folio=${options.folio}` : '';
     query += options?.text ? `&text=${options.text}` : '';
     query += options?.certificatesValidityStatus ? `&certificatesvaliditystatus=${options.certificatesValidityStatus}` : '';
