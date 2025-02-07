@@ -17,27 +17,29 @@ import organizationStandardsSlice from "./slices/organizationStandardsSlice";
 import shiftsSlice from "./slices/shiftsSlice";
 import sitesSlice from "./slices/sitesSlice";
 import standardsSlice from "./slices/standardsSlice";
+import usersSlice from "./slices/usersSlice";
 
 export const store = configureStore({
-  reducer: {
-    applicationFormClient: applicationFormClientSlice.reducer,
-    applicationForms: applicationFormsSlice.reducer,
-    auditorDocuments: auditorDocumentsSlice.reducer,
-    auditors: auditorsSlice.reducer,
-    auditorStandards: auditorStandardsSlice.reducer,
-    auth: authSlice.reducer,
-    catAuditorDocuments: catAuditorDocumentsSlice.reducer,
-    certificates: certificatesSlice.reducer,
-    contacts: contactsSlice.reducer,
-    nacecodes: nacecodesSlice.reducer,
-    notes: notesSlice.reducer,
-    organizations: organizationsSlice.reducer,
-    organizationStandards: organizationStandardsSlice.reducer,
-    shifts: shiftsSlice.reducer,
-    sites: sitesSlice.reducer,
-    standards: standardsSlice.reducer,
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+    reducer: {
+        applicationFormClient: applicationFormClientSlice.reducer,
+        applicationForms: applicationFormsSlice.reducer,
+        auditorDocuments: auditorDocumentsSlice.reducer,
+        auditors: auditorsSlice.reducer,
+        auditorStandards: auditorStandardsSlice.reducer,
+        auth: authSlice.reducer,
+        catAuditorDocuments: catAuditorDocumentsSlice.reducer,
+        certificates: certificatesSlice.reducer,
+        contacts: contactsSlice.reducer,
+        nacecodes: nacecodesSlice.reducer,
+        notes: notesSlice.reducer,
+        organizations: organizationsSlice.reducer,
+        organizationStandards: organizationStandardsSlice.reducer,
+        shifts: shiftsSlice.reducer,
+        sites: sitesSlice.reducer,
+        standards: standardsSlice.reducer,
+        users: usersSlice.reducer,
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
 });
 
 export default store;

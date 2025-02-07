@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import enums from '../../../helpers/enums'
 import { useShiftsStore } from '../../../hooks/useShiftsStore';
 import { useSitesStore } from '../../../hooks/useSiteStore';
@@ -29,9 +29,12 @@ const EditShiftModal = ({ id, ...props }) => {
     const formDefaultValues = {
         typeSelect: '',
         noEmployeesInput: '',
+        activitiesDescriptionInput: '',
         shiftStartInput: '',
         shiftEndInput: '',
-        activitiesDescriptionInput: '',
+        shiftStart2Input: '',
+        shiftEnd2Input: '',
+        extraInfoInput: '',
         statusCheck: false,
     };
     const validationSchema = Yup.object({
@@ -41,14 +44,20 @@ const EditShiftModal = ({ id, ...props }) => {
             .typeError('Must be a number')
             .min(0, 'Must be zero or greater')
             .required('Must specify the number of employees'),
+        activitiesDescriptionInput: Yup.string()
+            .max(500, 'The description cannot exceed more than 500 characters'),
         shiftStartInput: Yup.string()
             .matches(HOUR24_REGEX, 'Must be a valid time')
             .required('Must specify the start time'),
         shiftEndInput: Yup.string()
             .matches(HOUR24_REGEX, 'Must be a valid time')
             .required('Must specify the end time'),
-        activitiesDescriptionInput: Yup.string()
-            .max(500, 'The description cannot exceed more than 500 characters'),
+        shiftStart2Input: Yup.string()
+            .matches(HOUR24_REGEX, 'Must be a valid time'),
+        shiftEnd2Input: Yup.string()
+            .matches(HOUR24_REGEX, 'Must be a valid time'),
+        extraInfoInput: Yup.string()
+            .max(1000, 'The additional information cannot exceed more than 1000 characters'),
     });
 
     // CUSTOM HOOKS
@@ -73,22 +82,29 @@ const EditShiftModal = ({ id, ...props }) => {
 
     // HOOKS
 
+    const secondShiftRef = useRef(null);
+
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     // const [activeShift, setActiveShift] = useState(false);
     const [currentAction, setCurrentAction] = useState(null);
+    const [showSecondShift, setShowSecondShift] = useState(false);
 
     useEffect(() => {
         if (!!shift && showModal) {
             setInitialValues({
                 typeSelect: shift?.Type ?? '',
                 noEmployeesInput: shift?.NoEmployees ?? '',
+                activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
                 shiftStartInput: shift?.ShiftStart ? shift?.ShiftStart.slice(0, 5) : '',
                 shiftEndInput: shift?.ShiftEnd ? shift?.ShiftEnd.slice(0, 5) : '',
-                activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
+                shiftStart2Input: shift?.ShiftStart2 ? shift?.ShiftStart2.slice(0, 5) : '',
+                shiftEnd2Input: shift?.ShiftEnd2 ? shift?.ShiftEnd2.slice(0, 5) : '',
+                extraInfoInput: shift?.ExtraInfo ?? '',
                 statusCheck: shift?.Status === DefaultStatusType.active,
             });
 
+            setShowSecondShift(shift?.ShiftStart2 && shift?.ShiftEnd2);
             //setActiveShift(shift?.Status === DefaultStatusType.active);
         }
     }, [shift]);
@@ -140,9 +156,12 @@ const EditShiftModal = ({ id, ...props }) => {
             ID: shift.ID,
             Type: values.typeSelect,
             NoEmployees: values.noEmployeesInput,
+            ActivitiesDescription: values.activitiesDescriptionInput,
             ShiftStart: values.shiftStartInput,
             ShiftEnd: values.shiftEndInput,
-            ActivitiesDescription: values.activitiesDescriptionInput,
+            ShiftStart2: values.shiftStart2Input,
+            ShiftEnd2: values.shiftEnd2Input,
+            ExtraInfo: values.extraInfoInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
@@ -217,22 +236,80 @@ const EditShiftModal = ({ id, ...props }) => {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col xs="6">
-                                            <AryFormikTextInput name="shiftStartInput"
-                                                label="Start"
-                                            />
-                                        </Col>
-                                        <Col xs="6">
-                                            <AryFormikTextInput name="shiftEndInput"
-                                                label="End"
+                                        <Col xs="12">
+                                            <AryFormikTextArea name="activitiesDescriptionInput"
+                                                label="Activities"
+                                                rows="3"
                                             />
                                         </Col>
                                     </Row>
                                     <Row>
+                                        <Col xs="6">
+                                            <AryFormikTextInput name="shiftStartInput"
+                                                label="From"
+                                                placeholder="hh:mm"
+                                            />
+                                        </Col>
+                                        <Col xs="6">
+                                            <AryFormikTextInput name="shiftEndInput"
+                                                label="To"
+                                                placeholder="hh:mm"
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <div className="bg-light border-radius-md p-3 pb-0 mb-3">
+                                        <Row>
+                                            <Col xs="12">
+                                                <div className="form-check form-switch">
+                                                    <input id="showSecondShiftCheck" name="showSecondShiftCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        onChange={ (e) => {
+                                                            const isChecked = e.target.checked;
+                                                            setShowSecondShift(isChecked);
+                                                        }}
+                                                        checked={ showSecondShift }
+                                                    />
+                                                    <label 
+                                                        className="form-check-label text-xs"
+                                                        htmlFor="showSecondShiftCheck"
+                                                    >
+                                                        If have a rest period, specify the start and end time of the second part of the schedule.   
+                                                    </label>
+
+                                                </div>
+                                            </Col>
+                                        </Row>                                    
+                                        <Row 
+                                            ref={ secondShiftRef }
+                                            style={{
+                                                maxHeight: showSecondShift
+                                                    ? `${secondShiftRef.current.scrollHeight}px`
+                                                    : '0px',
+                                                overflow: 'hidden',
+                                                transition: 'max-height 0.5s ease-in-out',
+                                            }}
+                                        >
+                                            <Col xs="6">
+                                                <AryFormikTextInput name="shiftStart2Input"
+                                                    label="Then from"
+                                                    placeholder="hh:mm"
+                                                />
+                                            </Col>
+                                            <Col xs="6">
+                                                <AryFormikTextInput name="shiftEnd2Input"
+                                                    label="To"
+                                                    placeholder="hh:mm"
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    <Row>
                                         <Col xs="12">
-                                            <AryFormikTextArea name="activitiesDescriptionInput"
-                                                label="Activities"
-                                                rows="4"
+                                            <AryFormikTextArea name="extraInfoInput"
+                                                label="Aditional information"
+                                                rows="3"
+                                                placeholder="Specify things like days of the week or some important information."
                                             />
                                         </Col>
                                     </Row>

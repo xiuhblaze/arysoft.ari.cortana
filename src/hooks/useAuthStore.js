@@ -23,13 +23,6 @@ export const useAuthStore = () => {
 
     // METHODS
 
-    // const setError = (message) => {
-    //     if (message.length === 0) return;
-    //     dispatch(setAuthErrorMessage(message));
-    //     setTimeout(() => {
-    //         dispatch(clearAuthErrorMessage())
-    //     }, 10);
-    // };
     const setError = (value) => {    
         if (isString(value)) {
             dispatch(setAuthErrorMessage(value));    

@@ -249,6 +249,7 @@ const enums = () => {
         morning: 1,
         evening: 2,
         night: 3,
+        mixed: 4,
     });
 
     // Sites
@@ -275,6 +276,17 @@ const enums = () => {
         nameDesc: 4,
         statusDesc: 5,
         updateDesc: 6,
+    });
+
+    // Users
+
+    const UserType = Object.freeze({
+        nothing: 0,
+        admin: 1,
+        auditor: 2,
+        organization: 3,
+        sales: 4,
+        superAdmin: 5,
     });
 
     return {
@@ -307,6 +319,7 @@ const enums = () => {
         ShiftType,
         SiteOrderType,
         StandardOrderType,
+        UserType,
     }
 };
 

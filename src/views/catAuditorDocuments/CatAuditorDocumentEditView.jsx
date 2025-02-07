@@ -263,7 +263,7 @@ console.log('onFormSubmit', toSave);
                                                             </AryFormikSelectInput>
                                                         </Col>
 
-                                                        <div className="bg-gray-100 border-radius-md mb-3">
+                                                        <div className="bg-gray-100 border-radius-md p-3 mb-3">
                                                             <Row>
                                                             <Col xs="4">
                                                                 <AryFormikTextInput name="warningEveryInput"

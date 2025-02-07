@@ -5,7 +5,9 @@ export const authSlice = createSlice({
   initialState: {
     status: 'checking', // 'checking', 'not-authenticated', 'authenticated'
     user: {},
-    userErrorMessage: undefined,
+    isPwdSaving: false,
+    pwdSavedOk: false,
+    userErrorMessage: null,
   },
   reducers: {
     onChecking: (state) => {
@@ -20,11 +22,20 @@ export const authSlice = createSlice({
       state.status = 'not-authenticated';
       state.user = {};
     },
+    onPwdSaving: (state) => {
+      state.isPwdSaving = true;
+    },
+    isPwdSavedOk: (state) => {
+      state.isPwdSaving = false;
+      state.pwdSavedOk = true;
+    },
     setAuthErrorMessage: (state, action) => {
+      state.isPwdSaving = false;
+      state.pwdSavedOk = false;
       state.userErrorMessage = action.payload;
     },
     clearAuthErrorMessage: (state) => {
-      state.userErrorMessage = undefined
+      state.userErrorMessage = null
     }
   }
 });
