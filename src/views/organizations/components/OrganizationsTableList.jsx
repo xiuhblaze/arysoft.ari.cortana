@@ -128,6 +128,7 @@ const OrganizationsTableList = () => {
                                         </div>
                                     </div>
                                 </th>
+                                {/* <th className={headStyle}>Legal entity</th> */}
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
                                 <th className={headStyle}>Sites</th>
@@ -142,7 +143,6 @@ const OrganizationsTableList = () => {
                                         Certificates
                                     </div>
                                 </th>
-                                <th className={headStyle}>QR</th>
                                 <th>
                                     <div className="d-flex justify-content-center align-items-center gap-1">
                                         <SortItem

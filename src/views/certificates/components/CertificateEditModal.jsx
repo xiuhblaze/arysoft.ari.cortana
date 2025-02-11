@@ -1,8 +1,8 @@
-import { addDays } from "date-fns";
+import { addDays, set } from "date-fns";
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
-import { Button, Col, Modal, Row } from "react-bootstrap";
+import { Button, Col, Image, Modal, Row } from "react-bootstrap";
 import { certificateStatusProps } from "../helpers/certificateStatusProps";
-import { faCertificate, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faCertificate, faEdit, faRotateRight, faSave } from "@fortawesome/free-solid-svg-icons";
 import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
@@ -35,13 +35,7 @@ const CertificateEditModal = ({ id, ...props }) => {
         // DefaultValidityStatusType,
         StandardOrderType,
     } = enums();
-    // const auditPlanValidityStatusProps = [
-    //     { label: '-', value: DefaultValidityStatusType.nothing, variant: 'secondary' },
-    //     { lable: 'Success', value: DefaultValidityStatusType.success, variant: 'success' },
-    //     { label: 'Warning', value: DefaultValidityStatusType.warning, variant: 'warning' },
-    //     { label: 'Deleted', value: DefaultValidityStatusType.danger, variant: 'danger' },
-    // ];
-
+    
     const {
         certificatesAsync,
         
@@ -62,6 +56,7 @@ const CertificateEditModal = ({ id, ...props }) => {
         startDateInput: '',
         dueDateInput: '',
         commentsInput: '',
+        crnInput: '',
         prevAuditDateInput: '',
         prevAuditNoteInput: '',
         nextAuditDateInput: '',
@@ -87,6 +82,8 @@ const CertificateEditModal = ({ id, ...props }) => {
             .required('Must specify due date'),
         commentsInput: Yup.string()
             .max(500, 'The comments cannot exceed more than 500 characters'),
+        crnInput: Yup.string()
+            .max(10, 'The Certificate Registration Number cannot exceed more than 10 characters'),
         prevAuditDateInput: Yup.date()
             .typeError('Must be a valid date')
             .required('Must specify previous audit date'),
@@ -113,6 +110,23 @@ const CertificateEditModal = ({ id, ...props }) => {
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
                                 message: 'Only files with png, jpg or pdf extensions are allowed'
+                            });
+                        }
+                    }
+                    return true;
+                }
+            }),
+        qrCodeFileInput: Yup.mixed()
+            .test({
+                name: 'is-type-valid',
+                message: 'Some file error', // <- este solo es visible si el último return es false
+                test: (value, ctx) => {
+                    if (!!value) {
+                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const validTypes = ['jpg', 'png'];
+                        if (!validTypes.includes(extension)) {
+                            return ctx.createError({
+                                message: 'Only files with png or jpg extensions are allowed' 
                             });
                         }
                     }
@@ -161,6 +175,9 @@ const CertificateEditModal = ({ id, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [statusOptions, setStatusOptions] = useState(null);
     const [showAddNote, setShowAddNote] = useState(false);
+
+    const [qrCodePreview, setQrCodePreview] = useState(null);
+    const [newQRCode, setNewQRCode] = useState(false);
     
     useEffect(() => {
         
@@ -170,6 +187,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                 startDateInput: !!certificate?.StartDate ? getISODate(certificate.StartDate) : '',
                 dueDateInput: !!certificate?.DueDate ? getISODate(certificate.DueDate) : '',
                 commentsInput: certificate?.Comments ?? '',
+                crnInput: certificate?.CRN ?? '',
                 prevAuditDateInput: !!certificate?.PrevAuditDate ? getISODate(certificate.PrevAuditDate) : '',
                 prevAuditNoteInput: certificate?.PrevAuditNote ?? '',
                 nextAuditDateInput: !!certificate?.NextAuditDate ? getISODate(certificate.NextAuditDate) : '',
@@ -180,6 +198,7 @@ const CertificateEditModal = ({ id, ...props }) => {
                 actionPlanDateInput: !!certificate?.ActionPlanDate ? getISODate(certificate.ActionPlanDate) : '',
                 actionPlanDeliveredCheck: !!certificate?.ActionPlanDelivered ?? false,
                 certificateFileInput: '',
+                qrCodeFileInput: '',
                 statusSelect: certificate?.Status ?? ''
             });
 
@@ -235,6 +254,8 @@ const CertificateEditModal = ({ id, ...props }) => {
                 status: DefaultStatusType.active,
                 pageSize: 0,
             });
+
+            setNewQRCode(isNullOrEmpty(certificate.QRFile));
             
             setShowAddNote(false);
         }
@@ -311,6 +332,7 @@ const CertificateEditModal = ({ id, ...props }) => {
             StartDate: values.startDateInput,
             DueDate: values.dueDateInput,
             Comments: values.commentsInput,
+            CRN: values.crnInput,
             PrevAuditDate: values.prevAuditDateInput,
             PrevAuditNote: values.prevAuditNoteInput,
             NextAuditDate: values.nextAuditDateInput,
@@ -331,7 +353,7 @@ const CertificateEditModal = ({ id, ...props }) => {
             });
         }
 
-        certificateSaveAsync(toSave, values.certificateFileInput);
+        certificateSaveAsync(toSave, values.certificateFileInput, values.qrCodeFileInput);
     }; // onFormSubmit
 
     return (
@@ -340,26 +362,15 @@ const CertificateEditModal = ({ id, ...props }) => {
                 variant="link"
                 className="text-dark p-0 mb-0"
                 onClick={ onShowModal }
-                title={ !!id ? "Edit certificate" : "Create new certificate" }
+                title={ !!id ? "Edit certificate" : "Add certificate" }
             >
                 <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } size="xl" />
             </Button>
             <Modal show={ showModal } onHide={ onCloseModal } size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {
-                            !!id ? (
-                                <>
-                                    <FontAwesomeIcon icon={ faEdit } className="px-3" />
-                                    Edit certificate
-                                </>
-                            ) : (
-                                <>
-                                    <FontAwesomeIcon icon={ faSquarePlus } className="px-3" />
-                                    Add certificate
-                                </>
-                            )
-                        }
+                        <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } className="px-3" />
+                        { !!id ? "Edit certificate" : "Add certificate" }
                     </Modal.Title>
                 </Modal.Header>
                 {
@@ -378,56 +389,156 @@ const CertificateEditModal = ({ id, ...props }) => {
                                 <Form>
                                     <Modal.Body>
                                         <Row>
-                                            <Col xs="12">
-                                                <AryFormikSelectInput
-                                                    name="standardSelect"
-                                                    label="Standard"
-                                                    disabled={!!id}
-                                                    helpText={ !id ? 'Select a standard to assign' : certificate.Standard.Name }
-                                                >
-                                                    { !id && <option value="">(select)</option> }
-                                                    {
-                                                        organizationStandards.map(item =>
-                                                            <option
-                                                                key={item.StandardID}
-                                                                value={item.StandardID}
-                                                                className="text-capitalize"
-                                                            >
-                                                                {item.StandardName}
-                                                            </option>
-                                                        )
-                                                    }
-                                                </AryFormikSelectInput>
+                                            <Col xs="12" sm="8">
+                                                <Row>
+                                                    <Col xs="12">
+                                                        <AryFormikSelectInput
+                                                            name="standardSelect"
+                                                            label="Standard"
+                                                            disabled={!!id}
+                                                            helpText={ !id ? 'Select a standard to assign' : certificate.Standard.Name }
+                                                        >
+                                                            { !id && <option value="">(select)</option> }
+                                                            {
+                                                                organizationStandards.map(item =>
+                                                                    <option
+                                                                        key={item.StandardID}
+                                                                        value={item.StandardID}
+                                                                        className="text-capitalize"
+                                                                    >
+                                                                        {item.StandardName}
+                                                                    </option>
+                                                                )
+                                                            }
+                                                        </AryFormikSelectInput>
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="crnInput"
+                                                            label="Certificate Registration Number"
+                                                            placeholder="MEX-0-0000-000000"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <label className="form-label">Certificate file</label>
+                                                        <div className="d-flex justify-content-between align-items-center mb-3">
+                                                            {
+                                                                !isNullOrEmpty(certificate.Filename) &&
+                                                                <div>
+                                                                    <a
+                                                                        href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/certificates/${certificate.Filename}`}
+                                                                        target="_blank"
+                                                                        className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
+                                                                        title="View current file"
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faCertificate} size="lg" />
+                                                                    </a>
+                                                                </div>
+                                                            }
+                                                            <div className="w-100">
+                                                                <input
+                                                                    type="file"
+                                                                    name="certificateFile"
+                                                                    accept="image/jpeg,image/png,application/pdf"
+                                                                    className="form-control"
+                                                                    onChange={(e) => {
+                                                                        formik.setFieldValue('certificateFileInput', e.currentTarget.files[0]);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
                                             </Col>
-                                            <Col xs="12">
-                                                <label className="form-label">Certificate file</label>
-                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                            <Col xs="12" sm="4">
+                                                <div className="d-flex justify-content-between">
+                                                    <label className="form-label">QR Code</label>
                                                     {
-                                                        !isNullOrEmpty(certificate.Filename) &&
-                                                        <div>
-                                                            <a
-                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/certificates/${certificate.Filename}`}
-                                                                target="_blank"
-                                                                className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
-                                                                title="View current file"
+                                                        !newQRCode && !!certificate.QRFile &&
+                                                        <div className="d-flex justify-content-end gap-3">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={() => setNewQRCode(true)}
+                                                                title="Upload new QR Code"
                                                             >
-                                                                <FontAwesomeIcon icon={faCertificate} size="lg" />
-                                                            </a>
+                                                                <FontAwesomeIcon icon={faRotateRight} size="lg" />
+                                                            </button>
+                                                            {/* <button
+                                                                type="button"
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={onDeleteFile}
+                                                                title="Delete QR code file"
+                                                            >
+                                                                <FontAwesomeIcon icon={faTrash} size="lg" />
+                                                            </button> */}
                                                         </div>
                                                     }
-                                                    <div className="w-100">
+                                                    {
+                                                        !!newQRCode && !isNullOrEmpty(certificate.QRFile) &&
+                                                        <div className="text-end">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                                onClick={ () => {
+                                                                    setNewQRCode(false);
+                                                                    setQrCodePreview(null);
+                                                                    formik.setFieldValue("qrCodeFileInput", '');
+                                                                }}
+                                                                title="Cancel upload new QR Code"
+                                                            >
+                                                                <FontAwesomeIcon icon={faBan} size="lg" />
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                {
+                                                !!newQRCode ? (
+                                                    <>
+                                                        {
+                                                            !!qrCodePreview && 
+                                                            <div>
+                                                                <Image src={qrCodePreview}
+                                                                    thumbnail
+                                                                    fluid
+                                                                    className="mb-3"
+                                                                />
+                                                            </div>
+                                                        }
                                                         <input
                                                             type="file"
-                                                            name="certificateFile"
-                                                            accept="image/jpeg,image/png,application/pdf"
-                                                            className="form-control"
+                                                            name="qrFile"
+                                                            accept="image/png,image/jpeg,image/jpg"
+                                                            className="form-control mb-3"
                                                             onChange={(e) => {
-                                                                formik.setFieldValue('certificateFileInput', e.currentTarget.files[0]);
+                                                                const fileReader = new FileReader();
+                                                                fileReader.onload = () => {
+                                                                    if (fileReader.readyState === 2) {
+                                                                        setQrCodePreview(fileReader.result);                                                                        
+                                                                    }
+                                                                };
+                                                                fileReader.readAsDataURL(e.target.files[0]);
+                                                                formik.setFieldValue('qrCodeFileInput', e.currentTarget.files[0]);
                                                             }}
                                                         />
+                                                        {
+                                                            formik.touched.qrCodeFileInput && formik.errors.qrCodeFileInput &&
+                                                            <span className="text-danger text-xs">{formik.errors.qrCodeFileInput}</span>
+                                                        }
+                                                    </>
+                                                ) : !!certificate.QRFile && (
+                                                    <div>
+                                                        <Image 
+                                                            src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/certificates/${certificate.QRFile}`}
+                                                            thumbnail
+                                                            fluid
+                                                            className="mb-3"
+                                                        />
                                                     </div>
-                                                </div>
+                                                )
+                                            }
                                             </Col>
+                                        </Row>
+                                        <Row>
                                             <Col xs="12" sm="6">
                                                 <AryFormikTextInput name="startDateInput"
                                                     type="date"

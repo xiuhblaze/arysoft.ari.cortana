@@ -21,7 +21,7 @@ const OrganizationStandardsCard = ({ readOnly = false, ...props }) => {
         isOrganizationStandardsLoading,
         organizationStandards,
         organizationStandardsAsync,
-    } =useOrganizationStandardsStore();
+    } = useOrganizationStandardsStore();
 
     useEffect(() => {
         if (!!organization) {

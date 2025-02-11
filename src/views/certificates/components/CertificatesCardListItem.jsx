@@ -1,15 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Col, ListGroupItem, Row } from "react-bootstrap";
+import { Button, Col, ListGroupItem, Row } from "react-bootstrap";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import CertificateEditModal from "./CertificateEditModal";
 import certificateValidityStatusProps from "../helpers/certificateValidityStatusProps";
 import envVariables from "../../../helpers/envVariables";
 import enums from "../../../helpers/enums";
 import { certificateStatusProps } from "../helpers/certificateStatusProps";
-import { faBackwardStep, faCertificate, faForwardStep, faNoteSticky, faStar, faPlay, faStop, faGear, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faBackwardStep, faCertificate, faForwardStep, faNoteSticky, faStar, faPlay, faStop, faGear, faTriangleExclamation, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import certificateActionPLanValidityStatusProps from "../helpers/certificateActionPlanValidityStatusProps";
 
-const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
+const CertificatesCardListItem = ({ item, onShowQRModal, readOnly = false, ...props }) => {
     const { 
         VITE_FILES_URL,
         URL_ORGANIZATION_FILES,
@@ -77,13 +77,32 @@ const CertificatesCardListItem = ({ item, readOnly = false, ...props }) => {
                 </div>
                 <div className="w-100">
                     <h6 className="mb-0 text-sm">
-                        { item.StandardName }
-                        {
-                            !!item.Comments 
-                            ? <FontAwesomeIcon icon={ faNoteSticky } className="text-warning ms-1" title={ item.Comments } />
-                            : <FontAwesomeIcon icon={ faNoteSticky } className="text-secondary ms-1" title="(no comments)" />
-                        }
-                    </h6>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <span>
+                                { item.StandardName }
+                                {
+                                    !!item.Comments 
+                                    ? <FontAwesomeIcon icon={ faNoteSticky } className="text-warning ms-1" title={ item.Comments } />
+                                    : <FontAwesomeIcon icon={ faNoteSticky } className="text-secondary ms-1" title="(no comments)" />
+                                }
+                                {
+                                    !!item.QRFile
+                                    ? <Button
+                                        variant="link"
+                                        className="text-dark p-0 mb-0 ms-1"
+                                        title="Show QR code"
+                                        onClick={ () => onShowQRModal() }
+                                    >
+                                        <FontAwesomeIcon icon={ faQrcode } size="lg" />
+                                    </Button>
+                                    : <FontAwesomeIcon icon={ faQrcode } className="text-secondary ms-1" title="(no QR code)" />
+                                }
+                            </span>
+                            <span title="Certificate Registration Number">
+                                { item.CRN }
+                            </span>
+                        </div>
+                    </h6>                    
                     <Row>
                         <Col xs="12" sm="6">
                             <div 

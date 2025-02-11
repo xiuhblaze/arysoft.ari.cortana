@@ -105,6 +105,7 @@ const SitesCard = ({ readOnly = false, ...props }) => {
                                                             : <FontAwesomeIcon icon={ faLocationPin } className="text-secondary" fixedWidth />
                                                         }
                                                         { item.Description }
+                                                        { !!item.Country && <span className="text-xs text-secondary ms-1">({ item.Country })</span> }
                                                     </h6>
                                                     <p className="mb-0 text-xs">{ item.Address }</p>
                                                     <p className="text-xs font-weight-bold">Employes: { item.EmployeesCount } | Shifts: { item.ShiftsCount }</p>

@@ -25,6 +25,7 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import renameFile from "../helpers/renameFile";
 
 const CERTIFICATES_ROUTE = '/certificates';
 const { VITE_PAGE_SIZE } = envVariables();
@@ -163,7 +164,7 @@ export const useCertificatesStore = () => {
         }
     };
 
-    const certificateSaveAsync = async (item, file) => {
+    const certificateSaveAsync = async (item, certificateFile, qrFile) => {
         dispatch(onCertificateSaving());
 
         const toSave = {
@@ -179,7 +180,17 @@ export const useCertificatesStore = () => {
             const data = JSON.stringify(toSave);
 
             formData.append('data', data);
-            formData.append('file', file);
+
+            if (!!certificateFile) {
+                const renamedFile = renameFile(certificateFile, 'certificate');
+                formData.append('CertificateFile', renamedFile);
+            }
+            if (!!qrFile) {
+                const renamedFile = renameFile(qrFile, 'qrcode');
+                formData.append('QRFile', renamedFile);
+            }
+
+            // formData.append('file', file);
 
             const resp = await cortanaApi.put(`${CERTIFICATES_ROUTE}`, formData, { headers });
             const { Data } = await resp.data;

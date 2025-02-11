@@ -1,7 +1,7 @@
-import { Card, Col, Image, Row } from 'react-bootstrap'
-import { faBan, faEdit, faRotateRight, faSave } from '@fortawesome/free-solid-svg-icons';
+import { Card, Col, Image, ListGroup, Row } from 'react-bootstrap'
+import { faBan, faEdit, faPlus, faRotateRight, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import * as Yup from 'yup';
@@ -9,12 +9,15 @@ import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import { Field, Form, Formik } from 'formik';
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import organizationStatusProps from '../helpers/organizationStatusProps';
 import { useNotesStore } from '../../../hooks/useNotesStore';
 import NotesListModal from '../../notes/components/NotesListModal';
+import { useCompaniesStore } from '../../../hooks/useCompaniesStore';
+import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
+import CompaniesList from '../../companies/components/CompaniesList';
 
 const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const {
@@ -23,33 +26,38 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
     } = envVariables();
-    const { OrganizationStatusType } = enums();
+    const { OrganizationStatusType, CompanyOrderType } = enums();
     const formDefaultValues = {
         nameInput: '',
-        legalEntityInput: '',
+        // legalEntityInput: '',
         websiteInput: '',
         phoneInput: '',
         logoInputFile: '',
-        qrcodeInputFile: '',
-        coidInput: '',
+        // qrcodeInputFile: '',
+        // coidInput: '',
+        extraInfoInput: '',
         statusSelect: '',
         noteInput: '',
+        companiesCountHidden: 0,
     };
     const validationSchema = Yup.object({
         nameInput: Yup.string()
             .required('Name is required')
             .max(250, 'Name must be at most 250 characters'),
-        legalEntityInput: Yup.string()
-            .required('Legal entity is required')
-            .max(250, 'Legal entity must be at most 250 characters'),
+        // legalEntityInput: Yup.string()
+        //     .required('Legal entity is required')
+        //     .max(250, 'Legal entity must be at most 250 characters'),
         websiteInput: Yup.string()
+            .url('Web site must be a valid URL')
             .max(250, 'Web site must be at most 250 characters'),
         phoneInput: Yup.string()
             .max(25, 'Phone number must be at most 25 characters')
             .matches(PHONE_REGEX, 'Phone number is not valid'),
-        coidInput: Yup.string()
-            .max(20, 'COID number must be at most 20 characters')
-            .matches(COID_REGEX, 'COID number is not valid'),
+        extraInfoInput: Yup.string()
+            .max(1000, 'Extra info must be at most 1000 characters'),
+        // coidInput: Yup.string()
+        //     .max(20, 'COID number must be at most 20 characters')
+        //     .matches(COID_REGEX, 'COID number is not valid'),
         logoInputFile: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -67,27 +75,29 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                     return true;
                 }
             }),
-        qrcodeInputFile: Yup.mixed()
-            .test({
-                name: 'is-type-valid',
-                message: 'Some file update error', // <- este solo es visible si el último return es false
-                test: (value, ctx) => {
-                    if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
-                        const validTypes = ['jpg', 'png'];
-                        if (!validTypes.includes(extension)) {
-                            return ctx.createError({
-                                message: 'Only files with png or jpg extensions are allowed'
-                            });
-                        }
-                    }
-                    return true;
-                }
-            }),
+        // qrcodeInputFile: Yup.mixed()
+        //     .test({
+        //         name: 'is-type-valid',
+        //         message: 'Some file update error', // <- este solo es visible si el último return es false
+        //         test: (value, ctx) => {
+        //             if (!!value) {
+        //                 const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+        //                 const validTypes = ['jpg', 'png'];
+        //                 if (!validTypes.includes(extension)) {
+        //                     return ctx.createError({
+        //                         message: 'Only files with png or jpg extensions are allowed'
+        //                     });
+        //                 }
+        //             }
+        //             return true;
+        //         }
+        //     }),
         statusSelect: Yup.string()
             .required('Must select a status'),
         noteInput: Yup.string()
             .max(250, 'The note cannot exceed more than 250 characters'),
+        companiesCountHidden: Yup.number()
+            .min(1, 'Must have at least one legal entity')
     });
 
     // CUSTOM HOOKS
@@ -104,6 +114,13 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     } = useOrganizationsStore();
 
     const {
+        isCompaniesLoading,
+        companies,
+        companiesAsync,
+        companiesErrorMessage
+    } = useCompaniesStore();
+
+    const {
         isNoteCreating,
         noteCreatedOk,
         note,
@@ -113,6 +130,8 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     // HOOKS
 
     const navigate = useNavigate();
+
+    const formikRef = useRef(null);
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [logoPreview, setLogoPreview] = useState(null);
@@ -126,14 +145,16 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         if (!!organization) {
             setInitialValues({
                 nameInput: organization?.Name ?? '',
-                legalEntityInput: organization?.LegalEntity ?? '',
+                // legalEntityInput: organization?.LegalEntity ?? '',
                 websiteInput: organization?.Website ?? '',
                 phoneInput: organization?.Phone ?? '',
-                coidInput: organization?.COID ?? '',
+                //coidInput: organization?.COID ?? '',
                 logoInputFile: '',
-                qrcodeInputFile: '',
+                extraInfoInput: organization?.ExtraInfo ?? '',
+                // qrcodeInputFile: '',
                 statusSelect: organization?.Status ?? '',
                 noteInput: '',
+                companiesCountHidden: organization?.Companies?.length ?? 0,
             });
 
             setNewLogo(isNullOrEmpty(organization.LogoFile));
@@ -173,9 +194,22 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                         { label: 'Deleted', value: OrganizationStatusType.deleted },
                     ]);
                     break;
-            }
+            } // switch
+
+            // companiesAsync({
+            //     organizationID: organization.ID,
+            //     pageSize: 0,
+            //     order: CompanyOrderType.name,
+            // });
         }
     }, [organization]);
+
+    useEffect(() => {
+        if (!!companies) {
+            formikRef.current.setFieldValue('companiesCountHidden', companies.length);
+        }
+    }, [companies])
+    
 
     useEffect(() => {
         if (!!organizationSavedOk) {
@@ -199,12 +233,15 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         const toSave = {
             ID: organization.ID,
             Name: values.nameInput,
-            LegalEntity: values.legalEntityInput,
+            // LegalEntity: values.legalEntityInput,
             Website: values.websiteInput,
             Phone: values.phoneInput,
-            COID: values.coidInput,
+            ExtraInfo: values.extraInfoInput,
+            // COID: values.coidInput,
             Status: values.statusSelect,
         };
+
+        //console.log(values);
 
         if (organization.Status != values.statusSelect) {
             const text = "Status changed to " + organizationStatusProps[values.statusSelect].label.toUpperCase();
@@ -254,9 +291,11 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 validationSchema={validationSchema}
                 enableReinitialize
                 onSubmit={onFormSubmit}
+                innerRef={formikRef}
             >
                 { formik => (
                     <Form>
+                        <Field name="companiesCountHidden" type="hidden" value={ formik.values.companiesCountHidden } />
                         <Card.Body className="py-0">
                             <Row>
                                 <Col xs="12" sm="4">
@@ -351,7 +390,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                             }
                                         </Col>
                                     </Row>
-                                    <Row>
+                                    {/* <Row>
                                         <Col xs="12">
                                             <div className="d-flex justify-content-between">
                                                 <label className="form-label">QR Code</label>
@@ -366,14 +405,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                         >
                                                             <FontAwesomeIcon icon={faRotateRight} size="lg" />
                                                         </button>
-                                                        {/* <button
+                                                        <button
                                                             type="button"
                                                             className="btn btn-link p-0 mb-0 text-secondary"
                                                             onClick={onDeleteFile}
                                                             title="Delete QR code file"
                                                         >
                                                             <FontAwesomeIcon icon={faTrash} size="lg" />
-                                                        </button> */}
+                                                        </button>
                                                     </div>
                                                 }
                                                 {
@@ -440,23 +479,24 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 )
                                             }
                                         </Col>
-                                    </Row>
+                                    </Row> */}
                                 </Col>
                                 <Col xs="12" sm="8">
                                     <Row>
                                         <Col xs="12">
                                             <AryFormikTextInput
                                                 name="nameInput"
-                                                label="Name"
+                                                label="General name"
                                                 type="text"
+                                                helpText="This name will be used for the certificates"
                                             />
                                         </Col>
                                         <Col xs="12">
-                                            <AryFormikTextInput
-                                                name="legalEntityInput"
-                                                label="Legal entity"
-                                                type="text"
-                                            />
+                                            <CompaniesList />
+                                            {
+                                                formik.touched.companiesCountHidden && formik.errors.companiesCountHidden &&
+                                                <span className="text-danger text-xs">{formik.errors.companiesCountHidden}</span>
+                                            }
                                         </Col>
                                         <Col xs="12">
                                             <AryFormikTextInput
@@ -477,12 +517,11 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                             />
                                         </Col>
                                         <Col xs="12">
-                                            <AryFormikTextInput
-                                                name="coidInput"
-                                                label="COID number"
-                                                type="text"
-                                                placeholder="MEX-0-0000-000000"
-                                                helpText="Only for FSSC 22000"
+                                            <AryFormikTextArea
+                                                name="extraInfoInput"
+                                                label="Extra info"
+                                                helpText="Add any extra info about the organization"
+                                                rows="3"
                                             />
                                         </Col>
                                         <Col xs="12">

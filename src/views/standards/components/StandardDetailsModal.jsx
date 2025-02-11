@@ -126,12 +126,12 @@ const StandardDetailsModal = ({ show, onHide, ...props }) => {
                                 <hr className="horizontal dark my-3" />
                                 <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
                                     <ListGroupItemData label="Certificates:" icon={ faCertificate }>
-                                        { standard.Certificates.length }
+                                        { standard?.Certificates?.length ?? 0 }
                                     </ListGroupItemData>
                                 </ListGroup.Item>
                                 <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
                                     <ListGroupItemData label="Organizations:" icon={ faCity }>
-                                        { standard.Organizations.length }
+                                        { standard?.Organizations?.length ?? 0 }
                                     </ListGroupItemData>
                                 </ListGroup.Item>
                             </ListGroup>

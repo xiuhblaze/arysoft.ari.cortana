@@ -1,10 +1,35 @@
 
 const organizationStatusProps = [
-  { bgColor: "secondary", label: "-" },
-  { bgColor: "warning", label: "Prospect" },
-  { bgColor: "info", label: "Active" },
-  { bgColor: "secondary", label: "Inactive" },
-  { bgColor: "danger", label: "Deleted" },
+    {
+        bgColor: 'light', 
+        label: '-',
+        className: 'opacity-2',
+        variant: 'light',
+    },
+    { 
+        bgColor: 'warning',
+        label: 'Prospect',
+        className: '',
+        variant: 'warning',
+    },
+    {
+        bgColor: 'info',
+        label: 'Active',
+        className: '',
+        variant: 'info',
+    },
+    { 
+        bgColor: 'secondary',
+        label: 'Inactive',
+        className: 'opacity-6',
+        variant: 'secondary',
+    },
+    { 
+        bgColor: 'danger',
+        label: 'Deleted',
+        className: '',
+        variant: 'danger',
+    },    
 ];
 
 export default organizationStatusProps; 

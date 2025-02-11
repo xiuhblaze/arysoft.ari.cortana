@@ -1,4 +1,4 @@
-import { Alert, Card, ListGroup, Spinner } from 'react-bootstrap';
+import { Alert, Card, ListGroup, Modal, Spinner } from 'react-bootstrap';
 import { useCertificatesStore } from '../../../hooks/useCertificatesStore';
 import { useEffect, useState } from 'react'
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
@@ -8,12 +8,14 @@ import enums from '../../../helpers/enums';
 import Swal from 'sweetalert2';
 import certificateValidityStatusProps from '../helpers/certificateValidityStatusProps';
 import certificateActionPLanValidityStatusProps from '../helpers/certificateActionPlanValidityStatusProps';
+import envVariables from '../../../helpers/envVariables';
 
 const CertificatesCard = ({ readOnly = false, ...props }) => {
     const { CertificateOrderType } = enums();    
-    const statusStyle = [
-
-    ];
+    const {
+        VITE_FILES_URL,
+        URL_ORGANIZATION_FILES,
+    } = envVariables();
 
     const {
         DefaultStatusType,
@@ -38,6 +40,8 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
 
     const [certificateValidityStatus, setCertificateValidityStatus] = useState(DefaultValidityStatusType.nothing);
     const [certificateActionPlanValidityStatus, setCertificateActionPlanValidityStatus] = useState(DefaultValidityStatusType.nothing);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [qrValues, setQRValues] = useState(null);
 
     useEffect(() => {
         if (!!organization) {
@@ -126,7 +130,17 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
         return status;
     } // getCertificateActionPlanValidityStatus
 
+    const onShowQRModal = (value) => {
+        setQRValues(value);
+        setShowQRModal(true);
+    }
+
+    const onCloseQRModal = () => {
+        setShowQRModal(false);
+    };
+
     return (
+        <>
         <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
@@ -164,7 +178,12 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
                             <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                 {
                                     certificates.map(item => 
-                                        <CertificatesCardListItem key={item.ID} item={item} readOnly={readOnly} />
+                                        <CertificatesCardListItem 
+                                            key={item.ID} 
+                                            item={item} 
+                                            readOnly={readOnly} 
+                                            onShowQRModal={ () => onShowQRModal(item.QRFile) }
+                                        />
                                     )
                                 }
                             </ListGroup>
@@ -172,6 +191,25 @@ const CertificatesCard = ({ readOnly = false, ...props }) => {
                 }
             </Card.Body>
         </Card>
+        <Modal show={showQRModal} onHide={onCloseQRModal} centered>
+                <Modal.Body>
+                    <div className="d-flex justify-content-center align-items-center py-5">
+                        { !!qrValues &&
+                            <img 
+                                src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/certificates/${qrValues}`} 
+                                alt="QR code"
+                                className="img-fluid w-50"
+                            />
+                        }
+                    </div>
+                    <div className="d-flex justify-content-end align-items-center mt-3">
+                        <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCloseQRModal}>
+                            Close
+                        </button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        </>
     )
 }
 

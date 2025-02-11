@@ -9,6 +9,7 @@ import auditorStandardsSlice from "./slices/auditorStandardsSlice";
 import authSlice from "./slices/authslice";
 import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
 import certificatesSlice from "./slices/certificatesSlice";
+import companiesSlice from "./slices/companiesSlice";
 import contactsSlice from "./slices/contactsSlice";
 import nacecodesSlice from "./slices/nacecodesSlice";
 import notesSlice from "./slices/notesSlice";
@@ -29,6 +30,7 @@ export const store = configureStore({
         auth: authSlice.reducer,
         catAuditorDocuments: catAuditorDocumentsSlice.reducer,
         certificates: certificatesSlice.reducer,
+        companies: companiesSlice.reducer,
         contacts: contactsSlice.reducer,
         nacecodes: nacecodesSlice.reducer,
         notes: notesSlice.reducer,

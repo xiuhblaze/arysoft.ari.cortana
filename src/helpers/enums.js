@@ -170,6 +170,20 @@ const enums = () => {
         deleted: 5,
     });
 
+    // Companies
+
+    const CompanyOrderType = Object.freeze({
+        nothing: 0,
+        name: 1,
+        legalEntity: 2,
+        COID: 3,
+        updated: 4,
+        nameDesc: 5,
+        legalEntityDesc: 6,
+        COIDDesc: 7,
+        updatedDesc: 8,
+    });
+
     // Contacts
        
     const ContactOrderType = Object.freeze({
@@ -207,17 +221,15 @@ const enums = () => {
     const OrganizationOrderType = Object.freeze({
         nothing: 0,
         folio: 1,
-        name: 2,
-        legalEntity: 3,
-        status: 4,
-        certificatesValidityStatus: 5,
-        updated: 6,
-        folioDesc: 7,
-        nameDesc: 8,
-        legalEntityDesc: 9,
-        statusDesc: 10,
-        certificatesValidityStatusDesc: 11,
-        updatedDesc: 12,
+        name: 2,        
+        status: 3,
+        certificatesValidityStatus: 4,
+        updated: 5,
+        folioDesc: 6,
+        nameDesc: 7,
+        statusDesc: 8,
+        certificatesValidityStatusDesc: 9,
+        updatedDesc: 10,
     });
 
     const OrganizationStandardOrderType = Object.freeze({
@@ -310,6 +322,7 @@ const enums = () => {
         CertificateOrderType,
         CertificateStatusType,
         CertificatesValidityStatusType,
+        CompanyOrderType,
         ContactOrderType,
         NacecodeOrderType,
         OrganizationOrderType,

@@ -9,9 +9,10 @@ import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Status from './Status';
+import organizationStatusProps from '../helpers/organizationStatusProps';
 
 const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hideActions = false, ...props }) => {
-
+    
     const {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
@@ -25,8 +26,14 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
         ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}`
         : defaultPhoto;
 
+    const myClassName = item.Status != OrganizationStatusType.active
+        ? !!className 
+            ? `${className} table-${ organizationStatusProps[item.Status].bgColor } ${ organizationStatusProps[item.Status].className }` 
+            : `table-${organizationStatusProps[item.Status].bgColor} ${ organizationStatusProps[item.Status].className }`
+        : '';
+
     return (
-        <tr {...props} className={className}>
+        <tr {...props} className={myClassName}>
             <td>
                 <div className="d-flex align-items-center me-2">
                     <div className="avatar m-3" style={{ minWidth: '48px'}}>
@@ -37,14 +44,49 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                             <span className="text-danger me-2">{ !!item.Folio ? item.Folio.toString().padStart(4, '0') : '----' }</span>
                             { item.Name }
                         </h6>
-                        <p className="text-xs mb-0">{ item.LegalEntity}</p>
-                        {
-                            !isNullOrEmpty(item.COID) &&
-                            <p className="text-xs mb-0">COID: <strong>{ item.COID }</strong></p>
-                        }
+                        {!!item.Companies
+                            ? <div className="d-flex flex-wrap flex-column text-xs gap-1 mb-0">
+                                { item.Companies
+                                    .filter(c => c.Status === DefaultStatusType.active || c.Status === DefaultStatusType.inactive)
+                                    .map(c => 
+                                        <span 
+                                            key={c.ID}
+                                            className={`d-flex flex-wrap ${ c.Status != DefaultStatusType.active ? 'text-secondary' : '' } me-1`}
+                                            title={ c.Status != DefaultStatusType.active ? 'Inactive' : 'Active' }
+                                        >
+                                            {c.Name} - {c.LegalEntity}
+                                            { c.COID && <span className="text-xs text-secondary ms-1" title="COID">({c.COID})</span> }
+                                        </span>) 
+                                }
+                            </div>
+                            : null}
                     </div>
                 </div>
             </td>
+            {/* <td>
+                <div className="align-middle text-center text-sm">
+                {
+                    !!item.Companies && item.Companies.length == 1 
+                        ? <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                            { item.Companies[0].LegalEntity }
+                        </div>
+                        : !!item.Companies && item.Companies.length > 1
+                            ? <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                                { item.Companies
+                                    .map(c => 
+                                        <span 
+                                            key={c.ID}
+                                            className={`d-flex flex-wrap ${ c.Status != DefaultStatusType.active ? 'text-secondary' : '' } me-1`}
+                                            title={ c.Status != DefaultStatusType.active ? 'Inactive' : 'Active' }
+                                        >
+                                            {c.Name} - {c.LegalEntity}
+                                        </span>) 
+                                }
+                            </div>
+                            : null
+                }
+                </div> 
+            </td>*/}
             <td>
                 <div className="d-flex flex-column align-items-start">
                     {
@@ -133,19 +175,6 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                             }
                         </div>
                     }
-                </div>
-            </td>
-            <td>
-                <div className="align-middle text-center text-sm">
-                { !!item.QRFile && 
-                    <img 
-                        src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.QRFile}`} 
-                        style={{ maxWidth: '48px', cursor: 'pointer' }}
-                        className="img-fluid" 
-                        alt="QR code"
-                        onClick={() => onShowQRModal()}
-                    />
-                }
                 </div>
             </td>
             <td>

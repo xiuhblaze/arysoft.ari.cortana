@@ -1,32 +1,31 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-    onShiftsLoading,
-    setShifts,
+    onCompaniesLoading,
+    setCompanies,
 
-    onShiftLoading,
-    setShift,
-    clearShifts,
+    onCompanyLoading,
+    setCompany,
+    clearCompanies,
 
-    onShiftCreating,
-    isShiftCreated,
-    onShiftSaving,
-    isShiftSaved,
-    onShiftDeleting,
-    isShiftDeleted,
+    onCompanyCreating,
+    isCompanyCreated,
+    onCompanySaving,
+    isCompanySaved,
+    onCompanyDeleting,
+    isCompanyDeleted,
 
-    setShiftsErrorMessage,
-    clearShiftsErrorMessage,
-    clearShift,
-} from "../store/slices/shiftsSlice";
+    setCompaniesErrorMessage,
+    clearCompaniesErrorMessage,
+    clearCompany,
+} from "../store/slices/companiesSlice";
 
 import envVariables from "../helpers/envVariables";
-//import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const SHIFT_URI = '/shifts';
+const COMPANY_URL = '/companies';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -35,8 +34,8 @@ const getSearchQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
-    query += options?.siteID ? `&siteid=${options.siteID}` : '';
-    query += options?.type ? `&type=${options.type}` : '';
+    query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
+    query += options?.text ? `&text=${options.text}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
@@ -44,24 +43,24 @@ const getSearchQuery = (options = {}) => {
     return query;
 };
 
-export const useShiftsStore = () => {
+export const useCompaniesStore = () => {
     const dispatch = useDispatch();
     const {
-        isShiftsLoading,
-        shifts,
-        shiftsMeta,
+        isCompaniesLoading,
+        companies,
+        companiesMeta,
 
-        isShiftLoading,
-        isShiftCreating,
-        shiftCreatedOk,
-        isShiftSaving,
-        shiftSavedOk,
-        isShiftDeleting,
-        shiftDeletedOk,
-        shift,
+        isCompanyLoading,
+        isCompanyCreating,
+        companyCreatedOk,
+        isCompanySaving,
+        companySavedOk,
+        isCompanyDeleting,
+        companyDeletedOk,
+        company,
 
-        shiftsErrorMessage
-    } = useSelector(state => state.shifts)
+        companiesErrorMessage
+    } = useSelector(state => state.companies)
 
     const { user } = useSelector(state => state.auth);
 
@@ -69,15 +68,15 @@ export const useShiftsStore = () => {
 
     const setError = (value) => {    
         if (isString(value)) {
-            dispatch(setShiftsErrorMessage(value));    
+            dispatch(setCompaniesErrorMessage(value));    
         } else if (isString(value.message)) {
-            dispatch(setShiftsErrorMessage(value.message));
+            dispatch(setCompaniesErrorMessage(value.message));
         } else {
             console.error('Unknow error data: ', value);
             return null;
         }            
         setTimeout(() => {
-            dispatch(clearShiftsErrorMessage());
+            dispatch(clearCompaniesErrorMessage());
         }, 10);
     }; // setError
 
@@ -87,17 +86,17 @@ export const useShiftsStore = () => {
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
      * @param {Type, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
-    const shiftsAsync = async (options = {}) => {
-        dispatch(onShiftsLoading());
+    const companiesAsync = async (options = {}) => {
+        dispatch(onCompaniesLoading());
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${SHIFT_URI}${query}`);
+            const resp = await cortanaApi.get(`${COMPANY_URL}${query}`);
             const { Data, Meta } = await resp.data;
 
-            dispatch(setShifts({
-                shifts: Data,
-                shiftsMeta: Meta
+            dispatch(setCompanies({
+                companies: Data,
+                companiesMeta: Meta
             }));
         } catch (error) {
             const message = getError(error);
@@ -105,8 +104,8 @@ export const useShiftsStore = () => {
         }
     };
 
-    const shiftsClear = () => {
-        dispatch(clearShifts());
+    const companiesClear = () => {
+        dispatch(clearCompanies());
     };
 
     /**
@@ -114,8 +113,8 @@ export const useShiftsStore = () => {
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
-    const shiftAsync = async (id) => {
-        dispatch(onShiftLoading());
+    const companyAsync = async (id) => {
+        dispatch(onCompanyLoading());
 
         if (!id) {
             setError('You must specify the ID');
@@ -123,10 +122,10 @@ export const useShiftsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${SHIFT_URI}/${id}`);
+            const resp = await cortanaApi.get(`${COMPANY_URL}/${id}`);
             const { Data } = await resp.data;
             
-            dispatch(setShift(Data));
+            dispatch(setCompany(Data));
         } catch (error) {
             const message = getError(error);
             setError(message);
@@ -135,22 +134,21 @@ export const useShiftsStore = () => {
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
-     * @param {OrganizationID} identificador de la organizacion asociada al shifto
+     * @param {OrganizationID} identificador de la organizacion asociada a la compañia
      */
-    const shiftCreateAsync = async (item) => {
-        dispatch(onShiftCreating());
+    const companyCreateAsync = async (item) => {
+        dispatch(onCompanyCreating());
 
         try {
             const params = {
-                //OrganizationID: item.OrganizationID,
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(SHIFT_URI, params);
+            const resp = await cortanaApi.post(COMPANY_URL, params);
             const { Data } = await resp.data;
 
-            dispatch(setShift(Data));
-            dispatch(isShiftCreated());
+            dispatch(setCompany(Data));
+            dispatch(isCompanyCreated());
         } catch (error) {
             const message = getError(error);
             setError(message);
@@ -159,21 +157,21 @@ export const useShiftsStore = () => {
 
     /**
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-     * @param {ID, Name, Description, Status, UpdatedUser} item Objeto tipo Shift
+     * @param {ID, Name, LegalEntity, COID, Status, UpdatedUser} item Objeto tipo Company
      */
-    const shiftSaveAsync = async (item) => {
-        dispatch(onShiftSaving());
+    const companySaveAsync = async (item) => {
+        dispatch(onCompanySaving());
 
         const toSave = {
             ...item,
             UpdatedUser: user.username,
         }
         try {
-            const resp = await cortanaApi.put(`${SHIFT_URI}/${toSave.ID}`, toSave);
+            const resp = await cortanaApi.put(`${COMPANY_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
-            dispatch(setShift(Data));
-            dispatch(isShiftSaved());
+            dispatch(setCompany(Data));
+            dispatch(isCompanySaved());
         } catch (error) {
             const message = getError(error);
             setError(message);
@@ -184,17 +182,17 @@ export const useShiftsStore = () => {
      * Elimina o marca como eliminado a un registro de la base de datos
      * @param {guid} id identificador del registro a eliminar
      */
-    const shiftDeleteAsync = async (id) => {
-        dispatch(onShiftDeleting());
+    const companyDeleteAsync = async (id) => {
+        dispatch(onCompanyDeleting());
 
         const toDelete = {
-            ShiftID: id,
+            CompanyID: id,
             UpdatedUser: user.username,
         }
 
         try {
-            const resp = await cortanaApi.delete(`${SHIFT_URI}/${id}`, { data: toDelete });
-            dispatch(isShiftDeleted());
+            const resp = await cortanaApi.delete(`${COMPANY_URL}/${id}`, { data: toDelete });
+            dispatch(isCompanyDeleted());
         } catch (error) {
             //console.log(error);
             const message = getError(error);
@@ -202,35 +200,35 @@ export const useShiftsStore = () => {
         }
     }
 
-    const shiftClear = () => {
-        dispatch(clearShift());
+    const companyClear = () => {
+        dispatch(clearCompany());
     }
 
     return {
         // properties
-        isShiftsLoading,
-        shifts,
-        shiftsMeta,
+        isCompaniesLoading,
+        companies,
+        companiesMeta,
 
-        isShiftLoading,
-        isShiftCreating,
-        shiftCreatedOk,
-        isShiftSaving,
-        shiftSavedOk,
-        isShiftDeleting,
-        shiftDeletedOk,
-        shift,
+        isCompanyLoading,
+        isCompanyCreating,
+        companyCreatedOk,
+        isCompanySaving,
+        companySavedOk,
+        isCompanyDeleting,
+        companyDeletedOk,
+        company,
 
-        shiftsErrorMessage,
+        companiesErrorMessage,
 
         // methods
-        shiftsAsync,
-        shiftsClear,
+        companiesAsync,
+        companiesClear,
         
-        shiftAsync,
-        shiftCreateAsync,
-        shiftSaveAsync,
-        shiftDeleteAsync,
-        shiftClear,
+        companyAsync,
+        companyCreateAsync,
+        companySaveAsync,
+        companyDeleteAsync,
+        companyClear,
     }
 };

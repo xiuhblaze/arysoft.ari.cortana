@@ -23,15 +23,18 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
 
     const  formDefaultValues = {
         standardSelect: '',
-        crnInput: '',
+        //crnInput: '',
+        extraInfoInput: '',
         statusCheck: false,
     };
 
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
             .required('Must select a standard'),
-        crnInput: Yup.string()
-            .max(10, 'Certificate Registration Number must be at most 10 characters'),
+        //crnInput: Yup.string()
+        //    .max(10, 'Certificate Registration Number must be at most 10 characters'),
+        extraInfoInput: Yup.string()
+            .max(1000, 'Extra Info must be at most 1000 characters'),
     });
 
     // CUSTOM HOOKS
@@ -71,7 +74,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
         if (!!organizationStandard && showModal) {
             setInitialValues({
                 standardSelect: organizationStandard?.StandardID ?? '',
-                crnInput: organizationStandard?.CRN ?? '',
+                extraInfoInput: organizationStandard?.ExtraInfo ?? '',
+                //crnInput: organizationStandard?.CRN ?? '',
                 statusCheck: organizationStandard.Status === DefaultStatusType.active,
             });
 
@@ -89,6 +93,7 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
             Swal.fire('Standard', `Standard ${!id ? 'assigned' : 'updated'} successfully`, 'success');            
             organizationStandardsAsync({
                 organizationID: organization.ID,
+                pageSize: 0,
             });
             organizationStandardClear();
             setShowModal(false);
@@ -129,7 +134,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
         const toSave = {
             ID: organizationStandard.ID,
             StandardID: !!id ? organizationStandard.StandardID : values.standardSelect,
-            CRN: values.crnInput,
+            //CRN: values.crnInput,
+            ExtraInfo: values.extraInfoInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
@@ -149,19 +155,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
             <Modal show={showModal} onHide={onCloseModal}>
                 <Modal.Header>
                     <Modal.Title>
-                        {
-                            !!id ? (
-                                <>
-                                    <FontAwesomeIcon icon={faEdit} className="px-3" />
-                                    Edit assigned standard
-                                </>
-                            ) : (
-                                <>
-                                    <FontAwesomeIcon icon={faPlus} className="px-3" />
-                                    Assign standard
-                                </>
-                            )
-                        }
+                        <FontAwesomeIcon icon={ !!id ? faEdit : faPlus } className="px-3" />
+                        { !! id ? 'Edit assigned standard' : 'Assign standard' }
                     </Modal.Title>
                 </Modal.Header>
                 {
@@ -207,8 +202,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
                                             </AryFormikSelectInput>
                                         </Col>
                                         <Col xs="12">
-                                            <AryFormikTextInput name="crnInput"
-                                                label="Certificate Registration Number"
+                                            <AryFormikTextInput name="extraInfoInput"
+                                                label="Aditional Info"
                                             />
                                         </Col>
                                         <Col xs="12">

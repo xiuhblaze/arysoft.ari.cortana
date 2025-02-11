@@ -25,6 +25,7 @@ import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import renameFile from "../helpers/renameFile";
 
 const ORGANIZATIONS_ROUTE = '/organizations';
 const { VITE_PAGE_SIZE } = envVariables();
@@ -75,13 +76,6 @@ export const useOrganizationsStore = () => {
 
     // Methods
 
-    // const setError = (message) => {
-    //     if (message.length === 0) return;
-    //     dispatch(setOrganizationsErrorMessage(message));
-    //     setTimeout(() => {
-    //         dispatch(setOrganizationsErrorMessage(null));
-    //     }, 10);
-    // };
     const setError = (value) => {    
         if (isString(value)) {
             dispatch(setOrganizationsErrorMessage(value));    
@@ -96,15 +90,15 @@ export const useOrganizationsStore = () => {
         }, 10);
     }; // setError
 
-    const renameFile = (file, newName) => {
-        const ext = file.name.split('.').pop();
-        const fullNewName = `${newName}.${ext}`;
+    // const renameFile = (file, newName) => {
+    //     const ext = file.name.split('.').pop();
+    //     const fullNewName = `${newName}.${ext}`;
 
-        return new File([file], fullNewName, { 
-            type: file.type,
-            lastModified: file.lastModified,
-        });
-    };
+    //     return new File([file], fullNewName, { 
+    //         type: file.type,
+    //         lastModified: file.lastModified,
+    //     });
+    // };
 
     //* Export Methods
 

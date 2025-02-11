@@ -18,9 +18,7 @@ const OrganizationStandardsCardItem = ({ item, readOnly = false, ...props }) => 
                     {item.StandardName}
                 </h6>
                 <p className="text-xs text-secondary mb-0">
-                    Certificate Registration Number: <span className="font-weight-bold">
-                        { item.CRN }
-                    </span>
+                    { item.ExtraInfo}
                 </p>
             </div>
             {

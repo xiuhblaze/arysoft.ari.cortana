@@ -15,7 +15,7 @@ import ShiftsCard from '../../shifts/components/ShiftsCard';
 import Swal from 'sweetalert2';
 
 const EditSiteModal = ({ id, ...props }) => {
-    
+    const DEFAULT_COUNTRY = 'México';
     const { 
         DefaultStatusType, 
         SiteOrderType,
@@ -23,8 +23,9 @@ const EditSiteModal = ({ id, ...props }) => {
 
     const formDefaultValues = {
         descriptionInput: '',
-        addressInput: '',
         isMainSiteCheck: false,
+        addressInput: '',
+        countryInput: DEFAULT_COUNTRY,
         locationUrlInput: '',
         statusCheck: false,
     };
@@ -34,6 +35,8 @@ const EditSiteModal = ({ id, ...props }) => {
             .max(500, 'Description must be less than 500 characters'),
         addressInput: Yup.string()
             .max(500, 'Address must be less than 500 characters'),
+        countryInput: Yup.string()
+            .max(50, 'Country must be less than 50 characters'),
         locationUrlInput: Yup.string()
             .max(250, 'Location URL must be less than 250 characters'),
     });
@@ -68,8 +71,9 @@ const EditSiteModal = ({ id, ...props }) => {
         if (!!site) {
             setInitialValues({
                 descriptionInput: site?.Description ?? '',
-                addressInput: site?.Address ?? '',
                 isMainSiteCheck: site?.IsMainSite ?? false,
+                addressInput: site?.Address ?? '',
+                countryInput: site?.Country ?? DEFAULT_COUNTRY,
                 locationUrlInput: site?.LocationURL ?? '',
                 statusCheck: site?.Status === DefaultStatusType.active,
             });
@@ -120,6 +124,7 @@ const EditSiteModal = ({ id, ...props }) => {
             ID: site.ID,
             Description: values.descriptionInput,
             Address: values.addressInput,
+            Country: values.countryInput,
             IsMainSite: values.isMainSiteCheck,
             LocationURL: values.locationUrlInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
@@ -182,7 +187,11 @@ const EditSiteModal = ({ id, ...props }) => {
                                                     <Col xs="12">
                                                         <AryFormikTextInput name="addressInput"
                                                             label="Address"
-                                                            placeholder="3312 Example Street, City 00000"
+                                                        />
+                                                    </Col>
+                                                    <Col xs="12">
+                                                        <AryFormikTextInput name="countryInput"
+                                                            label="Country"
                                                         />
                                                     </Col>
                                                     <Col xs="12">
