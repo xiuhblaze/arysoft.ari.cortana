@@ -27,8 +27,8 @@ const auditorValidityProps = [
     { 
         icon: faCircleExclamation, 
         iconFile: faFileCircleExclamation, 
-        label: 'At least one document is close to expired', 
-        singularLabel: 'The document is close to expired',
+        label: 'At least one document is about to expire', 
+        singularLabel: 'The document is about to expire',
         variant: 'warning' 
     },
     { 

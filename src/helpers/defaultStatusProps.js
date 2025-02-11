@@ -1,8 +1,24 @@
 const defaultStatusProps = [
-    { bgColor: "secondary", label: "-" },
-    { bgColor: "info", label: "Active" },
-    { bgColor: "secondary", label: "Inactive" },
-    { bgColor: "danger", label: "Deleted" },
+    { 
+        bgColor: "light",
+        label: "-",
+        variant: "light" 
+    },
+    { 
+        bgColor: "info",
+        label: "Active",
+        variant: "info" 
+    },
+    { 
+        bgColor: "secondary",
+        label: "Inactive", 
+        variant: "secondary" 
+    },
+    { 
+        bgColor: "danger", 
+        label: "Deleted", 
+        variant: "danger" 
+    },
 ];
 
 export default defaultStatusProps;

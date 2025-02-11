@@ -10,14 +10,24 @@ import envVariables from "../../../helpers/envVariables";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
-const Toolbar = () => {
+const OrganizationsToolbar = () => {
     const formDefaultData = {
+        folioInput: '',
         textInput: '',
+        standardSelect: '',
+        certificatesValidityStatusSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
-    const { OrganizationOrderType, OrganizationStatusType } = enums();
+    const { 
+        CertificatesValidityStatusType,
+        OrganizationOrderType, 
+        OrganizationStatusType,
+        StandardOrderType,
+    } = enums();
     const {
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE
@@ -37,6 +47,11 @@ const Toolbar = () => {
         organizationsAsync,
         organizationCreateAsync,
     } = useOrganizationsStore();
+
+    const {
+        standards,
+        standardsAsync,
+    } = useStandardsStore();
     
     // HOOKS
     
@@ -49,11 +64,20 @@ const Toolbar = () => {
 
         if (!!savedSearch) {
             setInitialValues({
+                folioInput: savedSearch.folio ?? '',
                 textInput: savedSearch.text ?? '',
+                standardSelect: savedSearch.standardID ?? '',
+                certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
+
+        standardsAsync({
+            pageSize: 0,
+            includeDeleted: false,
+            order: StandardOrderType.name,
+        });
     }, []);
 
     useEffect(() => {
@@ -72,8 +96,11 @@ const Toolbar = () => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            folio: values.folioInput,
             text: values.textInput,
+            standardID: values.standardSelect,
             status: values.statusSelect,
+            certificatesValidityStatus: values.certificatesValidityStatusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
@@ -88,7 +115,7 @@ const Toolbar = () => {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
-            order: OrganizationOrderType.name,
+            order: OrganizationOrderType.folioDesc,
         };
 
         setInitialValues(formDefaultData);
@@ -120,12 +147,49 @@ const Toolbar = () => {
                             <div className="d-flex flex-column flex-md-row">
                                 <div className="flex-md-grow-1 me-md-3">
                                     <div className="row d-flex justify-content-end">
+                                        <div className="col-12 col-sm-2 col-xxl-1">
+                                            <AryFormikTextInput 
+                                                name="folioInput" 
+                                                type="text" 
+                                                placeholder="folio"
+                                            />
+                                        </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikTextInput
                                                 name="textInput"
                                                 type="text"
                                                 placeholder="search..."
                                             />
+                                        </div>
+                                        <div className="col-12 col-sm-auto mb-3">
+                                            <AryFormikSelectInput name="standardSelect">
+                                                <option value="">(standard)</option>
+                                                {
+                                                    standards.map(item =>
+                                                        <option
+                                                            key={item.ID}
+                                                            value={item.ID}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {item.Name}
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-3 col-xxl-2">
+                                            <AryFormikSelectInput name="certificatesValidityStatusSelect">
+                                                {
+                                                    Object.keys(CertificatesValidityStatusType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={CertificatesValidityStatusType[key]}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {key === 'nothing' ? '(certificates validity)' : certificateValidityStatusProps[CertificatesValidityStatusType[key]].label}
+                                                        </option>
+                                                    )}
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput name="statusSelect">
@@ -136,7 +200,7 @@ const Toolbar = () => {
                                                             value={OrganizationStatusType[key]}
                                                             className="text-capitalize"
                                                         >
-                                                            {key === 'nothing' ? '(all)' : key}
+                                                            {key === 'nothing' ? '(status)' : key}
                                                         </option>
                                                     )}
                                             </AryFormikSelectInput>
@@ -185,4 +249,4 @@ const Toolbar = () => {
     )
 }
 
-export default Toolbar
+export default OrganizationsToolbar;

@@ -8,9 +8,11 @@ import { faPlus, faSearch, faTrash, faXmark } from '@fortawesome/free-solid-svg-
 import { Form, Formik } from 'formik';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
+import { useStandardsStore } from '../../../hooks/useStandardsStore';
 
 const CatAuditorDocumentsToolbar = () => {
     const formDefaultData = {
+        standardSelect: '',
         textInput: '',
         documentTypeSelect: '',
         subCategorySelect: '',
@@ -21,7 +23,8 @@ const CatAuditorDocumentsToolbar = () => {
         CatAuditorDocumentType,
         CatAuditorDocumentSubCategoryType,
         CatAuditorDocumentOrderType,
-        DefaultStatusType
+        DefaultStatusType,
+        StandardOrderType,
     } = enums();
     const {
         CATAUDITORDOCUMENTS_OPTIONS,
@@ -43,6 +46,12 @@ const CatAuditorDocumentsToolbar = () => {
         catAuditorDocumentCreateAsync,
     } = useCatAuditorDocumentsStore();
 
+    const {
+        isStandardsLoading,
+        standards,
+        standardsAsync,
+    } = useStandardsStore();
+
     // HOOKS
 
     const navigate = useNavigate();
@@ -54,6 +63,7 @@ const CatAuditorDocumentsToolbar = () => {
 
         if (!!savedSearch) {
             setInitialValues({
+                standardSelect: savedSearch.standardID ?? '',
                 textInput: savedSearch.text ?? '',
                 documentTypeSelect: savedSearch.documentType ?? '',
                 subCategorySelect: savedSearch.subCategory ?? '',
@@ -61,6 +71,12 @@ const CatAuditorDocumentsToolbar = () => {
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
+
+        standardsAsync({
+            pageSize: 0,
+            includeDeleted: false,
+            order: StandardOrderType.name,
+        });
     }, []);
 
     useEffect(() => {
@@ -79,6 +95,7 @@ const CatAuditorDocumentsToolbar = () => {
         const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            standardID: values.standardSelect,
             text: values.textInput,
             documentType: values.documentTypeSelect,
             subCategory: values.subCategorySelect,
@@ -135,6 +152,22 @@ const CatAuditorDocumentsToolbar = () => {
                                                 type="text"
                                                 placeholder="search..."
                                             />
+                                        </div>
+                                        <div className="col-12 col-sm-auto mb-3">
+                                            <AryFormikSelectInput name="standardSelect">
+                                                <option value="">(standard)</option>
+                                                {
+                                                    standards.map(item =>
+                                                        <option
+                                                            key={item.ID}
+                                                            value={item.ID}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {item.Name}
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput name="documentTypeSelect">

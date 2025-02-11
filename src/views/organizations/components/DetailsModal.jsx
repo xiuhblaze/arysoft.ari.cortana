@@ -8,7 +8,7 @@ import { faArrowRightToBracket, faArrowRotateLeft, faBuilding, faBuildingCircleX
 
 import enums from "../../../helpers/enums";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
-import statusProps from "../helpers/StatusProps";
+import organizationStatusProps from "../helpers/organizationStatusProps";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { ViewLoading } from "../../../components/Loaders";
 import Status from "./Status";
@@ -17,9 +17,17 @@ import bgHeadModal from '../../../assets/img/bgTrianglesBW.jpg';
 import ContactsCard from "../../contacts/components/ContactsCard";
 import SitesCard from "../../sites/components/SitesCard";
 
+import defaultPhoto from '../../../assets/img/icoOrganizationDefault.jpg';
+import envVariables from "../../../helpers/envVariables";
+import CertificatesCard from "../../certificates/components/CertificatesCard";
+
 const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
     const { OrganizationStatusType } = enums();
+    const {
+        URL_ORGANIZATION_FILES,
+        VITE_FILES_URL,
+    } = envVariables();
     const {
         isOrganizationLoading,
         isOrganizationSaving,
@@ -31,7 +39,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
 
     useEffect(() => {
         if (organizationSavedOk) {
-            Swal.fire('Standards', 'Successful restoration', 'success');
+            Swal.fire('Organization', 'Successful restoration', 'success');
             organizationClear();
             onHide();
         }
@@ -77,13 +85,19 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                     backgroundPositionY: '50%'
                                 }}
                             >
-                                <span className={`mask bg-gradient-${statusProps[organization.Status].bgColor} opacity-6`}></span>
+                                <span className={`mask bg-gradient-${organizationStatusProps[organization.Status].bgColor} opacity-6`}></span>
                             </div>
                             <div className="card card-body blur shadow-blur mx-4 mt-n7 overflow-hidden">
                                 <div className="row gx-4">
                                     <div className="col-auto">
                                         <div className="avatar avatar-xl position-relative">
-                                            <img src="/files/organizations/lgoArysoft2019.png" alt="profile_image" className="w-100 border-radius-lg shadow-sm" />
+                                            <img 
+                                                src={ !!organization.LogoFile
+                                                    ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`
+                                                    : defaultPhoto }
+                                                alt="Organization logo" 
+                                                className="w-100 border-radius-lg shadow-sm"
+                                            />
                                         </div>
                                     </div>
                                     <div className="col-auto my-auto">
@@ -128,26 +142,7 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                     <SitesCard readOnly />
                                 </Col>
                                 <Col xs="12" sm="4">
-                                    <Card className="h-100">
-                                        <Card.Header className="pb-0 p-3">
-                                            <h6 className="mb-0">Certificates</h6>
-                                        </Card.Header>
-                                        <Card.Body className="p-3">
-                                            <ListGroup>
-                                                <ListGroup.Item className="border-0 d-flex align-items-center px-0 mb-2">
-                                                    <div className="me-3">
-                                                        <div className="icon icon-shape bg-gradient-warning border-radius-md d-flex align-items-center justify-content-center">
-                                                            <FontAwesomeIcon icon={faCertificate} size="lg" className="text-white mx-3" aria-hidden="true" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="d-flex align-items-start flex-column justify-content-center">
-                                                        <h6 className="mb-0 text-sm">ISO 9000</h6>
-                                                        <p className="mb-0 text-xs">Expires: 2024/04/23</p>
-                                                    </div>
-                                                </ListGroup.Item>
-                                            </ListGroup>
-                                        </Card.Body>
-                                    </Card>
+                                    <CertificatesCard readOnly />
                                 </Col>
                             </Row>
                         </>

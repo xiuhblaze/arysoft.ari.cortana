@@ -1,21 +1,26 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"
-import { ListGroup, Modal } from "react-bootstrap";
+import { Card, ListGroup, Modal } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
 import enums from "../../../helpers/enums";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlignLeft, faAngleRight, faArrowRightToBracket, faArrowRotateLeft, faCalendarDay, faEdit, faLandmark } from "@fortawesome/free-solid-svg-icons";
+import { faAlignLeft, faAngleRight, faArrowRightToBracket, faArrowRotateLeft, faCalendarDay, faCertificate, faCity, faEdit, faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { ViewLoading } from "../../../components/Loaders";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import Status from "./Status";
 import ListGroupItemData from "../../../components/ListGroup/ListGroupItemData";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import AuditorSimpleItem from "../../auditors/components/AuditorSimpleItem";
+import { useAuditorsStore } from "../../../hooks/useAuditorsStore";
 
-const DetailsModal = ({ show, onHide, ...props }) => {
+const StandardDetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
     const { DefaultStatusType } = enums();
+
+    // CUSTOM HOOKS
+
     const {
         isStandardLoading,
         isStandardSaving,
@@ -25,6 +30,24 @@ const DetailsModal = ({ show, onHide, ...props }) => {
         standardClear,
     } = useStandardsStore();
 
+    const {
+        isAuditorsLoading,
+        auditors,
+        auditorsAsync,
+    } = useAuditorsStore();
+
+    // HOOKS
+
+    useEffect(() => {
+        if (!!standard) {
+
+            auditorsAsync({
+                standardID: standard.ID,
+                pageSize: 0,
+            });
+        }
+    }, [standard]);
+    
     useEffect(() => {
         if (standardSavedOk) {
             Swal.fire('Standards', 'Successful restoration');
@@ -80,9 +103,9 @@ const DetailsModal = ({ show, onHide, ...props }) => {
             </Modal.Header>
             <Modal.Body>
                 {
-                    isStandardLoading ? (
+                    isStandardLoading || isAuditorsLoading ? (
                         <ViewLoading />
-                    ) : !!standard ? (
+                    ) : !!standard && !!auditors ? (
                         <>
                             <ListGroup>
                                 <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
@@ -100,12 +123,36 @@ const DetailsModal = ({ show, onHide, ...props }) => {
                                         {!!standard.MaxReductionDays ? standard.MaxReductionDays : '0'}
                                     </ListGroupItemData>
                                 </ListGroup.Item>
-                                {/* <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
-                                    <ListGroupItemData label="Status:" icon={ faAngleRight }>
-                                        <Status value={standard.Status} />
+                                <hr className="horizontal dark my-3" />
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Certificates:" icon={ faCertificate }>
+                                        { standard?.Certificates?.length ?? 0 }
                                     </ListGroupItemData>
-                                </ListGroup.Item> */}
+                                </ListGroup.Item>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm">
+                                    <ListGroupItemData label="Organizations:" icon={ faCity }>
+                                        { standard?.Organizations?.length ?? 0 }
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
                             </ListGroup>
+                            
+
+                            <h6>Auditors</h6>
+                            {   
+                                auditors.length > 0 &&
+                                     auditors.map(item => {
+                                        const auditorStandard = standard.Auditors.find(x => x.AuditorID == item.ID);
+                                        const classCard = `d-inline-block mb-2 me-2 ${auditorStandard?.Status == DefaultStatusType.active ? '' : 'opacity-6'}`;
+                                        return (
+                                            <Card key={item.ID} className={ classCard }>
+                                                <Card.Body className="p-2">
+                                                    <AuditorSimpleItem item={item} size="sm" />
+                                                </Card.Body>
+                                            </Card>
+                                        )
+                                     }
+                                    )
+                            }
                         </>
                     ) : null
                 }
@@ -144,4 +191,4 @@ const DetailsModal = ({ show, onHide, ...props }) => {
     )
 }
 
-export default DetailsModal
+export default StandardDetailsModal

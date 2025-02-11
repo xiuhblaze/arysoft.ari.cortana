@@ -24,6 +24,7 @@ import envVariables from "../helpers/envVariables";
 import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
+import isString from "../helpers/isString";
 
 const SITE_URI = '/sites';
 const { VITE_PAGE_SIZE } = envVariables();

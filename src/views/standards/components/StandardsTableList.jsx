@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp, faClone, faEdit } from "@fortawesome/free-solid-svg-icons";
 
@@ -7,12 +6,10 @@ import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
 import AryTableSortIcon from "../../../components/AryTableSortIcon/AryTableSortIcon";
 import { ViewLoading } from "../../../components/Loaders";
-import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
-import DetailsModal from "./DetailsModal";
-import Status from "./Status";
-import AryDefaultStatusBadge from "../../../components/AryDefaultStatusBadge/AryDefaultStatusBadge";
+import StandardDetailsModal from "./StandardDetailsModal";
+import StandardsTableItem from "./StandardsTableItem";
 
 const StandardsTableList = ({ onOrder }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
@@ -80,7 +77,12 @@ const StandardsTableList = ({ onOrder }) => {
                                     </div>
                                 </th>
                                 <th>
-                                    <div className="d-flex justify-content-start align-items-center gap-1">
+                                    <div className={headStyle}>
+                                        Info
+                                    </div>
+                                </th>
+                                <th>
+                                    <div className="d-flex justify-content-center align-items-center gap-1">
                                         <div className="d-flex flex-row">
                                             <AryTableSortIcon
                                                 icon={faCaretUp}
@@ -100,7 +102,7 @@ const StandardsTableList = ({ onOrder }) => {
                                         </div>
                                     </div>
                                 </th>
-                                <th>
+                                {/* <th>
                                     <div className="d-flex justify-content-start align-items-center gap-1">
                                         <div className="d-flex flex-row">
                                             <AryTableSortIcon
@@ -120,55 +122,18 @@ const StandardsTableList = ({ onOrder }) => {
                                             Info
                                         </div>
                                     </div>
-                                </th>
+                                </th> */}
                                 <th className={`${headStyle} text-center`}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
                                 standards.map(item => (
-                                    <tr key={item.ID}>
-                                        <td>
-                                            <div className="d-flex flex-column align-items-start">
-                                                <h6 className="text-sm mb-0">
-                                                    {item.Name}
-                                                </h6>
-                                                <p className="text-xs text-secondary mb-0">
-                                                    {item.Description}
-                                                </p>
-                                                {/* <p className="text-xs text-secondary mb-0">
-                                                    {item.ID}
-                                                </p> */}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="text-center text-xs">
-                                                { item.MaxReductionDays ?? '0' }
-                                            </div>
-                                        </td>
-                                        <td className="align-middle text-center text-sm">
-                                            {/* <Status value={item.Status} /> */}
-                                            <AryDefaultStatusBadge value={item.Status} />
-                                        </td>
-                                        <td>
-                                            <div className="d-flex flex-column align-items-start">
-                                                <div className="text-xs"><strong>Updated</strong> {getFriendlyDate(item.Updated)} </div>
-                                                <div className="text-xs"><strong>By</strong> {item.UpdatedUser}</div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-2">
-                                                <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                                                    <FontAwesomeIcon icon={faClone} />
-                                                </a>
-                                                {item.Status !== DefaultStatusType.deleted && (
-                                                    <Link to={`${item.ID}`} title="Edit">
-                                                        <FontAwesomeIcon icon={faEdit} />
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <StandardsTableItem 
+                                        key={item.ID}
+                                        item={item}
+                                        onShowModal={onShowModal}
+                                    />
                                 ))
                             }
                         </tbody>
@@ -176,7 +141,7 @@ const StandardsTableList = ({ onOrder }) => {
                 </div>
             ) : null
             }
-            <DetailsModal show={showModal} onHide={onCloseModal} />
+            <StandardDetailsModal show={showModal} onHide={onCloseModal} />
         </>
     )
 }

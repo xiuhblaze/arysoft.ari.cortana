@@ -64,22 +64,9 @@ export const useShiftsStore = () => {
     } = useSelector(state => state.shifts)
 
     const { user } = useSelector(state => state.auth);
-    // const {
-    //     EstatusType,
-    //     ShiftsOrdenType
-    // } = enums();
 
     // Methods
 
-    // const setError = (message) => {
-
-    //     if (message.length === 0) return;
-
-    //     dispatch(setShiftsErrorMessage(message));
-    //     setTimeout(() => {
-    //         dispatch(clearShiftsErrorMessage());
-    //     }, 10);
-    // };
     const setError = (value) => {    
         if (isString(value)) {
             dispatch(setShiftsErrorMessage(value));    

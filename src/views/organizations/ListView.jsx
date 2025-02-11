@@ -10,7 +10,7 @@ import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import OrganizationsTableList from "./components/OrganizationsTableList";
-import Toolbar from "./components/Toolbar";
+import OrganizationsToolbar from "./components/OrganizationsToolbar";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 
 const ListView = () => {
@@ -19,8 +19,11 @@ const ListView = () => {
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE,
     } = envVariables();
-    const [controller, dispatch] = useArysoftUIController();
     const { OrganizationOrderType } = enums();
+    
+    // CUSTOM HOOKS
+    
+    const [controller, dispatch] = useArysoftUIController();
     const {
         organizationsMeta,
         organization,
@@ -29,12 +32,14 @@ const ListView = () => {
         organizationsAsync,
     } = useOrganizationsStore();
 
+    // HOOKS
+
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
         const newSearch = {
             pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
             pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.name,
+            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
         };
 
         const search = !!savedSearch ? savedSearch : newSearch;
@@ -44,12 +49,6 @@ const ListView = () => {
 
         setNavbarTitle(dispatch, null);
     }, []);
-
-    // useEffect(() => {
-    //   if (organizationCreatedOk) {
-    //     navigate(`/organizations/${ organization.OrganizationID }`);
-    //   }
-    // }, [organizationCreatedOk]);
 
     useEffect(() => {
         if (!!organizationsErrorMessage) {
@@ -68,18 +67,18 @@ const ListView = () => {
 
         organizationsAsync(search);
         localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+    }; // onClickGoPage
 
-    const onClickOrderList = (order = OrganizationOrderType.name) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            order: order
-        }
+    // const onClickOrderList = (order = OrganizationOrderType.name) => {
+    //     const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+    //     const search = {
+    //         ...savedSearch,
+    //         order: order
+    //     }
 
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    };
+    //     organizationsAsync(search);
+    //     localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+    // }; // onClickOrderList
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
@@ -87,7 +86,7 @@ const ListView = () => {
                 <Col>
                     <Card className="mb-4">
                         <Card.Header className="pb-0">
-                            <Toolbar />
+                            <OrganizationsToolbar />
                         </Card.Header>
                         <Card.Body className="px-0 pt-0 pb-2">
                             {!!organizationsMeta && (
@@ -97,7 +96,7 @@ const ListView = () => {
                                     onClickGoPage={onClickGoPage}
                                 />
                             )}
-                            <OrganizationsTableList onOrder={onClickOrderList} />
+                            <OrganizationsTableList />
                             {!!organizationsMeta && (
                                 <>
                                     <AryPagination

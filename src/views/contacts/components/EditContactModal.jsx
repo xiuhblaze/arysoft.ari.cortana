@@ -18,9 +18,11 @@ import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUp
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const EditContactModal = ({ id, ...props}) => {
-    const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
-    const { VITE_FILES_URI } = envVariables();
+    const { 
+        VITE_FILES_URL,
+        URL_ORGANIZATION_FILES,
+        PHONE_REGEX,
+    } = envVariables();
     const { 
         DefaultStatusType,
         ContactOrderType,
@@ -32,13 +34,55 @@ const EditContactModal = ({ id, ...props}) => {
         lastNameInput: '',
         emailInput: '',
         phoneInput: '',
-        phoneAltInput: '',
         addressInput: '',
         positionInput: '',
         photoFileInput: '',
         isMainContactCheck: false,
         statusCheck: false,
     };
+
+    const validationSchema = Yup.object({
+        firstNameInput: Yup.string()
+            .required('First name is required')
+            .max(50, 'First name is too long'),
+        middleNameInput: Yup.string()
+            .max(50, 'Middle name is too long'),
+        lastNameInput: Yup.string()
+            .max(50, 'Last name is too long')
+            .when('middleNameInput', {
+                is: value => !value || value.length === 0,
+                then: () => Yup.string().required('A last name is needed.'),
+            }),
+        emailInput: Yup.string()
+            .email('Email is invalid')
+            .max(250, 'Email is too long')
+            .required('Email is required'),
+        phoneInput: Yup.string()
+            .required('Phone is required')
+            .max(25, 'Phone is too long')
+            .matches(PHONE_REGEX, 'Phone is invalid'),
+        addressInput: Yup.string()
+            .max(500, 'Address is too long'),
+        positionInput: Yup.string()
+            .max(250, 'Poistion is too long'),
+        photoFileInput: Yup.mixed()
+            .test({
+                name: 'is-type-valid',
+                message: 'Some file update error', // <- este solo es visible si el último return es false
+                test: (value, ctx) => {
+                    if (!!value) {
+                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const validTypes = ['jpg', 'png'];
+                        if (!validTypes.includes(extension)) {
+                            return ctx.createError({
+                                message: 'Only files with png or jpg extensions are allowed'
+                            });
+                        }
+                    }
+                    return true;
+                }
+            }),
+    });
 
     // CUSTOM HOOKS
 
@@ -107,6 +151,15 @@ const EditContactModal = ({ id, ...props}) => {
             setShowModal(false);
         }
     }, [contactSavedOk]);
+
+    useEffect(() => {
+        if (!!contactsErrorMessage) {
+            Swal.fire('Contact', contactsErrorMessage, 'error');
+            // contactClear();
+            // setShowModal(false);
+        }
+    }, [contactsErrorMessage]);
+    
 
     // METHODS
 
@@ -196,6 +249,7 @@ const EditContactModal = ({ id, ...props}) => {
                     ) : !!contact ? (
                         <Formik
                             initialValues={ initialValues }
+                            validationSchema={ validationSchema }
                             onSubmit={ onFormSubmit }
                             enableReinitialize
                         >
@@ -259,7 +313,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                             <input 
                                                                 type="file"
                                                                 name="photoFile"
-                                                                accept="image/*"
+                                                                accept="image/jpeg,image/png"
                                                                 className="form-control"
                                                                 onChange={(e) => {
                                                                     const fileReader = new FileReader();
@@ -276,7 +330,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                         </>
                                                     ) : !!contact.PhotoFilename && 
                                                         <div>
-                                                            <Image src={`${VITE_FILES_URI}/contacts/${contact.ID}/${contact.PhotoFilename}`}
+                                                            <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${contact.OrganizationID}/contacts/${contact.ID}/${contact.PhotoFilename}`}
                                                                 thumbnail
                                                                 fluid
                                                                 className="mb-3"
@@ -325,7 +379,8 @@ const EditContactModal = ({ id, ...props}) => {
                                             <Col xs="12" sm="6">
                                                 <AryFormikTextInput name="phoneInput"
                                                     label="Phone number"
-                                                    placeholder="000-000-0000"
+                                                    placeholder="00-0000-0000"
+                                                    helpText="[0000000000] [x0000]"
                                                 />
                                             </Col>
                                         </Row>

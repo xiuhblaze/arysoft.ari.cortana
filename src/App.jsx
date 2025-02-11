@@ -10,6 +10,7 @@ import privateRoute from './routes/privateRoutes';
 
 import './app.css';
 import { Login } from './views/Login/Login';
+import Profile from './views/profile/Profile';
 
 function App() {
     const { pathname } = useLocation();
@@ -48,13 +49,15 @@ function App() {
                     <>
                         {renderRoutes(privateRoute)}
                         {renderRoutes(publicRoute)}
+                        <Route path="/profile" element={ <Profile /> } />
                         <Route path="/*" element={<Navigate to={privateRoute[0].path} />} />
                     </>
                 ) : (
                     <>
-                        {renderRoutes(publicRoute)}
+                        {/* {renderRoutes(publicRoute)} */}
                         <Route path="/login" element={<Login />} />
-                        <Route path="/*" element={<Navigate to={publicRoute[0].path} />} />
+                        {/* <Route path="/*" element={<Navigate to={publicRoute[0].path} />} /> */}
+                        <Route path="/*" element={<Navigate to={ '/login' } />} />
                     </>
                 )
             }

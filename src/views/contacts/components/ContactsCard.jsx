@@ -7,6 +7,9 @@ import enums from "../../../helpers/enums";
 import Swal from "sweetalert2";
 
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
+import envVariables from "../../../helpers/envVariables";
+import { checkFileExists } from "../../../helpers/checkFileExists";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -16,6 +19,10 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
         'bg-light opacity-6',
     ];
     const { ContactOrderType } = enums();
+    const { 
+        VITE_FILES_URL,
+        URL_ORGANIZATION_FILES,
+    } = envVariables();
 
     // CUSTOM HOOKS
 
@@ -29,7 +36,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
         contactsAsync,
         contactsErrorMessage,
     } = useContactsStore();
-
+    
     // HOOKS
 
     useEffect(() => {
@@ -67,15 +74,16 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                         <Spinner animation="border" variant="secondary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </Spinner>
-                    ) : !!contacts ? (
+                    ) : !!contacts && !!organization ? (
                         <ListGroup style={{ maxHeight: '300px', overflowY: 'auto' }}>
                             {
                                 contacts.map( item => {
-                                    const fileName = !!item.PhotoFilename
-                                        ? `/files/contacts/${item.ID}/${ item.PhotoFilename }`
+                                    const url = `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/contacts/${item.ID}`;
+                                    const fileName = !!item.PhotoFilename // && checkFileExists(`${url}/${ item.PhotoFilename }`)
+                                        ? `${url}/${ item.PhotoFilename }`
                                         : defaultProfile ;
                                     const itemStyle= `border-0 d-flex justify-content-between align-items-center px-0 mb-2 ${ statusStyle[item.Status] }`;
-
+                                    
                                     return (
                                         <ListGroup.Item key={ item.ID }
                                             className={ itemStyle }
@@ -87,6 +95,9 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
                                                     <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>{ item.FullName }</h6>
+                                                    { !isNullOrEmpty(item.Position) 
+                                                        && <p className="text-xs font-weight-bold mb-0">{ item.Position }</p> 
+                                                    }
                                                     <p className="mb-0 text-xs d-flex flex-column gap-1">
                                                         { 
                                                             !!item.Email ? (

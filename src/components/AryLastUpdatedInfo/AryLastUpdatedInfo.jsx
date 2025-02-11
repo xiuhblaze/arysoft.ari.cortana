@@ -11,8 +11,8 @@ const AryLastUpdatedInfo = ({ item, ...props }) => {
     // const created = item.Created instanceof Date ? new Date(item.Created) : null;
     // const updated = item.Updated instanceof Date ? new Date(item.Updated) : null;
 
-    const created = new Date(item.Created);
-    const updated = new Date(item.Updated);
+    const created = !!item?.Created ? new Date(item.Created) : null;
+    const updated = !!item?.Updated ? new Date(item.Updated) : null;
 
     let createdLocalDate = null;
     let updatedLocalDate = null;
@@ -47,7 +47,7 @@ const AryLastUpdatedInfo = ({ item, ...props }) => {
             </ListGroup.Item>
             <ListGroup.Item className="border-0 py-0 ps-0 text-xs">
                 <strong className="me-2">By:</strong>
-                {item.UpdatedUser}
+                { !!item?.UpdatedUser ? item.UpdatedUser : '(unknow)' }
             </ListGroup.Item>
         </ListGroup>
     )

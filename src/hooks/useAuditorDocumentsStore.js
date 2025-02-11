@@ -38,8 +38,8 @@ const getSearchQuery = (options = {}) => {
     query += options?.text ? `&text=${options.text}` : '';
     query += options?.auditorID ? `&auditorid=${options.auditorID}` : '';
     query += options?.catAuditorDocumentID ? `&catauditordocumentid=${options.catAuditorDocumentID}` : '';
-    query += options?.dueDateStart ? `&duedatestart=${formatISO(new Date(options.fechaInicio), { representation: 'date' })}` : '';
-    query += options?.dueDateEnd ? `&duedateend=${formatISO(new Date(options.fechaTermino), { representation: 'date' })}` : '';
+    query += options?.dueDateStart ? `&duedatestart=${formatISO(new Date(options.dueDateStart), { representation: 'date' })}` : '';
+    query += options?.dueDateEnd ? `&duedateend=${formatISO(new Date(options.dueDateEnd), { representation: 'date' })}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
@@ -225,7 +225,7 @@ export const useAuditorDocumentsStore = () => {
             const resp = await cortanaApi.delete(`${AUDITORDOCUMENTS_ROUTE}/${id}/documentfile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
-            console.log('auditorDocumentDeleteFileAsync.Data', Data)
+            // console.log('auditorDocumentDeleteFileAsync.Data', Data)
 
             if (!!Data) {
                 setAuditorDocument({

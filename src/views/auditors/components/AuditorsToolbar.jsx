@@ -7,18 +7,29 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Form, Formik } from "formik";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
 const AuditorsToolbar = () => {
     const formDefaultData = {
         textInput: '',
+        standardSelect: '',
         isLeaderSelect: '',
+        validitySelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
+    const {
+        BUTTON_ADD_CLASS,
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS
+    } =defaultCSSClasses();
     const { 
         AuditorIsLeaderType,
+        AuditorDocumentValidityType,
         AuditorOrderType,
-        DefaultStatusType
+        DefaultStatusType,
+        StandardOrderType
     } = enums();
     const {
         AUDITORS_OPTIONS,
@@ -35,6 +46,11 @@ const AuditorsToolbar = () => {
         auditorCreateAsync,
     } = useAuditorsStore();
 
+    const {
+        standards,
+        standardsAsync,
+    } = useStandardsStore();
+
     // HOOKS
 
     const navigate = useNavigate();
@@ -47,11 +63,19 @@ const AuditorsToolbar = () => {
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch.text ?? '',
+                standardSelect: savedSearch.standardID ?? '',
                 isLeaderSelect: savedSearch.isLeader ?? '',
+                validitySelect: savedSearch.validity ?? '',
                 statusSelect: savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
+
+        standardsAsync({
+            pageSize: 0,
+            includeDeleted: false,
+            order: StandardOrderType.name,
+        });
     }, []);
     
     useEffect(() => {
@@ -71,7 +95,9 @@ const AuditorsToolbar = () => {
         const search = {
             ...savedSearch,
             text: values.textInput,
+            standardID: values.standardSelect,
             isLeader: values.isLeaderSelect,
+            validity: values.validitySelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
@@ -101,7 +127,7 @@ const AuditorsToolbar = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
                 <button
-                    className="btn bg-gradient-dark text-nowrap mb-0"
+                    className={ BUTTON_ADD_CLASS }
                     onClick={ onNewItem }
                     title="New auditor"
                     disabled={ isAuditorCreating }
@@ -128,6 +154,22 @@ const AuditorsToolbar = () => {
                                                 placeholder="search..."
                                             />
                                         </div>
+                                        <div className="col-12 col-sm-auto mb-3">
+                                            <AryFormikSelectInput name="standardSelect">
+                                                <option value="">(standard)</option>
+                                                {
+                                                    standards.map(item =>
+                                                        <option
+                                                            key={item.ID}
+                                                            value={item.ID}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {item.Name}
+                                                        </option>
+                                                    )
+                                                }
+                                            </AryFormikSelectInput>
+                                        </div>
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput name="isLeaderSelect">
                                                 {
@@ -138,6 +180,20 @@ const AuditorsToolbar = () => {
                                                             className="text-capitalize"
                                                         >
                                                             {key === 'nothing' ? '(auditor)' : key}
+                                                        </option>
+                                                    )}
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-auto">
+                                            <AryFormikSelectInput name="validitySelect">
+                                                {
+                                                    Object.keys(AuditorDocumentValidityType).map(key =>
+                                                        <option
+                                                            key={key}
+                                                            value={AuditorDocumentValidityType[key]}
+                                                            className="text-capitalize"
+                                                        >
+                                                            {key === 'nothing' ? '(documentation)' : key}
                                                         </option>
                                                     )}
                                             </AryFormikSelectInput>
@@ -173,15 +229,15 @@ const AuditorsToolbar = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="d-flex justify-content-between gap-2">
+                                <div className="d-flex justify-content-between gap-2 mb-3">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className="btn bg-gradient-info">
+                                        <button type="submit" className={ BUTTON_SEARCH_CLASS}>
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className="btn btn-link text-secondary"
+                                        <button type="button" className={ BUTTON_CLEAR_SEARCH_CLASS }
                                             onClick={ (values) => {
                                                 onCleanSearch(values);
                                                 formik.resetForm(initialValues);

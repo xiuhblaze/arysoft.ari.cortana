@@ -7,12 +7,14 @@ import AryDefaultStatusBadge from '../../../components/AryDefaultStatusBadge/Ary
 import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 import auditorValidityProps from '../helpers/auditorValidityProps';
 import auditorRequiredProps from '../helpers/auditorRequiredProps';
+import enums from '../../../helpers/enums';
 
 const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, ...props }) => {
     const { 
         URL_AUDITOR_FILES,
         VITE_FILES_URL,
     } = envVariables();
+    const { DefaultStatusType } = enums();
     const pathPhotoFilename = !!item.PhotoFilename 
         ? `${VITE_FILES_URL}${URL_AUDITOR_FILES}/${item.ID}/${item.PhotoFilename}` 
         : defaultProfile;
@@ -53,6 +55,20 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
                             { item.Phone }
                         </a>
                     </p>
+                }
+            </td>
+            <td>
+                {
+                    !!item.Standards && 
+                    <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                        {
+                            item.Standards.map(i => (
+                                <div key={i.ID} className={`badge bg-gradient-${i.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-white me-1`}>
+                                    { i.StandardName }
+                                </div>
+                            ))
+                        }
+                    </div>
                 }
             </td>
             <td>
