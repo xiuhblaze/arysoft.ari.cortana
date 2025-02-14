@@ -19,6 +19,7 @@ import OrganizationEditCard from "./components/OrganizationEditCard";
 import CertificatesCard from "../certificates/components/CertificatesCard";
 import enums from "../../helpers/enums";
 import OrganizationStandardsCard from "./components/OrganizationStandardsCard";
+import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
 
 const EditView = () => {
     const {
@@ -130,13 +131,22 @@ const EditView = () => {
                     <ViewLoading />
                 ) : !!organization && (
                     <Row>
-                        <Col xs="12" sm="8" xxl="6">
+                        <Col xs="12" sm="6" xxl="6">
                             <OrganizationEditCard
                                 updatePhotoPreview={updatePhotoPreview}
                             />
                         </Col>
-                        <Col xs="12" sm="4" xxl="6">
-                            <OrganizationStandardsCard />
+                        <Col xs="12" sm="6" xxl="6">
+                            <Row className="mb-4">
+                                <Col xs="12">
+                                    <OrganizationStandardsCard />
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs="12">
+                                    <AuditCyclesCard />
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                 )
