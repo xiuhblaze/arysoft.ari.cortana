@@ -58,3 +58,11 @@ option {
   background-image: linear-gradient(310deg, #0e4d5d 0%, #57b3c9 100%);
   opacity: .85;
 }
+
+.item-action {
+  text-align: inherit;
+}
+
+.item-action:hover {
+  background-color: #f8f9fa !important;
+}

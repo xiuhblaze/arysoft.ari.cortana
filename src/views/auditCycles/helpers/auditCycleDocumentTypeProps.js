@@ -41,12 +41,6 @@ const auditCycleDocumentTypeProps = [
         variant: 'info',
     },
     {
-        id: AuditCycleDocumentType.audit,
-        icon: faMagnifyingGlass,
-        label: 'Audits',
-        variant: 'dark',
-    },
-    {
         id: AuditCycleDocumentType.cdc,
         icon: faListCheck,
         label: 'Certification decision checklist',
@@ -69,7 +63,13 @@ const auditCycleDocumentTypeProps = [
         icon: faFile,
         label: 'Other',
         variant: 'secondary',
-    }
+    },
+    {
+        id: AuditCycleDocumentType.audit,
+        icon: faMagnifyingGlass,
+        label: 'Audits',
+        variant: 'dark',
+    },
 ];
 
 export default auditCycleDocumentTypeProps;

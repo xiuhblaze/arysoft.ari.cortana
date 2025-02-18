@@ -59,7 +59,7 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
             setAuditCycleSelected(null);
             setAuditCycleDocumentsSelected(null);
 
-            auditCycleClear();
+            // auditCycleClear();
         }
     }, [organization]);
 
@@ -69,17 +69,18 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
             
             setNavOption(loadID);
             auditCycleAsync(loadID);
-
-            auditCycleDocumentsAsync({
-                auditCycleID: loadID,
-                pageSize: 0,
-            });
         }
     }, [auditCycles]);
 
     useEffect(() => {
         if (!!auditCycle && auditCycle.ID === navOption) {
+            console.log('Cambió el ciclo: ', auditCycle.ID)
             setAuditCycleSelected(auditCycle);
+
+            auditCycleDocumentsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
         }
     }, [auditCycle]);
 
@@ -125,38 +126,46 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                 {
                     !!auditCycleSelected && (
                         <div>
-                            <h6 className="text-dark text-sm font-weight-bold mb-0">
-                                {auditCycleSelected.Name}
-                            </h6>
-                            { !!auditCycleSelected.AuditCycleStandards && auditCycleSelected.AuditCycleStandards.length > 0 ? (
-                                <div className="d-flex justify-content-start align-items-start my-1 gap-2">
-                                    {
-                                        auditCycleSelected.AuditCycleStandards.map(item => (
-                                            <span key={item.ID} className="badge bg-gradient-secondary text-xs">
-                                                <FontAwesomeIcon icon={ faLandmark } className="me-1" />
-                                                <span className="text-xs">
-                                                    { item.StandardName }
-                                                </span>
-                                            </span>
-                                        ))
-                                    }
+                            <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
+                                <div>
+                                    <h6 className="text-dark text-sm font-weight-bold mb-0">
+                                        {auditCycleSelected.Name}
+                                    </h6>
+                                    { !!auditCycleSelected.AuditCycleStandards && auditCycleSelected.AuditCycleStandards.length > 0 ? (
+                                        <div className="d-flex justify-content-start align-items-start my-1 gap-2">
+                                            {
+                                                auditCycleSelected.AuditCycleStandards.map(item => (
+                                                    <span key={item.ID} className="badge bg-gradient-secondary text-xs">
+                                                        <FontAwesomeIcon icon={ faLandmark } className="me-1" />
+                                                        <span className="text-xs">
+                                                            { item.StandardName }
+                                                        </span>
+                                                    </span>
+                                                ))
+                                            }
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-secondary my-2">
+                                            (no standards assigned)
+                                        </p>
+                                    )}
+                                
+                                    <p className="text-xs text-secondary mb-0">
+                                        <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
+                                        <span className="font-weight-bold">{ new Date(auditCycleSelected.StartDate).toLocaleDateString() }</span>
+                                        <span className="mx-2">|</span>
+                                        <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
+                                        <span className="font-weight-bold">{ new Date(auditCycleSelected.EndDate).toLocaleDateString() }</span>
+                                        <span className="mx-2">|</span>
+                                        <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" />
+                                        {auditCycleSelected.ExtraInfo}
+                                    </p>
                                 </div>
-                            ) : (
-                                <p className="text-xs text-secondary mb-0">
-                                    (no standards assigned)
-                                </p>
-                            )}
-                            <div></div>
-                            <p className="text-xs text-secondary">
-                                <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
-                                <span className="font-weight-bold">{ new Date(auditCycleSelected.StartDate).toLocaleDateString() }</span>
-                                <span className="mx-2">|</span>
-                                <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
-                                <span className="font-weight-bold">{ new Date(auditCycleSelected.EndDate).toLocaleDateString() }</span>
-                                <span className="mx-2">|</span>
-                                <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" />
-                                {auditCycleSelected.ExtraInfo}
-                            </p>
+                                {
+                                    !readOnly && <AuditCycleEditItem id={ auditCycleSelected.ID } />
+                                }
+                            </div>
+                            
                             <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                                 <AuditCycleDocumentsList 
                                     auditCycle={ auditCycleSelected }

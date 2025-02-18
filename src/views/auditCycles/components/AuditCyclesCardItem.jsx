@@ -12,7 +12,6 @@ const AuditCyclesCardItem = ({ item, ...props }) => {
                 <FontAwesomeIcon icon={ faArrowsSpin } className="text-dark" />
                 <span className={`${item.Status == DefaultStatusType.active ? 'text-info text-gradient' : ''} mx-2`}>{ item.Name }</span>
             </Nav.Link>
-            <AuditCycleEditItem id={ item.ID } className="text-secondary mx-2" />
         </Nav.Item>
     )
 }

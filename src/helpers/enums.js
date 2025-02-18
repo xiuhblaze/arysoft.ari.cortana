@@ -84,6 +84,18 @@ const enums = () => {
         special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     });
 
+    const AuditStatusType = Object.freeze({
+        nothing: 0,
+        scheduled: 1,  // Agendada - Aun no llega su fecha de ejecución, permite subir documentos
+        confirmed: 2,  // Confirmada - El cliente ya confirmo la fecha y los auditores, estan en linea los documentos requeridos
+        inProcess: 3,  // En proceso - La auditoria esta dentro de las fechas de ejecución
+        finished: 4,   // Terminado - Posterior a la fecha de auditoria, es necesario subir la documentación requerida
+        completed: 5,  // Completed - Indica que toda la documentación ha sido cubierta
+        closed: 6,     // Closed - Audioria terminada, ya no se puede actualizar información 
+        canceled: 7,   // Cancelada - En cualquier Status la auditoria puede ser cancelada, es necesario indicar la razón
+        deleted: 8     // Eliminada - Registro eliminado logicamente, solo para administradores
+    });
+
     // Auditors
 
     const AuditorStandardOrderType = Object.freeze({
@@ -352,6 +364,7 @@ const enums = () => {
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
+        AuditStatusType,
         AuditStepType,
         AuditorDocumentOrderType,
         AuditorDocumentRequiredType,

@@ -13,7 +13,6 @@ import enums from '../../../helpers/enums';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import Swal from 'sweetalert2';
-import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore';
 import AuditCycleStandardsList from './AuditCycleStandardsList';
 
 const AuditCycleEditItem = ({ id, ...props }) => {
