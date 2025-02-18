@@ -13,6 +13,8 @@ import enums from '../../../helpers/enums';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import Swal from 'sweetalert2';
+import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore';
+import AuditCycleStandardsList from './AuditCycleStandardsList';
 
 const AuditCycleEditItem = ({ id, ...props }) => {
 
@@ -111,6 +113,9 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                 OrganizationID: organization.ID,
             });
         } else {
+            // if (!!auditCycle && auditCycle.ID === id)  {
+            //     auditCycleAsync(id);
+            // }
             auditCycleAsync(id);
         }
 
@@ -124,7 +129,6 @@ const AuditCycleEditItem = ({ id, ...props }) => {
     };
 
     const onFormSubmit = (values) => {
-
         const toSave = {
             ID: auditCycle.ID,
             Name: values.nameInput,
@@ -134,16 +138,14 @@ const AuditCycleEditItem = ({ id, ...props }) => {
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        // console.log(toSave);
-
         auditCycleSaveAsync(toSave);
-    };
+    }; // onFormSubmit
 
     return (
         <div {...props}>
             <button
-                type="button"
-                className="btn btn-link p-0 mb-0 text-lg"
+                type="button"                
+                className="btn btn-link p-0 mb-0"
                 title={!!id ? 'Edit current audit cycle' : 'Add new audit cycle'}
                 onClick={onShowModal}
             >
@@ -176,21 +178,25 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                                             <AryFormikTextInput
                                                 name="nameInput"
                                                 label="Cycle name"
+                                                placeholder="Cycle 1"
                                             />
                                         </Col>
-                                        <Col xs="12">
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 name="startDateInput"
                                                 type="date"
                                                 label="Start date"
                                             />
                                         </Col>
-                                        <Col xs="12">
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 name="endDateInput"
                                                 type="date"
                                                 label="End date"
                                             />
+                                        </Col>
+                                        <Col xs="12">
+                                            <AuditCycleStandardsList />
                                         </Col>
                                         <Col xs="12">
                                             <AryFormikTextInput
@@ -206,7 +212,6 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                                                     onChange={(e) => {
                                                         const isChecked = e.target.checked;
                                                         formik.setFieldValue('statusCheck', isChecked);
-                                                        // setActiveCheck(isChecked);
                                                     }}
                                                     checked={formik.values.statusCheck}
                                                 />

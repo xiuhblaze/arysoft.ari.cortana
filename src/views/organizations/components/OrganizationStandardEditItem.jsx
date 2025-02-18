@@ -21,7 +21,7 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
         StandardOrderType,
     } = enums();
 
-    const  formDefaultValues = {
+    const formDefaultValues = {
         standardSelect: '',
         //crnInput: '',
         extraInfoInput: '',

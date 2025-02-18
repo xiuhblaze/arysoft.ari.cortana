@@ -134,6 +134,7 @@ const EditView = () => {
                         <Col xs="12" sm="6" xxl="6">
                             <OrganizationEditCard
                                 updatePhotoPreview={updatePhotoPreview}
+                                className="h-100"
                             />
                         </Col>
                         <Col xs="12" sm="6" xxl="6">

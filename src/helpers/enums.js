@@ -42,6 +42,48 @@ const enums = () => {
         createdDesc: 4,
     });
 
+    // Audits cycles
+
+    const AuditCycleType = Object.freeze({
+        nothing: 0,
+        initial: 1,
+        recertification : 2,
+        transfer: 3,
+    });
+
+    const AuditCycleStandardsOrderType = Object.freeze({
+        nothing: 0,
+        standard: 1,
+        standardDesc: 2,
+    });
+
+    const AuditCycleDocumentType = Object.freeze({
+        nothing: 0,
+        appForm: 1,        // Application form
+        acd: 2,            // Audit day calculation
+        proposal: 3,
+        contract: 4,
+        auditProgramme: 5, // Confirmation letter
+        cdc: 6,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
+        certificate: 7,
+        survey: 8,
+        other: 9,          // Cualquier otro documento de interés
+        audit: 10,
+    });
+
+    // Audits
+
+    const AuditStepType = Object.freeze({
+        nothing: 0,
+        stage1: 1,
+        stage2: 2,
+        survey1: 3,
+        survey2: 4,
+        recertification: 5,
+        transfer: 6,
+        special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+    });
+
     // Auditors
 
     const AuditorStandardOrderType = Object.freeze({
@@ -307,6 +349,10 @@ const enums = () => {
 
         ApplicationFormOrderType,
         ApplicationFormStatusType,
+        AuditCycleStandardsOrderType,
+        AuditCycleType,
+        AuditCycleDocumentType,
+        AuditStepType,
         AuditorDocumentOrderType,
         AuditorDocumentRequiredType,
         AuditorDocumentType,
