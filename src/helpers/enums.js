@@ -84,6 +84,22 @@ const enums = () => {
         special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     });
 
+    const AuditDocumentType = Object.freeze({
+        nothing: 0,
+        auditPlan: 1,
+        oacm: 2,                // Opening and closing meeting
+        auditReport: 3,
+        fsscIntegrityLetter: 4, // Solo para FSSC
+        fsscAuditPlanSigned: 5, // Solo para FSSC
+        actionPlan: 6,          // Action plan & evidence
+        ncCloseReport: 7,       // Non conformities close report
+        techReport: 8,          // No for FSSC
+        cdc: 9,                 // Certification decision checklist - TODO: Ver si se va a quedar aquí
+        fsscScreenShot: 10,     // Solo para FSSC
+        travelExpenses: 11,     // Viaticos
+        other: 12,
+    });
+
     const AuditStatusType = Object.freeze({
         nothing: 0,
         scheduled: 1,  // Agendada - Aun no llega su fecha de ejecución, permite subir documentos
@@ -364,8 +380,9 @@ const enums = () => {
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
-        AuditStatusType,
         AuditStepType,
+        AuditDocumentType,
+        AuditStatusType,
         AuditorDocumentOrderType,
         AuditorDocumentRequiredType,
         AuditorDocumentType,

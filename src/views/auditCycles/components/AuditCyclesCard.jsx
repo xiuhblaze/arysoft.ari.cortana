@@ -46,8 +46,8 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
     //  HOOKS
 
     const [navOption, setNavOption] = useState(null);
-    const [auditCycleSelected, setAuditCycleSelected] = useState(null);
-    const [auditCycleDocumentsSelected, setAuditCycleDocumentsSelected] = useState(null);
+    // const [auditCycleSelected, setAuditCycleSelected] = useState(null);
+    // const [auditCycleDocumentsSelected, setAuditCycleDocumentsSelected] = useState(null);
 
     useEffect(() => {
         if (!!organization) {
@@ -56,8 +56,8 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                 pageSize: 0,
             });
             setNavOption(null);
-            setAuditCycleSelected(null);
-            setAuditCycleDocumentsSelected(null);
+            // setAuditCycleSelected(null);
+            // setAuditCycleDocumentsSelected(null);
 
             // auditCycleClear();
         }
@@ -75,7 +75,7 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
     useEffect(() => {
         if (!!auditCycle && auditCycle.ID === navOption) {
             console.log('Cambió el ciclo: ', auditCycle.ID)
-            setAuditCycleSelected(auditCycle);
+            //setAuditCycleSelected(auditCycle);
 
             auditCycleDocumentsAsync({
                 auditCycleID: auditCycle.ID,
@@ -84,11 +84,11 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
         }
     }, [auditCycle]);
 
-    useEffect(() => {
-        if (!!auditCycleDocuments) {
-            setAuditCycleDocumentsSelected(auditCycleDocuments);
-        }
-    }, [auditCycleDocuments]);
+    // useEffect(() => {
+    //     if (!!auditCycleDocuments) {
+    //         setAuditCycleDocumentsSelected(auditCycleDocuments);
+    //     }
+    // }, [auditCycleDocuments]);
     
     // METHODS
 
@@ -124,17 +124,17 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                     }
                 </Nav>
                 {
-                    !!auditCycleSelected && (
+                    !!auditCycle && (
                         <div>
                             <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
                                 <div>
                                     <h6 className="text-dark text-sm font-weight-bold mb-0">
-                                        {auditCycleSelected.Name}
+                                        {auditCycle.Name}
                                     </h6>
-                                    { !!auditCycleSelected.AuditCycleStandards && auditCycleSelected.AuditCycleStandards.length > 0 ? (
+                                    { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
                                         <div className="d-flex justify-content-start align-items-start my-1 gap-2">
                                             {
-                                                auditCycleSelected.AuditCycleStandards.map(item => (
+                                                auditCycle.AuditCycleStandards.map(item => (
                                                     <span key={item.ID} className="badge bg-gradient-secondary text-xs">
                                                         <FontAwesomeIcon icon={ faLandmark } className="me-1" />
                                                         <span className="text-xs">
@@ -152,25 +152,22 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                                 
                                     <p className="text-xs text-secondary mb-0">
                                         <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
-                                        <span className="font-weight-bold">{ new Date(auditCycleSelected.StartDate).toLocaleDateString() }</span>
+                                        <span className="font-weight-bold">{ new Date(auditCycle.StartDate).toLocaleDateString() }</span>
                                         <span className="mx-2">|</span>
                                         <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
-                                        <span className="font-weight-bold">{ new Date(auditCycleSelected.EndDate).toLocaleDateString() }</span>
+                                        <span className="font-weight-bold">{ new Date(auditCycle.EndDate).toLocaleDateString() }</span>
                                         <span className="mx-2">|</span>
                                         <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" />
-                                        {auditCycleSelected.ExtraInfo}
+                                        {auditCycle.ExtraInfo}
                                     </p>
                                 </div>
                                 {
-                                    !readOnly && <AuditCycleEditItem id={ auditCycleSelected.ID } />
+                                    !readOnly && <AuditCycleEditItem id={ auditCycle.ID } />
                                 }
                             </div>
                             
                             <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
-                                <AuditCycleDocumentsList 
-                                    auditCycle={ auditCycleSelected }
-                                    documents={ auditCycleDocumentsSelected }
-                                />
+                                <AuditCycleDocumentsList />
                             </div>
                         </div>
                     )

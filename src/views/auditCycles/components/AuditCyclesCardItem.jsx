@@ -1,7 +1,6 @@
 import { faArrowsSpin } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Nav } from 'react-bootstrap';
-import AuditCycleEditItem from './AuditCycleEditItem';
 import enums from '../../../helpers/enums';
 
 const AuditCyclesCardItem = ({ item, ...props }) => {

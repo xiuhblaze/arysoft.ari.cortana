@@ -1,42 +1,45 @@
-import { faEdit, faFile, faPlus, faSave } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useEffect, useState } from 'react'
-import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore'
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore'
-import { Col, Modal, Row } from 'react-bootstrap'
+import { faEdit, faFile, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import envVariables from '../../../helpers/envVariables';
+import enums from '../../../helpers/enums';
 import * as Yup from "yup";
-import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore'
-import { ViewLoading } from '../../../components/Loaders'
-import { Form, Formik } from 'formik'
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo'
-import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms'
-import enums from '../../../helpers/enums'
-import envVariables from '../../../helpers/envVariables'
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
-import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps'
-import Swal from 'sweetalert2'
+import { useEffect, useState } from 'react';
+import { Col, Modal, Row } from 'react-bootstrap';
+import { useAuditDocumentsStore } from '../../../hooks/useAuditDocumentsStore';
+import { useAuditsStore } from '../../../hooks/useAuditsStore';
+import Swal from 'sweetalert2';
+import { ViewLoading } from '../../../components/Loaders';
+import { Form, Formik } from 'formik';
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
+import auditDocumentTypeProps from '../helpers/auditDocumentTypeProps';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 
-const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) => {
+const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
         VITE_FILES_URL,
         URL_ORGANIZATION_FILES,
     } = envVariables();
 
-    const { 
-        AuditCycleDocumentType,
-        DefaultStatusType ,
+    const {
+        AuditDocumentType,
+        DefaultStatusType,
     } = enums();
 
     const formDefaultValues = {
         standardSelect: '',
         fileInput: '',
-        versionInput: '',        
-        commentsInput: '',  
+        commentsInput: '',
         otherDescriptionInput: '',
+        isWitnessIncludedCheck: false,
         statusCheck: false,
     };
-    const validationSchema = Yup.object({      
+
+    const validationSchema = Yup.object({
+        standardSelect: Yup.string()
+            .required('Must select a standard'),
         fileInput: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -54,8 +57,6 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                     return true;
                 }
             }),  
-        versionInput: Yup.string()
-            .max(10, 'Version must be at most 10 characters'),
         commentsInput: Yup.string()
             .max(500, 'Comments must be at most 500 characters'),
         otherDescriptionInput: Yup.string()
@@ -68,28 +69,28 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
         organization
     } = useOrganizationsStore();
 
-    // const {
-    //     auditCycle,
-    // } = useAuditCyclesStore();
+    const {
+        auditCycle
+    } = useAuditCyclesStore();
 
     const {
-        organizationStandards
-    } = useOrganizationStandardsStore();
+        audit
+    } = useAuditsStore();
 
     const {
-        isAuditCycleDocumentLoading,
-        isAuditCycleDocumentCreating,
-        isAuditCycleDocumentSaving,
-        auditCycleDocumentSavedOk,
-        auditCycleDocument,
-        auditCycleDocumentsErrorMessage,
+        isAuditDocumentLoading,
+        isAuditDocumentCreating,
+        isAuditDocumentSaving,
+        auditDocumentSavedOk,
+        auditDocument,
+        auditDocumentsErrorMessage,
 
-        auditCycleDocumentsAsync,
-        auditCycleDocumentAsync,
-        auditCycleDocumentCreateAsync,
-        auditCycleDocumentSaveAsync,
-        auditCycleDocumentClear,
-    } = useAuditCycleDocumentsStore();
+        auditDocumentsAsync,
+        auditDocumentAsync,
+        auditDocumentCreateAsync,
+        auditDocumentSaveAsync,
+        auditDocumentClear,
+    } = useAuditDocumentsStore();
 
     // HOOKS
 
@@ -97,79 +98,83 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
     useEffect(() => {
-        if (!!auditCycleDocument && showModal) {
+        if (!!auditDocument && showModal) {
             setInitialValues({
-                standardSelect: auditCycleDocument?.StandardID ?? '',
-                versionInput: auditCycleDocument?.Version ?? '',
-                commentsInput: auditCycleDocument?.Comments ?? '',
-                otherDescriptionInput: auditCycleDocument?.OtherDescription ?? '',
-                statusCheck: auditCycleDocument?.Status == DefaultStatusType.active,
+                standardSelect: auditDocument?.StandardID ?? '',
+                fileInput: '',
+                commentsInput: auditDocument?.Comments ?? '',
+                otherDescriptionInput: auditDocument?.OtherDescription ?? '',
+                isWitnessIncludedCheck: auditDocument?.isWitnessIncluded ?? false,
+                statusCheck: auditDocument.Status == DefaultStatusType.active,
             });
         }
-    }, [auditCycleDocument]);
-
+    }, [auditDocument]);
+    
     useEffect(() => {
-        if (!!auditCycleDocumentSavedOk && showModal) {
-            Swal.fire('Document', `Document ${ !id ? 'added' : 'updated'} successfully`, 'success');  
-            auditCycleDocumentsAsync({
-                auditCycleID: auditCycle.ID,
+        if (!!auditDocumentSavedOk && showModal) {
+            Swal.fire('Document', `Document ${!id ? 'added' : 'updated'} successfully`, 'success');
+            auditDocumentsAsync({
+                auditID: audit.ID,
                 pageSize: 0,
             });
-            auditCycleDocumentClear();
-            setShowModal(false);
-        }
-    }, [auditCycleDocumentSavedOk]);
-
-    useEffect(() => {
-        if (!!auditCycleDocumentsErrorMessage && showModal) {
-            Swal.fire('Document', auditCycleDocumentsErrorMessage, 'error');
-            auditCycleDocumentClear();
+            // auditDocumentClear();
+            // setShowModal(false);
             onCloseModal();
         }
-    }, [auditCycleDocumentsErrorMessage]);
+    }, [auditDocumentSavedOk]);
     
+    useEffect(() => {
+        if (!!auditDocumentsErrorMessage && showModal) {
+            Swal.fire('Document', auditDocumentsErrorMessage, 'error');
+            // auditDocumentClear();
+            onCloseModal();
+        }
+    }, [auditDocumentsErrorMessage]);
+
     // METHODS
 
     const onShowModal = () => {
-
+        
         if (!id) {
-            auditCycleDocumentCreateAsync({
-                AuditCycleID: auditCycle.ID,
+            auditDocumentCreateAsync({
+                AuditID: audit.ID,
             });
         } else {
-            auditCycleDocumentAsync(id);
+            auditDocumentAsync(id);
         }
 
         setShowModal(true);
-    }; // onShowModal
-
+    };
+    
     const onCloseModal = () => {
-
-        auditCycleDocumentClear();
+        auditDocumentClear();
         setShowModal(false);
-    }; // onCloseModal
+    };
 
     const onFormSubmit = (values) => {
+        //console.log('onFormSubmit', values);
+
         const toSave = {
-            ID: auditCycleDocument.ID,
-            StandardID: values.standardSelect == '' ? null : values.standardSelect,
-            Version: values.versionInput,
-            Comments: values.commentsInput,
+            ID: auditDocument.ID,
+            StandardID: !!id ? auditDocument.StandardID : values.standardSelect,
             DocumentType: documentType,
+            Comments: values.commentsInput,
             OtherDescription: values.otherDescriptionInput,
+            isWitnessIncluded: !!values.isWitnessIncludedCheck ?? false,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        auditCycleDocumentSaveAsync(toSave, values.fileInput);
-    }; // onFormSubmit
-    
+        //console.log(toSave);
+        auditDocumentSaveAsync(toSave, values.fileInput);
+    };
+
     return (
         <div {...props}>
             <button
                 type="button"
                 className="btn btn-link p-0 mb-0"
                 title={!!id ? 'Edit document information' : 'Add new document'}
-                onClick={ onShowModal }
+                onClick={onShowModal}
             >
                 <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />
             </button>
@@ -181,11 +186,11 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                     </Modal.Title>
                 </Modal.Header>
                 {
-                    isAuditCycleDocumentLoading || isAuditCycleDocumentCreating ? (
+                    isAuditDocumentLoading || isAuditDocumentCreating ? (
                         <Modal.Body>
                             <ViewLoading />
-                        </Modal.Body>
-                    ) : !!auditCycleDocument && showModal &&
+                        </Modal.Body>                        
+                    ) : !!auditDocument && showModal && 
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
@@ -198,9 +203,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                     <Row>
                                         <Col xs="12">
                                             <p className="text-secondary font-weight-bold mb-0">
-                                                { auditCycle.Name }
-                                                <span className="mx-2">-</span>
-                                                { auditCycleDocumentTypeProps[documentType].label }
+                                                { auditDocumentTypeProps[documentType].label }
                                             </p>
                                         </Col>
                                     </Row>
@@ -213,17 +216,9 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                             >
                                                 <option value="">(select)</option>
                                                 {
-                                                    organizationStandards
-                                                        // .filter(item => (item.Status === DefaultStatusType.active))
-                                                        .map(item =>
-                                                            <option
-                                                                key={item.StandardID}
-                                                                value={item.StandardID}
-                                                                className="text-capitalize"
-                                                            >
-                                                                {item.StandardName}
-                                                            </option>
-                                                        )
+                                                    !!audit && !!audit.Standards && audit.Standards.length > 0 && audit.Standards.map(standard => (
+                                                        <option key={standard.StandardID} value={standard.StandardID}>{standard.StandardName}</option>
+                                                    ))
                                                 }
                                             </AryFormikSelectInput>
                                         </Col>
@@ -231,10 +226,10 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                             <label className="form-label">Document file</label>
                                             <div className="d-flex justify-content-between align-items-center mb-3">
                                                 {
-                                                    !isNullOrEmpty(auditCycleDocument.Filename) &&
+                                                    !isNullOrEmpty(auditDocument.Filename) &&
                                                     <div>
                                                         <a
-                                                            href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${auditCycleDocument.Filename}`}
+                                                            href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${audit.ID}/${auditDocument.Filename}`}
                                                             target="_blank"
                                                             className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
                                                             title="View current file"
@@ -263,13 +258,6 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                             </div>
                                         </Col>
                                         <Col xs="12">
-                                            <AryFormikTextInput
-                                                name="versionInput"
-                                                label="Version"
-                                                placeholder="1.0"
-                                            />
-                                        </Col>
-                                        <Col xs="12">
                                             <AryFormikTextArea
                                                 name="commentsInput"
                                                 label="Comments"
@@ -277,7 +265,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                             />
                                         </Col>
                                         {
-                                            documentType == AuditCycleDocumentType.other &&
+                                            documentType == AuditDocumentType.other &&
                                             <Col xs="12">
                                                 <AryFormikTextInput
                                                     name="otherDescriptionInput"
@@ -286,6 +274,22 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                                 />
                                             </Col>
                                         }
+                                        <Col xs="12" md="6">
+                                            <div className="form-check form-switch mb-3">
+                                                <input id="isWitnessIncludedCheck" name="isWitnessIncludedCheck"
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    onChange={ formik.handleChange }
+                                                    checked={ formik.values.isWitnessIncludedCheck }
+                                                />
+                                                <label 
+                                                    className="form-check-label text-secondary mb-0" 
+                                                    htmlFor="isWitnessIncludedCheck"
+                                                >
+                                                    Is witness included in the document
+                                                </label>
+                                            </div>
+                                        </Col>
                                         <Col xs="12" md="6" xxl="4">
                                             <div className="form-check form-switch mb-3">
                                                 <input id="statusCheck" name="statusCheck"
@@ -307,12 +311,12 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
                                         <div className="text-secondary mb-3 mb-sm-0">
-                                            <AryLastUpdatedInfo item={ auditCycleDocument } />
+                                            <AryLastUpdatedInfo item={ auditDocument } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <button type="submit"
                                                 className="btn bg-gradient-dark mb-0"
-                                                disabled={ isAuditCycleDocumentSaving }
+                                                disabled={ isAuditDocumentSaving }
                                             >
                                                 <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
                                                 Save
@@ -335,4 +339,4 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
     )
 }
 
-export default AuditCycleDocumentEditItem
+export default AuditDocumentEditItem

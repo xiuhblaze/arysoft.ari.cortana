@@ -275,7 +275,7 @@ export const useAuditDocumentsStore = () => {
         auditDocumentSaveAsync,
         // auditDocumentSaveWithFileAsync,
         auditDocumentDeleteAsync,
-        auditDocumentDeleteFileAsync,
+        //auditDocumentDeleteFileAsync,
         auditDocumentClear,
     }
 };

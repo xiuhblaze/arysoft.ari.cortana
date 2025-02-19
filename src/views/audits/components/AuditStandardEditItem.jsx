@@ -1,149 +1,146 @@
-import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit, faPlus, faSave } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import * as Yup from "yup";
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
-import { useAuditCycleStandardsStore } from '../../../hooks/useAuditCycleStandardsStore';
-import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore';
-import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import { Col, Modal, Row } from 'react-bootstrap';
-import { ViewLoading } from '../../../components/Loaders';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput } from '../../../components/Forms';
-import enums from '../../../helpers/enums';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import auditStepProps from '../../audits/helpers/auditStepProps';
+import { useAuditsStore } from "../../../hooks/useAuditsStore";
+import { useAuditStandardsStore } from "../../../hooks/useAuditStandardsStore";
+import { useOrganizationStandardsStore } from "../../../hooks/useOrganizationStandardsStore";
+import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
+import { useEffect, useState } from "react";
+import { useAuditCycleStandardsStore } from "../../../hooks/useAuditCycleStandardsStore";
+import enums from "../../../helpers/enums";
+import { Col, Modal, Row } from "react-bootstrap";
+import { ViewLoading } from "../../../components/Loaders";
+import { Form, Formik } from "formik";
+import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import auditStepProps from "../helpers/auditStepProps";
+import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import Swal from "sweetalert2";
 
-const AuditCycleStandardEditItem = ({ id, ...props }) => {
+const AuditStandardEditItem = ({ id, ...props }) => {
 
     const {
-        AuditCycleType,
-        AuditStepType,
-        DefaultStatusType,
-        StandardOrderType,
+        DefaultStatusType
     } = enums();
 
     const formDefaultValues = {
         standardSelect: '',
-        initialStepSelect: '',
-        cycleTypeSelect: '',
+        stepSelect: '',
+        extraInfoInput: '',
         statusCheck: false,
-    }; // formDefaultValues
+    };
 
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
             .required('Must select a standard'),
-        initialStepSelect: Yup.string()
-            .required('Must select the initial step'),
-        cycleTypeSelect: Yup.string()
-            .required('Must select the cycle type'),
+        stepSelect: Yup.string()
+            .required('Must select the step'),
+        extraInfoInput: Yup.string()
+            .max(1000, 'Extra info must be at most 1000 characters'),
     });
 
     // CUSTOM HOOKS
 
     const {
-        auditCycle,
+        auditCycle
     } = useAuditCyclesStore();
 
     const {
-        isAuditCycleStandardLoading,
-        isAuditCycleStandardCreating,
-        isAuditCycleStandardSaving,
-        auditCycleStandardSavedOk,
-        auditCycleStandard,
-        auditCycleStandardsErrorMessage,
-
-        auditCycleStandardsAsync,
-        auditCycleStandardAsync,
-        auditCycleStandardCreateAsync,
-        auditCycleStandardSaveAsync,
-        auditCycleStandardClear,
-    } = useAuditCycleStandardsStore();
+        audit
+    } = useAuditsStore();
 
     const {
-        isOrganizationStandardsLoading,
-        organizationStandards,
-        organizationStandardsAsync,
-    } = useOrganizationStandardsStore();
+        isAuditStandardLoading,
+        isAuditStandardCreating,
+        isAuditStandardSaving,
+        auditStandardSavedOk,
+        auditStandard,
+        auditStandardsErrorMessage,
 
+        auditStandardsAsync,
+        auditStandardAsync,
+        auditStandardCreateAsync,
+        auditStandardSaveAsync,
+        auditStandardClear,
+    } = useAuditStandardsStore();
+
+    const {
+        isAuditCycleStandardsLoading,
+        auditCycleStandards,
+        auditCycleStandardsAsync,
+    } = useAuditCycleStandardsStore();
+        
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
     useEffect(() => {
-        if (!!auditCycleStandard && showModal) {
+        if (!!auditStandard && showModal) {
             setInitialValues({
-                standardSelect: auditCycleStandard?.StandardID ?? '',
-                initialStepSelect: auditCycleStandard?.InitialStep ?? '',
-                cycleTypeSelect: auditCycleStandard?.CycleType ?? '',
-                statusCheck: auditCycleStandard.Status === DefaultStatusType.active,
+                standardSelect: auditStandard?.StandardID ?? '',
+                stepSelect: auditStandard?.Step ?? '',
+                extraInfoInput: auditStandard?.ExtraInfo ?? '',
+                statusCheck: auditStandard.Status === DefaultStatusType.active,
             });
 
-            if (!organizationStandards) {
-                organizationStandardsAsync({
-                    status: DefaultStatusType.active,
+            if (!auditCycleStandards || auditCycleStandards.length === 0) {
+                // console.log('AuditStandardEditItem: auditCycleStandards is empty');
+                auditCycleStandardsAsync({ 
+                    auditCycleID: audit.AuditCycleID,
                     pageSize: 0,
-                    includeDeleted: false,
-                    order: StandardOrderType.name,
                 });
             }
         }
-    }, [auditCycleStandard]);
-
+    }, [auditStandard]);
+    
     useEffect(() => {
-        if (!!auditCycleStandardSavedOk && showModal) {
-            Swal.fire('Audit cycle standard', `Standard ${!id ? 'assigned' : 'updated'} successfully`, 'success');
-            auditCycleStandardsAsync({
-                auditCycleID: auditCycle.ID,
+        if (!!auditStandardSavedOk && showModal) {
+            Swal.fire('Audit standard', `Standard ${!id ? 'assigned' : 'updated'} successfully`, 'success');
+            auditStandardsAsync({
+                auditID: audit.ID,
                 pageSize: 0,
             });
             onCloseModal();
         }
-    }, [auditCycleStandardSavedOk]);
+    }, [auditStandardSavedOk]);
     
-
     useEffect(() => {
-        if (auditCycleStandardsErrorMessage && showModal) {
-            Swal.fire('Audit cycle standard', auditCycleStandardsErrorMessage, 'error');
+        if (!!auditStandardsErrorMessage && showModal) {
+            Swal.fire('Audit standard', auditStandardsErrorMessage, 'error');
             onCloseModal();
-        }        
-    }, [auditCycleStandardsErrorMessage]);
+        }
+    }, [auditStandardsErrorMessage]);
     
     // METHODS
 
     const onShowModal = () => {
 
         if (!id) {
-            auditCycleStandardCreateAsync({
-                AuditCycleID: auditCycle.ID,
+            auditStandardCreateAsync({
+                AuditID: audit.ID,
             });
         } else {
-            auditCycleStandardAsync(id);
+            auditStandardAsync(id);
         }
 
         setShowModal(true);
     }; // onShowModal
 
     const onCloseModal = () => {
-
-        auditCycleStandardClear();
+        auditStandardClear();
         setShowModal(false);
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
-
         const toSave = {
-            ID: auditCycleStandard.ID,
-            StandardID: !!id ? auditCycleStandard.StandardID : values.standardSelect,
-            InitialStep: values.initialStepSelect ?? '',
-            CycleType: values.cycleTypeSelect ?? '',
+            ID: auditStandard.ID,
+            StandardID: !!id ? auditStandard.StandardID : values.standardSelect,
+            Step: values.stepSelect ?? '',
+            ExtraInfo: values.extraInfoInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        console.log('onFormSubmit', toSave);
-
-        auditCycleStandardSaveAsync(toSave);
+        auditStandardSaveAsync(toSave);
     }; // onFormSubmit
 
     return (
@@ -152,23 +149,23 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                 type="button"
                 className="btn btn-link p-0 mb-0"
                 title={!!id ? 'Edit standard association' : 'Associate standard'}
-                onClick={ onShowModal }
+                onClick={onShowModal}
             >
-                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} size="lg" className="text-dark" />
+                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />
             </button>
             <Modal show={showModal} onHide={onCloseModal}>
                 <Modal.Header>
                     <Modal.Title>
                         <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="px-3" />
-                        { !!id ? 'Edit assigned standard' : 'Assign standard' }
+                        { !!id ? 'Edit standard association' : 'Associate standard' }
                     </Modal.Title>
                 </Modal.Header>
                 {
-                    isAuditCycleStandardLoading || isAuditCycleStandardCreating || isOrganizationStandardsLoading ? (
+                    isAuditStandardLoading || isAuditStandardCreating || isAuditCycleStandardsLoading ? (
                         <Modal.Body>
                             <ViewLoading />
                         </Modal.Body>
-                    ) : !!auditCycleStandard && showModal &&
+                    ) : !!auditStandard && showModal &&
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
@@ -187,7 +184,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                             >
                                                 { !id && <option value="">(select)</option> }
                                                 {
-                                                    organizationStandards
+                                                    auditCycleStandards
                                                         // .filter(item => (item.Status === DefaultStatusType.active))
                                                         .map(item =>
                                                             <option
@@ -201,28 +198,10 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                                 }
                                             </AryFormikSelectInput>
                                         </Col>
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12">
                                             <AryFormikSelectInput
-                                                name="cycleTypeSelect"
-                                                label="Cycle type"
-                                            >
-                                                {
-                                                    Object.keys(AuditCycleType).map(key =>
-                                                        <option
-                                                            key={key}
-                                                            value={AuditCycleType[key]}
-                                                            className="text-capitalize"
-                                                        >
-                                                            {key === 'nothing' ? '(select)' : key}
-                                                        </option>
-                                                    )
-                                                }
-                                            </AryFormikSelectInput>
-                                        </Col>
-                                        <Col xs="12" sm="6">
-                                            <AryFormikSelectInput
-                                                name="initialStepSelect"
-                                                label="Initial step"
+                                                name="stepSelect"
+                                                label="Step"
                                             >
                                                 {
                                                     auditStepProps.map(item =>
@@ -236,6 +215,12 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                                     )
                                                 }
                                             </AryFormikSelectInput>
+                                        </Col>
+                                        <Col xs="12">
+                                            <AryFormikTextInput
+                                                name="extraInfoInput"
+                                                label="Extra info"
+                                            />
                                         </Col>
                                         <Col xs="12" md="6" xxl="4">
                                             <div className="form-check form-switch mb-3">
@@ -258,12 +243,12 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
                                         <div className="text-secondary mb-3 mb-sm-0">
-                                            <AryLastUpdatedInfo item={ auditCycleStandard } />
+                                            <AryLastUpdatedInfo item={ auditStandard } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <button type="submit"
                                                 className="btn bg-gradient-dark mb-0"
-                                                disabled={ isAuditCycleStandardSaving }
+                                                disabled={ isAuditStandardSaving }
                                             >
                                                 <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
                                                 Save
@@ -286,4 +271,4 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
     )
 }
 
-export default AuditCycleStandardEditItem
+export default AuditStandardEditItem

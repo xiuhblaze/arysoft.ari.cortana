@@ -11,13 +11,11 @@ import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Fo
 import getISODate from '../../../helpers/getISODate';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import Swal from 'sweetalert2';
+import AuditStandardsList from './AuditStandardsList';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import AuditDocumentsList from './AuditDocumentsList';
 
-const AuditEditItem = ({ id, auditCycle, ...props }) => {
-    
-    if (!auditCycle) {
-        console.log('AuditEditItem: auditCycle is empty');
-        return;
-    }
+const AuditEditItem = ({ id, ...props }) => {
 
     const {
         AuditStatusType,
@@ -46,6 +44,10 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
     // CUSTOM HOOKS
 
     const {
+        auditCycle
+    } = useAuditCyclesStore();
+
+    const {
         isAuditLoading,
         isAuditCreating,
         isAuditSaving,
@@ -64,6 +66,7 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [showAllFiles, setShowAllFiles] = useState(false);
 
     useEffect(() => {
         if (!!audit && showModal) {
@@ -165,6 +168,9 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
                                         <Col xs="12" sm="5">
                                             <Row>
                                                 <Col xs="12">
+                                                    <AuditStandardsList />
+                                                </Col>
+                                                <Col xs="12">
                                                     <AryFormikTextInput
                                                         name="descriptionInput"
                                                         label="Audit description"
@@ -202,7 +208,7 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
                                                         }
                                                     </AryFormikSelectInput>
                                                 </Col>
-                                                <Col xs="12" md="6" xxl="4">
+                                                <Col xs="12" sm="6">
                                                     <div className="form-check form-switch mb-3">
                                                         <input id="hasWitnessCheck" name="hasWitnessCheck"
                                                             className="form-check-input"
@@ -219,10 +225,41 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
                                                     </div>
                                                 </Col>
                                             </Row>
+                                            <Row>
+                                                <Col xs="12" className="d-flex justify-content-end">
+                                                    <button type="submit"
+                                                        className="btn bg-gradient-dark mb-0"
+                                                        disabled={ isAuditSaving }
+                                                    >
+                                                        <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                        Save
+                                                    </button>
+                                                </Col>
+                                            </Row>
                                         </Col>
                                         <Col xs="12" sm="7">
-                                            <h6 className="text-sm font-weight-bold mb-0">Audit documents</h6>
-                                            <p>...</p>
+                                            <h5>Audit documents</h5>
+                                            <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+                                                <AuditDocumentsList showAllFiles={ showAllFiles } />
+                                            </div>
+                                            <Row>
+                                                <Col xs="12" className="d-flex justify-content-end">
+                                                    <div className="form-check form-switch mb-3">
+                                                        <input id="showAllFilesCheck" name="showAllFilesCheck"
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            onChange={ () => setShowAllFiles(!showAllFiles) }
+                                                            checked={ showAllFiles }
+                                                        />
+                                                        <label 
+                                                            className="form-check-label text-secondary mb-0" 
+                                                            htmlFor="showAllFilesCheck"
+                                                        >
+                                                            Show all files
+                                                        </label>
+                                                    </div>
+                                                </Col>
+                                            </Row>
                                         </Col>
                                     </Row>
                                 </Modal.Body>
@@ -232,13 +269,6 @@ const AuditEditItem = ({ id, auditCycle, ...props }) => {
                                             <AryLastUpdatedInfo item={ audit } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
-                                            <button type="submit"
-                                                className="btn bg-gradient-dark mb-0"
-                                                disabled={ isAuditSaving }
-                                            >
-                                                <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
-                                                Save
-                                            </button>
                                             <button type="button"
                                                 className="btn btn-link text-secondary mb-0"
                                                 onClick={ onCloseModal }

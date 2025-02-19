@@ -62,7 +62,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
             auditCycleAsync,
             auditCycleCreateAsync,
             auditCycleSaveAsync,
-            auditCycleClear,
+            // auditCycleClear,
         } = useAuditCyclesStore();
 
     // HOOKS
@@ -89,7 +89,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                 organizationID: organization.ID,
                 pageSize: 0,
             });
-            auditCycleClear();
+            // auditCycleClear();
             setShowModal(false);
         }
     }, [auditCycleSavedOk]);
@@ -97,7 +97,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
     useEffect(() => {
         if (!!auditCyclesErrorMessage && showModal) {
             Swal.fire('Cycle', auditCyclesErrorMessage, 'error');
-            auditCycleClear();
+            // auditCycleClear();
             onCloseModal();
         }
     }, [auditCyclesErrorMessage]);
@@ -112,10 +112,17 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                 OrganizationID: organization.ID,
             });
         } else {
-            // if (!!auditCycle && auditCycle.ID === id)  {
-            //     auditCycleAsync(id);
-            // }
-            auditCycleAsync(id);
+            if (!!auditCycle && auditCycle.ID !== id)  {
+                auditCycleAsync(id);
+            } else {
+                setInitialValues({
+                    nameInput: auditCycle?.Name ?? '',
+                    startDateInput: !!auditCycle?.StartDate ? getISODate(auditCycle.StartDate) : '',
+                    endDateInput: !!auditCycle?.EndDate ? getISODate(auditCycle.EndDate) : '',
+                    extraInfoInput: auditCycle?.ExtraInfo ?? '',
+                    statusCheck: auditCycle.Status === DefaultStatusType.active,
+                });
+            }
         }
 
         setShowModal(true);
@@ -123,7 +130,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
 
     const onCloseModal = () => {
 
-        auditCycleClear();
+        // auditCycleClear();
         setShowModal(false);
     };
 

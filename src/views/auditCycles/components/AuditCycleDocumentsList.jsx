@@ -9,8 +9,10 @@ import AuditCycleDocumentEditItem from './AuditCycleDocumentEditItem';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import AuditList from '../../audits/components/AuditList';
 import AuditEditItem from '../../audits/components/AuditEditItem';
+import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 
-const AuditCycleDocumentsList = ({ auditCycle, documents, readonly = false, ...props }) => {
+const AuditCycleDocumentsList = ({ readonly = false, ...props }) => {
     const { 
         VITE_FILES_URL,
         URL_ORGANIZATION_FILES
@@ -25,6 +27,14 @@ const AuditCycleDocumentsList = ({ auditCycle, documents, readonly = false, ...p
     const {
         organization
     } = useOrganizationsStore();
+
+    const {
+        auditCycle
+    } = useAuditCyclesStore();
+
+    const {
+        auditCycleDocuments
+    } = useAuditCycleDocumentsStore();
 
     return (
         <div {...props} className="timeline timeline-one-side">
@@ -49,7 +59,7 @@ const AuditCycleDocumentsList = ({ auditCycle, documents, readonly = false, ...p
                                         </h6>
                                         <div className="d-flex justify-content-start gap-3 mt-1 mb-0">
                                             {
-                                                !!documents && documents
+                                                !!auditCycleDocuments && auditCycleDocuments
                                                     .filter(doc => doc.DocumentType == item.id)
                                                     .map(doc => {
                                                         const url = `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}`;
@@ -112,10 +122,10 @@ const AuditCycleDocumentsList = ({ auditCycle, documents, readonly = false, ...p
                                         <div className="timeline-content" style={{ maxWidth: 'none' }}>
                                             <h6 className='d-flex justify-content-between align-items-center text-dark text-sm font-weight-bold mb-0'>
                                                 {auditCycleDocumentTypeProps[AuditCycleDocumentType.audit].label}
-                                                <AuditEditItem auditCycle={ auditCycle } />
+                                                <AuditEditItem />
                                             </h6>
                                             <div className="d-flex justify-content-start gap-3 mt-1 mb-0">
-                                                <AuditList auditCycle={ auditCycle } />
+                                                <AuditList />
                                             </div>
                                         </div>
                                     </div>

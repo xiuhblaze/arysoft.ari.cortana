@@ -4,6 +4,7 @@ import auditStepProps from '../helpers/auditStepProps';
 import enums from '../../../helpers/enums';
 import auditStatusProps from '../helpers/auditStatusProps';
 import AuditEditItem from './AuditEditItem';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 
 const StandardItem = ({ standard, ...props }) => {
     const { DefaultStatusType } = enums();
@@ -15,12 +16,12 @@ const StandardItem = ({ standard, ...props }) => {
     )
 } // StandardItem
 
-const AuditItem = ({ item, auditCycle, ...props }) => {
+const AuditItem = ({ item, ...props }) => {
 
-    if (!auditCycle) {
-        console.log('AuditItem: auditCycle is empty');
-        return;
-    }
+    // if (!auditCycle) {
+    //     console.log('AuditItem: auditCycle is empty');
+    //     return;
+    // }
 
     return (
         <div {...props} className="d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-3">
@@ -54,7 +55,7 @@ const AuditItem = ({ item, auditCycle, ...props }) => {
                 <p className="text-secondary text-xs mb-0">Auditors: { item.AuditorsCount ?? 0 }, Documents: { item.DocumentsCount ?? 0 }, Has witness: { !!item.HasWitness ? 'yes':'no'}, </p> 
             </div>
             <div>
-                <AuditEditItem id={ item.ID } auditCycle={ auditCycle } />
+                <AuditEditItem id={ item.ID } />
             </div>
         </div>
     )
