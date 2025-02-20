@@ -14,7 +14,10 @@ import AuditCycleDocumentsList from './AuditCycleDocumentsList';
 
 const AuditCyclesCard = ({ readOnly = false, ...props }) => {
 
-    const { AuditCycleDocumentType } = enums();
+    const {         
+        AuditCycleDocumentType,
+        DefaultStatusType,
+    } = enums();
     const { 
         VITE_FILES_URL,
         URL_ORGANIZATION_FILES
@@ -46,6 +49,7 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
     //  HOOKS
 
     const [navOption, setNavOption] = useState(null);
+    const [showAllFiles, setShowAllFiles] = useState(false);
     // const [auditCycleSelected, setAuditCycleSelected] = useState(null);
     // const [auditCycleDocumentsSelected, setAuditCycleDocumentsSelected] = useState(null);
 
@@ -69,6 +73,8 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
             
             setNavOption(loadID);
             auditCycleAsync(loadID);
+        } else {
+            auditCycleClear();
         }
     }, [auditCycles]);
 
@@ -124,7 +130,7 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                     }
                 </Nav>
                 {
-                    !!auditCycle && (
+                    !!auditCycle && auditCycle.Status != DefaultStatusType.nothing && (
                         <div>
                             <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
                                 <div>
@@ -165,9 +171,24 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
                                     !readOnly && <AuditCycleEditItem id={ auditCycle.ID } />
                                 }
                             </div>
-                            
                             <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
-                                <AuditCycleDocumentsList />
+                                <AuditCycleDocumentsList showAllFiles={ showAllFiles } />
+                            </div>
+                            <div className="d-flex justify-content-end">
+                                <div className="form-check form-switch">
+                                    <input id="showAllFilesCheck" name="showAllFilesCheck"
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        onChange={ () => setShowAllFiles(!showAllFiles) }
+                                        checked={ showAllFiles }
+                                    />
+                                    <label 
+                                        className="form-check-label text-secondary mb-0" 
+                                        htmlFor="showAllFilesCheck"
+                                    >
+                                        Show all files
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     )

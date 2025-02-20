@@ -132,15 +132,15 @@ const OrganizationsTableList = () => {
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
                                 <th className={headStyle}>Sites</th>
-                                <th className="d-flex justify-content-start align-items-center gap-1">
-                                    <SortItem
+                                <th className="d-flex justify-content-center align-items-center gap-1">
+                                    {/* <SortItem
                                         activeAsc={currentOrder === OrganizationOrderType.certificatesValidityStatus}
                                         activeDesc={currentOrder === OrganizationOrderType.certificatesValidityStatusDesc}
                                         onOrderAsc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatus) }}
                                         onOrderDesc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatusDesc) }}
-                                    />
+                                    /> */}
                                     <div className={headStyle}>
-                                        Certificates
+                                        Standards
                                     </div>
                                 </th>
                                 <th>

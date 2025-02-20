@@ -17,7 +17,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
 import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps'
 import Swal from 'sweetalert2'
 
-const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) => {
+const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
         VITE_FILES_URL,
         URL_ORGANIZATION_FILES,
@@ -68,9 +68,9 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
         organization
     } = useOrganizationsStore();
 
-    // const {
-    //     auditCycle,
-    // } = useAuditCyclesStore();
+    const {
+        auditCycle,
+    } = useAuditCyclesStore();
 
     const {
         organizationStandards
@@ -103,7 +103,8 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                 versionInput: auditCycleDocument?.Version ?? '',
                 commentsInput: auditCycleDocument?.Comments ?? '',
                 otherDescriptionInput: auditCycleDocument?.OtherDescription ?? '',
-                statusCheck: auditCycleDocument?.Status == DefaultStatusType.active,
+                statusCheck: auditCycleDocument?.Status == DefaultStatusType.active 
+                    || auditCycleDocument?.Status == DefaultStatusType.nothing,
             });
         }
     }, [auditCycleDocument]);
@@ -150,16 +151,17 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
+        //console.log(values);
         const toSave = {
             ID: auditCycleDocument.ID,
-            StandardID: values.standardSelect == '' ? null : values.standardSelect,
+            StandardID: values.standardSelect,
             Version: values.versionInput,
             Comments: values.commentsInput,
             DocumentType: documentType,
             OtherDescription: values.otherDescriptionInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
-
+        //console.log(toSave);
         auditCycleDocumentSaveAsync(toSave, values.fileInput);
     }; // onFormSubmit
     
@@ -211,7 +213,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                                 label="Standard"
                                                 helpText="Leave blank to assign to all standards"
                                             >
-                                                <option value="">(select)</option>
+                                                <option value="">(all standards)</option>
                                                 {
                                                     organizationStandards
                                                         // .filter(item => (item.Status === DefaultStatusType.active))
@@ -231,35 +233,40 @@ const AuditCycleDocumentEditItem = ({ id, documentType, auditCycle, ...props }) 
                                             <label className="form-label">Document file</label>
                                             <div className="d-flex justify-content-between align-items-center mb-3">
                                                 {
-                                                    !isNullOrEmpty(auditCycleDocument.Filename) &&
-                                                    <div>
-                                                        <a
-                                                            href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${auditCycleDocument.Filename}`}
-                                                            target="_blank"
-                                                            className="btn btn-link text-dark mb-0 text-lg py-2 text-center"
-                                                            title="View current file"
-                                                        >
-                                                            <FontAwesomeIcon icon={faFile} size="lg" />
-                                                        </a>
-                                                    </div>
+                                                    isNullOrEmpty(auditCycleDocument.Filename) ? (
+                                                        <div className="w-100">
+                                                            <input
+                                                                id="Filename"
+                                                                type="file"
+                                                                name="fileInput"
+                                                                accept=".png, .jpg, .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar, .7z"
+                                                                className="form-control"
+                                                                onChange={(e) => {
+                                                                    formik.setFieldValue('fileInput', e.currentTarget.files[0]);
+                                                                }}
+                                                            />
+                                                            {/* <div className="text-xs text-secondary mt-1 me-2">If a file exists, the new one will overwrite the current one</div> */}
+                                                            {
+                                                                formik.touched.fileInput && formik.errors.fileInput &&
+                                                                <span className="text-danger text-xs">{formik.errors.fileInput}</span>
+                                                            }
+                                                        </div>
+                                                    ) : (
+                                                        <div>
+                                                            <a
+                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${auditCycleDocument.Filename}`}
+                                                                target="_blank"
+                                                                className="btn btn-link text-dark mb-0 py-2 text-center"
+                                                                title="View current file"
+                                                            >
+                                                                <FontAwesomeIcon icon={faFile} size="xl" />
+                                                                <span className=" text-sm ms-2">
+                                                                    { auditCycleDocument.Filename }
+                                                                </span>
+                                                            </a>
+                                                        </div>
+                                                    )
                                                 }
-                                                <div className="w-100">
-                                                    <input
-                                                        id="Filename"
-                                                        type="file"
-                                                        name="fileInput"
-                                                        accept=".png, .jpg, .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar, .7z"
-                                                        className="form-control"
-                                                        onChange={(e) => {
-                                                            formik.setFieldValue('fileInput', e.currentTarget.files[0]);
-                                                        }}
-                                                    />
-                                                    <div className="text-xs text-secondary mt-1 me-2">If a file exists, the new one will overwrite the current one</div>
-                                                    {
-                                                        formik.touched.fileInput && formik.errors.fileInput &&
-                                                        <span className="text-danger text-xs">{formik.errors.fileInput}</span>
-                                                    }
-                                                </div>
                                             </div>
                                         </Col>
                                         <Col xs="12">

@@ -64,11 +64,11 @@ const enums = () => {
         proposal: 3,
         contract: 4,
         auditProgramme: 5, // Confirmation letter
-        cdc: 6,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
-        certificate: 7,
-        survey: 8,
-        other: 9,          // Cualquier otro documento de interés
-        audit: 10,
+        //cdc: 6,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
+        certificate: 6,
+        survey: 7,
+        other: 8,          // Cualquier otro documento de interés
+        audit: 9,
     });
 
     // Audits
@@ -94,10 +94,11 @@ const enums = () => {
         actionPlan: 6,          // Action plan & evidence
         ncCloseReport: 7,       // Non conformities close report
         techReport: 8,          // No for FSSC
-        cdc: 9,                 // Certification decision checklist - TODO: Ver si se va a quedar aquí
+        cdc: 9,                 // Certification decision checklist - TODO: Aqui se queda
         fsscScreenShot: 10,     // Solo para FSSC
         travelExpenses: 11,     // Viaticos
-        other: 12,
+        witnessReport: 12,      // Reporte de testigos
+        other: 13,
     });
 
     const AuditStatusType = Object.freeze({

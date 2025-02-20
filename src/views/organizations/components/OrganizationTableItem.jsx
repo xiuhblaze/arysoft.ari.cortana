@@ -157,15 +157,15 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
             </td>
             <td>
                 <div className="d-flex justify-content-center align-items-center gap-1">
-                    <FontAwesomeIcon
+                    {/* <FontAwesomeIcon
                         icon={ certificateValidityStatusProps[item.CertificatesValidityStatus].icon }
                         className={ `text-${certificateValidityStatusProps[item.CertificatesValidityStatus].variant}` }
                         size="lg"
                         title={ certificateValidityStatusProps[item.CertificatesValidityStatus].label }
-                    />
+                    /> */}
                     {
                         !!item.Standards &&
-                        <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                        <div className="d-flex justify-content-center align-items-center flex-wrap text-xs gap-1 mb-0">
                             {
                                 item.Standards.map(i => (
                                     <div key={i.ID} className={`badge bg-gradient-${i.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-white me-1`}>

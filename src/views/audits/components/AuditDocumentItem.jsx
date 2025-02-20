@@ -16,7 +16,7 @@ const AuditDocumentItem = ({ item, readOnly = false, ...props }) => {
 
     const {
         DefaultStatusType
-    } =enums();
+    } = enums();
     
     // CUSTOM HOOKS
 

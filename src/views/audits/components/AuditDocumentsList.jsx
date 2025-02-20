@@ -31,7 +31,10 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
 
     // HOOKS
 
-    const [hasFSSCStandard, setHasFSSCStandard] = useState(false);
+    const [aboutFSSC, setAboutFSSC] = useState({
+        hasFSSC: false,
+        isOnlyFSSC: false,
+    });
     
     useEffect(() => {
         if (!!audit) {
@@ -39,7 +42,10 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
 
             if (!!audit.Standards && audit.Standards.length > 0) {
                 const fsscStandard = audit.Standards.some(i => i.StandardName.includes('FSSC'));
-                setHasFSSCStandard(!!fsscStandard);
+                setAboutFSSC({
+                    hasFSSC: !!fsscStandard,
+                    isOnlyFSSC: fsscStandard && audit.Standards.length === 1,
+                });
 
                 //console.log('Use FSSC Standard', fsscStandard);
             }
@@ -58,10 +64,11 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
                     .filter(i => i.id != AuditDocumentType.nothing)
                     .map(item => {
 
-                        if (!hasFSSCStandard && item.id == AuditDocumentType.fsscIntegrityLetter) return null;
-                        if (!hasFSSCStandard && item.id == AuditDocumentType.fsscAuditPlanSigned) return null;
-                        if (!hasFSSCStandard && item.id == AuditDocumentType.fsscScreenShot) return null;
-                        if (hasFSSCStandard && item.id == AuditDocumentType.techReport) return null;
+                        if (!aboutFSSC.hasFSSC && item.id == AuditDocumentType.fsscIntegrityLetter) return null;
+                        if (!aboutFSSC.hasFSSC && item.id == AuditDocumentType.fsscAuditPlanSigned) return null;
+                        if (!aboutFSSC.hasFSSC && item.id == AuditDocumentType.fsscScreenShot) return null;
+                        if (aboutFSSC.isOnlyFSSC && item.id == AuditDocumentType.techReport) return null;
+                        if (!audit.HasWitness && item.id == AuditDocumentType.witnessReport) return null;
 
                         return (
                             <div key={item.id}>
@@ -74,7 +81,7 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
                                             { item.label }
                                             <AuditDocumentEditItem documentType={ item.id } />
                                         </h6>
-                                        <div className="d-flex justify-content-start gap-3 mt-1 mb-0">
+                                        <div className="d-flex justify-content-start flex-wrap gap-3 mt-1 mb-0">
                                             {
                                                 isAuditDocumentsLoading ? (
                                                     <Spinner animation="border" role="status" 
@@ -84,7 +91,8 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
                                                         <span className="visually-hidden">Loading...</span>
                                                     </Spinner>
                                                 ) : !!auditDocuments && auditDocuments
-                                                    .filter(doc => doc.DocumentType == item.id && (showAllFiles || doc.Status == DefaultStatusType.active))
+                                                    .filter(doc => doc.DocumentType == item.id 
+                                                        && (showAllFiles || doc.Status == DefaultStatusType.active))
                                                     .map(doc => <AuditDocumentItem key={doc.ID} item={doc} />)
                                             }
                                         </div>

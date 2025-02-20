@@ -41,12 +41,6 @@ const auditCycleDocumentTypeProps = [
         variant: 'info',
     },
     {
-        id: AuditCycleDocumentType.cdc,
-        icon: faListCheck,
-        label: 'Certification decision checklist',
-        variant: 'danger',
-    },
-    {
         id: AuditCycleDocumentType.certificate,
         icon: faCertificate,
         label: 'Certificate',

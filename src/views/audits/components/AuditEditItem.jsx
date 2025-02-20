@@ -137,7 +137,7 @@ const AuditEditItem = ({ id, ...props }) => {
             <button
                 type="button"
                 className="btn btn-link p-0 mb-0"
-                title={!!id ? "Edit audit" : "Add new audit"}
+                title={!!id ? "Edit audit" : "New audit"}
                 onClick={onShowModal}
             >
                 <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />
@@ -146,7 +146,7 @@ const AuditEditItem = ({ id, ...props }) => {
                 <Modal.Header>
                     <Modal.Title>
                         <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="px-3" />
-                        { !!id ? "Edit audit" : "Add new audit" }
+                        { !!id ? "Audit" : "Add audit" } 
                     </Modal.Title>
                 </Modal.Header>
                 {
@@ -238,28 +238,30 @@ const AuditEditItem = ({ id, ...props }) => {
                                             </Row>
                                         </Col>
                                         <Col xs="12" sm="7">
-                                            <h5>Audit documents</h5>
-                                            <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
-                                                <AuditDocumentsList showAllFiles={ showAllFiles } />
+                                            <div className="bg-gray-100 rounded-3 p-2">
+                                                <h5>Audit documents</h5>
+                                                <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+                                                    <AuditDocumentsList showAllFiles={ showAllFiles } />
+                                                </div>
+                                                <Row>
+                                                    <Col xs="12" className="d-flex justify-content-end">
+                                                        <div className="form-check form-switch">
+                                                            <input id="showAllFilesCheck" name="showAllFilesCheck"
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                onChange={ () => setShowAllFiles(!showAllFiles) }
+                                                                checked={ showAllFiles }
+                                                            />
+                                                            <label 
+                                                                className="form-check-label text-secondary mb-0" 
+                                                                htmlFor="showAllFilesCheck"
+                                                            >
+                                                                Show all files
+                                                            </label>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
                                             </div>
-                                            <Row>
-                                                <Col xs="12" className="d-flex justify-content-end">
-                                                    <div className="form-check form-switch mb-3">
-                                                        <input id="showAllFilesCheck" name="showAllFilesCheck"
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            onChange={ () => setShowAllFiles(!showAllFiles) }
-                                                            checked={ showAllFiles }
-                                                        />
-                                                        <label 
-                                                            className="form-check-label text-secondary mb-0" 
-                                                            htmlFor="showAllFilesCheck"
-                                                        >
-                                                            Show all files
-                                                        </label>
-                                                    </div>
-                                                </Col>
-                                            </Row>
                                         </Col>
                                     </Row>
                                 </Modal.Body>

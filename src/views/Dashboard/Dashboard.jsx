@@ -22,6 +22,8 @@ import { MiniStatisticsCard } from '../../components/Cards';
 
 import bgElectronic from '../../assets/img/bgElectronic.jpg';
 import { addDays, addHours } from 'date-fns';
+import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { useEffect } from 'react';
 
 const locales = {
   'en-US': enUS,
@@ -61,6 +63,13 @@ const myEventsList = [
 ];
 
 export const Dashboard = () => {
+  const [controller, despatch] = useArysoftUIController();
+
+  useEffect(() => {
+    setNavbarTitle(despatch, null);
+  }, []);
+  
+
   return (
     <DashboardLayout>
       <Container fluid className="py-4">

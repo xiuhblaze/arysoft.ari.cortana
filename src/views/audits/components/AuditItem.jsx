@@ -24,7 +24,7 @@ const AuditItem = ({ item, ...props }) => {
     // }
 
     return (
-        <div {...props} className="d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-3">
+        <div {...props} className="d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-2">
             <div>
                 <FontAwesomeIcon 
                     icon={ auditStatusProps[item.Status].icon }
@@ -43,7 +43,7 @@ const AuditItem = ({ item, ...props }) => {
                     <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
                     <span className="font-weight-bold">{ new Date(item.EndDate).toLocaleDateString() }</span>
                 </p>
-                <div className="font-weight-bold text-xs text-secondary mb-0">
+                <div className="font-weight-bold text-xs text-dark mb-0">
                     {
                         !!item.Standards && item.Standards.length > 0 ?
                         <span className="font-weight-bold">
@@ -52,7 +52,11 @@ const AuditItem = ({ item, ...props }) => {
                         : null
                     }
                 </div>
-                <p className="text-secondary text-xs mb-0">Auditors: { item.AuditorsCount ?? 0 }, Documents: { item.DocumentsCount ?? 0 }, Has witness: { !!item.HasWitness ? 'yes':'no'}, </p> 
+                <p className="text-secondary text-xs mb-0">
+                    Auditors: <span className={`badge bg-gradient-${ !!item.AuditorCount && item.AuditorCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.AuditorCount ?? 0 }</span>
+                    Documents: <span className={`badge bg-gradient-${ !!item.DocumentsCount && item.DocumentsCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.DocumentsCount ?? 0 }</span>  
+                    Has witness: <span className={`badge bg-gradient-${!!item.HasWitness ? 'secondary' : 'light'}`}>{ !!item.HasWitness ? 'yes':'no'}</span>
+                </p>
             </div>
             <div>
                 <AuditEditItem id={ item.ID } />

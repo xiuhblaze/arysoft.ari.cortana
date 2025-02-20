@@ -1,4 +1,4 @@
-import { faCamera, faClipboardList, faEnvelopeOpenText, faFile, faFileShield, faFileSignature, faHandshake, faLaptopFile, faListCheck, faMagnifyingGlass, faPaste, faPlane } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faClipboardList, faEnvelopeOpenText, faFile, faFileLines, faFileShield, faFileSignature, faHandshake, faLaptopFile, faListCheck, faMagnifyingGlass, faPaste, faPlane } from "@fortawesome/free-solid-svg-icons";
 import enums from "../../../helpers/enums";
 
 const {
@@ -76,6 +76,12 @@ const auditDocumentTypeProps = [
         id: AuditDocumentType.travelExpenses,
         icon: faPlane,
         label: 'Travel expenses',  
+        variant: 'dark',
+    },
+    {
+        id: AuditDocumentType.witnessReport,
+        icon: faFileLines,
+        label: 'Witness report',
         variant: 'dark',
     },
     {
