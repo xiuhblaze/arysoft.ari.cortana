@@ -20,6 +20,8 @@ import CertificatesCard from "../certificates/components/CertificatesCard";
 import enums from "../../helpers/enums";
 import OrganizationStandardsCard from "./components/OrganizationStandardsCard";
 import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
+import { useAuditCyclesStore } from "../../hooks/useAuditCyclesStore";
+import { useAuditCycleDocumentsStore } from "../../hooks/useAuditCycleDocumentsStore";
 
 const EditView = () => {
     const {
@@ -41,12 +43,30 @@ const EditView = () => {
         
         organizationAsync,
     } = useOrganizationsStore();
+
+    const { 
+        auditCycleClear,
+        auditCyclesClear,
+    } = useAuditCyclesStore();
+
+    const {
+        auditCycleDocumentsClear,
+    } = useAuditCycleDocumentsStore();
     
     // HOOKS
     
     const { id } = useParams();
 
     const [photoPreview, setPhotoPreview] = useState(null);
+
+    useEffect(() => {
+
+        //console.log('limpiando auditCycle');
+        auditCyclesClear();
+        auditCycleClear();
+        auditCycleDocumentsClear();
+    }, []);
+    
         
     useEffect(() => {
         if (!!id) organizationAsync(id);
@@ -55,8 +75,6 @@ const EditView = () => {
     useEffect(() => {
         if (!!organization) {
             setNavbarTitle(dispatch, organization.Name);
-
-            
         }
     }, [organization]);
 
@@ -130,40 +148,42 @@ const EditView = () => {
                 isOrganizationLoading ? (
                     <ViewLoading />
                 ) : !!organization && (
-                    <Row>
-                        <Col xs="12" sm="6" xxl="6">
-                            <OrganizationEditCard
-                                updatePhotoPreview={updatePhotoPreview}
-                                className="h-100"
-                            />
-                        </Col>
-                        <Col xs="12" sm="6" xxl="6">
-                            <Row className="mb-4">
-                                <Col xs="12">
-                                    <OrganizationStandardsCard />
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col xs="12">
-                                    <AuditCyclesCard />
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
+                    <>
+                        <Row>
+                            <Col xs="12" sm="6" xxl="6">
+                                <OrganizationEditCard
+                                    updatePhotoPreview={updatePhotoPreview}
+                                    className="h-100"
+                                />
+                            </Col>
+                            <Col xs="12" sm="6" xxl="6">
+                                <Row className="mb-4">
+                                    <Col xs="12">
+                                        <OrganizationStandardsCard />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs="12">
+                                        <AuditCyclesCard organizationID={organization.ID} />
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row className="mt-4">
+                            <Col xs={12} sm={4}>
+                                <ContactsCard />
+                            </Col>
+                            <Col xs={12} sm={4}>
+                                <SitesCard />
+                            </Col>
+                            <Col xs={12} sm={4}>
+                                <CertificatesCard />
+                            </Col>
+                        </Row>
+                    </>
                 )
             }
             
-            <Row className="mt-4">
-                <Col xs={12} sm={4}>
-                    <ContactsCard />
-                </Col>
-                <Col xs={12} sm={4}>
-                    <SitesCard />
-                </Col>
-                <Col xs={12} sm={4}>
-                    <CertificatesCard />
-                </Col>
-            </Row>
         </Container>
         </>
     )

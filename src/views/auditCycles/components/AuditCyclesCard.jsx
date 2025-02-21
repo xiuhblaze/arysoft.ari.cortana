@@ -11,8 +11,9 @@ import AuditCyclesCardItem from './AuditCyclesCardItem';
 import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import AuditCycleDocumentsList from './AuditCycleDocumentsList';
+import { ViewLoading } from '../../../components/Loaders';
 
-const AuditCyclesCard = ({ readOnly = false, ...props }) => {
+const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
 
     const {         
         AuditCycleDocumentType,
@@ -37,7 +38,8 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
 
         isAuditCyclesLoading,
         auditCycles,
-        auditCyclesAsync,        
+        auditCyclesAsync,
+        auditCyclesClear,        
     } = useAuditCyclesStore();
 
     const {
@@ -50,38 +52,50 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
 
     const [navOption, setNavOption] = useState(null);
     const [showAllFiles, setShowAllFiles] = useState(false);
-    // const [auditCycleSelected, setAuditCycleSelected] = useState(null);
-    // const [auditCycleDocumentsSelected, setAuditCycleDocumentsSelected] = useState(null);
+
+    // useEffect(() => {
+    //     console.log('AuditCyclesCard load');
+    //     console.log('AuditCycles', auditCycles[0]?.ID )
+    // }, []);
+    
 
     useEffect(() => {
-        if (!!organization) {
+        if (!!organizationID) {
+            //console.log('Cambió la organización: ', organizationID);
             auditCyclesAsync({
-                organizationID: organization.ID,
+                organizationID: organizationID,
                 pageSize: 0,
             });
             setNavOption(null);
-            // setAuditCycleSelected(null);
-            // setAuditCycleDocumentsSelected(null);
 
-            // auditCycleClear();
+            auditCycleClear();
         }
-    }, [organization]);
+    }, [organizationID]);
 
     useEffect(() => {
-        if (!!auditCycles && auditCycles.length > 0) {
-            const loadID = navOption ?? auditCycles[0].ID;
-            
+      //console.log('navOption cambió', navOption);
+    }, [navOption]);
+    
+
+    useEffect(() => {
+        //console.log('useEffect auditCycles: auditCycles cambió');
+        if (auditCycles.length > 0 && auditCycles[0].OrganizationID == organizationID) {
+            const loadID = !!navOption ? navOption : auditCycles[0].ID; //auditCycles[0].ID; // navOption ?? auditCycles[0].ID;
+            //console.log('Cargando el ciclo de auditorias: ', loadID);
             setNavOption(loadID);
             auditCycleAsync(loadID);
         } else {
+            //console.log('No hay ciclos o no se han cargado los ed la oranización');
             auditCycleClear();
         }
     }, [auditCycles]);
 
     useEffect(() => {
-        if (!!auditCycle && auditCycle.ID === navOption) {
-            console.log('Cambió el ciclo: ', auditCycle.ID)
+        //console.log('useEffect auditCycle: auditCycle cambió', auditCycle?.ID, navOption);
+        if (!!auditCycle) { // && auditCycle.ID === navOption) {
+            //console.log('Cambió el ciclo: ', auditCycle.ID)
             //setAuditCycleSelected(auditCycle);
+            //console.log('Cargando los documentos del ciclo de auditorias: ', auditCycle.ID);
 
             auditCycleDocumentsAsync({
                 auditCycleID: auditCycle.ID,
@@ -89,12 +103,6 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
             });
         }
     }, [auditCycle]);
-
-    // useEffect(() => {
-    //     if (!!auditCycleDocuments) {
-    //         setAuditCycleDocumentsSelected(auditCycleDocuments);
-    //     }
-    // }, [auditCycleDocuments]);
     
     // METHODS
 
@@ -106,94 +114,114 @@ const AuditCyclesCard = ({ readOnly = false, ...props }) => {
 
     return (
         <Card {...props}>
-            <Card.Header className="pb-0 p-3">
-                <div className="d-flex justify-content-between align-items-center">
-                    <Card.Title>
-                        <FontAwesomeIcon icon={faArrowsSpin} size="lg" className="text-dark me-2" />
-                        Audit cycles
-                    </Card.Title>
-                    { !readOnly && <AuditCycleEditItem /> }
-                </div>
-            </Card.Header>
-            <Card.Body>
-                <Nav
-                    variant="pills"
-                    className="nav-fill p-1 mb-3"
-                    activeKey={navOption}
-                    onSelect={(selectedKey) => loadAuditCycle(selectedKey)}
-                    role="tablist"
-                >
-                    {
-                        !!auditCycles && auditCycles.map(item => (
-                            <AuditCyclesCardItem key={item.ID} item={item} />
-                        ))
-                    }
-                </Nav>
-                {
-                    !!auditCycle && auditCycle.Status != DefaultStatusType.nothing && (
-                        <div>
-                            <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
-                                <div>
-                                    <h6 className="text-dark text-sm font-weight-bold mb-0">
-                                        {auditCycle.Name}
-                                    </h6>
-                                    { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
-                                        <div className="d-flex justify-content-start align-items-start my-1 gap-2">
-                                            {
-                                                auditCycle.AuditCycleStandards.map(item => (
-                                                    <span key={item.ID} className="badge bg-gradient-secondary text-xs">
-                                                        <FontAwesomeIcon icon={ faLandmark } className="me-1" />
-                                                        <span className="text-xs">
-                                                            { item.StandardName }
-                                                        </span>
-                                                    </span>
-                                                ))
-                                            }
-                                        </div>
-                                    ) : (
-                                        <p className="text-xs text-secondary my-2">
-                                            (no standards assigned)
-                                        </p>
-                                    )}
-                                
-                                    <p className="text-xs text-secondary mb-0">
-                                        <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
-                                        <span className="font-weight-bold">{ new Date(auditCycle.StartDate).toLocaleDateString() }</span>
-                                        <span className="mx-2">|</span>
-                                        <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
-                                        <span className="font-weight-bold">{ new Date(auditCycle.EndDate).toLocaleDateString() }</span>
-                                        <span className="mx-2">|</span>
-                                        <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" />
-                                        {auditCycle.ExtraInfo}
+            {
+                isAuditCyclesLoading ? (
+                    <ViewLoading /> 
+                ) : !!auditCycles && (
+                    <>
+                        <Card.Header className="pb-0 p-3">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <Card.Title>
+                                    <FontAwesomeIcon icon={faArrowsSpin} size="lg" className="text-dark me-2" />
+                                    Audit cycles
+                                </Card.Title>
+                                { !readOnly && <AuditCycleEditItem /> }
+                            </div>
+                        </Card.Header>
+                        <Card.Body>
+                            {
+                                auditCycles.length == 0 && 
+                                <div className="d-flex justify-content-center align-items-center bg-gray-100 rounded-3 p-2">
+                                    <p className="text-secondary text-sm my-3">
+                                        No audit cycles found
                                     </p>
                                 </div>
-                                {
-                                    !readOnly && <AuditCycleEditItem id={ auditCycle.ID } />
-                                }
-                            </div>
-                            <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
-                                <AuditCycleDocumentsList showAllFiles={ showAllFiles } />
-                            </div>
-                            <div className="d-flex justify-content-end">
-                                <div className="form-check form-switch">
-                                    <input id="showAllFilesCheck" name="showAllFilesCheck"
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        onChange={ () => setShowAllFiles(!showAllFiles) }
-                                        checked={ showAllFiles }
-                                    />
-                                    <label 
-                                        className="form-check-label text-secondary mb-0" 
-                                        htmlFor="showAllFilesCheck"
-                                    >
-                                        Show all files
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }
-            </Card.Body>
+                            }
+                            {
+                                !!auditCycles && auditCycles.length > 0 &&
+                                <Nav
+                                    variant="pills"
+                                    className="nav-fill p-1 mb-3"
+                                    activeKey={navOption}
+                                    onSelect={(selectedKey) => loadAuditCycle(selectedKey)}
+                                    role="tablist"
+                                >
+                                    {
+                                        auditCycles.map(item => (
+                                            <AuditCyclesCardItem key={item.ID} item={item} />
+                                        ))
+                                    }
+                                </Nav>
+                            }
+                            {
+                                !!auditCycle && auditCycle.Status != DefaultStatusType.nothing && (
+                                    <div>
+                                        <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
+                                            <div>
+                                                <h6 className="text-dark text-sm font-weight-bold mb-0">
+                                                    {auditCycle.Name}
+                                                </h6>
+                                                { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
+                                                    <div className="d-flex justify-content-start align-items-start my-1 gap-2">
+                                                        {
+                                                            auditCycle.AuditCycleStandards.map(item => (
+                                                                <span key={item.ID} className="badge bg-gradient-secondary text-xs">
+                                                                    <FontAwesomeIcon icon={ faLandmark } className="me-1" />
+                                                                    <span className="text-xs">
+                                                                        { item.StandardName }
+                                                                    </span>
+                                                                </span>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-xs text-secondary my-2">
+                                                        (no standards assigned)
+                                                    </p>
+                                                )}
+                                            
+                                                <p className="text-xs text-secondary mb-0">
+                                                    <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
+                                                    <span className="font-weight-bold">{ new Date(auditCycle.StartDate).toLocaleDateString() }</span>
+                                                    <span className="mx-2">|</span>
+                                                    <FontAwesomeIcon icon={ faStop } className="text-primary me-1" />
+                                                    <span className="font-weight-bold">{ new Date(auditCycle.EndDate).toLocaleDateString() }</span>
+                                                    <span className="mx-2">|</span>
+                                                    <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" />
+                                                    {auditCycle.ExtraInfo}
+                                                </p>
+                                            </div>
+                                            {
+                                                !readOnly && <AuditCycleEditItem id={ auditCycle.ID } />
+                                            }
+                                        </div>
+                                        <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+                                            <AuditCycleDocumentsList showAllFiles={ showAllFiles } />
+                                        </div>
+                                        <div className="d-flex justify-content-end">
+                                            <div className="form-check form-switch">
+                                                <input id="showAllFilesCheck" name="showAllFilesCheck"
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    onChange={ () => setShowAllFiles(!showAllFiles) }
+                                                    checked={ showAllFiles }
+                                                />
+                                                <label 
+                                                    className="form-check-label text-secondary mb-0" 
+                                                    htmlFor="showAllFilesCheck"
+                                                >
+                                                    Show all files
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            }
+                        </Card.Body>
+                    </>
+                )
+            }
+            
         </Card>
     )
 }
