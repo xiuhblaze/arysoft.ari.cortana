@@ -1,4 +1,4 @@
-import { faEdit, faFile, faPlus, faSave } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faFile, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore'
@@ -16,6 +16,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
 import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps'
 import Swal from 'sweetalert2'
+import getRandomNumber from '../../../helpers/getRandomNumber'
 
 const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
@@ -98,8 +99,13 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
 
     useEffect(() => {
         if (!!auditCycleDocument && showModal) {
+            const oneStandardActive = auditCycle.AuditCycleStandards.find(i => i.Status == DefaultStatusType.active);
+            const standardSelect = auditCycle.AuditCycleStandards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
+                ? oneStandardActive.StandardID 
+                : '';
+
             setInitialValues({
-                standardSelect: auditCycleDocument?.StandardID ?? '',
+                standardSelect: auditCycleDocument?.StandardID ?? standardSelect,
                 versionInput: auditCycleDocument?.Version ?? '',
                 commentsInput: auditCycleDocument?.Comments ?? '',
                 otherDescriptionInput: auditCycleDocument?.OtherDescription ?? '',
@@ -179,7 +185,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                 <Modal.Header>
                     <Modal.Title>
                         <FontAwesomeIcon icon={ !!id ? faEdit : faPlus } className="px-3" />
-                        { !!id ? 'Edit document' : 'Add document' }
+                        { !!id ? 'Edit document info' : 'Add document file' }
                     </Modal.Title>
                 </Modal.Header>
                 {
@@ -199,11 +205,17 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                                 <Modal.Body>
                                     <Row>
                                         <Col xs="12">
-                                            <p className="text-secondary font-weight-bold mb-0">
-                                                { auditCycle.Name }
-                                                <span className="mx-2">-</span>
-                                                { auditCycleDocumentTypeProps[documentType].label }
-                                            </p>
+                                            <div className="alert alert-light mb-1">
+                                                <h6 className="mb-0"> 
+                                                    { auditCycle.Name }
+                                                    <span className="mx-2">-</span>
+                                                    { auditCycleDocumentTypeProps[documentType].label }
+                                                </h6>
+                                                { 
+                                                    !isNullOrEmpty(auditCycleDocumentTypeProps[documentType].helpText)
+                                                    && <p className="text-xs mb-0">{ auditCycleDocumentTypeProps[documentType].helpText }</p>
+                                                }
+                                            </div>
                                         </Col>
                                     </Row>
                                     <Row>
@@ -215,13 +227,15 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                                             >
                                                 <option value="">(all standards)</option>
                                                 {
-                                                    organizationStandards
+                                                    //organizationStandards
+                                                    auditCycle.AuditCycleStandards
                                                         // .filter(item => (item.Status === DefaultStatusType.active))
                                                         .map(item =>
                                                             <option
                                                                 key={item.StandardID}
                                                                 value={item.StandardID}
                                                                 className="text-capitalize"
+                                                                disabled={ item.Status != DefaultStatusType.active }
                                                             >
                                                                 {item.StandardName}
                                                             </option>
@@ -254,7 +268,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                                                     ) : (
                                                         <div>
                                                             <a
-                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${auditCycleDocument.Filename}`}
+                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${auditCycleDocument.Filename}?v=${getRandomNumber(4)}`}
                                                                 target="_blank"
                                                                 className="btn btn-link text-dark mb-0 py-2 text-center"
                                                                 title="View current file"
@@ -321,7 +335,11 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                                                 className="btn bg-gradient-dark mb-0"
                                                 disabled={ isAuditCycleDocumentSaving }
                                             >
-                                                <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                {
+                                                    isAuditCycleDocumentSaving 
+                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                }
                                                 Save
                                             </button>
                                             <button type="button"

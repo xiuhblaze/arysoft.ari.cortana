@@ -141,7 +141,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
-        console.log('onFormSubmit', toSave);
+        // console.log('onFormSubmit', toSave);
 
         auditCycleStandardSaveAsync(toSave);
     }; // onFormSubmit

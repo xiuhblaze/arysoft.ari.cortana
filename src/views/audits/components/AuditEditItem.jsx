@@ -1,12 +1,12 @@
-import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faExclamationTriangle, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Col, Modal, Row } from 'react-bootstrap';
 import enums from '../../../helpers/enums';
 import * as Yup from "yup";
 import { useAuditsStore } from '../../../hooks/useAuditsStore';
 import { ViewLoading } from '../../../components/Loaders';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import getISODate from '../../../helpers/getISODate';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import AuditStandardsList from './AuditStandardsList';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import AuditDocumentsList from './AuditDocumentsList';
+import { useAuditStandardsStore } from '../../../hooks/useAuditStandardsStore';
 
 const AuditEditItem = ({ id, ...props }) => {
 
@@ -27,6 +28,7 @@ const AuditEditItem = ({ id, ...props }) => {
         endDateInput: '',
         statusSelect: AuditStatusType.scheduled,
         hasWitnessCheck: false,
+        standardsCountHidden: 0,
     };
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
@@ -38,7 +40,13 @@ const AuditEditItem = ({ id, ...props }) => {
             .typeError('End date has an invalid format')
             .required('Must specify end date'),
         statusSelect: Yup.string()
+            .oneOf(Object.values(AuditStatusType)
+                    .filter(ast => ast != AuditStatusType.nothing)
+                    .map(ast => ast + ''), 
+                'Select a valid option')
             .required('Must select a status'),
+        standardsCountHidden: Yup.number()
+            .min(1, 'Must have at least one standard'),
     }); 
 
     // CUSTOM HOOKS
@@ -46,6 +54,10 @@ const AuditEditItem = ({ id, ...props }) => {
     const {
         auditCycle
     } = useAuditCyclesStore();
+
+    const {
+        auditStandards
+    } = useAuditStandardsStore();
 
     const {
         isAuditLoading,
@@ -64,9 +76,12 @@ const AuditEditItem = ({ id, ...props }) => {
 
     // HOOKS
 
+    const formikRef = useRef(null);
+
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [showAllFiles, setShowAllFiles] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
         if (!!audit && showModal) {
@@ -74,11 +89,21 @@ const AuditEditItem = ({ id, ...props }) => {
                 descriptionInput: audit?.Description ?? '',
                 startDateInput: !!audit?.StartDate ? getISODate(audit.StartDate) : '',
                 endDateInput: !!audit?.EndDate ? getISODate(audit.EndDate) : '',
-                statusSelect: audit?.Status ??  AuditStatusType.nothing,
+                statusSelect: !!audit?.Status && audit?.Status != AuditStatusType.nothing
+                    ? audit?.Status
+                    : AuditStatusType.scheduled, //! Aquí voy, esto no está bien
                 hasWitnessCheck: audit?.HasWitness ?? false,
+                standardsCountHidden: audit?.Standards?.length ?? 0,
             });
         }
     }, [audit]);
+
+    useEffect(() => {
+        if (!!auditStandards && showModal) {
+            formikRef.current.setFieldValue('standardsCountHidden', auditStandards.length);
+        }
+    }, [auditStandards]);
+    
     
     useEffect(() => {
         if (!!auditSavedOk && showModal) {
@@ -115,7 +140,34 @@ const AuditEditItem = ({ id, ...props }) => {
     }; // onShowModal
 
     const onCloseModal = () => {
-        setShowModal(false);
+
+        if (hasChanges) {
+            Swal.fire({
+                title: 'Discard changes?',
+                text: 'Are you sure you want to discard changes? The changes will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard changes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    auditsAsync({
+                        auditCycleID: auditCycle.ID,
+                        pageSize: 0,
+                    });
+                    auditClear();
+                    setShowModal(false);
+                }
+            })
+        } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
+            auditsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+            auditClear();
+            setShowModal(false);
+        }
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
@@ -160,8 +212,15 @@ const AuditEditItem = ({ id, ...props }) => {
                         validationSchema={validationSchema}
                         enableReinitialize
                         onSubmit={onFormSubmit}
+                        innerRef={formikRef}
                     >
-                        {formik => (
+                        {formik => {
+                            
+                            useEffect(() => {
+                                setHasChanges(formik.dirty);
+                            }, [formik.dirty]);
+
+                            return (
                             <Form>
                                 <Modal.Body>
                                     <Row>
@@ -169,6 +228,11 @@ const AuditEditItem = ({ id, ...props }) => {
                                             <Row>
                                                 <Col xs="12">
                                                     <AuditStandardsList />
+                                                    <Field name="standardsCountHidden" type="hidden" value={ formik.values.standardsCountHidden } />
+                                                    {
+                                                        formik.touched.standardsCountHidden && formik.errors.standardsCountHidden &&
+                                                        <span className="text-danger text-xs">{formik.errors.standardsCountHidden}</span>
+                                                    }
                                                 </Col>
                                                 <Col xs="12">
                                                     <AryFormikTextInput
@@ -229,9 +293,13 @@ const AuditEditItem = ({ id, ...props }) => {
                                                 <Col xs="12" className="d-flex justify-content-end">
                                                     <button type="submit"
                                                         className="btn bg-gradient-dark mb-0"
-                                                        disabled={ isAuditSaving }
+                                                        disabled={ isAuditSaving || !hasChanges }
                                                     >
-                                                        <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                        {
+                                                            isAuditSaving 
+                                                                ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                                : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                        }
                                                         Save
                                                     </button>
                                                 </Col>
@@ -240,7 +308,19 @@ const AuditEditItem = ({ id, ...props }) => {
                                         <Col xs="12" sm="7">
                                             <div className="bg-gray-100 rounded-3 p-2">
                                                 <h5>Audit documents</h5>
-                                                <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+                                                {
+                                                    audit.Status == AuditStatusType.nothing &&
+                                                    <div className="alert alert-primary">
+                                                        <div className="d-flex justify-content-start align-items-center">
+                                                            <FontAwesomeIcon icon={faExclamationTriangle} className="text-white me-3" size="lg" />
+                                                            <span className="text-white text-xs">
+                                                                This audit has <span className="font-weight-bold">not been saved</span> even once; 
+                                                                save it first so you can add documents
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                                                     <AuditDocumentsList showAllFiles={ showAllFiles } />
                                                 </div>
                                                 <Row>
@@ -281,7 +361,7 @@ const AuditEditItem = ({ id, ...props }) => {
                                     </div>
                                 </Modal.Footer>
                             </Form>
-                        )}
+                        )}}
                     </Formik>
                 }
             </Modal>

@@ -30,6 +30,14 @@ option {
   transition: all .2s cubic-bezier(.34,1.61,.7,1.3);
 }
 
+.item-action {
+  text-align: inherit;
+}
+
+.item-action:hover {
+  background-color: #e9ecef !important;
+}
+
 /* ARI Color
 ******************************************************************************/
 
@@ -57,12 +65,4 @@ option {
 .card.card-background.card-background-mask-ari:after {
   background-image: linear-gradient(310deg, #0e4d5d 0%, #57b3c9 100%);
   opacity: .85;
-}
-
-.item-action {
-  text-align: inherit;
-}
-
-.item-action:hover {
-  background-color: #f8f9fa !important;
 }

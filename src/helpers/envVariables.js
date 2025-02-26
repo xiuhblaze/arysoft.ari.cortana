@@ -17,6 +17,8 @@ const envVariables = () => {
     const URL_CONTACTS_FILES = '/contacts';
     const URL_ORGANIZATION_FILES = '/organizations';
 
+    const COMMENTS_SMALL_MAX_LENGTH = 15;
+
     return {
         ...import.meta.env,
 
@@ -36,6 +38,8 @@ const envVariables = () => {
         NACECODES_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         STANDARDS_OPTIONS,
+
+        COMMENTS_SMALL_MAX_LENGTH,
     }
 };
 

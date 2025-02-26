@@ -16,6 +16,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import getRandomNumber from '../../../helpers/getRandomNumber';
 
 const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
@@ -99,13 +100,19 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
 
     useEffect(() => {
         if (!!auditDocument && showModal) {
+            const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
+            const standardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
+                ? oneStandardActive.StandardID 
+                : '';
+
             setInitialValues({
-                standardSelect: auditDocument?.StandardID ?? '',
+                standardSelect: auditDocument?.StandardID ?? standardSelect,
                 fileInput: '',
                 commentsInput: auditDocument?.Comments ?? '',
                 otherDescriptionInput: auditDocument?.OtherDescription ?? '',
                 isWitnessIncludedCheck: auditDocument?.isWitnessIncluded ?? false,
-                statusCheck: auditDocument.Status == DefaultStatusType.active,
+                statusCheck: auditDocument.Status == DefaultStatusType.active
+                    || auditDocument.Status == DefaultStatusType.nothing,
             });
         }
     }, [auditDocument]);
@@ -216,8 +223,15 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                             >
                                                 <option value="">(all standards)</option>
                                                 {
-                                                    !!audit && !!audit.Standards && audit.Standards.length > 0 && audit.Standards.map(standard => (
-                                                        <option key={standard.StandardID} value={standard.StandardID}>{standard.StandardName}</option>
+                                                    !!audit && !!audit.Standards && audit.Standards.length > 0 && 
+                                                    audit.Standards.map(standard => (
+                                                        <option 
+                                                            key={standard.StandardID} 
+                                                            value={standard.StandardID}
+                                                            disabled={ standard.Status != DefaultStatusType.active }
+                                                        >
+                                                            {standard.StandardName}
+                                                        </option>
                                                     ))
                                                 }
                                             </AryFormikSelectInput>
@@ -247,7 +261,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                                     ) : (
                                                         <div>
                                                             <a
-                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${audit.ID}/${auditDocument.Filename}`}
+                                                                href={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${audit.ID}/${auditDocument.Filename}?v=${getRandomNumber(4)}`}
                                                                 target="_blank"
                                                                 className="btn btn-link text-dark mb-0 py-2 text-center"
                                                                 title="View current file"

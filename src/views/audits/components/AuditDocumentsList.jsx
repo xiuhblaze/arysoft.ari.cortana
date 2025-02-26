@@ -19,6 +19,7 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
     // CUSTOM HOOKS
 
     const {
+        isAuditSaving,
         audit
     } = useAuditsStore();
 
@@ -70,17 +71,32 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
                         if (aboutFSSC.isOnlyFSSC && item.id == AuditDocumentType.techReport) return null;
                         if (!audit.HasWitness && item.id == AuditDocumentType.witnessReport) return null;
 
+                        const documents = auditDocuments.filter(doc => doc.DocumentType == item.id
+                            && (showAllFiles || doc.Status == DefaultStatusType.active)
+                        );
+                        const iconColorStyle = `text-${ documents.length == 0 
+                            ? 'secondary'
+                            : item.variant} text-gradient`;
+
                         return (
                             <div key={item.id}>
-                                <div className="timeline-block mb-3">
+                                <div className="timeline-block">
                                     <div className="timeline-step">
-                                        <FontAwesomeIcon icon={item.icon} className={`text-${item.variant} text-gradient`} />
+                                        <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
                                     </div>
                                     <div className="timeline-content" style={{ maxWidth: 'none' }}>
-                                        <h6 className='d-flex justify-content-between align-items-center text-dark text-sm font-weight-bold mb-0'>
-                                            { item.label }
-                                            <AuditDocumentEditItem documentType={ item.id } />
-                                        </h6>
+                                        <div className='d-flex justify-content-between align-items-center pe-2 mb-0'>
+                                            <div>
+                                                <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
+                                                <p className="text-xs text-secondary mb-0">{item.helpText}</p>
+                                            </div>
+                                            {
+                                                !readOnly && audit.Status != DefaultStatusType.nothing && !isAuditSaving &&
+                                                <div className="text-dark text-sm font-weight-bold">
+                                                    <AuditDocumentEditItem documentType={ item.id } />
+                                                </div>
+                                            }
+                                        </div>
                                         <div className="d-flex justify-content-start flex-wrap gap-3 mt-1 mb-0">
                                             {
                                                 isAuditDocumentsLoading ? (
@@ -90,12 +106,10 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
                                                     >
                                                         <span className="visually-hidden">Loading...</span>
                                                     </Spinner>
-                                                ) : !!auditDocuments && auditDocuments
-                                                    .filter(doc => doc.DocumentType == item.id 
-                                                        && (showAllFiles || doc.Status == DefaultStatusType.active))
-                                                    .map(doc => <AuditDocumentItem key={doc.ID} item={doc} />)
+                                                ) : documents.map(doc => <AuditDocumentItem key={doc.ID} item={doc} />)
                                             }
                                         </div>
+                                        <hr className="horizontal dark my-1" />
                                     </div>
                                 </div>
                             </div>
@@ -106,4 +120,4 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
     )
 }
 
-export default AuditDocumentsList
+export default AuditDocumentsList;

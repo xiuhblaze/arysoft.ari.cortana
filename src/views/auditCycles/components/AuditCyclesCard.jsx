@@ -80,7 +80,8 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
     useEffect(() => {
         //console.log('useEffect auditCycles: auditCycles cambió');
         if (auditCycles.length > 0 && auditCycles[0].OrganizationID == organizationID) {
-            const loadID = !!navOption ? navOption : auditCycles[0].ID; //auditCycles[0].ID; // navOption ?? auditCycles[0].ID;
+            const firstCycleActive = auditCycles.find(cycle => cycle.Status === DefaultStatusType.active);
+            const loadID = !!navOption ? navOption : firstCycleActive?.ID ?? auditCycles[0].ID;
             //console.log('Cargando el ciclo de auditorias: ', loadID);
             setNavOption(loadID);
             auditCycleAsync(loadID);
@@ -165,7 +166,10 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                     <div className="d-flex justify-content-start align-items-start my-1 gap-2">
                                                         {
                                                             auditCycle.AuditCycleStandards.map(item => (
-                                                                <span key={item.ID} className="badge bg-gradient-secondary text-xs">
+                                                                <span key={item.ID} 
+                                                                    className={`badge bg-gradient-${ item.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-xs`}
+                                                                    title={ item.Status == DefaultStatusType.active ? 'Active' : 'Inactive' }
+                                                                > 
                                                                     <FontAwesomeIcon icon={ faLandmark } className="me-1" />
                                                                     <span className="text-xs">
                                                                         { item.StandardName }
