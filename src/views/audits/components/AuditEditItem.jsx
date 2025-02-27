@@ -82,6 +82,7 @@ const AuditEditItem = ({ id, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [showAllFiles, setShowAllFiles] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
+    const [statusOptions, setStatusOptions] = useState(false); 
 
     useEffect(() => {
         if (!!audit && showModal) {
@@ -95,6 +96,39 @@ const AuditEditItem = ({ id, ...props }) => {
                 hasWitnessCheck: audit?.HasWitness ?? false,
                 standardsCountHidden: audit?.Standards?.length ?? 0,
             });
+
+            switch (audit.Status) {
+                // case AuditStatusType.scheduled:
+                //     setstatusOptions([
+                //         { label: 'Scheduled', value: AuditStatusType.scheduled },
+                //         { label: 'In progress', value: AuditStatusType.inProgress },
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                // case AuditStatusType.inProgress:
+                //     setstatusOptions([
+                //         { label: 'In progress', value: AuditStatusType.inProgress },
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                // case AuditStatusType.completed:
+                //     setstatusOptions([
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                default:
+                    setStatusOptions([
+                        { label: '(status)', value: AuditStatusType.nothing },
+                        { label: 'Scheduled', value: AuditStatusType.scheduled },
+                        { label: 'Confirmed', value: AuditStatusType.confirmed },
+                        { label: 'In process', value: AuditStatusType.inProcess },
+                        { label: 'Finished', value: AuditStatusType.finished },
+                        { label: 'Completed', value: AuditStatusType.completed },
+                        { label: 'Closed', value: AuditStatusType.closed },
+                        { label: 'Canceled', value: AuditStatusType.canceled },
+                    ]);
+                    break;
+            } // switch
         }
     }, [audit]);
 
@@ -260,15 +294,23 @@ const AuditEditItem = ({ id, ...props }) => {
                                                         label="Status"
                                                     >
                                                         {
-                                                            Object.keys(AuditStatusType).map(key =>
+                                                            !!statusOptions && statusOptions.map(item =>
                                                                 <option
-                                                                    key={key}
-                                                                    value={ AuditStatusType[key] }
-                                                                    className="text-capitalize"
+                                                                    key={item.value}
+                                                                    value={item.value}
                                                                 >
-                                                                    {key == 'nothing' ? '(select)': key}
+                                                                    {item.label}
                                                                 </option>
                                                             )
+                                                            // Object.keys(AuditStatusType).map(key =>
+                                                            //     <option
+                                                            //         key={key}
+                                                            //         value={ AuditStatusType[key] }
+                                                            //         className="text-capitalize"
+                                                            //     >
+                                                            //         {key == 'nothing' ? '(select)': key}
+                                                            //     </option>
+                                                            // )
                                                         }
                                                     </AryFormikSelectInput>
                                                 </Col>

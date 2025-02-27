@@ -39,16 +39,18 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
     
     useEffect(() => {
         if (!!audit) {
-            //console.log('AuditDocumentList', audit);
 
             if (!!audit.Standards && audit.Standards.length > 0) {
-                const fsscStandard = audit.Standards.some(i => i.StandardName.includes('FSSC'));
+                const fsscStandard = audit.Standards.some(i => 
+                    i.StandardName.includes('FSSC') && i.Status == DefaultStatusType.active
+                );
+
                 setAboutFSSC({
                     hasFSSC: !!fsscStandard,
-                    isOnlyFSSC: fsscStandard && audit.Standards.length === 1,
+                    isOnlyFSSC: fsscStandard && audit.Standards
+                        .filter(s => s.Status == DefaultStatusType.active)
+                        .length === 1,
                 });
-
-                //console.log('Use FSSC Standard', fsscStandard);
             }
 
             auditDocumentsAsync({

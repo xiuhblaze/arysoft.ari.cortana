@@ -136,8 +136,8 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [logoPreview, setLogoPreview] = useState(null);
     const [newLogo, setNewLogo] = useState(false);
-    const [qrcodePreview, setQrcodePreview] = useState(null);
-    const [newQRCode, setNewQRCode] = useState(false);
+    // const [qrcodePreview, setQrcodePreview] = useState(null);
+    // const [newQRCode, setNewQRCode] = useState(false);
     const [statusOptions, setStatusOptions] = useState(null);
     const [showAddNote, setShowAddNote] = useState(false);
 
@@ -158,7 +158,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             });
 
             setNewLogo(isNullOrEmpty(organization.LogoFile));
-            setNewQRCode(isNullOrEmpty(organization.QRFile));
+            //setNewQRCode(isNullOrEmpty(organization.QRFile));
 
             switch (organization.Status) {
                 case OrganizationStatusType.prospect:
