@@ -1,22 +1,23 @@
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
+import { Col, ListGroup, Modal, Row } from 'react-bootstrap';
 import { faEdit, faFile, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import envVariables from '../../../helpers/envVariables';
-import enums from '../../../helpers/enums';
-import * as Yup from "yup";
-import { useEffect, useState } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
+import { Form, Formik } from 'formik';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import { useAuditDocumentsStore } from '../../../hooks/useAuditDocumentsStore';
 import { useAuditsStore } from '../../../hooks/useAuditsStore';
-import Swal from 'sweetalert2';
-import { ViewLoading } from '../../../components/Loaders';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
-import auditDocumentTypeProps from '../helpers/auditDocumentTypeProps';
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import { useEffect, useState } from 'react';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import { ViewLoading } from '../../../components/Loaders';
+import * as Yup from "yup";
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import auditDocumentTypeProps from '../helpers/auditDocumentTypeProps';
+import enums from '../../../helpers/enums';
+import envVariables from '../../../helpers/envVariables';
 import getRandomNumber from '../../../helpers/getRandomNumber';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
+import Swal from 'sweetalert2';
+import AuditDocumentStandardsList from './AuditDocumentStandardsList';
 
 const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
@@ -216,25 +217,44 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                     </Row>
                                     <Row>
                                         <Col xs="12">
-                                            <AryFormikSelectInput
-                                                name="standardSelect"
-                                                label="Standard"
-                                                helpText="Leave blank to assign to all standards"
-                                            >
-                                                <option value="">(all standards)</option>
-                                                {
-                                                    !!audit && !!audit.Standards && audit.Standards.length > 0 && 
-                                                    audit.Standards.map(standard => (
-                                                        <option 
-                                                            key={standard.StandardID} 
-                                                            value={standard.StandardID}
-                                                            disabled={ standard.Status != DefaultStatusType.active }
+                                            <Row>
+                                                <Col xs="8">
+                                                    <AryFormikSelectInput
+                                                        name="standardSelect"
+                                                        label="Standard"
+                                                        helpText="Select the standard associated with the document"
+                                                    >
+                                                        <option value="">(all standards)</option>
+                                                        {
+                                                            !!audit && !!audit.Standards && audit.Standards.length > 0 && 
+                                                            audit.Standards.map(standard => (
+                                                                <option 
+                                                                    key={standard.StandardID} 
+                                                                    value={standard.StandardID}
+                                                                    disabled={ standard.Status != DefaultStatusType.active }
+                                                                >
+                                                                    {standard.StandardName}
+                                                                </option>
+                                                            ))
+                                                        }
+                                                    </AryFormikSelectInput>
+                                                </Col>
+                                                <Col xs="4">
+                                                    {/* //! AQUI VOY, HAY QUE MEJORAR COSAS!!! */}
+                                                    <div class="d-grid gap-2">
+                                                        <label className="form-label">Add another standard</label>
+                                                        <button 
+                                                            type='button' 
+                                                            className="btn bg-gradient-secondary text-white"
                                                         >
-                                                            {standard.StandardName}
-                                                        </option>
-                                                    ))
-                                                }
-                                            </AryFormikSelectInput>
+                                                            Add another
+                                                        </button>
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+                                        <Col xs="12">
+                                            <AuditDocumentStandardsList />
                                         </Col>
                                         <Col xs="12">
                                             <label className="form-label">Document file</label>
@@ -331,6 +351,15 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
                                         <div className="text-secondary mb-3 mb-sm-0">
+                                            {
+                                                !!auditDocument?.UploadedBy &&
+                                                <ListGroup>
+                                                    <ListGroup.Item className="border-0 py-0 ps-0 text-xs">
+                                                        <strong className="me-2">Uploaded by:</strong>
+                                                        { auditDocument.UploadedBy }
+                                                    </ListGroup.Item>                                                    
+                                                </ListGroup>
+                                            }
                                             <AryLastUpdatedInfo item={ auditDocument } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">

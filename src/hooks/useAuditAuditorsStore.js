@@ -203,7 +203,63 @@ export const useAuditAuditorsStore = () => {
 
     const auditAuditorClear = () => {
         dispatch(clearAuditAuditor());
-    }
+    } // auditAuditorClear
+
+    // AUDIT STANDARDS
+
+    const auditStandardAddAsync = async (id) => {
+
+        if (!auditAuditor) { 
+            setError('The audit auditor is not loaded');
+            return;
+        }
+
+        const toAdd = {
+            AuditAuditorID: id,
+            AuditStandardID: auditAuditor.ID,
+        };
+
+        try {
+            const resp = await cortanaApi.post(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, toAdd);
+            const { Data } = await resp.data;
+
+            console.log('auditStandardAddAsync.Data', Data);
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditStandardAddAsync
+
+    const auditStandardDelAsync = async (id) => {
+
+        if (!auditAuditor) { 
+            setError('The audit auditor is not loaded');
+            return;
+        }
+
+        const toRemove = {
+            AuditAuditorID: id,
+            AuditStandardID: auditAuditor.ID,
+        };
+
+        try {
+            const resp = await cortanaApi.delete(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, toRemove);
+            const { Data } = await resp.data;
+
+            console.log('auditStandardDelAsync.Data', Data);
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditStandardDelAsync
 
     return {
         // properties
@@ -231,5 +287,8 @@ export const useAuditAuditorsStore = () => {
         auditAuditorSaveAsync,
         auditAuditorDeleteAsync,
         auditAuditorClear,
+        // audit standards - add or remove from audit auditor
+        auditStandardAddAsync,
+        auditStandardDelAsync,
     }
 };

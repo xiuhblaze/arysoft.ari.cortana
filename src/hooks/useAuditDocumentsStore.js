@@ -207,7 +207,7 @@ export const useAuditDocumentsStore = () => {
         try {
             const resp = await cortanaApi.delete(`${AUDITDOCUMENT_URL}/${id}`, { data: toDelete });
 
-            console.log('auditDocumentDeleteAsync.resp', resp);
+            // console.log('auditDocumentDeleteAsync.resp', resp);
 
             dispatch(isAuditDocumentDeleted());
         } catch (error) {
@@ -249,6 +249,62 @@ export const useAuditDocumentsStore = () => {
         dispatch(clearAuditDocument());
     }
 
+    // AUDIT STANDARDS
+
+    const auditStandardAddAsync = async (id) => {
+
+        if (!auditDocument) { 
+            setError('The audit document is not loaded');
+            return;
+        }
+
+        const toAdd = {
+            AuditDocumentID: id,
+            AuditStandardID: auditDocument.ID,
+        };
+
+        try {
+            const resp = await cortanaApi.post(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toAdd);
+            const { Data } = await resp.data;
+
+            console.log('auditStandardAddAsync.Data', Data);
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditStandardAddAsync
+
+    const auditStandardDelAsync = async (id) => {
+
+        if (!auditDocument) { 
+            setError('The audit document is not loaded');
+            return;
+        }
+
+        const toRemove = {
+            AuditDocumentID: id,
+            AuditStandardID: auditDocument.ID,
+        };
+
+        try {
+            const resp = await cortanaApi.delete(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toRemove);
+            const { Data } = await resp.data;
+
+            console.log('auditStandardDelAsync.Data', Data);
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditStandardDelAsync
+
     return {
         // properties
         isAuditDocumentsLoading,
@@ -273,9 +329,13 @@ export const useAuditDocumentsStore = () => {
         auditDocumentAsync,
         auditDocumentCreateAsync,
         auditDocumentSaveAsync,
+        auditStandardAddAsync,
         // auditDocumentSaveWithFileAsync,
         auditDocumentDeleteAsync,
         //auditDocumentDeleteFileAsync,
-        auditDocumentClear,
+        auditDocumentClear,        
+        // audit standards - add or remove from audit document
+        auditStandardAddAsync,
+        auditStandardDelAsync,
     }
 };

@@ -92,7 +92,7 @@ const AuditEditItem = ({ id, ...props }) => {
                 endDateInput: !!audit?.EndDate ? getISODate(audit.EndDate) : '',
                 statusSelect: !!audit?.Status && audit?.Status != AuditStatusType.nothing
                     ? audit?.Status
-                    : AuditStatusType.scheduled, //! Aquí voy, esto no está bien
+                    : AuditStatusType.scheduled,
                 hasWitnessCheck: audit?.HasWitness ?? false,
                 standardsCountHidden: audit?.Standards?.length ?? 0,
             });
@@ -118,7 +118,7 @@ const AuditEditItem = ({ id, ...props }) => {
                 //     break;
                 default:
                     setStatusOptions([
-                        { label: '(status)', value: AuditStatusType.nothing },
+                        { label: '(select)', value: AuditStatusType.nothing },
                         { label: 'Scheduled', value: AuditStatusType.scheduled },
                         { label: 'Confirmed', value: AuditStatusType.confirmed },
                         { label: 'In process', value: AuditStatusType.inProcess },
