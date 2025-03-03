@@ -30,7 +30,9 @@ const AuditDocumentItem = ({ item, readOnly = false, ...props }) => {
         auditCycle
     } = useAuditCyclesStore();
 
-    const title = isNullOrEmpty(item.StandardName) ? 'All Standards' : item.StandardName;
+    //const title = isNullOrEmpty(item.StandardName) ? 'All Standards' : item.StandardName;
+
+    const title = item.StandardsNames.length > 0 ? item.StandardsNames.join(', ') : '(no standards)';
     const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action px-2 py-1${ item.Status != DefaultStatusType.active ? ' opacity-5' : '' }`;
     const url = `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}/${item.AuditID}`;
     const fileName = !!item.Filename

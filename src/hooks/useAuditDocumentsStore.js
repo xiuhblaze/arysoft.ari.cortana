@@ -259,15 +259,17 @@ export const useAuditDocumentsStore = () => {
         }
 
         const toAdd = {
-            AuditDocumentID: id,
-            AuditStandardID: auditDocument.ID,
+            AuditDocumentID: auditDocument.ID,
+            AuditStandardID: id,
         };
+
+        // console.log(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toAdd);
 
         try {
             const resp = await cortanaApi.post(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toAdd);
             const { Data } = await resp.data;
 
-            console.log('auditStandardAddAsync.Data', Data);
+            // console.log('auditStandardAddAsync.Data', Data);
 
             return Data;
         } catch (error) {
@@ -278,7 +280,7 @@ export const useAuditDocumentsStore = () => {
         return null;
     }; // auditStandardAddAsync
 
-    const auditStandardDelAsync = async (id) => {
+    const auditStandardDelAsync = async (auditStandardID) => {
 
         if (!auditDocument) { 
             setError('The audit document is not loaded');
@@ -286,15 +288,17 @@ export const useAuditDocumentsStore = () => {
         }
 
         const toRemove = {
-            AuditDocumentID: id,
-            AuditStandardID: auditDocument.ID,
+            AuditDocumentID: auditDocument.ID,
+            AuditStandardID: auditStandardID,
         };
 
+        // console.log(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toRemove);
+
         try {
-            const resp = await cortanaApi.delete(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, toRemove);
+            const resp = await cortanaApi.delete(`${AUDITDOCUMENT_URL}/${auditDocument.ID}/audit-standard`, { data: toRemove });
             const { Data } = await resp.data;
 
-            console.log('auditStandardDelAsync.Data', Data);
+            //console.log('auditStandardDelAsync.Data', Data);
 
             return Data;
         } catch (error) {

@@ -1,12 +1,12 @@
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { Col, ListGroup, Modal, Row } from 'react-bootstrap';
-import { faEdit, faFile, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFile, faLandmark, faPlus, faSave, faTrash, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import { useAuditDocumentsStore } from '../../../hooks/useAuditDocumentsStore';
 import { useAuditsStore } from '../../../hooks/useAuditsStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { ViewLoading } from '../../../components/Loaders';
 import * as Yup from "yup";
@@ -18,6 +18,7 @@ import getRandomNumber from '../../../helpers/getRandomNumber';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
 import AuditDocumentStandardsList from './AuditDocumentStandardsList';
+import { set } from 'date-fns';
 
 const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
@@ -31,12 +32,12 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     } = enums();
 
     const formDefaultValues = {
-        standardSelect: '',
         fileInput: '',
         commentsInput: '',
         otherDescriptionInput: '',
         isWitnessIncludedCheck: false,
         statusCheck: false,
+        standardsCountHidden: 0,
     };
 
     const validationSchema = Yup.object({
@@ -63,6 +64,8 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
             .max(500, 'Comments must be at most 500 characters'),
         otherDescriptionInput: Yup.string()
             .max(100, 'Other description must be at most 100 characters'),
+        standardsCountHidden: Yup.number()
+                    .min(1, 'Must have at least one standard'),
     });
 
     // CUSTOM HOOKS
@@ -92,29 +95,48 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         auditDocumentCreateAsync,
         auditDocumentSaveAsync,
         auditDocumentClear,
+
+        auditStandardAddAsync,
+        auditStandardDelAsync,
     } = useAuditDocumentsStore();
 
     // HOOKS
 
+    const formikRef = useRef(null);
+
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
+    const [standardSelect, setStandardSelect] = useState('');
+    const [isForUpdateStandard, setIsForUpdateStandard] = useState(false);
+    const [standardsCount, setStandardsCount] = useState(0);
+
     useEffect(() => {
-        if (!!auditDocument && showModal) {
-            const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
-            const standardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
-                ? oneStandardActive.StandardID 
-                : '';
+        
+        // 
+        // console.log('isForUpdateStandard', isForUpdateStandard);
+
+        if (!!auditDocument && showModal && !isForUpdateStandard) {
+            // const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
+            // const standardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
+            //     ? oneStandardActive.StandardID 
+            //     : '';
 
             setInitialValues({
-                standardSelect: auditDocument?.StandardID ?? standardSelect,
+                // standardSelect: auditDocument?.StandardID ?? standardSelect,
                 fileInput: '',
                 commentsInput: auditDocument?.Comments ?? '',
                 otherDescriptionInput: auditDocument?.OtherDescription ?? '',
                 isWitnessIncludedCheck: auditDocument?.isWitnessIncluded ?? false,
                 statusCheck: auditDocument.Status == DefaultStatusType.active
                     || auditDocument.Status == DefaultStatusType.nothing,
+                standardsCountHidden: auditDocument?.AuditStandards?.length ?? 0,
             });
+
+            setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+        } else if (!!auditDocument && showModal && isForUpdateStandard) {
+            setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+            formikRef.current.setFieldValue('standardsCountHidden', auditDocument?.AuditStandards?.length ?? 0);
         }
     }, [auditDocument]);
     
@@ -139,6 +161,11 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         }
     }, [auditDocumentsErrorMessage]);
 
+    useEffect(() => {
+        console.log('standardsCount', standardsCount);
+    }, [standardsCount])
+    
+
     // METHODS
 
     const onShowModal = () => {
@@ -162,9 +189,11 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const onFormSubmit = (values) => {
         //console.log('onFormSubmit', values);
 
+        addStandardSelected(); // por si hay algun standard seleccionado
+
         const toSave = {
             ID: auditDocument.ID,
-            StandardID: values.standardSelect, // id ? auditDocument.StandardID : values.standardSelect,
+            // StandardID: values.standardSelect, // id ? auditDocument.StandardID : values.standardSelect,
             DocumentType: documentType,
             Comments: values.commentsInput,
             OtherDescription: values.otherDescriptionInput,
@@ -174,7 +203,73 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
 
         //console.log(toSave);
         auditDocumentSaveAsync(toSave, values.fileInput);
-    };
+    }; // onFormSubmit
+
+    // AUDIT STANDARDS
+
+    const addStandardSelected = () => {
+        // console.log('addStandardSelected', standardSelect);
+
+        if (!isNullOrEmpty(standardSelect)) {
+            
+            // validar que el standard seleccionado no sea una que ya este asignado
+            if (!!auditDocument?.AuditStandards && auditDocument.AuditStandards.length > 0) {
+                const existStandard = auditDocument.AuditStandards.find(i => i.ID == standardSelect);
+                //console.log('existStandard', existStandard);
+                if (!!existStandard) {
+                    Swal.fire('Error', 'The standard is already assigned', 'error');
+                    // console.log('El standard seleccionado ya está asignado');
+                    return;
+                }
+            }
+
+            auditStandardAddAsync(standardSelect)
+                .then(data => {
+                    // console.log('data', data);
+                    if (!!data) {
+                        auditDocumentAsync(auditDocument.ID); // Refrescar la lista de standards
+                        setIsForUpdateStandard(true); // Para que no actualice los initialValues
+                        setStandardSelect(''); // reiniciar el select
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }; // addStandardSelected
+
+    const delStandard = (auditStandardID) => {
+        // console.log('delStandard', auditStandardID);
+
+        if (!!auditStandardID) {
+            auditStandardDelAsync(auditStandardID)
+                .then(data => {
+                    // console.log('data', data);
+                    if (!!data) {
+                        auditDocumentAsync(auditDocument.ID); // Refrescar la lista de standards
+                        setIsForUpdateStandard(true); // Para que no actualice los initialValues
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }; // delStandard
+
+    const onStandardSelectChange = (e) => {
+        setStandardSelect(e.target.value); // Creo que aquí con esto es suficiente
+
+        // Para contar el numero de standards o si al menos esta uno seleccionado
+        if (!isNullOrEmpty(e.target.value)) {
+            setStandardsCount(standardsCount + 1);
+            formikRef.current.setFieldValue('standardsCountHidden', standardsCount + 1);
+        } else {
+            setStandardsCount(standardsCount - 1);
+            formikRef.current.setFieldValue('standardsCountHidden', standardsCount - 1);
+        }
+
+        // console.log('onStandardSelectChange', e.target.value);
+    }; // onStandardSelectChange
 
     return (
         <div {...props}>
@@ -204,6 +299,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                         validationSchema={validationSchema}
                         enableReinitialize
                         onSubmit={onFormSubmit}
+                        innerRef={formikRef}
                     >
                         {formik => (
                             <Form>
@@ -219,33 +315,36 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                         <Col xs="12">
                                             <Row>
                                                 <Col xs="8">
-                                                    <AryFormikSelectInput
-                                                        name="standardSelect"
-                                                        label="Standard"
-                                                        helpText="Select the standard associated with the document"
-                                                    >
-                                                        <option value="">(all standards)</option>
-                                                        {
-                                                            !!audit && !!audit.Standards && audit.Standards.length > 0 && 
-                                                            audit.Standards.map(standard => (
-                                                                <option 
-                                                                    key={standard.StandardID} 
-                                                                    value={standard.StandardID}
-                                                                    disabled={ standard.Status != DefaultStatusType.active }
-                                                                >
-                                                                    {standard.StandardName}
-                                                                </option>
-                                                            ))
-                                                        }
-                                                    </AryFormikSelectInput>
+                                                    <div className="mb-3">
+                                                        <label className="form-label">Standard</label>
+                                                        <select 
+                                                            className="form-select" 
+                                                            value={standardSelect} 
+                                                            onChange={onStandardSelectChange}
+                                                        >
+                                                            <option value="">(select standard)</option>
+                                                            {
+                                                                !!audit && !!audit.Standards && audit.Standards.length > 0 && 
+                                                                audit.Standards.map(standard => (
+                                                                    <option 
+                                                                        key={standard.ID} 
+                                                                        value={standard.ID}
+                                                                        disabled={ standard.Status != DefaultStatusType.active }
+                                                                    >
+                                                                        {standard.StandardName}
+                                                                    </option>
+                                                                ))
+                                                            }
+                                                        </select>
+                                                    </div>
                                                 </Col>
                                                 <Col xs="4">
-                                                    {/* //! AQUI VOY, HAY QUE MEJORAR COSAS!!! */}
-                                                    <div class="d-grid gap-2">
-                                                        <label className="form-label">Add another standard</label>
+                                                    <div className="d-grid gap-1">
+                                                        <label className="form-label">&nbsp;</label>
                                                         <button 
                                                             type='button' 
                                                             className="btn bg-gradient-secondary text-white"
+                                                            onClick={addStandardSelected}
                                                         >
                                                             Add another
                                                         </button>
@@ -254,7 +353,40 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                             </Row>
                                         </Col>
                                         <Col xs="12">
-                                            <AuditDocumentStandardsList />
+                                            <label className="form-label">Standards assigned</label>
+                                            { !!auditDocument && !!auditDocument?.AuditStandards && auditDocument.AuditStandards.length > 0 ? (
+                                                <ListGroup className="mb-3">
+                                                    {
+                                                        auditDocument.AuditStandards.map(item => 
+                                                            <ListGroup.Item key={item.ID} className="border-0 py-1 ps-0 text-xs">
+                                                                <div className='d-flex justify-content-between align-items-center'>
+                                                                    <span>
+                                                                        <FontAwesomeIcon icon={ faLandmark } className="me-2" />
+                                                                        {item.StandardName}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-link p-0 mb-0 text-secondary"
+                                                                        onClick={() => delStandard(item.ID)}
+                                                                        title="Delete standard"
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                                                                    </button>
+                                                                </div>
+                                                            </ListGroup.Item>
+                                                        )
+                                                    }
+                                                </ListGroup>
+                                            ) : (
+                                                <p className="text-center text-secondary text-xs">
+                                                    (no standards assigned, select the standard or press de Add Another button to assign more than one)
+                                                </p>
+                                            )}
+                                            <Field name="standardsCountHidden" type="hidden" value={ formik.values.standardsCountHidden } />
+                                            {
+                                                formik.touched.standardsCountHidden && formik.errors.standardsCountHidden &&
+                                                <span className="text-danger text-xs">{formik.errors.standardsCountHidden}</span>
+                                            }
                                         </Col>
                                         <Col xs="12">
                                             <label className="form-label">Document file</label>

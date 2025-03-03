@@ -191,6 +191,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                                 key={item.StandardID}
                                                                 value={item.StandardID}
                                                                 className="text-capitalize"
+                                                                disabled={item.Status !== DefaultStatusType.active}
                                                             >
                                                                 {item.StandardName}
                                                             </option>

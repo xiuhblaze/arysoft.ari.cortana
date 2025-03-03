@@ -5,22 +5,22 @@ import { useAuditStandardsStore } from "../../../hooks/useAuditStandardsStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLandmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-const AuditDocumentStandardsList = ({ readOnly = false, ...props }) => {
+const AuditDocumentStandardsList = ({ ...props }) => {
 
     // CUSTOM HOOKS
 
-    const {
-        audit,
-    } = useAuditsStore();
+    // const {
+    //     audit,
+    // } = useAuditsStore();
 
     const {
         auditDocument,
     } = useAuditDocumentsStore();
 
     return (
-        <Row>
+        <Row {...props}>
             <Col xs="12">
-                { !!auditDocument ? (
+                { !!auditDocument && !!auditDocument?.AuditStandards && auditDocument.AuditStandards.length > 0 ? (
                     <ListGroup className="mb-3">
                         {
                             auditDocument.AuditStandards.map(item => 
@@ -33,7 +33,7 @@ const AuditDocumentStandardsList = ({ readOnly = false, ...props }) => {
                     </ListGroup>
                 ) : (
                     <p className="text-center text-secondary text-xs">
-                        (no standards assigned, press de <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one)
+                        (no standards assigned, select the standard or press de Add Another button to assign more than one)
                     </p>
                 )}
             </Col>

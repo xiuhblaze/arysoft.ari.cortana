@@ -207,7 +207,7 @@ export const useAuditAuditorsStore = () => {
 
     // AUDIT STANDARDS
 
-    const auditStandardAddAsync = async (id) => {
+    const auditStandardAddAsync = async (auditStandardID) => {
 
         if (!auditAuditor) { 
             setError('The audit auditor is not loaded');
@@ -215,8 +215,8 @@ export const useAuditAuditorsStore = () => {
         }
 
         const toAdd = {
-            AuditAuditorID: id,
-            AuditStandardID: auditAuditor.ID,
+            AuditAuditorID: auditAuditor.ID,
+            AuditStandardID: auditStandardID,
         };
 
         try {
@@ -234,7 +234,7 @@ export const useAuditAuditorsStore = () => {
         return null;
     }; // auditStandardAddAsync
 
-    const auditStandardDelAsync = async (id) => {
+    const auditStandardDelAsync = async (auditStandardID) => {
 
         if (!auditAuditor) { 
             setError('The audit auditor is not loaded');
@@ -242,12 +242,12 @@ export const useAuditAuditorsStore = () => {
         }
 
         const toRemove = {
-            AuditAuditorID: id,
-            AuditStandardID: auditAuditor.ID,
+            AuditAuditorID: auditAuditor.ID,
+            AuditStandardID: auditStandardID,
         };
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, toRemove);
+            const resp = await cortanaApi.delete(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, { data: toRemove });
             const { Data } = await resp.data;
 
             console.log('auditStandardDelAsync.Data', Data);
