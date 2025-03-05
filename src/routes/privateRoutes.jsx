@@ -1,15 +1,24 @@
 
-import { faCity, faClipboard, faFileCircleCheck, faHome, faLandmark, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { 
+    faBuilding,
+    faCity,
+    faClipboard,
+    faFileCircleCheck,
+    faHome,
+    faLandmark,
+    faUsers
+} from "@fortawesome/free-solid-svg-icons";
 
 import { lazy } from "react";
 
+const lazyApplicants = lazy(() => import('../views/applicants'));
 const lazyApplicationForm = lazy(() => import('../views/applicationForms'));
 const lazyAuditors = lazy(() => import('../views/auditors'));
+const lazyCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyOrganizations = lazy(() => import('../views/organizations'));
 const lazyStandards = lazy(() => import('../views/standards'));
-const lazrCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
 
 const privateRoute = [
     {
@@ -19,6 +28,14 @@ const privateRoute = [
         path: '/dashboard',
         icon: faHome,
         element: lazyDashboard
+    },
+    {
+        type: 'collapse',
+        title: 'Applicants',
+        key: 'applicants',
+        path: '/applicants/*',
+        icon: faBuilding,
+        element: lazyApplicants
     },
     {
         type: 'collapse',
@@ -55,7 +72,7 @@ const privateRoute = [
         key: 'catAuditorDocuments',
         path: '/auditors-documents/*',
         icon: faFileCircleCheck,
-        element: lazrCatAuditorDocuments
+        element: lazyCatAuditorDocuments
     },
     {
         type: 'collapse',

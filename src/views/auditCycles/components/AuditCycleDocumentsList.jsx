@@ -11,14 +11,20 @@ import AuditEditItem from '../../audits/components/AuditEditItem';
 import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore';
 //import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import AuditCycleDocumentItem from './AuditCycleDocumentItem';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     const { 
         AuditCycleDocumentType,
-        DefaultStatusType
+        DefaultStatusType,
+        OrganizationStatusType,
     } = enums();
 
     // CUSTOM HOOKS
+
+    const {
+        organization
+    } = useOrganizationsStore();
 
     const {
         auditCycleDocuments
@@ -36,6 +42,11 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                         const iconColorStyle = `text-${ documents.length == 0 
                             ? 'secondary'
                             : item.variant} text-gradient`;
+
+                        if (organization.Status == OrganizationStatusType.applicant
+                            && item.id > AuditCycleDocumentType.contract
+                        ) 
+                            return null;
                         
                         return (    
                             <div key={item.id}>

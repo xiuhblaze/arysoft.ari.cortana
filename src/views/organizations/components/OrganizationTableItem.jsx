@@ -26,7 +26,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
         ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}`
         : defaultPhoto;
 
-    const myClassName = item.Status != OrganizationStatusType.active
+    const myClassName = item.Status != OrganizationStatusType.active && item.Status != OrganizationStatusType.applicant
         ? !!className 
             ? `${className} table-${ organizationStatusProps[item.Status].bgColor } ${ organizationStatusProps[item.Status].className }` 
             : `table-${organizationStatusProps[item.Status].bgColor} ${ organizationStatusProps[item.Status].className }`

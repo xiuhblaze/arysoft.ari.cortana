@@ -1,6 +1,6 @@
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { Col, ListGroup, Modal, Row } from 'react-bootstrap';
-import { faEdit, faFile, faLandmark, faPlus, faSave, faTrash, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFile, faLandmark, faPlus, faSave, faSpinner, faTrash, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Field, Form, Formik } from 'formik';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
@@ -499,7 +499,11 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                                 className="btn bg-gradient-dark mb-0"
                                                 disabled={ isAuditDocumentSaving }
                                             >
-                                                <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                {
+                                                    isAuditDocumentSaving 
+                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                }
                                                 Save
                                             </button>
                                             <button type="button"

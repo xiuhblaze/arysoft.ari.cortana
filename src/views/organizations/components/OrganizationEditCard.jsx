@@ -163,7 +163,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             switch (organization.Status) {
                 case OrganizationStatusType.prospect:
                     setStatusOptions([
-                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Applicant', value: OrganizationStatusType.applicant },
                         { label: 'Active', value: OrganizationStatusType.active },
                     ]);
                     break;
@@ -188,7 +188,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 default:
                     setStatusOptions([
                         { label: '(status)', value: '' },
-                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Applicant', value: OrganizationStatusType.applicant },
                         { label: 'Active', value: OrganizationStatusType.active },
                         { label: 'Inactive', value: OrganizationStatusType.inactive },
                         { label: 'Deleted', value: OrganizationStatusType.deleted },

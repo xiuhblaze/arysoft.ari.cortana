@@ -23,7 +23,7 @@ import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
 import { useAuditCyclesStore } from "../../hooks/useAuditCyclesStore";
 import { useAuditCycleDocumentsStore } from "../../hooks/useAuditCycleDocumentsStore";
 
-const EditView = () => {
+const EditView = ({ applicantsOnly = false, ...props }) => {
     const {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
@@ -170,15 +170,18 @@ const EditView = () => {
                             </Col>
                         </Row>
                         <Row className="mt-4">
-                            <Col xs={12} sm={4}>
+                            <Col xs={12} sm={applicantsOnly ? 6 : 4}>
                                 <ContactsCard />
                             </Col>
-                            <Col xs={12} sm={4}>
+                            <Col xs={12} sm={applicantsOnly ? 6 : 4}>
                                 <SitesCard />
                             </Col>
-                            <Col xs={12} sm={4}>
-                                <CertificatesCard />
-                            </Col>
+                            {
+                                !applicantsOnly &&
+                                <Col xs={12} sm={4}>
+                                    <CertificatesCard />
+                                </Col>
+                            }
                         </Row>
                     </>
                 )

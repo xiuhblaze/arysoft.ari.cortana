@@ -1,4 +1,5 @@
 const envVariables = () => {
+    const APPLICANTS_OPTIONS = 'arysoft-ari-applicantsOptions';
     const APPLICATION_FORM_OPTIONS = 'arysoft-ari-applicationFormOptions';
     const AUDITORS_OPTIONS = 'arysoft-ari-auditorsOptions';
     const CATAUDITORDOCUMENTS_OPTIONS = 'arysoft-ari-catAuditorDocumentsOptions';
@@ -21,7 +22,7 @@ const envVariables = () => {
 
     return {
         ...import.meta.env,
-
+        
         URL_APPLICATIONFORMS,
         URL_AUDITOR_FILES,
         URL_CONTACTS_FILES,
@@ -31,6 +32,7 @@ const envVariables = () => {
         HOUR24_REGEX,
         PHONE_REGEX,
 
+        APPLICANTS_OPTIONS,
         APPLICATION_FORM_OPTIONS,
         AUDITORS_OPTIONS,
         CATAUDITORDOCUMENTS_OPTIONS,

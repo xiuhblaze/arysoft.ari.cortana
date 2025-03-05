@@ -34,7 +34,7 @@ const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) 
     );
 };
 
-const OrganizationsTableList = () => {
+const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
     const { OrganizationStatusType, OrganizationOrderType } = enums();
     const { 
@@ -124,7 +124,11 @@ const OrganizationsTableList = () => {
                                             onOrderDesc={() => { onClickOrderList(OrganizationOrderType.nameDesc) }}
                                         />
                                         <div className={headStyle}>
-                                            Organization
+                                            {
+                                                applicantsOnly
+                                                    ? 'Applicant'
+                                                    : 'Organization'
+                                            }
                                         </div>
                                     </div>
                                 </th>
@@ -176,7 +180,7 @@ const OrganizationsTableList = () => {
             ) : null
             }
             <DetailsModal show={showModal} onHide={onCloseModal} />
-            <Modal show={showQRModal} onHide={onCloseQRModal} centered>
+            {/* <Modal show={showQRModal} onHide={onCloseQRModal} centered>
                 <Modal.Body>
                     <div className="d-flex justify-content-center align-items-center py-5">
                         { !!qrValues &&
@@ -193,7 +197,7 @@ const OrganizationsTableList = () => {
                         </button>
                     </div>
                 </Modal.Body>
-            </Modal>
+            </Modal> */}
         </>
     )
 }

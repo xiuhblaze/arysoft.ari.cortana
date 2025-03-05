@@ -283,7 +283,7 @@ const enums = () => {
 
     const OrganizationStatusType = Object.freeze({
         nothing: 0,
-        prospect: 1,
+        applicant: 1,
         active: 2,
         inactive: 3,
         deleted: 4,

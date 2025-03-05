@@ -13,6 +13,7 @@ import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Fo
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 import * as Yup from "yup";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import { useAuditStandardsStore } from "../../../hooks/useAuditStandardsStore";
 
 const AuditAuditorEditItem = ({ id, ...props }) => {
 
@@ -51,6 +52,10 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
     const {
         audit
     } = useAuditsStore();
+
+    const {
+        auditStandards,
+    } = useAuditStandardsStore();
 
     const {
         isAuditAuditorLoading,
@@ -312,8 +317,8 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                         >
                                                             <option value="">(select standard)</option>
                                                             {
-                                                                !!audit && !!audit.Standards && audit.Standards.length > 0 && 
-                                                                audit.Standards.map(standard => (
+                                                                !!auditStandards && auditStandards.length > 0 && 
+                                                                auditStandards.map(standard => (
                                                                     <option 
                                                                         key={standard.ID} 
                                                                         value={standard.ID}
