@@ -15,6 +15,8 @@ import AuditStandardsList from './AuditStandardsList';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import AuditDocumentsList from './AuditDocumentsList';
 import { useAuditStandardsStore } from '../../../hooks/useAuditStandardsStore';
+import AuditAuditorsList from './AuditAuditorsList';
+import { useAuditAuditorsStore } from '../../../hooks/useAuditAuditorsStore';
 
 const AuditEditItem = ({ id, ...props }) => {
 
@@ -29,6 +31,7 @@ const AuditEditItem = ({ id, ...props }) => {
         statusSelect: AuditStatusType.scheduled,
         hasWitnessCheck: false,
         standardsCountHidden: 0,
+        auditorsCountHidden: 0,
     };
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
@@ -47,6 +50,11 @@ const AuditEditItem = ({ id, ...props }) => {
             .required('Must select a status'),
         standardsCountHidden: Yup.number()
             .min(1, 'Must have at least one standard'),
+        auditorsCountHidden: Yup.number()
+            .when('statusSelect', {
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
+                then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
+            }),
     }); 
 
     // CUSTOM HOOKS
@@ -58,6 +66,10 @@ const AuditEditItem = ({ id, ...props }) => {
     const {
         auditStandards
     } = useAuditStandardsStore();
+
+    const {
+        auditAuditors
+    } = useAuditAuditorsStore();
 
     const {
         isAuditLoading,
@@ -95,6 +107,7 @@ const AuditEditItem = ({ id, ...props }) => {
                     : AuditStatusType.scheduled,
                 hasWitnessCheck: audit?.HasWitness ?? false,
                 standardsCountHidden: audit?.Standards?.length ?? 0,
+                auditorsCountHidden: audit?.Auditors?.length ?? 0,
             });
 
             switch (audit.Status) {
@@ -137,7 +150,12 @@ const AuditEditItem = ({ id, ...props }) => {
             formikRef.current.setFieldValue('standardsCountHidden', auditStandards.length);
         }
     }, [auditStandards]);
-    
+
+    useEffect(() => {
+        if (!!auditAuditors && showModal) {
+            formikRef.current.setFieldValue('auditorsCountHidden', auditAuditors.length);
+        }
+    }, [auditAuditors]);
     
     useEffect(() => {
         if (!!auditSavedOk && showModal) {
@@ -266,6 +284,14 @@ const AuditEditItem = ({ id, ...props }) => {
                                                     {
                                                         formik.touched.standardsCountHidden && formik.errors.standardsCountHidden &&
                                                         <span className="text-danger text-xs">{formik.errors.standardsCountHidden}</span>
+                                                    }
+                                                </Col>
+                                                <Col xs="12">
+                                                    <AuditAuditorsList />
+                                                    <Field name="auditorsCountHidden" type="hidden" value={ formik.values.auditorsCountHidden } />
+                                                    {
+                                                        formik.touched.auditorsCountHidden && formik.errors.auditorsCountHidden &&
+                                                        <span className="text-danger text-xs">{formik.errors.auditorsCountHidden}</span>
                                                     }
                                                 </Col>
                                                 <Col xs="12">

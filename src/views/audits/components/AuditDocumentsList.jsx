@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useAuditsStore } from '../../../hooks/useAuditsStore'
-import enums from '../../../helpers/enums';
-import auditDocumentTypeProps from '../helpers/auditDocumentTypeProps';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
-import AuditDocumentEditItem from './AuditDocumentEditItem';
-import { useAuditDocumentsStore } from '../../../hooks/useAuditDocumentsStore';
 import { Spinner } from 'react-bootstrap';
+import { useAuditDocumentsStore } from '../../../hooks/useAuditDocumentsStore';
+import { useAuditsStore } from '../../../hooks/useAuditsStore';
+import { useEffect, useState } from 'react';
+import AuditDocumentEditItem from './AuditDocumentEditItem';
 import AuditDocumentItem from './AuditDocumentItem';
+import auditDocumentTypeProps from '../helpers/auditDocumentTypeProps';
+import enums from '../../../helpers/enums';
 
 const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }) => {
 

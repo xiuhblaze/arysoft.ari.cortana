@@ -210,7 +210,7 @@ export const useAuditAuditorsStore = () => {
     const auditStandardAddAsync = async (auditStandardID) => {
 
         if (!auditAuditor) { 
-            setError('The audit auditor is not loaded');
+            setError('The auditor is not loaded');
             return;
         }
 
@@ -237,9 +237,9 @@ export const useAuditAuditorsStore = () => {
     const auditStandardDelAsync = async (auditStandardID) => {
 
         if (!auditAuditor) { 
-            setError('The audit auditor is not loaded');
+            setError('The auditor is not loaded');
             return;
-        }
+        }   
 
         const toRemove = {
             AuditAuditorID: auditAuditor.ID,

@@ -46,15 +46,17 @@ const AuditStandardsList = ({ readOnly = false, ...props }) => {
                     isAuditStandardsLoading ? (
                         <ViewLoading />
                     ) : !!auditStandards && auditStandards.length > 0 ? (
-                        <ListGroup className="mb-3">
-                            {
-                                auditStandards.map(item => 
-                                    <AuditStandardItem 
-                                        key={item.ID} 
-                                        item={item} 
-                                    />)
-                            }
-                        </ListGroup>
+                        <div className="bg-gray-100 rounded-3 mb-3 p-2">
+                            <ListGroup>
+                                {
+                                    auditStandards.map(item => 
+                                        <AuditStandardItem 
+                                            key={item.ID} 
+                                            item={item} 
+                                        />)
+                                }
+                            </ListGroup>
+                        </div>
                     ) : <p className="text-center text-secondary text-xs">
                         (no standards assigned, press de <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one)
                     </p>

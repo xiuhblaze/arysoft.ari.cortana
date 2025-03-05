@@ -80,7 +80,8 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                 standardSelect: auditStandard?.StandardID ?? '',
                 stepSelect: auditStandard?.Step ?? '',
                 extraInfoInput: auditStandard?.ExtraInfo ?? '',
-                statusCheck: auditStandard.Status === DefaultStatusType.active,
+                statusCheck: auditStandard.Status == DefaultStatusType.active
+                    || auditStandard.Status == DefaultStatusType.nothing,
             });
 
             if (!auditCycleStandards || auditCycleStandards.length === 0) {

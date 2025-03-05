@@ -161,9 +161,9 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         }
     }, [auditDocumentsErrorMessage]);
 
-    useEffect(() => {
-        console.log('standardsCount', standardsCount);
-    }, [standardsCount])
+    // useEffect(() => {
+    //     console.log('standardsCount', standardsCount);
+    // }, [standardsCount])
     
 
     // METHODS

@@ -53,7 +53,7 @@ const AuditItem = ({ item, ...props }) => {
                     }
                 </div>
                 <p className="text-secondary text-xs mb-0">
-                    Auditors: <span className={`badge bg-gradient-${ !!item.AuditorCount && item.AuditorCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.AuditorCount ?? 0 }</span>
+                    Auditors: <span className={`badge bg-gradient-${ !!item.AuditorsCount && item.AuditorsCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.AuditorsCount ?? 0 }</span>
                     Documents: <span className={`badge bg-gradient-${ !!item.DocumentsCount && item.DocumentsCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.DocumentsCount ?? 0 }</span>  
                     Has witness: <span className={`badge bg-gradient-${!!item.HasWitness ? 'secondary' : 'light'}`}>{ !!item.HasWitness ? 'yes':'no'}</span>
                 </p>
