@@ -12,7 +12,7 @@ import {
 import { lazy } from "react";
 
 const lazyApplicants = lazy(() => import('../views/applicants'));
-const lazyApplicationForm = lazy(() => import('../views/applicationForms'));
+// const lazyApplicationForm = lazy(() => import('../views/applicationForms'));
 const lazyAuditors = lazy(() => import('../views/auditors'));
 const lazyCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
 const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
@@ -37,14 +37,14 @@ const privateRoute = [
         icon: faBuilding,
         element: lazyApplicants
     },
-    {
-        type: 'collapse',
-        title: 'Application Forms',
-        key: 'application-forms',
-        path: '/application-forms/*',
-        icon: faClipboard,
-        element: lazyApplicationForm
-    },
+    // {
+    //     type: 'collapse',
+    //     title: 'Application Forms',
+    //     key: 'application-forms',
+    //     path: '/application-forms/*',
+    //     icon: faClipboard,
+    //     element: lazyApplicationForm
+    // },
     {
         type: 'collapse',
         title: 'Auditors',

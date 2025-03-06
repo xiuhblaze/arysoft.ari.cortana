@@ -36,7 +36,7 @@ const auditCycleDocumentTypeProps = [
         id: AuditCycleDocumentType.contract,
         icon: faFileContract,
         label: 'Contract',
-        helpText: 'A unique document',
+        helpText: 'A unique document for all standards',
         variant: 'success',
     },
     {

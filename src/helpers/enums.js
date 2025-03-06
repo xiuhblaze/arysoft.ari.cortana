@@ -113,6 +113,14 @@ const enums = () => {
         deleted: 8     // Eliminada - Registro eliminado logicamente, solo para administradores
     });
 
+    const AuditOrderType = Object.freeze({
+        nothing: 0,
+        date: 1,
+        status: 2,
+        dateDesc: 3,
+        statusDesc: 4,
+    });
+
     // Auditors
 
     const AuditorStandardOrderType = Object.freeze({
@@ -381,8 +389,9 @@ const enums = () => {
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
-        AuditStepType,
         AuditDocumentType,
+        AuditStepType,
+        AuditOrderType,
         AuditStatusType,
         AuditorDocumentOrderType,
         AuditorDocumentRequiredType,

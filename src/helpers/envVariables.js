@@ -4,6 +4,7 @@ const envVariables = () => {
     const AUDITORS_OPTIONS = 'arysoft-ari-auditorsOptions';
     const CATAUDITORDOCUMENTS_OPTIONS = 'arysoft-ari-catAuditorDocumentsOptions';
     const CONTACTS_OPTIONS = 'arysoft-ari-contactsOptions';
+    const DASHBOARD_OPTIONS = 'arysoft-ari-dashboardOptions';
     const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
     const ORGANIZATIONS_OPTIONS = 'arysoft-ari-organizationsOptions';
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
@@ -37,6 +38,7 @@ const envVariables = () => {
         AUDITORS_OPTIONS,
         CATAUDITORDOCUMENTS_OPTIONS,
         CONTACTS_OPTIONS,
+        DASHBOARD_OPTIONS,
         NACECODES_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         STANDARDS_OPTIONS,

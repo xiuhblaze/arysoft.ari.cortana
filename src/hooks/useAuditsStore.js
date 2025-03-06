@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { formatISO } from "date-fns";
 
 import {
     onAuditsLoading,
@@ -29,6 +30,7 @@ const AUDIT_URL = '/audits';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
+    console.log('getSearchQuery', options);
     let query = '';
 
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
@@ -36,13 +38,18 @@ const getSearchQuery = (options = {}) => {
 
     query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
     query += options?.auditCycleID ? `&auditcycleid=${options.auditCycleID}` : '';
+    query += options?.auditorID ? `&auditorid=${options.auditorID}` : '';
+    query += options?.standardID ? `&standardid=${options.standardID}` : '';
     query += options?.text ? `&text=${options.text}` : '';
-    query += options?.startDate ? `&startdate=${options.startDate}` : '';
-    query += options?.endDate ? `&enddate=${options.endDate}` : '';
+    query += options?.startDate ? `&startdate=${formatISO(new Date(options.startDate), { representation: 'date' })}` : ''; // options.startDate}` : '';
+    query += options?.endDate ? `&enddate=${formatISO(new Date(options.endDate), { representation: 'date' })}` : ''; // options.endDate}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
     query += options?.order ? `&order=${options.order}` : '';
+
+    console.log(query);
+
     return query;
 };
 
@@ -91,9 +98,10 @@ export const useAuditsStore = () => {
      */
     const auditsAsync = async (options = {}) => {
         dispatch(onAuditsLoading());
-
+console.log('auditsAsync', options);
         try {
             const query = getSearchQuery(options);
+            console.log(query);
             const resp = await cortanaApi.get(`${AUDIT_URL}${query}`);
             const { Data, Meta } = await resp.data;
 

@@ -11,7 +11,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Status from './Status';
 import organizationStatusProps from '../helpers/organizationStatusProps';
 
-const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hideActions = false, ...props }) => {
+const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
     
     const {
         URL_ORGANIZATION_FILES,
@@ -182,21 +182,16 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                     <Status value={ item.Status } />
                 </div>
             </td>
-            {
-                !hideActions && 
-                <td>
-                    <div className="d-flex justify-content-center gap-2">
-                        <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                            <FontAwesomeIcon icon={faClone} />
-                        </a>
-                        {item.Status !== OrganizationStatusType.deleted && (
-                            <Link to={`${item.ID}`} title="Edit">
-                                <FontAwesomeIcon icon={faEdit} />
-                            </Link>
-                        )}
-                    </div>
-                </td>
-            }
+            <td>
+                <div className="d-flex justify-content-center mx-3 gap-2">
+                    {/* <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
+                        <FontAwesomeIcon icon={faClone} />
+                    </a> */}
+                    <Link to={`${item.ID}`} title="Edit" className="text-dark">
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Link>
+                </div>
+            </td>
         </tr>
     );
 } // OrganizationTableItem

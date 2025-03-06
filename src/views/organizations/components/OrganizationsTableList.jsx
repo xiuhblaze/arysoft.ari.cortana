@@ -55,8 +55,8 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
     // HOOKS
     
     const [showModal, setShowModal] = useState(false);
-    const [showQRModal, setShowQRModal] = useState(false);
-    const [qrValues, setQRValues] = useState(null);
+    // const [showQRModal, setShowQRModal] = useState(false);
+    // const [qrValues, setQRValues] = useState(null);
     const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
 
     useEffect(() => {
@@ -77,14 +77,14 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
         setShowModal(false);
     };
 
-    const onShowQRModal = (values) => {
-        setQRValues(values);
-        setShowQRModal(true);
-    }
+    // const onShowQRModal = (values) => {
+    //     setQRValues(values);
+    //     setShowQRModal(true);
+    // }
 
-    const onCloseQRModal = () => {
-        setShowQRModal(false);
-    };
+    // const onCloseQRModal = () => {
+    //     setShowQRModal(false);
+    // };
 
     const onClickOrderList = (order = OrganizationOrderType.name) => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
@@ -160,7 +160,7 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                                         </div>
                                     </div>
                                 </th>
-                                <th className={`${headStyle} text-center`}>Action</th>
+                                <th className={`${headStyle} text-center`}>{/* Action */}</th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -170,7 +170,6 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                                         key={ item.ID } 
                                         item={ item }
                                         onShowModal={ () => onShowModal(item.ID) }
-                                        onShowQRModal={ () => onShowQRModal({ID: item.ID, QRFile: item.QRFile}) }
                                     />
                                 )
                             }
@@ -180,24 +179,6 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
             ) : null
             }
             <DetailsModal show={showModal} onHide={onCloseModal} />
-            {/* <Modal show={showQRModal} onHide={onCloseQRModal} centered>
-                <Modal.Body>
-                    <div className="d-flex justify-content-center align-items-center py-5">
-                        { !!qrValues &&
-                            <img 
-                                src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${qrValues.ID}/${qrValues.QRFile}`} 
-                                alt="QR code"
-                                className="img-fluid w-50"
-                            />
-                        }
-                    </div>
-                    <div className="d-flex justify-content-end align-items-center mt-3">
-                        <button type="button" className="btn btn-link text-secondary mb-0" onClick={onCloseQRModal}>
-                            Close
-                        </button>
-                    </div>
-                </Modal.Body>
-            </Modal> */}
         </>
     )
 }
