@@ -30,7 +30,6 @@ const AUDIT_URL = '/audits';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
-    console.log('getSearchQuery', options);
     let query = '';
 
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
@@ -47,8 +46,6 @@ const getSearchQuery = (options = {}) => {
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
     query += options?.order ? `&order=${options.order}` : '';
-
-    console.log(query);
 
     return query;
 };
@@ -94,14 +91,12 @@ export const useAuditsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
-     * @param {OrganizationID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
+     * @param {OrganizationID, AuditCycleID, AuditorID, StandardID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const auditsAsync = async (options = {}) => {
         dispatch(onAuditsLoading());
-console.log('auditsAsync', options);
         try {
             const query = getSearchQuery(options);
-            console.log(query);
             const resp = await cortanaApi.get(`${AUDIT_URL}${query}`);
             const { Data, Meta } = await resp.data;
 

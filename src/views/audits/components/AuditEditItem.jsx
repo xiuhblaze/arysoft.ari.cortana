@@ -17,8 +17,9 @@ import AuditDocumentsList from './AuditDocumentsList';
 import { useAuditStandardsStore } from '../../../hooks/useAuditStandardsStore';
 import AuditAuditorsList from './AuditAuditorsList';
 import { useAuditAuditorsStore } from '../../../hooks/useAuditAuditorsStore';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
-const AuditEditItem = ({ id, ...props }) => {
+const AuditEditItem = ({ id, onClose, iconClassName, ...props }) => {
 
     const {
         AuditStatusType,
@@ -60,7 +61,15 @@ const AuditEditItem = ({ id, ...props }) => {
     // CUSTOM HOOKS
 
     const {
-        auditCycle
+        isOrganizationLoading,
+        organization,
+        organizationAsync,
+    } = useOrganizationsStore();
+
+    const {
+        isAuditCycleLoading,
+        auditCycle,
+        auditCycleAsync,
     } = useAuditCyclesStore();
 
     const {
@@ -142,6 +151,16 @@ const AuditEditItem = ({ id, ...props }) => {
                     ]);
                     break;
             } // switch
+
+            if (!organization) {
+                console.log('AuditEditItem: loading organization');
+                organizationAsync(audit.AuditCycle.OrganizationID);
+            }
+
+            if (!auditCycle) {
+                console.log('AuditEditItem: loading audit cycle');
+                auditCycleAsync(audit.AuditCycle.ID);
+            }
         }
     }, [audit]);
 
@@ -204,19 +223,28 @@ const AuditEditItem = ({ id, ...props }) => {
                 confirmButtonText: 'Yes, discard changes!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    auditsAsync({
-                        auditCycleID: auditCycle.ID,
-                        pageSize: 0,
-                    });
+
+                    if (!!onClose) {
+                        onClose();
+                    } else {
+                        auditsAsync({
+                            auditCycleID: auditCycle.ID,
+                            pageSize: 0,
+                        });
+                    }
                     auditClear();
                     setShowModal(false);
                 }
             })
         } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
-            auditsAsync({
-                auditCycleID: auditCycle.ID,
-                pageSize: 0,
-            });
+            if (!!onClose) {
+                onClose();
+            } else {
+                auditsAsync({
+                    auditCycleID: auditCycle.ID,
+                    pageSize: 0,
+                });
+            }
             auditClear();
             setShowModal(false);
         }
@@ -244,7 +272,7 @@ const AuditEditItem = ({ id, ...props }) => {
                 title={!!id ? "Edit audit" : "New audit"}
                 onClick={onShowModal}
             >
-                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />
+                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className={ iconClassName ?? 'text-dark' } size="lg" />   
             </button>
             <Modal show={showModal} onHide={onCloseModal} size="lg">
                 <Modal.Header>
@@ -254,11 +282,11 @@ const AuditEditItem = ({ id, ...props }) => {
                     </Modal.Title>
                 </Modal.Header>
                 {
-                    isAuditLoading || isAuditCreating ? (
+                    isAuditLoading || isAuditCreating || isAuditCycleLoading || isOrganizationLoading ? (
                     <Modal.Body>
                         <ViewLoading />
                     </Modal.Body>
-                    ) : !!audit && showModal && 
+                    ) : !!audit && !!organization && !!auditCycle && showModal && 
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}

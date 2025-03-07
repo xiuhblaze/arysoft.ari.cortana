@@ -27,6 +27,7 @@ import { MiniStatisticsCard } from "../../components/Cards";
 import { useAuditsStore } from "../../hooks/useAuditsStore";
 
 import bgElectronic from "../../assets/img/bgElectronic.jpg";
+import CalendarEvent from './components/CalendarEvent';
 
 
 const locales = {
@@ -41,32 +42,33 @@ const localizer = dateFnsLocalizer({
     locales,
 })
 
-const myEventsList = [
-    {
-        title: 'Auditoria ISO 9K Etapa 2',
-        notes: 'Aun falta confirmación del cliente',
-        start: new Date(),
-        end: addHours(new Date(), 2),
-        bgColor: '#347CF7',
-        user: {
-            id: '123',
-            name: 'Adrián'
-        }
-    },
-    {
-        title: 'Auditoria ISO 14K Recertificación',
-        notes: 'Viaticos en proceso',
-        start: addDays(new Date(), 2),
-        end: addDays(new Date(), 3),
-        bgColor: '#82d616',
-        user: {
-            id: '123',
-            name: 'Ariadne Elizabeth'
-        }
-    }
-];
+// const myEventsList = [
+//     {
+//         title: 'Auditoria ISO 9K Etapa 2',
+//         notes: 'Aun falta confirmación del cliente',
+//         start: new Date(),
+//         end: addHours(new Date(), 2),
+//         bgColor: '#347CF7',
+//         user: {
+//             id: '123',
+//             name: 'Adrián'
+//         }
+//     },
+//     {
+//         title: 'Auditoria ISO 14K Recertificación',
+//         notes: 'Viaticos en proceso',
+//         start: addDays(new Date(), 2),
+//         end: addDays(new Date(), 3),
+//         bgColor: '#82d616',
+//         user: {
+//             id: '123',
+//             name: 'Ariadne Elizabeth'
+//         }
+//     }
+// ];
 
 export const Dashboard = () => {
+    const CALENDAR_LASTVIEW = 'ari-ariit-dashboard-lastview';
 
     const {
         DASHBOARD_OPTIONS,
@@ -94,6 +96,7 @@ export const Dashboard = () => {
     // HOOKS
 
     const [eventsList, setEventsList] = useState([]);
+    const [lastview, setLastview] = useState(localStorage.getItem(CALENDAR_LASTVIEW) || 'month');
 
     useEffect(() => {
         let fechaActual = new Date();
@@ -132,12 +135,22 @@ export const Dashboard = () => {
         // },
 
         setEventsList(audits.map(item => {
+
+            // console.log(item.StartDate, item.EndDate);
+            // console.log(new Date(item.StartDate), new Date(item.EndDate));
+
+            const endDate = new Date(item.EndDate);
+            endDate.setHours(23, 59, 59, 999);
+
             return {
                 title: item.Description,
-                notes: item.Notes,
+                notes: item.OrganizationName,
                 start: new Date(item.StartDate),
-                end: new Date(item.EndDate),
+                end: endDate, // new Date(item.EndDate),
                 bgColor: item.Status == 1 ? '#347CF7' : '#82d616',
+                audit: item,
+                //allDay: true,
+                allDayAccessor: true,
                 // user: {
                 //     id: item.AuditorID,
                 //     name: item.AuditorName
@@ -145,8 +158,56 @@ export const Dashboard = () => {
             }
         }));
 
-        console.log('audits', audits);
+        // console.log('audits', audits);
     }, [audits]);
+
+    // METHODS
+
+    // Se ejecuta cada que se rendereiza un evento del calendario
+    const eventPropGetter = (event, start, end, isSelected) => {
+
+        if (isSelected) {
+            // console.log({event, start, end, isSelected});
+            
+            return {
+                backgroundColor: '#347CF7',
+                border: '1px solid #347CF7',
+                color: '#fff',
+                fontWeight: 'bold',
+            };
+        }
+
+        // return {
+        //     title: event.title,
+        //     notes: event.notes,
+        //     start: event.start,
+        //     end: event.end,
+        //     bgColor: event.bgColor,
+        //     user: {
+        //         id: event.user.id,
+        //         name: event.user.name
+        //     }
+        // }
+    }; // eventPropGetter
+
+    const onDoubleClick = (event) => {
+        console.log('onDoubleClick', event);
+    }; // onDoubleClick
+
+    const onSelect = (event) => {
+        console.log('onSelect', event);
+    }; // onSelect
+
+    const onViewChanged = (event) => {
+        // console.log('onViewChanged', event);
+
+        localStorage.setItem(CALENDAR_LASTVIEW, event);
+        setLastview(event);
+    }; // onViewChanged
+
+    const onRangeChange = (event) => {
+        console.log('onRangeChange', event);
+    };
     
 
     return (
@@ -191,17 +252,26 @@ export const Dashboard = () => {
                         <Card>
                             <Card.Body>
                                 <Calendar
+                                    defaultView={ lastview }
                                     localizer={localizer}
                                     events={eventsList}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: '60vh' }}
+                                    style={{ height: '65vh' }}
+                                    eventPropGetter={eventPropGetter}
+                                    components={{
+                                        event: CalendarEvent
+                                    }}
+                                    onDoubleClickEvent={onDoubleClick}
+                                    onSelectEvent={onSelect}
+                                    onView={onViewChanged}
+                                    onRangeChange={onRangeChange}
                                 />
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
-                <Row className="mt-4">
+                {/* <Row className="mt-4">
                     <Col xs="12" lg="7" className="mb-lg-0 mb-4">
                         <Card>
                             <Card.Body className="p-3">
@@ -266,7 +336,7 @@ export const Dashboard = () => {
                             </ListGroup>
                         </Card>
                     </Col>
-                </Row>
+                </Row> */}
             </Container>
         </DashboardLayout>
     )
