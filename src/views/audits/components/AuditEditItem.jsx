@@ -1,30 +1,28 @@
-import { faEdit, faExclamationTriangle, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useRef, useState } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
-import enums from '../../../helpers/enums';
-import * as Yup from "yup";
-import { useAuditsStore } from '../../../hooks/useAuditsStore';
-import { ViewLoading } from '../../../components/Loaders';
-import { Field, Form, Formik } from 'formik';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
-import getISODate from '../../../helpers/getISODate';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import Swal from 'sweetalert2';
-import AuditStandardsList from './AuditStandardsList';
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
-import AuditDocumentsList from './AuditDocumentsList';
-import { useAuditStandardsStore } from '../../../hooks/useAuditStandardsStore';
-import AuditAuditorsList from './AuditAuditorsList';
+import { Col, Modal, Row } from 'react-bootstrap';
+import { faEdit, faExclamationTriangle, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { Field, Form, Formik } from 'formik';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuditAuditorsStore } from '../../../hooks/useAuditAuditorsStore';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import { useAuditsStore } from '../../../hooks/useAuditsStore';
+import { useAuditStandardsStore } from '../../../hooks/useAuditStandardsStore';
+import { useEffect, useRef, useState } from 'react';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { ViewLoading } from '../../../components/Loaders';
+import * as Yup from "yup";
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import AuditAuditorsList from './AuditAuditorsList';
+import AuditDocumentsList from './AuditDocumentsList';
+import AuditStandardsList from './AuditStandardsList';
+import enums from '../../../helpers/enums';
+import getISODate from '../../../helpers/getISODate';
+import Swal from 'sweetalert2';
 
 const AuditEditItem = ({ id, onClose, iconClassName, ...props }) => {
-
     const {
         AuditStatusType,
     } = enums();
-
     const formDefaultValues = {
         descriptionInput: '',
         startDateInput: '',
@@ -179,11 +177,15 @@ const AuditEditItem = ({ id, onClose, iconClassName, ...props }) => {
     useEffect(() => {
         if (!!auditSavedOk && showModal) {
             Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
-            auditsAsync({
-                auditCycleID: auditCycle.ID,
-                pageSize: 0,
-            });
-            auditClear();
+            if (!!onClose) {
+                onClose();
+            } else {
+                auditsAsync({
+                    auditCycleID: auditCycle.ID,
+                    pageSize: 0,
+                });
+            }            
+            auditClear();            
             setShowModal(false);
         }
     }, [auditSavedOk]);

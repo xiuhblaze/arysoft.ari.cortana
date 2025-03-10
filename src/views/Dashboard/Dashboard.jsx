@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, Col, Container, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from "date-fns";
+import { format, parse, startOfWeek, getDay, startOfMonth, startOfDay, endOfDay, endOfMonth, endOfWeek } from "date-fns";
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { addDays, addHours } from 'date-fns'; // xBLAZE: Puede que sean temporales
@@ -28,6 +28,9 @@ import { useAuditsStore } from "../../hooks/useAuditsStore";
 
 import bgElectronic from "../../assets/img/bgElectronic.jpg";
 import CalendarEvent from './components/CalendarEvent';
+import DashboardToolbar from './components/DashboardToolbar';
+import auditStatusProps from '../audits/helpers/auditStatusProps';
+import AuditModalEditItem from '../audits/components/AuditModalEditItem';
 
 
 const locales = {
@@ -42,31 +45,6 @@ const localizer = dateFnsLocalizer({
     locales,
 })
 
-// const myEventsList = [
-//     {
-//         title: 'Auditoria ISO 9K Etapa 2',
-//         notes: 'Aun falta confirmación del cliente',
-//         start: new Date(),
-//         end: addHours(new Date(), 2),
-//         bgColor: '#347CF7',
-//         user: {
-//             id: '123',
-//             name: 'Adrián'
-//         }
-//     },
-//     {
-//         title: 'Auditoria ISO 14K Recertificación',
-//         notes: 'Viaticos en proceso',
-//         start: addDays(new Date(), 2),
-//         end: addDays(new Date(), 3),
-//         bgColor: '#82d616',
-//         user: {
-//             id: '123',
-//             name: 'Ariadne Elizabeth'
-//         }
-//     }
-// ];
-
 export const Dashboard = () => {
     const CALENDAR_LASTVIEW = 'ari-ariit-dashboard-lastview';
 
@@ -78,7 +56,7 @@ export const Dashboard = () => {
     const {
         AuditOrderType,
     } = enums();
-    
+
     // CUSTOM HOOKS
 
     const [controller, despatch] = useArysoftUIController();
@@ -97,43 +75,27 @@ export const Dashboard = () => {
 
     const [eventsList, setEventsList] = useState([]);
     const [lastview, setLastview] = useState(localStorage.getItem(CALENDAR_LASTVIEW) || 'month');
+    const [auditID, setAuditID] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        let fechaActual = new Date();
-        let primerDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1); // Primer día del mes        
-        let ultimoDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0); // Último día del mes
-
+        const { start, end } = getInitialRange();        
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const newSearch = {
-            startDate: primerDia,
-            endDate: ultimoDia,
+            startDate: start, // : firstMonthDay,
+            endDate: end, // lastMonthDay,
             pageSize: 0, // savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
             pageNumber: 1,
             order: savedSearch?.order ? savedSearch.order : AuditOrderType.date,
         };
-
         const search = !!savedSearch ? savedSearch : newSearch;
-
+        
         auditsAsync(search);
         localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
-
         setNavbarTitle(despatch, null);
     }, []);
 
     useEffect(() => {
-
-        // {
-        //     title: 'Auditoria ISO 9K Etapa 2',
-        //     notes: 'Aun falta confirmación del cliente',
-        //     start: new Date(),
-        //     end: addHours(new Date(), 2),
-        //     bgColor: '#347CF7',
-        //     user: {
-        //         id: '123',
-        //         name: 'Adrián'
-        //     }
-        // },
-
         setEventsList(audits.map(item => {
 
             // console.log(item.StartDate, item.EndDate);
@@ -163,39 +125,73 @@ export const Dashboard = () => {
 
     // METHODS
 
+    const getInitialRange = () => {
+        // Por defecto, calculamos el rango basado en la fecha actual y la vista predeterminada
+        const currentDate = new Date();
+        const view = lastview; // O la vista que uses por defecto
+
+        let start, end;
+
+        if (view === 'month') {
+            const firstDayOfMonth = startOfMonth(currentDate);
+            const lastDayOfMonth = endOfMonth(currentDate);
+            const firstVisibleDay = startOfWeek(firstDayOfMonth);
+            const lastVisibleDay = endOfWeek(lastDayOfMonth);
+
+            start = firstVisibleDay;
+            end = lastVisibleDay;         
+        } else if (view === 'week') {
+
+            start = startOfWeek(currentDate);
+            end = endOfWeek(currentDate);
+        } else if (view === 'day') {
+            start = startOfDay(currentDate);
+            end = endOfDay(currentDate);  
+        } else {
+            // Agenda view (por defecto 4 días en muchas configuraciones)
+            start = currentDate;
+            end = addDays(currentDate, 4);
+        }
+
+        if (!!start) start.setHours(0, 0, 0, 0);
+        if (!!end) end.setHours(23, 59, 59, 999);
+
+        return { start, end };
+    }; // getInitialRange
+
     // Se ejecuta cada que se rendereiza un evento del calendario
     const eventPropGetter = (event, start, end, isSelected) => {
 
-        if (isSelected) {
-            // console.log({event, start, end, isSelected});
-            
+        // console.log('eventPropGetter', event);
+
+
+        if (!!event) {
+            // const style = {
+            //     backgroundColor: isSelected ? '#17c1e8' : '#cb0c9f',
+            //     backgroundImage: isSelected ? linearGradientPrimary : linearGradientInfo,
+            // };
+    
+            let myClassName = ''; // isSelected ? 'bg-gradient-primary' : 'bg-gradient-info';
+            myClassName += ` border-radius-lg`;
+            myClassName += ` bg-gradient-${auditStatusProps[event.audit.Status].variant}`;
+    
             return {
-                backgroundColor: '#347CF7',
-                border: '1px solid #347CF7',
-                color: '#fff',
-                fontWeight: 'bold',
-            };
+                className: myClassName,
+            }
         }
 
-        // return {
-        //     title: event.title,
-        //     notes: event.notes,
-        //     start: event.start,
-        //     end: event.end,
-        //     bgColor: event.bgColor,
-        //     user: {
-        //         id: event.user.id,
-        //         name: event.user.name
-        //     }
-        // }
+        
     }; // eventPropGetter
 
     const onDoubleClick = (event) => {
         console.log('onDoubleClick', event);
+
+        setAuditID(event.audit.ID);
+        setShowModal(true);
     }; // onDoubleClick
 
     const onSelect = (event) => {
-        console.log('onSelect', event);
+        //console.log('onSelect', event);
     }; // onSelect
 
     const onViewChanged = (event) => {
@@ -205,10 +201,48 @@ export const Dashboard = () => {
         setLastview(event);
     }; // onViewChanged
 
-    const onRangeChange = (event) => {
-        console.log('onRangeChange', event);
-    };
-    
+    const onRangeChange = (range) => {
+        // El formato de range depende de la vista actual
+        // Para 'month' view: range es un array con un solo objeto {start, end}
+        // Para 'week' o 'day' view: range es un objeto {start, end}
+        // Para 'agenda' view: range es un array de fechas
+
+        let startDate, endDate;
+
+        if (Array.isArray(range)) {
+            if (range.length === 1) {
+                // Vista mensual
+                startDate = range[0].start;
+                endDate = range[0].end;
+            } else {
+                // Vista agenda
+                startDate = range[0];
+                endDate = range[range.length - 1];
+            }
+        } else {
+            // Vistas de semana o día
+            startDate = range.start;
+            endDate = range.end;
+        }
+
+        // Actualizamos la consulta de auditorias
+        const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
+        const search = {
+            ...savedSearch,
+            startDate: startDate,
+            endDate: endDate,
+        };
+
+        auditsAsync(search);
+        localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
+    }; // onRangeChange
+
+    const onCloseModal = () => {
+        setShowModal(false);
+
+        console.log('onCloseModal');
+        //! Actualizar listado o lo que se ocupe ne el Dashboard
+    }; // onCloseModal
 
     return (
         <DashboardLayout>
@@ -250,14 +284,17 @@ export const Dashboard = () => {
                 <Row className="mt-4">
                     <Col md="12">
                         <Card>
+                            <Card.Header className="pb-0">
+                                <DashboardToolbar />
+                            </Card.Header>
                             <Card.Body>
                                 <Calendar
-                                    defaultView={ lastview }
+                                    defaultView={lastview}
                                     localizer={localizer}
                                     events={eventsList}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: '65vh' }}
+                                    style={{ height: '70vh' }}
                                     eventPropGetter={eventPropGetter}
                                     components={{
                                         event: CalendarEvent
@@ -337,6 +374,11 @@ export const Dashboard = () => {
                         </Card>
                     </Col>
                 </Row> */}
+                <AuditModalEditItem
+                    id={ auditID }
+                    show={showModal}
+                    onHide={onCloseModal}
+                />
             </Container>
         </DashboardLayout>
     )
