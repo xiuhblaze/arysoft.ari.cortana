@@ -50,7 +50,7 @@ const AuditDocumentItem = ({ item, readOnly = false, ...props }) => {
         : '';
     let smallNote = !isNullOrEmpty(item.Comments) && item.Comments.length > COMMENTS_SMALL_MAX_LENGTH
         ? item.Comments.substring(0, COMMENTS_SMALL_MAX_LENGTH) + '...'
-        : '';
+        : item.Comments;
     smallNote += item.IsWitnessIncluded
         ? (!isNullOrEmpty(smallNote) ? ` | ` : '') + 'Witness: ' + (item.IsWitnessIncluded ? 'Yes' : 'No')
         : '';

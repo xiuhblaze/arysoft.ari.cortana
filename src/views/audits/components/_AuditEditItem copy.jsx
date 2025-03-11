@@ -18,52 +18,51 @@ import AuditStandardsList from './AuditStandardsList';
 import enums from '../../../helpers/enums';
 import getISODate from '../../../helpers/getISODate';
 import Swal from 'sweetalert2';
-import AuditModalEditItem from './AuditModalEditItem';
 
-const AuditEditItem = ({ id = null, onClose, iconClassName, ...props }) => {
+const _AuditEditItem = ({ id, onClose, iconClassName, ...props }) => {
     const {
         AuditStatusType,
     } = enums();
-    // const formDefaultValues = {
-    //     descriptionInput: '',
-    //     startDateInput: '',
-    //     endDateInput: '',
-    //     statusSelect: AuditStatusType.scheduled,
-    //     hasWitnessCheck: false,
-    //     standardsCountHidden: 0,
-    //     auditorsCountHidden: 0,
-    // };
-    // const validationSchema = Yup.object({
-    //     descriptionInput: Yup.string()
-    //         .max(1000, ''),
-    //     startDateInput: Yup.date()
-    //         .typeError('Start date has an invalid format')
-    //         .required('Must specify start date'),
-    //     endDateInput: Yup.date()
-    //         .typeError('End date has an invalid format')
-    //         .required('Must specify end date'),
-    //     statusSelect: Yup.string()
-    //         .oneOf(Object.values(AuditStatusType)
-    //                 .filter(ast => ast != AuditStatusType.nothing)
-    //                 .map(ast => ast + ''), 
-    //             'Select a valid option')
-    //         .required('Must select a status'),
-    //     standardsCountHidden: Yup.number()
-    //         .min(1, 'Must have at least one standard'),
-    //     auditorsCountHidden: Yup.number()
-    //         .when('statusSelect', {
-    //             is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
-    //             then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
-    //         }),
-    // });  
+    const formDefaultValues = {
+        descriptionInput: '',
+        startDateInput: '',
+        endDateInput: '',
+        statusSelect: AuditStatusType.scheduled,
+        hasWitnessCheck: false,
+        standardsCountHidden: 0,
+        auditorsCountHidden: 0,
+    };
+    const validationSchema = Yup.object({
+        descriptionInput: Yup.string()
+            .max(1000, ''),
+        startDateInput: Yup.date()
+            .typeError('Start date has an invalid format')
+            .required('Must specify start date'),
+        endDateInput: Yup.date()
+            .typeError('End date has an invalid format')
+            .required('Must specify end date'),
+        statusSelect: Yup.string()
+            .oneOf(Object.values(AuditStatusType)
+                    .filter(ast => ast != AuditStatusType.nothing)
+                    .map(ast => ast + ''), 
+                'Select a valid option')
+            .required('Must select a status'),
+        standardsCountHidden: Yup.number()
+            .min(1, 'Must have at least one standard'),
+        auditorsCountHidden: Yup.number()
+            .when('statusSelect', {
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
+                then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
+            }),
+    }); 
 
     // CUSTOM HOOKS
 
-    // const {
-    //     isOrganizationLoading,
-    //     organization,
-    //     organizationAsync,
-    // } = useOrganizationsStore();
+    const {
+        isOrganizationLoading,
+        organization,
+        organizationAsync,
+    } = useOrganizationsStore();
 
     const {
         isAuditCycleLoading,
@@ -71,13 +70,13 @@ const AuditEditItem = ({ id = null, onClose, iconClassName, ...props }) => {
         auditCycleAsync,
     } = useAuditCyclesStore();
 
-    // const {
-    //     auditStandards
-    // } = useAuditStandardsStore();
+    const {
+        auditStandards
+    } = useAuditStandardsStore();
 
-    // const {
-    //     auditAuditors
-    // } = useAuditAuditorsStore();
+    const {
+        auditAuditors
+    } = useAuditAuditorsStore();
 
     const {
         isAuditLoading,
@@ -96,185 +95,176 @@ const AuditEditItem = ({ id = null, onClose, iconClassName, ...props }) => {
 
     // HOOKS
 
-    //const formikRef = useRef(null);
+    const formikRef = useRef(null);
 
-    // const [auditID, setAuditID] = useState(id ?? null);
-    const [showModal, setShowModal] = useState(false);    
-    // const [initialValues, setInitialValues] = useState(formDefaultValues);
-    // const [showAllFiles, setShowAllFiles] = useState(false);
-    // const [hasChanges, setHasChanges] = useState(false);
-    // const [statusOptions, setStatusOptions] = useState(false); 
+    const [showModal, setShowModal] = useState(false);
+    const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [showAllFiles, setShowAllFiles] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
+    const [statusOptions, setStatusOptions] = useState(false); 
 
-    // useEffect(() => {
-    //     if (!!audit && showModal) {
-    //         setInitialValues({
-    //             descriptionInput: audit?.Description ?? '',
-    //             startDateInput: !!audit?.StartDate ? getISODate(audit.StartDate) : '',
-    //             endDateInput: !!audit?.EndDate ? getISODate(audit.EndDate) : '',
-    //             statusSelect: !!audit?.Status && audit?.Status != AuditStatusType.nothing
-    //                 ? audit?.Status
-    //                 : AuditStatusType.scheduled,
-    //             hasWitnessCheck: audit?.HasWitness ?? false,
-    //             standardsCountHidden: audit?.Standards?.length ?? 0,
-    //             auditorsCountHidden: audit?.Auditors?.length ?? 0,
-    //         });
+    useEffect(() => {
+        if (!!audit && showModal) {
+            setInitialValues({
+                descriptionInput: audit?.Description ?? '',
+                startDateInput: !!audit?.StartDate ? getISODate(audit.StartDate) : '',
+                endDateInput: !!audit?.EndDate ? getISODate(audit.EndDate) : '',
+                statusSelect: !!audit?.Status && audit?.Status != AuditStatusType.nothing
+                    ? audit?.Status
+                    : AuditStatusType.scheduled,
+                hasWitnessCheck: audit?.HasWitness ?? false,
+                standardsCountHidden: audit?.Standards?.length ?? 0,
+                auditorsCountHidden: audit?.Auditors?.length ?? 0,
+            });
 
-    //         switch (audit.Status) {
-    //             // case AuditStatusType.scheduled:
-    //             //     setstatusOptions([
-    //             //         { label: 'Scheduled', value: AuditStatusType.scheduled },
-    //             //         { label: 'In progress', value: AuditStatusType.inProgress },
-    //             //         { label: 'Completed', value: AuditStatusType.completed },
-    //             //     ]);
-    //             //     break;
-    //             // case AuditStatusType.inProgress:
-    //             //     setstatusOptions([
-    //             //         { label: 'In progress', value: AuditStatusType.inProgress },
-    //             //         { label: 'Completed', value: AuditStatusType.completed },
-    //             //     ]);
-    //             //     break;
-    //             // case AuditStatusType.completed:
-    //             //     setstatusOptions([
-    //             //         { label: 'Completed', value: AuditStatusType.completed },
-    //             //     ]);
-    //             //     break;
-    //             default:
-    //                 setStatusOptions([
-    //                     { label: '(select)', value: AuditStatusType.nothing },
-    //                     { label: 'Scheduled', value: AuditStatusType.scheduled },
-    //                     { label: 'Confirmed', value: AuditStatusType.confirmed },
-    //                     { label: 'In process', value: AuditStatusType.inProcess },
-    //                     { label: 'Finished', value: AuditStatusType.finished },
-    //                     { label: 'Completed', value: AuditStatusType.completed },
-    //                     { label: 'Closed', value: AuditStatusType.closed },
-    //                     { label: 'Canceled', value: AuditStatusType.canceled },
-    //                 ]);
-    //                 break;
-    //         } // switch
+            switch (audit.Status) {
+                // case AuditStatusType.scheduled:
+                //     setstatusOptions([
+                //         { label: 'Scheduled', value: AuditStatusType.scheduled },
+                //         { label: 'In progress', value: AuditStatusType.inProgress },
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                // case AuditStatusType.inProgress:
+                //     setstatusOptions([
+                //         { label: 'In progress', value: AuditStatusType.inProgress },
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                // case AuditStatusType.completed:
+                //     setstatusOptions([
+                //         { label: 'Completed', value: AuditStatusType.completed },
+                //     ]);
+                //     break;
+                default:
+                    setStatusOptions([
+                        { label: '(select)', value: AuditStatusType.nothing },
+                        { label: 'Scheduled', value: AuditStatusType.scheduled },
+                        { label: 'Confirmed', value: AuditStatusType.confirmed },
+                        { label: 'In process', value: AuditStatusType.inProcess },
+                        { label: 'Finished', value: AuditStatusType.finished },
+                        { label: 'Completed', value: AuditStatusType.completed },
+                        { label: 'Closed', value: AuditStatusType.closed },
+                        { label: 'Canceled', value: AuditStatusType.canceled },
+                    ]);
+                    break;
+            } // switch
 
-    //         if (!organization) {
-    //             console.log('AuditEditItem: loading organization');
-    //             organizationAsync(audit.AuditCycle.OrganizationID);
-    //         }
+            if (!organization) {
+                console.log('AuditEditItem: loading organization');
+                organizationAsync(audit.AuditCycle.OrganizationID);
+            }
 
-    //         if (!auditCycle) {
-    //             console.log('AuditEditItem: loading audit cycle');
-    //             auditCycleAsync(audit.AuditCycle.ID);
-    //         }
-    //     }
-    // }, [audit]);
+            if (!auditCycle) {
+                console.log('AuditEditItem: loading audit cycle');
+                auditCycleAsync(audit.AuditCycle.ID);
+            }
+        }
+    }, [audit]);
 
-    // useEffect(() => {
-    //     if (!!auditStandards && showModal) {
-    //         formikRef.current.setFieldValue('standardsCountHidden', auditStandards.length);
-    //     }
-    // }, [auditStandards]);
+    useEffect(() => {
+        if (!!auditStandards && showModal) {
+            formikRef.current.setFieldValue('standardsCountHidden', auditStandards.length);
+        }
+    }, [auditStandards]);
 
-    // useEffect(() => {
-    //     if (!!auditAuditors && showModal) {
-    //         formikRef.current.setFieldValue('auditorsCountHidden', auditAuditors.length);
-    //     }
-    // }, [auditAuditors]);
+    useEffect(() => {
+        if (!!auditAuditors && showModal) {
+            formikRef.current.setFieldValue('auditorsCountHidden', auditAuditors.length);
+        }
+    }, [auditAuditors]);
     
-    // useEffect(() => {
-    //     if (!!auditSavedOk && showModal) {
-    //         Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
-    //         if (!!onClose) {
-    //             onClose();
-    //         } else {
-    //             auditsAsync({
-    //                 auditCycleID: auditCycle.ID,
-    //                 pageSize: 0,
-    //             });
-    //         }            
-    //         auditClear();            
-    //         setShowModal(false);
-    //     }
-    // }, [auditSavedOk]);
+    useEffect(() => {
+        if (!!auditSavedOk && showModal) {
+            Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
+            if (!!onClose) {
+                onClose();
+            } else {
+                auditsAsync({
+                    auditCycleID: auditCycle.ID,
+                    pageSize: 0,
+                });
+            }            
+            auditClear();            
+            setShowModal(false);
+        }
+    }, [auditSavedOk]);
     
-    // useEffect(() => {
-    //     if (!!auditsErrorMessage && showModal) {
-    //         Swal.fire('Audit', auditsErrorMessage, 'error');
-    //         auditClear();
-    //         onCloseModal();
-    //     }
-    // }, [auditsErrorMessage]);
+    useEffect(() => {
+        if (!!auditsErrorMessage && showModal) {
+            Swal.fire('Audit', auditsErrorMessage, 'error');
+            auditClear();
+            onCloseModal();
+        }
+    }, [auditsErrorMessage]);
     
     // METHODS
 
     const onShowModal = () => {
 
-
-
-        // if (!!id) {
-        //     auditAsync(id);
-        // } else {
-        //     auditCreateAsync({
-        //         AuditCycleID: auditCycle.ID,
-        //     });
-        // }
-        
+        if (!!id) {
+            auditAsync(id);
+        } else {
+            auditCreateAsync({
+                AuditCycleID: auditCycle.ID,
+            });
+        }
         setShowModal(true);
     }; // onShowModal
 
     const onCloseModal = () => {
-        // if (hasChanges) {
-        //     Swal.fire({
-        //         title: 'Discard changes?',
-        //         text: 'Are you sure you want to discard changes? The changes will be lost.',
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         confirmButtonColor: '#3085d6',
-        //         cancelButtonColor: '#d33',
-        //         confirmButtonText: 'Yes, discard changes!'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
 
-        //             if (!!onClose) {
-        //                 onClose();
-        //             } else {
-        //                 auditsAsync({
-        //                     auditCycleID: auditCycle.ID,
-        //                     pageSize: 0,
-        //                 });
-        //             }
-        //             auditClear();
-        //             setShowModal(false);
-        //         }
-        //     })
-        // } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
-        //     if (!!onClose) {
-        //         onClose();
-        //     } else {
-        //         auditsAsync({
-        //             auditCycleID: auditCycle.ID,
-        //             pageSize: 0,
-        //         });
-        //     }
-        //     auditClear();
-        //     setShowModal(false);
-        // }
-        setShowModal(false);
+        if (hasChanges) {
+            Swal.fire({
+                title: 'Discard changes?',
+                text: 'Are you sure you want to discard changes? The changes will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard changes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
 
-        auditsAsync({
-            auditCycleID: auditCycle.ID,
-            pageSize: 0,
-        });
+                    if (!!onClose) {
+                        onClose();
+                    } else {
+                        auditsAsync({
+                            auditCycleID: auditCycle.ID,
+                            pageSize: 0,
+                        });
+                    }
+                    auditClear();
+                    setShowModal(false);
+                }
+            })
+        } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
+            if (!!onClose) {
+                onClose();
+            } else {
+                auditsAsync({
+                    auditCycleID: auditCycle.ID,
+                    pageSize: 0,
+                });
+            }
+            auditClear();
+            setShowModal(false);
+        }
     }; // onCloseModal
 
-    // const onFormSubmit = (values) => {
-    //     const toSave = {
-    //         ID: audit.ID,
-    //         Description: values.descriptionInput,
-    //         StartDate: values.startDateInput,
-    //         EndDate: values.endDateInput,
-    //         Status: values.statusSelect,
-    //         HasWitness: values.hasWitnessCheck,
-    //     };
+    const onFormSubmit = (values) => {
+        const toSave = {
+            ID: audit.ID,
+            Description: values.descriptionInput,
+            StartDate: values.startDateInput,
+            EndDate: values.endDateInput,
+            Status: values.statusSelect,
+            HasWitness: values.hasWitnessCheck,
+        };
 
-    //     // console.log(toSave);
-    //     auditSaveAsync(toSave);
-    // };
+        // console.log(toSave);
+        auditSaveAsync(toSave);
+    };
 
     return (
         <>
@@ -286,8 +276,7 @@ const AuditEditItem = ({ id = null, onClose, iconClassName, ...props }) => {
             >
                 <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className={ iconClassName ?? 'text-dark' } size="lg" />   
             </button>
-            <AuditModalEditItem id={ id } show={showModal} onHide={onCloseModal} />
-            {/* <Modal show={showModal} onHide={onCloseModal} size="lg">
+            <Modal show={showModal} onHide={onCloseModal} size="lg">
                 <Modal.Header>
                     <Modal.Title>
                         <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="px-3" />
@@ -473,9 +462,9 @@ const AuditEditItem = ({ id = null, onClose, iconClassName, ...props }) => {
                         )}}
                     </Formik>
                 }
-            </Modal> */}
+            </Modal>
         </>
     )
 }
 
-export default AuditEditItem
+export default _AuditEditItem

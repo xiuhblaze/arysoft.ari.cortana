@@ -168,12 +168,12 @@ const DashboardToolbar = ({ ...props }) => {
 
     return (
         <div {...props} className="d-flex flex-column flex-md-row justify-content-between gap-2">
-            <div>
+            {/* <div>
                 <button className={BUTTON_ADD_CLASS}>
                     <FontAwesomeIcon icon={faPlus} className="me-1" />
                     Add
                 </button>
-            </div>
+            </div> */}
             <div className="flex-fill">
                 <Formik
                     initialValues={initialValues}
@@ -270,16 +270,18 @@ const DashboardToolbar = ({ ...props }) => {
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto">
-                                            <div className="form-check form-switch">
-                                                <input id="includeDeletedCheck" name="includeDeletedCheck"
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    onChange={formik.handleChange}
-                                                    checked={formik.values.includeDeletedCheck}
-                                                />
-                                                <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
-                                                    <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
-                                                </label>
+                                            <div className="p-2 bg-gray-100 border-radius-md mb-3">
+                                                <div className="form-check form-switch">
+                                                    <input id="includeDeletedCheck" name="includeDeletedCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        onChange={formik.handleChange}
+                                                        checked={formik.values.includeDeletedCheck}
+                                                    />
+                                                    <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
+                                                        <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

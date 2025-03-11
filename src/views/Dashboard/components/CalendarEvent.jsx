@@ -31,18 +31,18 @@ const CalendarEvent = ({ ...props}) => {
             <div>
                 <h6 className="text-white text-sm font-weight-bold mb-0">
                     <FontAwesomeIcon icon={ auditStatusProps[props.event.audit.Status].icon } className="me-1"  />
-                    {props.event.title}
+                    {props.event.audit.Description}
                 </h6>
                 <p className="d-flex flex-wrap text-light text-xs mb-0">
-                    {props.event.notes}
+                    {props.event.audit.OrganizationName}
                 </p>
-                <p className="text-xs mb-0"> {props.event.audit.Auditors.map(i => i.AuditorName).join(', ')}</p>
+                {/* <p className="text-xs mb-0"> {props.event.audit.Auditors.map(i => i.AuditorName).join(', ')}</p> */}
             </div>
-            <AuditEditItem 
+            {/* <AuditEditItem 
                 id={ props.event.audit.ID } 
                 iconClassName="text-white"
                 onClose={ onCloseAuditModal }
-            />
+            /> */}
         </div>
     )
 }

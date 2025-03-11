@@ -31,6 +31,7 @@ import CalendarEvent from './components/CalendarEvent';
 import DashboardToolbar from './components/DashboardToolbar';
 import auditStatusProps from '../audits/helpers/auditStatusProps';
 import AuditModalEditItem from '../audits/components/AuditModalEditItem';
+import auditStepProps from '../audits/helpers/auditStepProps';
 
 
 const locales = {
@@ -77,11 +78,13 @@ export const Dashboard = () => {
     const [lastview, setLastview] = useState(localStorage.getItem(CALENDAR_LASTVIEW) || 'month');
     const [auditID, setAuditID] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    //const [defaultDate, setDefaultDate] = useState(null); //! Aun no funciona el mantener el mismo mes si se refresca el navegador :/
 
     useEffect(() => {
         const { start, end } = getInitialRange();        
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const newSearch = {
+            //defaultDate: defaultDate ?? new Date(),
             startDate: start, // : firstMonthDay,
             endDate: end, // lastMonthDay,
             pageSize: 0, // savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
@@ -89,6 +92,7 @@ export const Dashboard = () => {
             order: savedSearch?.order ? savedSearch.order : AuditOrderType.date,
         };
         const search = !!savedSearch ? savedSearch : newSearch;
+        // setDefaultDate(search.defaultDate);        
         
         auditsAsync(search);
         localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
@@ -104,8 +108,17 @@ export const Dashboard = () => {
             const endDate = new Date(item.EndDate);
             endDate.setHours(23, 59, 59, 999);
 
+            const toolTip = item.Description + '\n' 
+                + item.OrganizationName + '\n' 
+                + item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
+                + item.Standards.map(i => {
+                    let s = i.StandardName;
+                    s += ' - ' + auditStepProps[i.Step].abbreviation.toUpperCase();
+                    return s;
+                }).join(', ');
+
             return {
-                title: item.Description,
+                title: toolTip,
                 notes: item.OrganizationName,
                 start: new Date(item.StartDate),
                 end: endDate, // new Date(item.EndDate),
@@ -122,7 +135,7 @@ export const Dashboard = () => {
 
         // console.log('audits', audits);
     }, [audits]);
-
+    
     // METHODS
 
     const getInitialRange = () => {
@@ -161,10 +174,7 @@ export const Dashboard = () => {
 
     // Se ejecuta cada que se rendereiza un evento del calendario
     const eventPropGetter = (event, start, end, isSelected) => {
-
         // console.log('eventPropGetter', event);
-
-
         if (!!event) {
             // const style = {
             //     backgroundColor: isSelected ? '#17c1e8' : '#cb0c9f',
@@ -179,12 +189,10 @@ export const Dashboard = () => {
                 className: myClassName,
             }
         }
-
-        
     }; // eventPropGetter
 
     const onDoubleClick = (event) => {
-        console.log('onDoubleClick', event);
+        // console.log('onDoubleClick', event);
 
         setAuditID(event.audit.ID);
         setShowModal(true);
@@ -206,6 +214,8 @@ export const Dashboard = () => {
         // Para 'month' view: range es un array con un solo objeto {start, end}
         // Para 'week' o 'day' view: range es un objeto {start, end}
         // Para 'agenda' view: range es un array de fechas
+        
+        //console.log('onRangeChange', range);
 
         let startDate, endDate;
 
@@ -229,19 +239,37 @@ export const Dashboard = () => {
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            //defaultDate: defaultDate,
             startDate: startDate,
             endDate: endDate,
-        };
-
+        };        
         auditsAsync(search);
         localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
     }; // onRangeChange
 
+    const onNavigate = (date) => {
+        console.log('onNavigate', date);
+        // setDefaultDate(date);
+
+        // // Actualizamos la consulta de auditorias
+        // const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
+        // const search = {
+        //     ...savedSearch,
+        //     defaultDate: date,
+        // };
+
+        // auditsAsync(search);
+        // localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
+    };
+
     const onCloseModal = () => {
         setShowModal(false);
 
-        console.log('onCloseModal');
-        //! Actualizar listado o lo que se ocupe ne el Dashboard
+        //console.log('onCloseModal');
+        //! Actualizar listado o lo que se ocupe ne el Dashboard - YA!
+
+        const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
+        auditsAsync(savedSearch);
     }; // onCloseModal
 
     return (
@@ -287,14 +315,16 @@ export const Dashboard = () => {
                             <Card.Header className="pb-0">
                                 <DashboardToolbar />
                             </Card.Header>
-                            <Card.Body>
+                            <Card.Body className="pt-0">
                                 <Calendar
+                                    // date={defaultDate}
+                                    // defaultDate={defaultDate}
                                     defaultView={lastview}
                                     localizer={localizer}
                                     events={eventsList}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: '70vh' }}
+                                    style={{ height: 'calc(100vh - 100px)' }}
                                     eventPropGetter={eventPropGetter}
                                     components={{
                                         event: CalendarEvent
@@ -303,6 +333,7 @@ export const Dashboard = () => {
                                     onSelectEvent={onSelect}
                                     onView={onViewChanged}
                                     onRangeChange={onRangeChange}
+                                    onNavigate={onNavigate}
                                 />
                             </Card.Body>
                         </Card>
