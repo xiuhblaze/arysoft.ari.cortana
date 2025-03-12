@@ -115,7 +115,7 @@ const auditDocumentTypeProps = [
         id: AuditDocumentType.other,
         icon: faFile,
         label: 'Other files',  
-        helpText: 'Any other document necesary for the audit',
+        helpText: 'Any other document related to the audit',
         variant: 'dark',
     },
 ];

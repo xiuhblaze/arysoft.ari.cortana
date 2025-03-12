@@ -149,7 +149,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
             <button
                 type="button"
                 className="btn btn-link p-0 mb-0"
-                title={!!id ? 'Edit standard association' : 'Associate standard'}
+                title={!!id ? 'Edit standard associated' : 'Associate an standard'}
                 onClick={onShowModal}
             >
                 <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />

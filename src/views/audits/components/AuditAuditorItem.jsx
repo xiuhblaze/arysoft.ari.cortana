@@ -27,7 +27,7 @@ const AuditAuditorItem = ({ item, readOnly = false, ...props }) => {
                         { 
                             item.StandardsNames.length > 0 
                                 ? item.StandardsNames.join(', ') 
-                                : '(no standards assigned for this audit)' 
+                                : '(no standards assigned for this auditor)' 
                         }
                     </p>
                 </div>

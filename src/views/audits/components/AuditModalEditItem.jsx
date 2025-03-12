@@ -1,5 +1,5 @@
 import { Field, Form, Formik } from "formik";
-import { Col, Modal, Row } from "react-bootstrap";
+import { Alert, Card, Col, Modal, Row } from "react-bootstrap";
 import { useAuditsStore } from "../../../hooks/useAuditsStore";
 import { useEffect, useRef, useState } from "react";
 import { ViewLoading } from "../../../components/Loaders";
@@ -18,6 +18,8 @@ import getISODate from "../../../helpers/getISODate";
 import { faExclamationTriangle, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import AuditDocumentsList from "./AuditDocumentsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import auditStatusProps from "../helpers/auditStatusProps";
+import bgHeadModal from "../../../assets/img/bgWavesWhite.jpg";
 
 const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
@@ -155,10 +157,18 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                         { label: 'Confirmed', value: AuditStatusType.confirmed },
                         { label: 'Canceled', value: AuditStatusType.canceled },
                     ]);
-                    break;                
-                case AuditStatusType.inProgress:
+                    break;
+                
+                case AuditStatusType.inProcess:
                     setStatusOptions([
-                        { label: 'In progress', value: AuditStatusType.inProgress },
+                        { label: 'In process', value: AuditStatusType.inProcess },
+                        { label: 'Canceled', value: AuditStatusType.canceled },
+                    ]);
+                    break;
+                case AuditStatusType.finished:
+                    setStatusOptions([
+                        { label: 'Finished', value: AuditStatusType.finished },
+                        { label: 'Completed', value: AuditStatusType.completed },
                         { label: 'Canceled', value: AuditStatusType.canceled },
                     ]);
                     break;
@@ -188,13 +198,13 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     break;
             } // switch
             
-            if (!organization && !!show) {
-                //console.log('AuditEditItem: loading organization');
+            if (!organization || organization.ID != audit.AuditCycle?.OrganizationID) {
+                console.log('AuditEditItem: loading organization');
                 organizationAsync(audit.AuditCycle.OrganizationID);
             }
             
-            if (!auditCycle && !!show) {
-                //console.log('AuditEditItem: loading audit cycle');
+            if (!auditCycle || auditCycle.ID != audit.AuditCycle.ID) {
+                console.log('AuditEditItem: loading audit cycle');
                 auditCycleAsync(audit.AuditCycle.ID);
             }
             
@@ -257,12 +267,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     };  // onCloseModal
 
     return (
-        <Modal {...props} show={showModal} onHide={ onCloseModal } size="lg">
-            <Modal.Header>
-                <Modal.Title>
-                    { !id ? 'New audit' : 'Edit audit' }
-                </Modal.Title>
-            </Modal.Header>
+        <Modal {...props} show={showModal} onHide={ onCloseModal } 
+            size="xl" 
+            contentClassName="bg-gray-100 border-0 shadow-lg"
+            fullscreen="sm-down"
+        >
             { 
                 isAuditLoading || isAuditCreating || isOrganizationLoading || isAuditCycleLoading ? (
                     <Modal.Body>
@@ -283,98 +292,140 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                             return (
                                 <Form>
                                     <Modal.Body>
-                                        <Row>
-                                            <Col xs="12" sm="5">
-                                                <Row>
-                                                    <Col xs="12">
-                                                        <AuditStandardsList />
-                                                        <Field name="standardsCountHidden" type="hidden" value={ formik.values.standardsCountHidden } />
-                                                        {
-                                                            formik.touched.standardsCountHidden && formik.errors.standardsCountHidden &&
-                                                            <span className="text-danger text-xs">{formik.errors.standardsCountHidden}</span>
-                                                        }
-                                                    </Col>
-                                                    <Col xs="12">
-                                                        <AuditAuditorsList />
-                                                        <Field name="auditorsCountHidden" type="hidden" value={ formik.values.auditorsCountHidden } />
-                                                        {
-                                                            formik.touched.auditorsCountHidden && formik.errors.auditorsCountHidden &&
-                                                            <span className="text-danger text-xs">{formik.errors.auditorsCountHidden}</span>
-                                                        }
-                                                    </Col>
-                                                    <Col xs="12">
-                                                        <AryFormikTextInput
-                                                            name="descriptionInput"
-                                                            label="Audit description"
-                                                        />
-                                                    </Col>
-                                                    <Col xs="12" sm="6">
-                                                        <AryFormikTextInput
-                                                            name="startDateInput"
-                                                            type="date"
-                                                            label="Start date"
-                                                        />
-                                                    </Col>
-                                                    <Col xs="12" sm="6">
-                                                        <AryFormikTextInput
-                                                            name="endDateInput"
-                                                            type="date"
-                                                            label="End date"
-                                                        />
-                                                    </Col>
-                                                    <Col xs="12">
-                                                        <AryFormikSelectInput
-                                                            name="statusSelect"
-                                                            label="Status"
+                                        <div
+                                            className="page-header min-height-150 border-radius-xl"
+                                            style={{
+                                                backgroundImage: `url(${bgHeadModal})`,
+                                                backgroundPositionY: '50%'
+                                            }}
+                                        >
+                                            <h4 className="text-white mx-4 pb-5" style={{ zIndex: 1 }}>Audit</h4>
+                                            <span className={`mask bg-gradient-${auditStatusProps[audit.Status].variant} opacity-6`} />
+                                        </div>                                        
+                                        <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+                                            <Row className="gx-4">
+                                                <Col xs="12" className="d-flex justify-content-between align-items-center">
+                                                    <div className="d-flex align-items-center">
+                                                        <div 
+                                                            className={`icon icon-md icon-shape bg-gradient-${ auditStatusProps[audit.Status].variant } border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`} 
+                                                            title="Lorem ipsum"
+                                                            style={{ minWidth: '48px' }}
                                                         >
-                                                            {
-                                                                !!statusOptions && statusOptions.map(item =>
-                                                                    <option
-                                                                        key={item.value}
-                                                                        value={item.value}
-                                                                    >
-                                                                        {item.label}
-                                                                    </option>
-                                                                )
-                                                            }
-                                                        </AryFormikSelectInput>
-                                                    </Col>
-                                                    <Col xs="12" sm="6">
-                                                        <div className="form-check form-switch mb-3">
-                                                            <input id="hasWitnessCheck" name="hasWitnessCheck"
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                onChange={ formik.handleChange }
-                                                                checked={ formik.values.hasWitnessCheck }
-                                                            />
-                                                            <label 
-                                                                className="form-check-label text-secondary mb-0" 
-                                                                htmlFor="hasWitnessCheck"
-                                                            >
-                                                                Has witness
-                                                            </label>
+                                                            <FontAwesomeIcon icon={ auditStatusProps[audit.Status].icon  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
                                                         </div>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col xs="12" className="d-flex justify-content-end">
-                                                        <button type="submit"
-                                                            className="btn bg-gradient-dark mb-0"
-                                                            disabled={ isAuditSaving || !hasChanges }
-                                                        >
-                                                            {
-                                                                isAuditSaving 
-                                                                    ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
-                                                                    : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
-                                                            }
-                                                            Save
-                                                        </button>
-                                                    </Col>
-                                                </Row>
+                                                        <div className="h-100">
+                                                            <h5 className="flex-wrap mb-1">
+                                                                { organization.Name }
+                                                            </h5>
+                                                            <p className="mb-0 font-weight-bold text-sm">
+                                                                { auditCycle.Name }
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="d-flex align-items-center">
+                                                        <div className={`badge bg-gradient-${auditStatusProps[audit.Status].variant} text-white`}>
+                                                            { auditStatusProps[audit.Status].label }
+                                                        </div>
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                        <Row className="mt-4">
+                                            <Col xs="12" sm="5">
+                                                <Card>
+                                                    <Card.Body className="p-3">
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <AuditStandardsList />
+                                                                <Field name="standardsCountHidden" type="hidden" value={ formik.values.standardsCountHidden } />
+                                                                {
+                                                                    formik.touched.standardsCountHidden && formik.errors.standardsCountHidden &&
+                                                                    <span className="text-danger text-xs">{formik.errors.standardsCountHidden}</span>
+                                                                }
+                                                            </Col>
+                                                            <Col xs="12">
+                                                                <AuditAuditorsList />
+                                                                <Field name="auditorsCountHidden" type="hidden" value={ formik.values.auditorsCountHidden } />
+                                                                {
+                                                                    formik.touched.auditorsCountHidden && formik.errors.auditorsCountHidden &&
+                                                                    <span className="text-danger text-xs">{formik.errors.auditorsCountHidden}</span>
+                                                                }
+                                                            </Col>
+                                                            <Col xs="12">
+                                                                <AryFormikTextInput
+                                                                    name="descriptionInput"
+                                                                    label="Audit description"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <AryFormikTextInput
+                                                                    name="startDateInput"
+                                                                    type="date"
+                                                                    label="Start date"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <AryFormikTextInput
+                                                                    name="endDateInput"
+                                                                    type="date"
+                                                                    label="End date"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="12">
+                                                                <AryFormikSelectInput
+                                                                    name="statusSelect"
+                                                                    label="Status"
+                                                                >
+                                                                    {
+                                                                        !!statusOptions && statusOptions.map(item =>
+                                                                            <option
+                                                                                key={item.value}
+                                                                                value={item.value}
+                                                                            >
+                                                                                {item.label}
+                                                                            </option>
+                                                                        )
+                                                                    }
+                                                                </AryFormikSelectInput>
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <div className="form-check form-switch mb-3">
+                                                                    <input id="hasWitnessCheck" name="hasWitnessCheck"
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        onChange={ formik.handleChange }
+                                                                        checked={ formik.values.hasWitnessCheck }
+                                                                    />
+                                                                    <label 
+                                                                        className="form-check-label text-secondary mb-0" 
+                                                                        htmlFor="hasWitnessCheck"
+                                                                    >
+                                                                        Has witness
+                                                                    </label>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
+                                                        <Row>
+                                                            <Col xs="12" className="d-flex justify-content-end">
+                                                                <button type="submit"
+                                                                    className="btn bg-gradient-dark mb-0"
+                                                                    disabled={ isAuditSaving || !hasChanges }
+                                                                >
+                                                                    {
+                                                                        isAuditSaving 
+                                                                            ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                                            : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                                    }
+                                                                    Save
+                                                                </button>
+                                                            </Col>
+                                                        </Row>
+                                                    </Card.Body>
+                                                </Card>
                                             </Col>
                                             <Col xs="12" sm="7">
                                                 <div className="bg-gray-100 rounded-3 p-2">
-                                                    <h5>Audit documents</h5>
+                                                    <h5>Documents</h5>
                                                     {
                                                         audit.Status == AuditStatusType.nothing &&
                                                         <div className="alert alert-primary">
@@ -411,14 +462,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                 </div>
                                             </Col>
                                         </Row>
-
-                                        {/* <pre className="bg-gray-100 rounded-3 p-3"
-                                            style={{ maxHeight: '40vh', overflowY: 'auto' }}
-                                        >
-                                            <code className="text-xs">
-                                                { JSON.stringify(audit, null, 4) }
-                                            </code>
-                                        </pre> */}
                                     </Modal.Body>
                                     <Modal.Footer>
                                         <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">

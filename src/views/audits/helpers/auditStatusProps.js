@@ -1,4 +1,4 @@
-import { faBan, faCalendar, faCalendarCheck, faCheck, faCheckDouble, faCircleCheck, faClose, faDoorClosed, faFlagCheckered, faLock, faUserGear, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faCalendar, faCalendarCheck, faCalendarPlus, faCheck, faCheckDouble, faCircleCheck, faClose, faDoorClosed, faFlagCheckered, faLock, faUserGear, faXmark } from "@fortawesome/free-solid-svg-icons";
 import enums from "../../../helpers/enums";
 
 const { AuditStatusType } = enums();
@@ -6,9 +6,9 @@ const { AuditStatusType } = enums();
 const auditStatusProps = [
     {
         id: AuditStatusType.nothing,
-        icon: null,
-        label: '-',
-        variant: 'light',
+        icon: faCalendarPlus,
+        label: 'New',
+        variant: 'info',
     },
     {
         id: AuditStatusType.scheduled,
