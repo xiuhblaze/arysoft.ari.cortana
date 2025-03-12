@@ -19,7 +19,7 @@ export const organizationsSlice = createSlice({
         organizationDeletedOk: false,
         organization: null,
 
-        organizationErrorMessage: null,
+        organizationsErrorMessage: null,
     },
     reducers: {
         // Collection
@@ -91,7 +91,7 @@ export const organizationsSlice = createSlice({
             state.organizationSavedOk = false;
             state.isOrganizationDeleting = false;
             state.organizationDeletedOk = false;
-            state.organizationErrorMessage = action.payload;
+            state.organizationsErrorMessage = action.payload;
         }
     }
 });

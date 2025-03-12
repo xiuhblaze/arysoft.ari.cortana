@@ -47,7 +47,7 @@ const OrganizationStandardsCard = ({ readOnly = false, ...props }) => {
                     isOrganizationLoading || isOrganizationStandardsLoading ? (
                         <ViewLoading />
                     ) : !!organization && !!organizationStandards ? (
-                        <ListGroup className="mb-3">
+                        <ListGroup>
                             {
                                 organizationStandards.map(item => (
                                     <OrganizationStandardsCardItem

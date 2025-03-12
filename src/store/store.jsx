@@ -1,12 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-
 import applicationFormClientSlice from "./slices/applicationFormClientSlice";
 import applicationFormsSlice from "./slices/applicationFormsSlice";
+import auditAuditorsSlice from "./slices/auditAuditorsSlice";
+import auditCycleDocumentsSlice from "./slices/auditCycleDocumentsSlice";
+import auditCyclesSlice from "./slices/auditCyclesSlice";
+import auditCycleStandardsSlice from "./slices/auditCycleStandardsSlice";
+import auditDocumentsSlice from "./slices/auditDocumentsSlice";
 import auditorDocumentsSlice from "./slices/auditorDocumentsSlice";
 import auditorsSlice from "./slices/auditorsSlice";
 import auditorStandardsSlice from "./slices/auditorStandardsSlice";
-import authSlice from "./slices/authslice";
+import auditsSlice from "./slices/auditsSlice";
+import auditStandardsSlice from "./slices/auditStandardsSlice";
+import authSlice from "./slices/authSlice";
 import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
 import certificatesSlice from "./slices/certificatesSlice";
 import companiesSlice from "./slices/companiesSlice";
@@ -24,9 +30,16 @@ export const store = configureStore({
     reducer: {
         applicationFormClient: applicationFormClientSlice.reducer,
         applicationForms: applicationFormsSlice.reducer,
+        auditAuditors: auditAuditorsSlice.reducer,
+        auditCycleDocuments: auditCycleDocumentsSlice.reducer,
+        auditCycles: auditCyclesSlice.reducer,
+        auditCycleStandards: auditCycleStandardsSlice.reducer,
+        auditDocuments: auditDocumentsSlice.reducer,
         auditorDocuments: auditorDocumentsSlice.reducer,
         auditors: auditorsSlice.reducer,
         auditorStandards: auditorStandardsSlice.reducer,
+        audits: auditsSlice.reducer,
+        auditStandards: auditStandardsSlice.reducer,
         auth: authSlice.reducer,
         catAuditorDocuments: catAuditorDocumentsSlice.reducer,
         certificates: certificatesSlice.reducer,

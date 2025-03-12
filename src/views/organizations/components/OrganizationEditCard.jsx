@@ -1,27 +1,27 @@
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { Card, Col, Image, ListGroup, Row } from 'react-bootstrap'
 import { faBan, faEdit, faPlus, faRotateRight, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
+import { Field, Form, Formik } from 'formik';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useCompaniesStore } from '../../../hooks/useCompaniesStore';
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { useNotesStore } from '../../../hooks/useNotesStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import * as Yup from 'yup';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import CompaniesList from '../../companies/components/CompaniesList';
 import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
-import Swal from 'sweetalert2';
-import { Field, Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import organizationStatusProps from '../helpers/organizationStatusProps';
-import { useNotesStore } from '../../../hooks/useNotesStore';
 import NotesListModal from '../../notes/components/NotesListModal';
-import { useCompaniesStore } from '../../../hooks/useCompaniesStore';
-import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
-import CompaniesList from '../../companies/components/CompaniesList';
+import organizationStatusProps from '../helpers/organizationStatusProps';
+import Swal from 'sweetalert2';
 
 const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const {
-        COID_REGEX,
         PHONE_REGEX,
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
@@ -29,12 +29,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const { OrganizationStatusType, CompanyOrderType } = enums();
     const formDefaultValues = {
         nameInput: '',
-        // legalEntityInput: '',
         websiteInput: '',
         phoneInput: '',
         logoInputFile: '',
-        // qrcodeInputFile: '',
-        // coidInput: '',
         extraInfoInput: '',
         statusSelect: '',
         noteInput: '',
@@ -44,9 +41,6 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         nameInput: Yup.string()
             .required('Name is required')
             .max(250, 'Name must be at most 250 characters'),
-        // legalEntityInput: Yup.string()
-        //     .required('Legal entity is required')
-        //     .max(250, 'Legal entity must be at most 250 characters'),
         websiteInput: Yup.string()
             .url('Web site must be a valid URL')
             .max(250, 'Web site must be at most 250 characters'),
@@ -55,9 +49,6 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             .matches(PHONE_REGEX, 'Phone number is not valid'),
         extraInfoInput: Yup.string()
             .max(1000, 'Extra info must be at most 1000 characters'),
-        // coidInput: Yup.string()
-        //     .max(20, 'COID number must be at most 20 characters')
-        //     .matches(COID_REGEX, 'COID number is not valid'),
         logoInputFile: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -75,23 +66,6 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                     return true;
                 }
             }),
-        // qrcodeInputFile: Yup.mixed()
-        //     .test({
-        //         name: 'is-type-valid',
-        //         message: 'Some file update error', // <- este solo es visible si el último return es false
-        //         test: (value, ctx) => {
-        //             if (!!value) {
-        //                 const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
-        //                 const validTypes = ['jpg', 'png'];
-        //                 if (!validTypes.includes(extension)) {
-        //                     return ctx.createError({
-        //                         message: 'Only files with png or jpg extensions are allowed'
-        //                     });
-        //                 }
-        //             }
-        //             return true;
-        //         }
-        //     }),
         statusSelect: Yup.string()
             .required('Must select a status'),
         noteInput: Yup.string()
@@ -121,6 +95,11 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     } = useCompaniesStore();
 
     const {
+        auditCycles,
+        auditCycle,
+    } = useAuditCyclesStore();
+
+    const {
         isNoteCreating,
         noteCreatedOk,
         note,
@@ -136,34 +115,37 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [logoPreview, setLogoPreview] = useState(null);
     const [newLogo, setNewLogo] = useState(false);
-    const [qrcodePreview, setQrcodePreview] = useState(null);
-    const [newQRCode, setNewQRCode] = useState(false);
     const [statusOptions, setStatusOptions] = useState(null);
     const [showAddNote, setShowAddNote] = useState(false);
+    const [isApplicant, setIsApplicant] = useState(false);
+    const [saveNote, setSaveNote] = useState(''); 
 
     useEffect(() => {
         if (!!organization) {
             setInitialValues({
                 nameInput: organization?.Name ?? '',
-                // legalEntityInput: organization?.LegalEntity ?? '',
                 websiteInput: organization?.Website ?? '',
                 phoneInput: organization?.Phone ?? '',
-                //coidInput: organization?.COID ?? '',
                 logoInputFile: '',
                 extraInfoInput: organization?.ExtraInfo ?? '',
-                // qrcodeInputFile: '',
-                statusSelect: organization?.Status ?? '',
+                statusSelect: organization.Status == OrganizationStatusType.nothing 
+                    ? OrganizationStatusType.applicant 
+                    : organization?.Status ?? '',
                 noteInput: '',
                 companiesCountHidden: organization?.Companies?.length ?? 0,
             });
 
             setNewLogo(isNullOrEmpty(organization.LogoFile));
-            setNewQRCode(isNullOrEmpty(organization.QRFile));
 
             switch (organization.Status) {
-                case OrganizationStatusType.prospect:
+                case OrganizationStatusType.nothing:
                     setStatusOptions([
-                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Applicant', value: OrganizationStatusType.applicant },
+                    ]);
+                    break;
+                case OrganizationStatusType.applicant:
+                    setStatusOptions([
+                        { label: 'Applicant', value: OrganizationStatusType.applicant },
                         { label: 'Active', value: OrganizationStatusType.active },
                     ]);
                     break;
@@ -188,7 +170,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 default:
                     setStatusOptions([
                         { label: '(status)', value: '' },
-                        { label: 'Prospect', value: OrganizationStatusType.prospect },
+                        { label: 'Applicant', value: OrganizationStatusType.applicant },
                         { label: 'Active', value: OrganizationStatusType.active },
                         { label: 'Inactive', value: OrganizationStatusType.inactive },
                         { label: 'Deleted', value: OrganizationStatusType.deleted },
@@ -196,11 +178,10 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                     break;
             } // switch
 
-            // companiesAsync({
-            //     organizationID: organization.ID,
-            //     pageSize: 0,
-            //     order: CompanyOrderType.name,
-            // });
+            setIsApplicant(
+                organization.Status == OrganizationStatusType.applicant 
+                || organization.Status == OrganizationStatusType.nothing
+            );
         }
     }, [organization]);
 
@@ -213,17 +194,26 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
 
     useEffect(() => {
         if (!!organizationSavedOk) {
-            Swal.fire('Organization', 'Changes made successfully', 'success');
+
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({
+                    OwnerID: organization.ID,
+                    Text: saveNote,
+                });
+                setSaveNote('');
+            }
+
+            Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Changes made successfully', 'success');
             organizationClear();
-            navigate('/organizations/');
+            navigate(isApplicant ? '/applicants/' : '/organizations/');
         }
     }, [organizationSavedOk]);
 
     useEffect(() => {
         if (organizationDeletedOk) {
-            Swal.fire('Organization', 'Record deleted successfully', 'success');
+            Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Record deleted successfully', 'success');
             organizationClear();
-            navigate('/organizations/');
+            navigate(isApplicant ? '/applicants/' : '/organizations/');
         }
     }, [organizationDeletedOk]);
     
@@ -233,25 +223,34 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         const toSave = {
             ID: organization.ID,
             Name: values.nameInput,
-            // LegalEntity: values.legalEntityInput,
             Website: values.websiteInput,
             Phone: values.phoneInput,
             ExtraInfo: values.extraInfoInput,
-            // COID: values.coidInput,
             Status: values.statusSelect,
         };
 
-        //console.log(values);
-
         if (organization.Status != values.statusSelect) {
             const text = "Status changed to " + organizationStatusProps[values.statusSelect].label.toUpperCase();
-            noteCreateAsync({
-                OwnerID: organization.ID,
-                Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,
-            });
+            
+            // if (organization.Status == OrganizationStatusType.applicant 
+            //     && values.statusSelect == OrganizationStatusType.active) {
+            //     console.log('Cambió a activo, validar si ya tiene la documentación necesaria');
+            // }
+
+            setSaveNote(`${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`);
+
+            // noteCreateAsync({
+            //     OwnerID: organization.ID,
+            //     Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,
+            // });
+
+            setIsApplicant(
+                organization.Status == OrganizationStatusType.applicant
+                || organization.Status == OrganizationStatusType.nothing
+            );
         }
 
-        organizationSaveAsync(toSave, values.logoInputFile, values.qrcodeInputFile);
+        organizationSaveAsync(toSave, values.logoInputFile);
     }; // onFormSubmit
 
     const onCancelButton = () => {
@@ -283,7 +282,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             <Card.Header className="pb-0">
                 <Card.Title>
                     <FontAwesomeIcon icon={ faEdit } size="lg" className="text-dark me-2" />
-                    Edit organization
+                    Edit { isApplicant ? 'applicant' : 'organization' }
                 </Card.Title>
             </Card.Header>
             <Formik

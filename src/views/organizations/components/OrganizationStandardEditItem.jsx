@@ -21,9 +21,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
         StandardOrderType,
     } = enums();
 
-    const  formDefaultValues = {
+    const formDefaultValues = {
         standardSelect: '',
-        //crnInput: '',
         extraInfoInput: '',
         statusCheck: false,
     };
@@ -31,8 +30,6 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
             .required('Must select a standard'),
-        //crnInput: Yup.string()
-        //    .max(10, 'Certificate Registration Number must be at most 10 characters'),
         extraInfoInput: Yup.string()
             .max(1000, 'Extra Info must be at most 1000 characters'),
     });
@@ -75,8 +72,9 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
             setInitialValues({
                 standardSelect: organizationStandard?.StandardID ?? '',
                 extraInfoInput: organizationStandard?.ExtraInfo ?? '',
-                //crnInput: organizationStandard?.CRN ?? '',
-                statusCheck: organizationStandard.Status === DefaultStatusType.active,
+                statusCheck: 
+                    organizationStandard.Status === DefaultStatusType.active
+                    || organizationStandard.Status === DefaultStatusType.nothing,
             });
 
             standardsAsync({

@@ -26,7 +26,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const CONTACT_URI = '/contacts';
+const CONTACT_URL = '/contacts';
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -92,7 +92,7 @@ export const useContactsStore = () => {
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${CONTACT_URI}${query}`);
+            const resp = await cortanaApi.get(`${CONTACT_URL}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setContacts({
@@ -123,7 +123,7 @@ export const useContactsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${CONTACT_URI}/${id}`);
+            const resp = await cortanaApi.get(`${CONTACT_URL}/${id}`);
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -146,7 +146,7 @@ export const useContactsStore = () => {
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(CONTACT_URI, params);
+            const resp = await cortanaApi.post(CONTACT_URL, params);
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -169,7 +169,7 @@ export const useContactsStore = () => {
     //         UpdatedUser: user.username,
     //     }
     //     try {
-    //         const resp = await cortanaApi.put(`${CONTACT_URI}/${toSave.ID}`, toSave);
+    //         const resp = await cortanaApi.put(`${CONTACT_URL}/${toSave.ID}`, toSave);
     //         const { Data } = await resp.data;
 
     //         dispatch(setContact(Data));
@@ -198,7 +198,7 @@ export const useContactsStore = () => {
             formData.append('data', data);
             formData.append('file', file);
 
-            const resp = await cortanaApi.put(`${CONTACT_URI}`, formData, { headers });
+            const resp = await cortanaApi.put(`${CONTACT_URL}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setContact(Data));
@@ -223,7 +223,7 @@ export const useContactsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${CONTACT_URI}/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${CONTACT_URL}/${id}`, { data: toDelete });
 
             console.log('contactDeleteAsync.resp', resp);
 
@@ -242,7 +242,7 @@ export const useContactsStore = () => {
         };
 
         try {
-            const resp = await cortanaApi.delete(`${CONTACT_URI}/${id}/photofile`, { data: toDeleteFile });
+            const resp = await cortanaApi.delete(`${CONTACT_URL}/${id}/photofile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
             console.log('contactDeleteFileAsync.Data', Data)

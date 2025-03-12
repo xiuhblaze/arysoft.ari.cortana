@@ -13,7 +13,7 @@ import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 
-const OrganizationsToolbar = () => {
+const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     const formDefaultData = {
         folioInput: '',
         textInput: '',
@@ -29,6 +29,7 @@ const OrganizationsToolbar = () => {
         StandardOrderType,
     } = enums();
     const {
+        APPLICANTS_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         VITE_PAGE_SIZE
     } = envVariables();
@@ -37,6 +38,10 @@ const OrganizationsToolbar = () => {
         BUTTON_SEARCH_CLASS,
         BUTTON_CLEAR_SEARCH_CLASS,
     } = defaultCSSClasses();
+
+    const SEARCH_OPTIONS = applicantsOnly
+        ? APPLICANTS_OPTIONS
+        : ORGANIZATIONS_OPTIONS;
 
     // CUSTOM HOOKS
 
@@ -58,9 +63,10 @@ const OrganizationsToolbar = () => {
     const navigate = useNavigate();
 
     const [initialValues, setInitialValues] = useState(formDefaultData);
+    const [statusOptions, setStatusOptions] = useState(null);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
@@ -68,7 +74,9 @@ const OrganizationsToolbar = () => {
                 textInput: savedSearch.text ?? '',
                 standardSelect: savedSearch.standardID ?? '',
                 certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
-                statusSelect: savedSearch.status ?? '',
+                statusSelect: applicantsOnly
+                    ? OrganizationStatusType.applicant
+                    : savedSearch.status ?? '',
                 includeDeletedCheck: savedSearch.includeDeleted ?? false,
             });
         }
@@ -78,11 +86,24 @@ const OrganizationsToolbar = () => {
             includeDeleted: false,
             order: StandardOrderType.name,
         });
+
+        if (applicantsOnly) {
+            setStatusOptions([
+                { label: 'Applicant', value: OrganizationStatusType.applicant },
+            ]);
+        } else {
+            setStatusOptions([
+                { label: '(status)', value: '' },
+                { label: 'Active', value: OrganizationStatusType.active },
+                { label: 'Inactive', value: OrganizationStatusType.inactive },
+                // { label: 'Deleted', value: OrganizationStatusType.deleted },
+            ]);
+        }
     }, []);
 
     useEffect(() => {
-        if (organizationCreatedOk) {
-            navigate(`/organizations/${organization.ID}`);
+        if (organizationCreatedOk) {            
+            navigate(`/applicants/${organization.ID}`);
         }
     }, [organizationCreatedOk]);
 
@@ -93,7 +114,7 @@ const OrganizationsToolbar = () => {
     };
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
         const search = {
             ...savedSearch,
             folio: values.folioInput,
@@ -106,11 +127,11 @@ const OrganizationsToolbar = () => {
         };
 
         organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
     };
 
     const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
         const search = {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
@@ -120,22 +141,25 @@ const OrganizationsToolbar = () => {
 
         setInitialValues(formDefaultData);
         organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
     };
 
     return (
-        <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
-            <div>
-                <button
-                    className={ BUTTON_ADD_CLASS }
-                    onClick={onNewItem}
-                    title="New organization"
-                    disabled={isOrganizationCreating}
-                >
-                    <FontAwesomeIcon icon={faPlus} className="me-1" />
-                    Add
-                </button>
-            </div>
+        <div {...props} className="d-flex flex-column flex-md-row justify-content-between gap-2">
+            {
+                applicantsOnly &&
+                <div>
+                    <button
+                        className={ BUTTON_ADD_CLASS }
+                        onClick={onNewItem}
+                        title="New applicant"
+                        disabled={isOrganizationCreating}
+                    >
+                        <FontAwesomeIcon icon={faPlus} className="me-1" />
+                        Add
+                    </button>
+                </div>
+            }
             <div className="flex-fill">
                 <Formik
                     initialValues={initialValues}
@@ -177,22 +201,42 @@ const OrganizationsToolbar = () => {
                                                 }
                                             </AryFormikSelectInput>
                                         </div>
-                                        <div className="col-12 col-sm-3 col-xxl-2">
-                                            <AryFormikSelectInput name="certificatesValidityStatusSelect">
-                                                {
-                                                    Object.keys(CertificatesValidityStatusType).map(key =>
-                                                        <option
-                                                            key={key}
-                                                            value={CertificatesValidityStatusType[key]}
-                                                            className="text-capitalize"
-                                                        >
-                                                            {key === 'nothing' ? '(certificates validity)' : certificateValidityStatusProps[CertificatesValidityStatusType[key]].label}
-                                                        </option>
-                                                    )}
-                                            </AryFormikSelectInput>
-                                        </div>
+                                        {
+                                            !applicantsOnly &&
+                                            <div className="col-12 col-sm-3 col-xxl-2">
+                                                <AryFormikSelectInput name="certificatesValidityStatusSelect">
+                                                    {
+                                                        Object.keys(CertificatesValidityStatusType).map(key =>
+                                                            <option
+                                                                key={key}
+                                                                value={CertificatesValidityStatusType[key]}
+                                                                className="text-capitalize"
+                                                            >
+                                                                {key === 'nothing' ? '(certificates validity)' : certificateValidityStatusProps[CertificatesValidityStatusType[key]].label}
+                                                            </option>
+                                                        )}
+                                                </AryFormikSelectInput>
+                                            </div>
+                                        }
                                         <div className="col-12 col-sm-auto">
-                                            <AryFormikSelectInput name="statusSelect">
+                                            <AryFormikSelectInput
+                                                name="statusSelect"
+                                                onChange={ (e) => {
+                                                    const selectedValue = e.target.value;
+                                                    formik.setFieldValue('statusSelect', selectedValue);                                                    
+                                                }}
+                                                disabled={!!applicantsOnly}
+                                            >
+                                                { !!statusOptions && statusOptions.map(item =>
+                                                    <option
+                                                        key={item.value}
+                                                        value={item.value}
+                                                    >
+                                                        {item.label}
+                                                    </option>
+                                                )}
+                                            </AryFormikSelectInput>
+                                            {/* <AryFormikSelectInput name="statusSelect">
                                                 {
                                                     Object.keys(OrganizationStatusType).map(key =>
                                                         <option
@@ -203,7 +247,7 @@ const OrganizationsToolbar = () => {
                                                             {key === 'nothing' ? '(status)' : key}
                                                         </option>
                                                     )}
-                                            </AryFormikSelectInput>
+                                            </AryFormikSelectInput> */}
                                         </div>
                                         <div className="col-auto ps-sm-0">
                                             <div className="p-2 bg-gray-100 border-radius-md mb-3">

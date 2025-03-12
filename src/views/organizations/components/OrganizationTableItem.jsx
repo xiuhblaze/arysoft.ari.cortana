@@ -11,7 +11,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Status from './Status';
 import organizationStatusProps from '../helpers/organizationStatusProps';
 
-const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hideActions = false, ...props }) => {
+const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
     
     const {
         URL_ORGANIZATION_FILES,
@@ -26,7 +26,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
         ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}`
         : defaultPhoto;
 
-    const myClassName = item.Status != OrganizationStatusType.active
+    const myClassName = item.Status != OrganizationStatusType.active && item.Status != OrganizationStatusType.applicant
         ? !!className 
             ? `${className} table-${ organizationStatusProps[item.Status].bgColor } ${ organizationStatusProps[item.Status].className }` 
             : `table-${organizationStatusProps[item.Status].bgColor} ${ organizationStatusProps[item.Status].className }`
@@ -157,15 +157,15 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
             </td>
             <td>
                 <div className="d-flex justify-content-center align-items-center gap-1">
-                    <FontAwesomeIcon
+                    {/* <FontAwesomeIcon
                         icon={ certificateValidityStatusProps[item.CertificatesValidityStatus].icon }
                         className={ `text-${certificateValidityStatusProps[item.CertificatesValidityStatus].variant}` }
                         size="lg"
                         title={ certificateValidityStatusProps[item.CertificatesValidityStatus].label }
-                    />
+                    /> */}
                     {
                         !!item.Standards &&
-                        <div className="d-flex flex-wrap text-xs gap-1 mb-0">
+                        <div className="d-flex justify-content-center align-items-center flex-wrap text-xs gap-1 mb-0">
                             {
                                 item.Standards.map(i => (
                                     <div key={i.ID} className={`badge bg-gradient-${i.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-white me-1`}>
@@ -182,21 +182,16 @@ const OrganizationTableItem = ({ item, className, onShowModal, onShowQRModal, hi
                     <Status value={ item.Status } />
                 </div>
             </td>
-            {
-                !hideActions && 
-                <td>
-                    <div className="d-flex justify-content-center gap-2">
-                        <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                            <FontAwesomeIcon icon={faClone} />
-                        </a>
-                        {item.Status !== OrganizationStatusType.deleted && (
-                            <Link to={`${item.ID}`} title="Edit">
-                                <FontAwesomeIcon icon={faEdit} />
-                            </Link>
-                        )}
-                    </div>
-                </td>
-            }
+            <td>
+                <div className="d-flex justify-content-center mx-3 gap-2">
+                    {/* <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
+                        <FontAwesomeIcon icon={faClone} />
+                    </a> */}
+                    <Link to={`${item.ID}`} title="Edit" className="text-dark">
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Link>
+                </div>
+            </td>
         </tr>
     );
 } // OrganizationTableItem

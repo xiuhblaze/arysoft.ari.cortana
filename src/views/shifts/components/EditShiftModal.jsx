@@ -15,8 +15,8 @@ import * as Yup from 'yup';
 import envVariables from '../../../helpers/envVariables';
 
 const EditShiftModal = ({ id, ...props }) => {
-    const NEW_ITEM = 'shift.new';
-    const UPDATE_ITEM = 'shift.update';
+    // const NEW_ITEM = 'shift.new';
+    // const UPDATE_ITEM = 'shift.update';
     const {
         DefaultStatusType,
         ShiftOrderType,
@@ -27,7 +27,7 @@ const EditShiftModal = ({ id, ...props }) => {
     } = envVariables();
 
     const formDefaultValues = {
-        typeSelect: '',
+        typeSelect: ShiftType.nothing,
         noEmployeesInput: '',
         activitiesDescriptionInput: '',
         shiftStartInput: '',
@@ -39,7 +39,7 @@ const EditShiftModal = ({ id, ...props }) => {
     };
     const validationSchema = Yup.object({
         typeSelect: Yup.string()
-            .required('Mus select a shift type'),
+            .required('Must select a shift type'),
         noEmployeesInput: Yup.number()
             .typeError('Must be a number')
             .min(0, 'Must be zero or greater')
@@ -93,7 +93,7 @@ const EditShiftModal = ({ id, ...props }) => {
     useEffect(() => {
         if (!!shift && showModal) {
             setInitialValues({
-                typeSelect: shift?.Type ?? '',
+                typeSelect: shift?.Type ?? ShiftType.nothing,
                 noEmployeesInput: shift?.NoEmployees ?? '',
                 activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
                 shiftStartInput: shift?.ShiftStart ? shift?.ShiftStart.slice(0, 5) : '',
@@ -101,10 +101,11 @@ const EditShiftModal = ({ id, ...props }) => {
                 shiftStart2Input: shift?.ShiftStart2 ? shift?.ShiftStart2.slice(0, 5) : '',
                 shiftEnd2Input: shift?.ShiftEnd2 ? shift?.ShiftEnd2.slice(0, 5) : '',
                 extraInfoInput: shift?.ExtraInfo ?? '',
-                statusCheck: shift?.Status === DefaultStatusType.active,
+                statusCheck: shift.Status == DefaultStatusType.active
+                    || shift.Status == DefaultStatusType.nothing,
             });
 
-            setShowSecondShift(shift?.ShiftStart2 && shift?.ShiftEnd2);
+            setShowSecondShift(shift.ShiftStart2 && shift.ShiftEnd2);
             //setActiveShift(shift?.Status === DefaultStatusType.active);
         }
     }, [shift]);
@@ -135,20 +136,21 @@ const EditShiftModal = ({ id, ...props }) => {
         setShowModal(true);
         
         if (!!id) {
-            setCurrentAction(UPDATE_ITEM);
+            //setCurrentAction(UPDATE_ITEM);
             shiftAsync(id);
         } else {
             shiftCreateAsync({
                 SiteID: site.ID,
             });
-            setCurrentAction(NEW_ITEM);
+            //setCurrentAction(NEW_ITEM);
         }
     }; // onShowModal
 
     const onCloseModal = () => {
         // shiftClear();
         setShowModal(false);
-        setCurrentAction(null);
+        //setCurrentAction(null);
+        setShowSecondShift(false);
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
@@ -186,11 +188,11 @@ const EditShiftModal = ({ id, ...props }) => {
                         {
                             !!shift && showModal && <>
                                 <FontAwesomeIcon 
-                                    icon={ currentAction === UPDATE_ITEM ? faEdit : faSquarePlus }
+                                    icon={ !!id ? faEdit : faSquarePlus }
                                     size="lg"
                                     className="px-3"
                                 />
-                                { currentAction === UPDATE_ITEM ? 'Edit shift' : 'Add shift' }
+                                { !!id ? 'Edit shift' : 'Add shift' }
                             </>
                         }
                     </Modal.Title>
@@ -261,7 +263,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                         <Row>
                                             <Col xs="12">
                                                 <div className="form-check form-switch">
-                                                    <input id="showSecondShiftCheck" name="showSecondShiftCheck"
+                                                    <input id="showSecondShiftCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
                                                         onChange={ (e) => {
@@ -284,7 +286,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                             ref={ secondShiftRef }
                                             style={{
                                                 maxHeight: showSecondShift
-                                                    ? `${secondShiftRef.current.scrollHeight}px`
+                                                    ? `${secondShiftRef?.current?.scrollHeight ?? 0}px`
                                                     : '0px',
                                                 overflow: 'hidden',
                                                 transition: 'max-height 0.5s ease-in-out',
@@ -339,12 +341,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-center w-100">
                                         <div className="text-secondary">
-                                            {
-                                                !!shift && 
-                                                <AryLastUpdatedInfo
-                                                    item={ shift }
-                                                />
-                                            }
+                                            <AryLastUpdatedInfo item={ shift } />
                                         </div>
                                         <div className="d-flex justify-content-end gap-2">
                                             <button type="submit"

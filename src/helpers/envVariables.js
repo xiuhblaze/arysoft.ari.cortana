@@ -1,8 +1,10 @@
 const envVariables = () => {
+    const APPLICANTS_OPTIONS = 'arysoft-ari-applicantsOptions';
     const APPLICATION_FORM_OPTIONS = 'arysoft-ari-applicationFormOptions';
     const AUDITORS_OPTIONS = 'arysoft-ari-auditorsOptions';
     const CATAUDITORDOCUMENTS_OPTIONS = 'arysoft-ari-catAuditorDocumentsOptions';
     const CONTACTS_OPTIONS = 'arysoft-ari-contactsOptions';
+    const DASHBOARD_OPTIONS = 'arysoft-ari-dashboardOptions';
     const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
     const ORGANIZATIONS_OPTIONS = 'arysoft-ari-organizationsOptions';
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
@@ -17,9 +19,11 @@ const envVariables = () => {
     const URL_CONTACTS_FILES = '/contacts';
     const URL_ORGANIZATION_FILES = '/organizations';
 
+    const COMMENTS_SMALL_MAX_LENGTH = 15;
+
     return {
         ...import.meta.env,
-
+        
         URL_APPLICATIONFORMS,
         URL_AUDITOR_FILES,
         URL_CONTACTS_FILES,
@@ -29,13 +33,17 @@ const envVariables = () => {
         HOUR24_REGEX,
         PHONE_REGEX,
 
+        APPLICANTS_OPTIONS,
         APPLICATION_FORM_OPTIONS,
         AUDITORS_OPTIONS,
         CATAUDITORDOCUMENTS_OPTIONS,
         CONTACTS_OPTIONS,
+        DASHBOARD_OPTIONS,
         NACECODES_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         STANDARDS_OPTIONS,
+
+        COMMENTS_SMALL_MAX_LENGTH,
     }
 };
 

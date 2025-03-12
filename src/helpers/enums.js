@@ -42,6 +42,85 @@ const enums = () => {
         createdDesc: 4,
     });
 
+    // Audits cycles
+
+    const AuditCycleType = Object.freeze({
+        nothing: 0,
+        initial: 1,
+        recertification : 2,
+        transfer: 3,
+    });
+
+    const AuditCycleStandardsOrderType = Object.freeze({
+        nothing: 0,
+        standard: 1,
+        standardDesc: 2,
+    });
+
+    const AuditCycleDocumentType = Object.freeze({
+        nothing: 0,
+        appForm: 1,        // Application form
+        acd: 2,            // Audit day calculation
+        proposal: 3,
+        contract: 4,
+        auditProgramme: 5, // Confirmation letter
+        //cdc: 6,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
+        certificate: 6,
+        survey: 7,
+        other: 8,          // Cualquier otro documento de interés
+        audit: 9,
+    });
+
+    // Audits
+
+    const AuditStepType = Object.freeze({
+        nothing: 0,
+        stage1: 1,
+        stage2: 2,
+        survey1: 3,
+        survey2: 4,
+        recertification: 5,
+        transfer: 6,
+        special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+    });
+
+    const AuditDocumentType = Object.freeze({
+        nothing: 0,
+        auditPlan: 1,
+        oacm: 2,                // Opening and closing meeting
+        auditReport: 3,
+        fsscIntegrityLetter: 4, // Solo para FSSC
+        fsscAuditPlanSigned: 5, // Solo para FSSC
+        actionPlan: 6,          // Action plan & evidence
+        ncCloseReport: 7,       // Non conformities close report
+        techReport: 8,          // No for FSSC
+        cdc: 9,                 // Certification decision checklist - TODO: Aqui se queda
+        fsscScreenShot: 10,     // Solo para FSSC
+        travelExpenses: 11,     // Viaticos
+        witnessReport: 12,      // Reporte de testigos
+        other: 13,
+    });
+
+    const AuditStatusType = Object.freeze({
+        nothing: 0,
+        scheduled: 1,  // Agendada - Aun no llega su fecha de ejecución, permite subir documentos
+        confirmed: 2,  // Confirmada - El cliente ya confirmo la fecha y los auditores, estan en linea los documentos requeridos
+        inProcess: 3,  // En proceso - La auditoria esta dentro de las fechas de ejecución
+        finished: 4,   // Terminado - Posterior a la fecha de auditoria, es necesario subir la documentación requerida
+        completed: 5,  // Completed - Indica que toda la documentación ha sido cubierta
+        closed: 6,     // Closed - Audioria terminada, ya no se puede actualizar información 
+        canceled: 7,   // Cancelada - En cualquier Status la auditoria puede ser cancelada, es necesario indicar la razón
+        deleted: 8     // Eliminada - Registro eliminado logicamente, solo para administradores
+    });
+
+    const AuditOrderType = Object.freeze({
+        nothing: 0,
+        date: 1,
+        status: 2,
+        dateDesc: 3,
+        statusDesc: 4,
+    });
+
     // Auditors
 
     const AuditorStandardOrderType = Object.freeze({
@@ -212,7 +291,7 @@ const enums = () => {
 
     const OrganizationStatusType = Object.freeze({
         nothing: 0,
-        prospect: 1,
+        applicant: 1,
         active: 2,
         inactive: 3,
         deleted: 4,
@@ -307,6 +386,13 @@ const enums = () => {
 
         ApplicationFormOrderType,
         ApplicationFormStatusType,
+        AuditCycleStandardsOrderType,
+        AuditCycleType,
+        AuditCycleDocumentType,
+        AuditDocumentType,
+        AuditStepType,
+        AuditOrderType,
+        AuditStatusType,
         AuditorDocumentOrderType,
         AuditorDocumentRequiredType,
         AuditorDocumentType,

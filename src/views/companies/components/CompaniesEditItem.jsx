@@ -71,7 +71,8 @@ const CompaniesEditItem = ({ id, ...props }) => {
                 nameInput: company?.Name ?? '',
                 legalEntityInput: company?.LegalEntity ?? '',
                 coidInput: company?.COID ?? '',
-                statusCheck: company?.Status === DefaultStatusType.active,
+                statusCheck: company?.Status == DefaultStatusType.active
+                    || company?.Status == DefaultStatusType.nothing
             });
         }
     }, [company]);

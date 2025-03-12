@@ -7,10 +7,10 @@ const organizationStatusProps = [
         variant: 'light',
     },
     { 
-        bgColor: 'warning',
-        label: 'Prospect',
+        bgColor: 'primary',
+        label: 'Applicant',
         className: '',
-        variant: 'warning',
+        variant: 'primary',
     },
     {
         bgColor: 'info',

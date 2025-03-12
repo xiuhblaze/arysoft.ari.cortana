@@ -76,7 +76,7 @@ export const useOrganizationsStore = () => {
 
     // Methods
 
-    const setError = (value) => {    
+    const setError = (value) => {
         if (isString(value)) {
             dispatch(setOrganizationsErrorMessage(value));    
         } else if (isString(value.message)) {
@@ -196,9 +196,8 @@ export const useOrganizationsStore = () => {
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
      * @param {Name, LegalEntity, Website, Phone, COID, Status, UpdatedUser} item Objeto tipo Organization
      * @param {File} logoFile 
-     * @param {File} qrFile 
      */
-    const organizationSaveAsync = async (item, logoFile, qrFile) => {
+    const organizationSaveAsync = async (item, logoFile) => {
         dispatch(onOrganizationSaving());
 
         const toSave = {
@@ -219,10 +218,10 @@ export const useOrganizationsStore = () => {
                 const renamedFile = renameFile(logoFile, 'logotype');
                 formData.append('LogoFile', renamedFile);
             }
-            if (!!qrFile) {
-                const renamedFile = renameFile(qrFile, 'qrcode');
-                formData.append('QRFile', renamedFile);
-            }
+            // if (!!qrFile) {
+            //     const renamedFile = renameFile(qrFile, 'qrcode');
+            //     formData.append('QRFile', renamedFile);
+            // }
 
             const resp = await cortanaApi.put(`${ORGANIZATIONS_ROUTE}`, formData, { headers });
             const { Data } = await resp.data;
