@@ -14,12 +14,22 @@ import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 export const ToolbarForm = () => {
     const { DefaultStatusType, NacecodeOrderType } = enums();
     const { NACECODES_OPTIONS, VITE_PAGE_SIZE } = envVariables();
-
     const {
         BUTTON_ADD_CLASS,
         BUTTON_SEARCH_CLASS,
         BUTTON_CLEAR_SEARCH_CLASS,
     } = defaultCSSClasses();
+
+    const formDefaultData = {
+        textInput: '',
+        sectorInput: '',
+        divisionInput: '',
+        groupInput: '',
+        classInput: '',
+        onlySelect: '',
+        statusSelect: '',
+        includeDeletedCheck: false,
+    };
 
     // CUSTOM HOOKS
 
@@ -31,17 +41,18 @@ export const ToolbarForm = () => {
     
     // HOOKS
     
-    const [initialValues, setInitialValues] = useState({
-        textInput: '',
-        statusSelect: '',
-        includeDeletedCheck: false,
-    })
+    const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch?.text ?? '',
+                sectorInput: savedSearch?.sector ?? '',
+                divisionInput: savedSearch?.division ?? '',
+                groupInput: savedSearch?.group ?? '',
+                classInput: savedSearch?.class ?? '',
+                onlySelect: savedSearch?.onlyOption ?? '',
                 statusSelect: savedSearch?.status ?? '',
                 includeDeletedCheck: savedSearch?.includeDeleted ?? false,
             });
@@ -59,6 +70,11 @@ export const ToolbarForm = () => {
         const search = {
             ...savedSearch,
             text: values.textInput,
+            sector: values.sectorInput,
+            division: values.divisionInput,
+            group: values.groupInput,
+            class: values.classInput,
+            onlyOption: values.onlySelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
@@ -66,11 +82,9 @@ export const ToolbarForm = () => {
 
         nacecodesAsync(search);
         localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    };
+    }; // onSearchSubmit
 
-    const onCleanSearch = (e) => {
-        e.preventDefault();
-
+    const onCleanSearch = () => {
         const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         const search = {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
@@ -79,15 +93,10 @@ export const ToolbarForm = () => {
             order: NacecodeOrderType.sector,
         };
 
-        setInitialValues({
-            textInput: '',
-            statusSelect: '',
-            includeDeletedCheck: false,
-        });
-
+        setInitialValues(formDefaultData);
         nacecodesAsync(search);
         localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    };
+    }; // onCleanSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -114,13 +123,54 @@ export const ToolbarForm = () => {
                                 <div className="flex-md-grow-1 me-md-3">
                                     <div className="row d-flex justify-content-end">
                                         <div className="col-12 col-sm-auto">
-                                            <AryFormikTextInput name="textInput" type="text" />
+                                            <AryFormikTextInput 
+                                                name="textInput"
+                                                type="text"
+                                                placeholder="search..."
+                                            />
+                                        </div>
+                                        <div className="col-3 col-sm-1 ps-sm-0">
+                                            <AryFormikTextInput 
+                                                name="sectorInput" 
+                                                type="text"
+                                                placeholder="sector" 
+                                            />
+                                        </div>
+                                        <div className="col-3 col-sm-1 ps-sm-0">
+                                            <AryFormikTextInput 
+                                                name="divisionInput" 
+                                                type="text"
+                                                placeholder="division" 
+                                            />
+                                        </div>
+                                        <div className="col-3 col-sm-1 ps-sm-0">
+                                            <AryFormikTextInput 
+                                                name="groupInput" 
+                                                type="text"
+                                                placeholder="group" 
+                                            />
+                                        </div>
+                                        <div className="col-3 col-sm-1 ps-sm-0">
+                                            <AryFormikTextInput 
+                                                name="classInput" 
+                                                type="text"
+                                                placeholder="class" 
+                                            />
+                                        </div>
+                                        <div className="col-12 col-sm-auto ps-sm-0">
+                                            <AryFormikSelectInput name="onlySelect">
+                                                <option value="">(only)</option>
+                                                <option value="sectors">Only sectors</option>
+                                                <option value="divisions">Only divisions</option>
+                                                <option value="groups">Only groups</option>
+                                                <option value="classes">Only classes</option>
+                                            </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto ps-sm-0">
                                             <AryFormikSelectInput name="statusSelect">
                                                 {
                                                     Object.keys(DefaultStatusType).map((key) => {
-                                                        if (key === 'nothing') return (<option key={key} value={DefaultStatusType[key]}>(all)</option>);
+                                                        if (key === 'nothing') return (<option key={key} value={DefaultStatusType[key]}>(status)</option>);
                                                         return (<option key={key} value={DefaultStatusType[key]} className="text-capitalize">{key}</option>);
                                                     })}
                                             </AryFormikSelectInput>
