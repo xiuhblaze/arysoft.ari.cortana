@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCaretDown, faCaretUp, faClone, faEdit, faEnvelope, faGlobe, faPhone, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
-import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import { ViewLoading } from "../../../components/Loaders";
 
-import Status from "./Status";
 import DetailsModal from "./DetailsModal";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import AryTableSortIcon from "../../../components/AryTableSortIcon/AryTableSortIcon";
 import OrganizationTableItem from "./OrganizationTableItem";
-import { Modal } from "react-bootstrap";
 
 const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) => {
     return (
@@ -36,12 +31,14 @@ const SortItem = ({ activeAsc, activeDesc, onOrderAsc, onOrderDesc, ...props }) 
 
 const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
-    const { OrganizationStatusType, OrganizationOrderType } = enums();
+    const { OrganizationOrderType } = enums();
     const { 
         ORGANIZATIONS_OPTIONS,
-        VITE_FILES_URL,
-        URL_ORGANIZATION_FILES,
+        APPLICANTS_OPTIONS,
      } = envVariables();
+     const SEARCH_OPTIONS = applicantsOnly
+        ? APPLICANTS_OPTIONS
+        : ORGANIZATIONS_OPTIONS;
     
     // CUSTOM HOOKS
     
@@ -55,13 +52,11 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
     // HOOKS
     
     const [showModal, setShowModal] = useState(false);
-    // const [showQRModal, setShowQRModal] = useState(false);
-    // const [qrValues, setQRValues] = useState(null);
-    const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
+        const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
 
     useEffect(() => {
         if (!!organizations) {
-            const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+            const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
             setCurrentOrder(savedSearch?.order ?? OrganizationOrderType.name);
         }
     }, [organizations]);
@@ -77,24 +72,15 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
         setShowModal(false);
     };
 
-    // const onShowQRModal = (values) => {
-    //     setQRValues(values);
-    //     setShowQRModal(true);
-    // }
-
-    // const onCloseQRModal = () => {
-    //     setShowQRModal(false);
-    // };
-
     const onClickOrderList = (order = OrganizationOrderType.name) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
         const search = {
             ...savedSearch,
             order: order
         }
 
         organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
     };
 
     return (
@@ -132,21 +118,10 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                                         </div>
                                     </div>
                                 </th>
-                                {/* <th className={headStyle}>Legal entity</th> */}
                                 <th className={headStyle}>Info</th>
                                 <th className={headStyle}>Contact</th>
                                 <th className={headStyle}>Sites</th>
-                                <th className="d-flex justify-content-center align-items-center gap-1">
-                                    {/* <SortItem
-                                        activeAsc={currentOrder === OrganizationOrderType.certificatesValidityStatus}
-                                        activeDesc={currentOrder === OrganizationOrderType.certificatesValidityStatusDesc}
-                                        onOrderAsc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatus) }}
-                                        onOrderDesc={() => { onClickOrderList(OrganizationOrderType.certificatesValidityStatusDesc) }}
-                                    /> */}
-                                    <div className={headStyle}>
-                                        Standards
-                                    </div>
-                                </th>
+                                <th className={headStyle}>Standards</th>
                                 <th>
                                     <div className="d-flex justify-content-center align-items-center gap-1">
                                         <SortItem
