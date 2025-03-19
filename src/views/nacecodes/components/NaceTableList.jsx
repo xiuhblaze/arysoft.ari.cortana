@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { Spinner } from "react-bootstrap";
 
@@ -15,7 +15,7 @@ import DetailsModal from "./DetailsModal";
 import { Link } from "react-router-dom";
 import { ViewLoading } from "../../../components/Loaders";
 
-export const NaceTableList = () => {
+export const NaceTableList = memo(() => {
   const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder';
   const { NacecodeOrderType, DefaultStatusType } = enums();
   const [showModal, setShowModal] = useState(false);
@@ -99,6 +99,6 @@ export const NaceTableList = () => {
     <DetailsModal show={ showModal } onHide={ onCloseModal } />
     </>
   )
-}
+});
 
 export default NaceTableList;

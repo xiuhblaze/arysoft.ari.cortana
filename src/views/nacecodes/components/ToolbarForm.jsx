@@ -10,6 +10,7 @@ import enums from "../../../helpers/enums";
 import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import debounce from "lodash.debounce";
 
 export const ToolbarForm = () => {
     const { DefaultStatusType, NacecodeOrderType } = enums();
@@ -61,11 +62,7 @@ export const ToolbarForm = () => {
 
     // METHODS
 
-    const onNewItem = () => {
-        nacecodeCreateAsync();
-    };
-
-    const onSearchSubmit = (values) => {
+    const sendSearch = (values) => {
         const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         const search = {
             ...savedSearch,
@@ -82,6 +79,35 @@ export const ToolbarForm = () => {
 
         nacecodesAsync(search);
         localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
+    }; // sendSearch
+
+    const debouncedSearch = debounce(sendSearch, 500, {
+        leading: true,
+        trailing: false,
+    });
+     
+    const onNewItem = () => {
+        nacecodeCreateAsync();
+    };
+
+    const onSearchSubmit = (values) => {
+        debouncedSearch(values);
+        // const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
+        // const search = {
+        //     ...savedSearch,
+        //     text: values.textInput,
+        //     sector: values.sectorInput,
+        //     division: values.divisionInput,
+        //     group: values.groupInput,
+        //     class: values.classInput,
+        //     onlyOption: values.onlySelect,
+        //     status: values.statusSelect,
+        //     includeDeleted: values.includeDeletedCheck,
+        //     pageNumber: 1,
+        // };
+
+        // nacecodesAsync(search);
+        // localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
 
     const onCleanSearch = () => {

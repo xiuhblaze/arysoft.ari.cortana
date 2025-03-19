@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 
-import { AryFormikTextInput } from "../../../components/Forms";
+import { AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { useContactsStore } from "../../../hooks/useContactStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import enums from "../../../helpers/enums";
@@ -38,6 +38,7 @@ const EditContactModal = ({ id, ...props}) => {
         positionInput: '',
         photoFileInput: '',
         isMainContactCheck: false,
+        extraInfoInput: '',
         statusCheck: false,
     };
 
@@ -82,6 +83,8 @@ const EditContactModal = ({ id, ...props}) => {
                     return true;
                 }
             }),
+        extraInfoInput: Yup.string()
+            .max(1000, 'Extra info is too long'),
     });
 
     // CUSTOM HOOKS
@@ -130,6 +133,7 @@ const EditContactModal = ({ id, ...props}) => {
                 positionInput: contact?.Position ?? '',
                 photoFileInput: '',
                 isMainContactCheck: contact?.IsMainContact ?? false,
+                extraInfoInput: contact?.ExtraInfo ?? '',
                 statusCheck: contact?.Status === DefaultStatusType.active,
             });
 
@@ -197,7 +201,8 @@ const EditContactModal = ({ id, ...props}) => {
             Address: values.addressInput,
             Position: values.positionInput,
             IsMainContact: values.isMainContactCheck,
-            Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive, //contact.Status,
+            ExtraInfo: values.extraInfoInput,
+            Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
         contactSaveAsync(toSave, values.photoFileInput);
@@ -363,32 +368,36 @@ const EditContactModal = ({ id, ...props}) => {
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12">
+                                            <Col xs="12" sm="4">
                                                 <AryFormikTextInput name="positionInput"
                                                     label="Position"
                                                 />
                                             </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12" sm="6">
+                                            <Col xs="12" sm="4">
                                                 <AryFormikTextInput name="emailInput"
                                                     label="E-Mail"
                                                     placeholder="name@example.com"
                                                 />
                                             </Col>
-                                            <Col xs="12" sm="6">
+                                            <Col xs="12" sm="4">
                                                 <AryFormikTextInput name="phoneInput"
                                                     label="Phone number"
                                                     placeholder="00-0000-0000"
                                                     helpText="[0000000000] [x0000]"
                                                 />
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12">
-                                                <AryFormikTextInput name="addressInput"
+                                            </Col>                                        
+                                            <Col xs="12" sm="6">
+                                                <AryFormikTextArea name="addressInput"
                                                     label="Address"
                                                     placeholder="3312 Example Street, City 00000"
+                                                    rows={3}
+                                                />
+                                            </Col>
+                                            <Col xs="12" sm="6">
+                                                <AryFormikTextArea name="extraInfoInput"
+                                                    label="Extra info"
+                                                    placeholder="Extra info"
+                                                    rows={3}
                                                 />
                                             </Col>
                                         </Row>

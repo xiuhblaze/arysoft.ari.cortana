@@ -10,6 +10,8 @@ import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 import envVariables from "../../../helpers/envVariables";
 import { checkFileExists } from "../../../helpers/checkFileExists";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import { faEnvelope, faNoteSticky, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -94,22 +96,34 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                                     <img className="border-radius-md shadow" src={ fileName } />
                                                 </div>
                                                 <div className="d-flex align-items-start flex-column justify-content-center">
-                                                    <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>{ item.FullName }</h6>
+                                                    <h6 className={ `mb-0 text-sm ${ item.IsMainContact ? 'text-info text-gradient' : '' }` }>
+                                                        { item.FullName }
+                                                        {
+                                                            !!item.ExtraInfo &&
+                                                            <FontAwesomeIcon icon={ faNoteSticky } className="text-warning ms-1" title={ item.ExtraInfo } />
+                                                        }
+                                                    </h6>
                                                     { !isNullOrEmpty(item.Position) 
                                                         && <p className="text-xs font-weight-bold mb-0">{ item.Position }</p> 
                                                     }
-                                                    <p className="mb-0 text-xs d-flex flex-column gap-1">
+                                                    <div className="text-xs d-flex flex-column gap-1">
                                                         { 
                                                             !!item.Email ? (
-                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`mailto:${item.Email}`} title="Send mail">{ item.Email }</a>
+                                                                <div className="d-flex flex-row justify-content-start align-items-center">
+                                                                    <FontAwesomeIcon icon={ faEnvelope } className="text-secondary me-1" title="E-Mail" />
+                                                                    <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`mailto:${item.Email}`} title="Send mail">{ item.Email }</a>
+                                                                </div>
                                                             ) : null
                                                         }
                                                         {
                                                             !!item.Phone ? (
-                                                                <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`tel:${ item.Phone }`} title="Use to call">{ item.Phone }</a>
+                                                                <div className="d-flex flex-row justify-content-start align-items-center">
+                                                                    <FontAwesomeIcon icon={ faPhone } className="text-secondary me-1" title="Phone number" />
+                                                                    <a className={ item.IsMainContact ? 'text-dark' : 'text-secondary' } href={`tel:${ item.Phone }`} title="Use to call">{ item.Phone }</a>
+                                                                </div>
                                                             ) : null
                                                         }
-                                                    </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div>
@@ -123,9 +137,6 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                         </ListGroup>
                     ) : null
                 }
-                <ListGroup>
-
-                </ListGroup>
             </Card.Body>
         </Card>
     )

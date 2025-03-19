@@ -107,14 +107,14 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     const [statusOptions, setStatusOptions] = useState(false);
     
     useEffect(() => {
-        console.log('AuditModalEditItem', id);
+        // console.log('AuditModalEditItem', id);
     }, []);
     
 
     useEffect(() => {
         
         if (!!show) {
-            console.log('AuditModalEditItem Show', id);
+            // console.log('AuditModalEditItem Show', id);
             if (!!id) {
                 auditAsync(id);
             } else if (!!auditCycle) {
@@ -199,12 +199,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             } // switch
             
             if (!organization || organization.ID != audit.AuditCycle?.OrganizationID) {
-                console.log('AuditEditItem: loading organization');
+                //console.log('AuditEditItem: loading organization');
                 organizationAsync(audit.AuditCycle.OrganizationID);
             }
             
             if (!auditCycle || auditCycle.ID != audit.AuditCycle.ID) {
-                console.log('AuditEditItem: loading audit cycle');
+                //console.log('AuditEditItem: loading audit cycle');
                 auditCycleAsync(audit.AuditCycle.ID);
             }
             

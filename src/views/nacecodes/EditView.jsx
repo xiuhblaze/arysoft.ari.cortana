@@ -1,24 +1,80 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 
-import Swal from 'sweetalert2';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { Card, Col, Container, Row } from 'react-bootstrap';
+import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Swal from 'sweetalert2';
+import * as Yup from "yup";
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
-import useNacecodesStore from '../../hooks/useNaceCodesStore';
-import enums from '../../helpers/enums';
-import { ViewLoading } from '../../components/Loaders';
 import { AryFormikTextInput } from '../../components/Forms';
+import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { ViewLoading } from '../../components/Loaders';
+import enums from '../../helpers/enums';
 import Status from './components/Status';
+import useNacecodesStore from '../../hooks/useNaceCodesStore';
 
 export const EditView = () => {
     const { id } = useParams();
     const [controller, dispatch] = useArysoftUIController();
     const navigate = useNavigate();
     const { DefaultStatusType } = enums();
+
+    const formDefaultValues = {
+        sectorInput: '',
+        divisionInput: '',
+        groupInput: '',
+        classInput: '',
+        descriptionInput: '',
+        statusCheck: false,
+    };
+    const validationSchema = Yup.object({
+        sectorInput: Yup.number()
+            .typeError('The sector must be a number')
+            .positive('The sector must be a positive number')
+            .integer('The sector must be an integer number')
+            .min(0, 'The sector must be greater than 0')
+            .max(99, 'The sector must be less than 99')
+            .required('The sector is required'),
+        divisionInput: Yup.number()
+            .typeError('The division must be a number')
+            .positive('The division must be a positive number')
+            .integer('The division must be an integer number')
+            .min(0, 'The division must be greater than 0')
+            .max(99, 'The division must be less than 99'),
+        groupInput: Yup.number()
+            .typeError('The group must be a number')
+            .positive('The group must be a positive number')
+            .integer('The group must be an integer number')
+            .min(0, 'The group must be greater than 0')
+            .max(99, 'The group must be less than 99')
+            .test(
+                'division-is-required',
+                'The division is required',
+                function(value) {
+                    return !(!!value && !this.parent.divisionInput);
+                }
+            ),
+        classInput: Yup.number()
+            .typeError('The class must be a number')
+            .positive('The class must be a positive number')
+            .integer('The class must be an integer number')
+            .min(0, 'The class must be greater than 0')
+            .max(99, 'The class must be less than 99')
+            .test(
+                'group-is-required',
+                'The group is required',
+                function(value) {
+                    return !(!!value && !this.parent.groupInput);
+                }
+            )   ,
+        descriptionInput: Yup.string()
+            .required('Description is required'),
+    });
+
+    // CUSTOM HOOKS
+
     const {
         isNacecodeLoading,
         isNacecodeSaving,
@@ -34,12 +90,25 @@ export const EditView = () => {
         nacecodeClear,
     } = useNacecodesStore();
 
+    // HOOKS
+
+    const [initialValues, setInitialValues] = useState(formDefaultValues);
+
     useEffect(() => {
         if (!!id) nacecodeAsync(id);
     }, [id]);
 
     useEffect(() => {
         if (!!nacecode) {
+            setInitialValues({
+                sectorInput: nacecode?.Sector ?? '',
+                divisionInput: nacecode?.Division ?? '',
+                groupInput: nacecode?.Group ?? '',
+                classInput: nacecode?.Class ?? '',
+                descriptionInput: nacecode?.Description ?? '',
+                statusCheck: nacecode?.Status ? nacecode.Status == DefaultStatusType.active : false,
+            });
+
             setNavbarTitle(dispatch, nacecode.Description);
         }
     }, [nacecode]);
@@ -121,15 +190,10 @@ export const EditView = () => {
                                     </Card.Header>
                                     <Card.Body>
                                         <Formik
-                                            initialValues={{
-                                                sectorInput: nacecode?.Sector || '',
-                                                divisionInput: nacecode?.Division || '',
-                                                groupInput: nacecode?.Group || '',
-                                                classInput: nacecode?.Class || '',
-                                                descriptionInput: nacecode?.Description || '',
-                                                activeCheck: nacecode?.Status ? nacecode.Status == DefaultStatusType.active : false,
-                                            }}
+                                            initialValues={initialValues}
+                                            validationSchema={validationSchema}
                                             onSubmit={onFormSubmit}
+                                            enableReinitialize
                                         >
                                             {(formik) => (
                                                 <Form>
