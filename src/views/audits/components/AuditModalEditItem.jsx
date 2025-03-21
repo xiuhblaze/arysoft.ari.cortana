@@ -308,7 +308,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                     <div className="d-flex align-items-center">
                                                         <div 
                                                             className={`icon icon-md icon-shape bg-gradient-${ auditStatusProps[audit.Status].variant } border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`} 
-                                                            title="Lorem ipsum"
+                                                            title={ auditStatusProps[audit.Status].label }
                                                             style={{ minWidth: '48px' }}
                                                         >
                                                             <FontAwesomeIcon icon={ auditStatusProps[audit.Status].icon  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 

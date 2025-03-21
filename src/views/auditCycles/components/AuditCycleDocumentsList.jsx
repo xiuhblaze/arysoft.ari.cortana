@@ -12,6 +12,7 @@ import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumen
 //import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import AuditCycleDocumentItem from './AuditCycleDocumentItem';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     const { 
@@ -60,10 +61,17 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                 <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
                                                 <p className="text-xs text-secondary mb-0">{item.helpText}</p>
                                             </div>
-                                            <div className="text-dark text-sm font-weight-bold">
-                                                <AuditCycleDocumentEditItem 
-                                                    documentType={ item.id }
-                                                />
+                                            <div className="d-flex align-items-end gap-2">
+                                                { item.id == AuditCycleDocumentType.appForm &&
+                                                    <div className="text-dark text-sm font-weight-bold">
+                                                        <FontAwesomeIcon icon={ faWindowMaximize } />
+                                                    </div>
+                                                }
+                                                <div className="text-dark text-sm font-weight-bold">
+                                                    <AuditCycleDocumentEditItem 
+                                                        documentType={ item.id }
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
