@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={ store }>
       <Suspense fallback={ <Loading /> }>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
           <ArysoftUIControllerProvider>
             <App />
           </ArysoftUIControllerProvider>

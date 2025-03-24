@@ -73,11 +73,6 @@ const StandardsTableList = ({ onOrder }) => {
                                 </th>
                                 <th>
                                     <div className={headStyle}>
-                                        Reduction Days
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className={headStyle}>
                                         Info
                                     </div>
                                 </th>

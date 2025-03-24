@@ -359,6 +359,19 @@ const enums = () => {
 
     // Standards
 
+    const StandardBaseType = Object.freeze({
+        nothing: 0,
+        iso9k: 1,
+        iso14K: 2,
+        iso22K: 3,
+        iso27K: 4,
+        iso37K: 5,
+        iso45K: 6,
+        fssc22K: 7,
+        haccp: 8,
+        gMarkets: 9,
+    });
+
     const StandardOrderType = Object.freeze({
         nothing: 0,
         name: 1,
@@ -418,6 +431,7 @@ const enums = () => {
         ShiftType,
         SiteOrderType,
         StandardOrderType,
+        StandardBaseType,
         UserType,
     }
 };

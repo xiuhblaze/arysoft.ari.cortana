@@ -36,28 +36,28 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         auditorsCountHidden: 0,
     }; // formDefaultValues
     const validationSchema = Yup.object({
-            descriptionInput: Yup.string()
-                .max(1000, ''),
-            startDateInput: Yup.date()
-                .typeError('Start date has an invalid format')
-                .required('Must specify start date'),
-            endDateInput: Yup.date()
-                .typeError('End date has an invalid format')
-                .required('Must specify end date'),
-            statusSelect: Yup.string()
-                .oneOf(Object.values(AuditStatusType)
-                        .filter(ast => ast != AuditStatusType.nothing)
-                        .map(ast => ast + ''), 
-                    'Select a valid option')
-                .required('Must select a status'),
-            standardsCountHidden: Yup.number()
-                .min(1, 'Must have at least one standard'),
-            auditorsCountHidden: Yup.number()
-                .when('statusSelect', {
-                    is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
-                    then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
-                }),
-        }); 
+        descriptionInput: Yup.string()
+            .max(1000, ''),
+        startDateInput: Yup.date()
+            .typeError('Start date has an invalid format')
+            .required('Must specify start date'),
+        endDateInput: Yup.date()
+            .typeError('End date has an invalid format')
+            .required('Must specify end date'),
+        statusSelect: Yup.string()
+            .oneOf(Object.values(AuditStatusType)
+                    .filter(ast => ast != AuditStatusType.nothing)
+                    .map(ast => ast + ''), 
+                'Select a valid option')
+            .required('Must select a status'),
+        standardsCountHidden: Yup.number()
+            .min(1, 'Must have at least one standard'),
+        auditorsCountHidden: Yup.number()
+            .when('statusSelect', {
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
+                then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
+            }),
+    }); 
 
     // CUSTOM HOOKS
 

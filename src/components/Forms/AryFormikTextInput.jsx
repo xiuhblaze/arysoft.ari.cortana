@@ -7,7 +7,7 @@ export const AryFormikTextInput = ({ label, classNameDiv, startLabel, endLabel, 
 
     const inputForm = (
         <input
-            className={`form-control${ meta.touched && meta.error ? ' is-invalid' : ''}${ className ?? ''}`}
+            className={`form-control${ meta.touched && meta.error ? ' is-invalid' : ''}${ !!className ?  ' ' + className : ''}`}
             ref={innerRef}
             {...field}
             {...baseProps}

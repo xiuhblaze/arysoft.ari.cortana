@@ -1,22 +1,25 @@
-import * as Yup from 'yup';
-import { Card, Col, Row } from "react-bootstrap";
-import { useStandardsStore } from '../../../hooks/useStandardsStore';
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import enums from '../../../helpers/enums';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Card, Col, Row } from "react-bootstrap";
 import { faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Formik } from 'formik';
-import { AryFormikTextInput } from '../../../components/Forms';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import { useNavigate } from 'react-router-dom';
+import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import enums from '../../../helpers/enums';
+import standardBaseProps from '../helpers/standardBaseProps';
+
 const StandardEditCard = ({ ...props }) => {
-    const { DefaultStatusType } = enums();
+    const { DefaultStatusType, StandardBaseType } = enums();
     const formDefaultValues = {
         nameInput: '',
         descriptionInput: '',
         maxReductionDaysInput: '',
+        baseTypeSelect: '',
         statusCheck: false,
     };
     const validationSchema = Yup.object({
@@ -29,6 +32,8 @@ const StandardEditCard = ({ ...props }) => {
             .typeError('Must be a number')
             .min(0, 'The value must be positive or zero')
             .lessThan(20, 'The number exceeds the maximum allowed value (20 days)'),
+        baseTypeSelect: Yup.string()
+            .required('Base type is required'),
     });
     
     // CUSTOM HOOKS
@@ -53,6 +58,7 @@ const StandardEditCard = ({ ...props }) => {
                 nameInput: standard?.Name ?? '',
                 descriptionInput: standard?.Description ?? '',
                 maxReductionDaysInput: standard?.MaxReductionDays ?? '',
+                baseTypeSelect: standard?.StandardBase ?? '',
                 statusCheck: standard?.Status 
                     ? standard.Status == DefaultStatusType.active 
                     : false,
@@ -77,6 +83,7 @@ const StandardEditCard = ({ ...props }) => {
             Name: values.nameInput,
             Description: values.descriptionInput,
             MaxReductionDays: Number(values.maxReductionDaysInput),
+            StandardBase: values.baseTypeSelect,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
 
@@ -123,6 +130,20 @@ const StandardEditCard = ({ ...props }) => {
                                         label="Max reduction days"
                                         type="text"
                                     />
+                                </Col>
+                                <Col xs="12">
+                                    <AryFormikSelectInput
+                                        name="baseTypeSelect"
+                                        label="Base type"
+                                        helpText="Select the base type for the standard, with this option the system will automatically apply the necessary information and validations to the standard"
+                                    >
+                                        { standardBaseProps.map(item => {
+                                            if (item.id == StandardBaseType.nothing) {
+                                                return <option key={item.id} value={item.id}>(select standard base)</option>
+                                            }
+                                            return <option key={item.id} value={item.id}>{item.label}</option>
+                                        }) }
+                                    </AryFormikSelectInput>
                                 </Col>
                                 <Col xs="12">
                                     <div className="form-check form-switch mb-0">
