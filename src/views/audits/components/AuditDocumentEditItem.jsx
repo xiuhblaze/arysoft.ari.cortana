@@ -49,7 +49,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                 message: 'Some file error', // <- este solo es visible si el último return es false
                 test: (value, ctx) => {
                     if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
                         const validTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
@@ -113,17 +113,15 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
 
     useEffect(() => {
         
-        // 
-        // console.log('isForUpdateStandard', isForUpdateStandard);
-
         if (!!auditDocument && showModal && !isForUpdateStandard) {
-            // const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
-            // const standardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
-            //     ? oneStandardActive.StandardID 
-            //     : '';
+            const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
+            const myStandardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
+                ? oneStandardActive.ID 
+                : null;
+            // Si ya está seleccionado que no lo ponga
+            const standard = auditDocument.AuditStandards?.find(i => i.ID == myStandardSelect); 
 
             setInitialValues({
-                // standardSelect: auditDocument?.StandardID ?? standardSelect,
                 fileInput: '',
                 commentsInput: auditDocument?.Comments ?? '',
                 otherDescriptionInput: auditDocument?.OtherDescription ?? '',
@@ -134,6 +132,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
             });
 
             setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+            setStandardSelect(!standard ? myStandardSelect : '');
         } else if (!!auditDocument && showModal && isForUpdateStandard) {
             setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
             formikRef.current.setFieldValue('standardsCountHidden', auditDocument?.AuditStandards?.length ?? 0);

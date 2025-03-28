@@ -17,7 +17,29 @@ const enums = () => {
 
     // Application Forms
 
-    const ApplicationFormStatusType = Object.freeze({
+    const AppFormOrderType = Object.freeze({
+        nothing: 0,
+        created: 1,
+        organization: 2,
+        createdDesc: 3,
+        organizationDesc: 4
+    });
+
+    const AppFormStatusType = Object.freeze({
+        nothing: 0,            // Nuevo registro
+        new: 1,                // Nuevo registro almacenado con la información mínima
+        send: 2,               // El cliente envío su información
+        salesReview: 3,        // Ventas revisa y aprueba el appForm recibido por el cliente
+        salesRejected: 4,      // Rechazado por ventas, el cliente debe de completar más información
+        applicantReview: 5,    // Revisa que todo esté bien y es quien aprueba el appForm
+        applicantRejected: 6,  // Rechazado por el revisor del appForm, sales debe de completar más información
+        active: 7,             // AppForm activo
+        inactive: 8,           // Ya no está en uso este appForm
+        cancel: 9,             // En algún momento el appForm fué cancelado
+        deleted: 10,           // Eliminación logica
+    });
+
+    const ApplicationFormStatusType = Object.freeze({ // Obsoleto
         nothing: 0,
         new: 1,
         send: 2,
@@ -277,6 +299,14 @@ const enums = () => {
 
     // NACE Codes
 
+    const NaceCodeOnlyOptionType = Object.freeze({
+        nothing: 0,
+        sectors: 1,
+        divisions: 2,
+        groups: 3,
+        classes: 4,
+    });
+
     const NacecodeOrderType = Object.freeze({
         nothing: 0,
         sector: 1,
@@ -397,6 +427,8 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
+        AppFormOrderType,
+        AppFormStatusType,
         ApplicationFormOrderType,
         ApplicationFormStatusType,
         AuditCycleStandardsOrderType,
@@ -423,6 +455,7 @@ const enums = () => {
         CertificatesValidityStatusType,
         CompanyOrderType,
         ContactOrderType,
+        NaceCodeOnlyOptionType,
         NacecodeOrderType,
         OrganizationOrderType,
         OrganizationStatusType,

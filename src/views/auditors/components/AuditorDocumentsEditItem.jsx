@@ -18,6 +18,7 @@ import enums from '../../../helpers/enums';
 import getISODate from '../../../helpers/getISODate';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Swal from 'sweetalert2';
+import AryFormDebug from '../../../components/Forms/AryFormDebug';
 
 const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...props }) => {
     const NEW_ITEM = 'auditorDocument.new';
@@ -62,7 +63,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                 message: 'Some file error', // <- este solo es visible si el último return es false
                 test: (value, ctx) => {
                     if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? ''; 
                         const validTypes = ['pdf', 'jpg', 'jpeg', 'png'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
@@ -377,7 +378,7 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     <input
                                                         id="documentFile"
                                                         type="file"
-                                                        name="documentFile"
+                                                        name="documentFileInput"
                                                         accept="image/jpeg,image/png,application/pdf"
                                                         className="form-control"
                                                         onChange={(e) => {
@@ -386,8 +387,8 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                     />
                                                     <div className="text-xs text-secondary mt-1 me-2">If a file exists, the new one will overwrite the current one</div>
                                                     {
-                                                        formik.touched.documentFileInput && formik.errors.photoFileInput &&
-                                                        <span className="text-danger text-xs">{formik.errors.photoFileInput}</span>
+                                                        formik.touched.documentFileInput && formik.errors.documentFileInput &&
+                                                        <span className="text-danger text-xs">{formik.errors.documentFileInput}</span>
                                                     }
                                                 </div>
                                             </div>
@@ -412,6 +413,9 @@ const AuditorDocumentsEditItem = ({ catAuditorDocumentID, auditorDocumentID, ...
                                                 </label>
                                             </div>
                                         </Col>
+                                        {/* <div className="text-xs">
+                                            { process.env.NODE_ENV == 'development' && <AryFormDebug formik={ formik } /> }
+                                        </div> */}
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>

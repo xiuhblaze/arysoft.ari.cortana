@@ -16,7 +16,7 @@ import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
 import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
 import envVariables from "../../helpers/envVariables";
 import OrganizationEditCard from "./components/OrganizationEditCard";
-import CertificatesCard from "../certificates/components/CertificatesCard";
+//import CertificatesCard from "../certificates/components/CertificatesCard";
 import enums from "../../helpers/enums";
 import OrganizationStandardsCard from "./components/OrganizationStandardsCard";
 import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
@@ -176,12 +176,12 @@ const EditView = ({ applicantsOnly = false, ...props }) => {
                             <Col xs={12} sm={applicantsOnly ? 6 : 4}>
                                 <SitesCard />
                             </Col>
-                            {
+                            {/* {
                                 !applicantsOnly &&
                                 <Col xs={12} sm={4}>
                                     <CertificatesCard />
                                 </Col>
-                            }
+                            } */}
                         </Row>
                     </>
                 )

@@ -198,13 +198,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     break;
             } // switch
             
-            if (!organization || organization.ID != audit.AuditCycle?.OrganizationID) {
-                //console.log('AuditEditItem: loading organization');
+            if (!organization || (!!audit.AuditCycle && organization.ID != audit.AuditCycle?.OrganizationID)) {
                 organizationAsync(audit.AuditCycle.OrganizationID);
             }
             
-            if (!auditCycle || auditCycle.ID != audit.AuditCycle.ID) {
-                //console.log('AuditEditItem: loading audit cycle');
+            if (!auditCycle || (!!audit.AuditCycle && auditCycle.ID != audit.AuditCycle.ID)) {
                 auditCycleAsync(audit.AuditCycle.ID);
             }
             

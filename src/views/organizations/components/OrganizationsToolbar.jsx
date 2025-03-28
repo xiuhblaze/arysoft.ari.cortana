@@ -120,7 +120,9 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
             folio: values.folioInput,
             text: values.textInput,
             standardID: values.standardSelect,
-            status: values.statusSelect,
+            status: applicantsOnly
+                ? OrganizationStatusType.applicant
+                : values.statusSelect,
             certificatesValidityStatus: values.certificatesValidityStatusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
@@ -136,6 +138,9 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
             pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             includeDeleted: false,
+            status: applicantsOnly
+                ? OrganizationStatusType.applicant
+                : savedSearch?.status ?? '',
             order: OrganizationOrderType.folioDesc,
         };
 

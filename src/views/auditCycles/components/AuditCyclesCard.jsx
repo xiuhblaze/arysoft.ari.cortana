@@ -12,6 +12,7 @@ import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import AuditCycleDocumentsList from './AuditCycleDocumentsList';
 import { ViewLoading } from '../../../components/Loaders';
+import auditStepProps from '../../audits/helpers/auditStepProps';
 
 const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
 
@@ -172,7 +173,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                                 > 
                                                                     <FontAwesomeIcon icon={ faLandmark } className="me-1" />
                                                                     <span className="text-xs">
-                                                                        { item.StandardName }
+                                                                        { item.StandardName } - { auditStepProps[item.InitialStep].abbreviation }
                                                                     </span>
                                                                 </span>
                                                             ))

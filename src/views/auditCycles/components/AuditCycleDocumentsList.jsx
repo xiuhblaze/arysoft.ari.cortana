@@ -17,6 +17,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { faFile, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
 import AppFormButtonNewItem from '../../appForms/components/appFormButtonNewItem';
+import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleList';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     const { 
@@ -76,16 +77,13 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                         <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
                                     </div>
                                     <div className="timeline-content" style={{ maxWidth: 'none' }}>
-                                        <div className='d-flex justify-content-between align-items-center pe-2 mb-0'>
+                                        <div className='d-flex justify-content-between align-items-center me-1 mb-0'>
                                             <div>
                                                 <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
                                                 <p className="text-xs text-secondary mb-0">{item.helpText}</p>
                                             </div>
-                                            <div className="d-flex align-items-center gap-2">
-                                                { 
-                                                    item.id == AuditCycleDocumentType.appForm &&
-                                                    <AppFormButtonNewItem />
-                                                }
+                                            <div className="d-flex align-items-center gap-3">
+                                                { item.id == AuditCycleDocumentType.appForm && <AppFormButtonNewItem /> }
                                                 <div className="text-dark text-sm font-weight-bold">
                                                     <AuditCycleDocumentEditItem 
                                                         documentType={ item.id }
@@ -98,6 +96,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                 documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                             }
                                         </div>
+                                        { item.id == AuditCycleDocumentType.appForm && <AppFormAuditCycleList /> }                                        
                                     </div>
                                 </div>
                                 {
@@ -110,7 +109,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                             />
                                         </div>
                                         <div className="timeline-content" style={{ maxWidth: 'none' }}>
-                                            <div className='d-flex justify-content-between align-items-center pe-2 mb-0'>
+                                            <div className='d-flex justify-content-between align-items-center me-1 mb-0'>
                                                 <div>
                                                     <h6 className="text-sm text-dark font-weight-bold mb-0">
                                                         {auditCycleDocumentTypeProps[AuditCycleDocumentType.audit].label}

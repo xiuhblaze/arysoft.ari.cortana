@@ -11,6 +11,7 @@ import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import debounce from "lodash.debounce";
+import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
 
 export const ToolbarForm = () => {
     const { DefaultStatusType, NacecodeOrderType } = enums();
@@ -185,11 +186,11 @@ export const ToolbarForm = () => {
                                         </div>
                                         <div className="col-12 col-sm-auto ps-sm-0">
                                             <AryFormikSelectInput name="onlySelect">
-                                                <option value="">(only)</option>
-                                                <option value="sectors">Only sectors</option>
-                                                <option value="divisions">Only divisions</option>
-                                                <option value="groups">Only groups</option>
-                                                <option value="classes">Only classes</option>
+                                                {
+                                                    nacecodeOnlyOptionsProps.map((option) => (
+                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                    ))
+                                                }
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto ps-sm-0">

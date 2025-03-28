@@ -22,11 +22,11 @@ const AppFormButtonNewItem = () => {
         <div>
             <button
                 type="button"
-                className="btn btn-link p-0 mb-0"
+                className="btn btn-link text-dark p-0 mb-0"
                 title="New application form"
                 onClick={onShowAppFormModal}
             >
-                <FontAwesomeIcon icon={faWindowMaximize} />
+                <FontAwesomeIcon icon={faWindowMaximize} size="lg" />
             </button>
             <AppFormModalEditItem 
                 show={showAppFormModal}

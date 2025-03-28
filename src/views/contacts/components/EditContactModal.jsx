@@ -72,7 +72,7 @@ const EditContactModal = ({ id, ...props}) => {
                 message: 'Some file update error', // <- este solo es visible si el último return es false
                 test: (value, ctx) => {
                     if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
                         const validTypes = ['jpg', 'png'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({

@@ -223,8 +223,6 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.post(`${APPFORM_URL}/${appForm.ID}/nace-code`, toAdd);
             const { Data } = await resp.data;
 
-            console.log('appFormNaceCodeAddAsync.Data', Data);
-
             return Data;
         } catch (error) {   
             const message = getError(error);
