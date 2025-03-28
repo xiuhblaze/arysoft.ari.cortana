@@ -9,6 +9,7 @@ import getSelectSearchOptionSelected from '../../../helpers/getSelectSearchOptio
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLandmark, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
+import Swal from 'sweetalert2';
 
 const AppFormEditNaceCodes = ({ onChange, ...props }) => {
 
@@ -96,6 +97,7 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
                 }
             }).catch(err => {
                 console.log(err);
+                Swal.fire('Error', err, 'error');
             });
         setDisabledButtons(false);
     }; // onClickAdd

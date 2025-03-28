@@ -16,7 +16,7 @@ import AuditCycleDocumentItem from './AuditCycleDocumentItem';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { faFile, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
-import AppFormButtonNewItem from '../../appForms/components/appFormButtonNewItem';
+import AppFormButtonNewItem from '../../appForms/components/AppFormButtonNewItem';
 import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleList';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {

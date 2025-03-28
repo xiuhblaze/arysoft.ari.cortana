@@ -16,24 +16,59 @@ const appFormStatusProps = [
         description: 'New recorded application form'
     },
     { 
-        value: AppFormStatusType.send, // Este es un appform nuevo desde una organización
-        label: 'Send', 
-        variant: 'warning',
-        description: 'Application form sent from applicant'
+        value: AppFormStatusType.startOrg, // Este es un appform nuevo desde una organización
+        label: 'New from org', 
+        variant: 'primary',
+        description: 'New application form registered from the organization'
     }, 
     {
         value: AppFormStatusType.salesReview,
         label: 'Sales review', 
-        variant: 'info',
+        variant: 'warning',
         description: 'Sales review and approval'
     },
-    { value: 3, label: 'Sales rejected', bgColor: 'bg-gradient-danger', variant: 'danger' },
-    { value: 4, label: 'Applicant review', bgColor: 'bg-gradient-warning', variant: 'warning' },
-    { value: 5, label: 'Applicant rejected', bgColor: 'bg-gradient-danger', variant: 'danger' },
-    { value: 6, label: 'Active', bgColor: 'bg-gradient-success', variant: 'success' },
-    { value: 7, label: 'Inactive', bgColor: 'bg-gradient-secondary', variant: 'secondary' },
-    { value: 8, label: 'Canceled', bgColor: 'bg-gradient-dark', variant: 'dark' },
-    { value: 9, label: 'Deleted', bgColor: 'bg-gradient-dark', variant: 'dark' },
+    { 
+        value: AppFormStatusType.salesRejected,
+        label: 'Sales rejected', 
+        variant: 'danger',
+        description: 'Rejected by sales, check the comments'
+    },
+    { 
+        value: AppFormStatusType.applicantReview,
+        label: 'Applicant review', 
+        variant: 'warning',
+        description: 'Applicant review and approval'
+    },
+    {
+        value: AppFormStatusType.applicantRejected,
+        label: 'Applicant rejected', 
+        variant: 'danger',
+        description: 'Rejected by reviewer, check the comments'
+    },
+    { 
+        value: AppFormStatusType.active, 
+        label: 'Active', 
+        variant: 'success',
+        description: 'Active application form'
+    },
+    { 
+        value: AppFormStatusType.inactive,
+        label: 'Inactive', 
+        variant: 'secondary',
+        description: 'Inactive application form'
+    },
+    { 
+        value: AppFormStatusType.canceled,
+        label: 'Canceled',
+        variant: 'light',
+        description: 'Canceled application form'
+    },
+    { 
+        value: AppFormStatusType.deleted,
+        label: 'Deleted',
+        variant: 'danger',
+        description: 'Deleted application form'
+    },
 ];
 
 export default appFormStatusProps;

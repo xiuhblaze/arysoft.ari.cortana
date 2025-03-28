@@ -65,7 +65,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         otherDescriptionInput: Yup.string()
             .max(100, 'Other description must be at most 100 characters'),
         standardsCountHidden: Yup.number()
-                    .min(1, 'Must have at least one standard'),
+            .min(1, 'Must have at least one standard'),
     });
 
     // CUSTOM HOOKS
@@ -266,7 +266,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
             setStandardsCount(standardsCount - 1);
             formikRef.current.setFieldValue('standardsCountHidden', standardsCount - 1);
         }
-
+//! Aquí en ocaciones aunque este seleccionado un standard, marca la validación de que hace falta
         // console.log('onStandardSelectChange', e.target.value);
     }; // onStandardSelectChange
 

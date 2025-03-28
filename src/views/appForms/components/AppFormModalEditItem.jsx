@@ -123,7 +123,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     const [statusChangedWith, setStatusChangedWith] = useState(null);
 
     useEffect(() => {
-
+//console.log('AppFormModalEditItem', show, id);
         if (!!show) {
             if (!!id) {
                 appFormAsync(id);
@@ -155,8 +155,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         if (!!appForm && !!show) {
+            //console.log('useEffect: appForm', appForm);
             setInitialValues({
-                standardSelect: appForm.StandardBase ?? '',
+                standardSelect: appForm.Standard?.StandardBase ?? '',
                 activitiesScopeInput: appForm.ActivitiesScope ?? '',
                 processServicesCountInput: appForm.ProcessServicesCount ?? '',
                 processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
@@ -199,6 +200,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             ));
 
             setOriginalStatus(appForm.Status);
+            setStandardSelected(appForm.Standard?.StandardBase);
 
             setShowModal(true);
         }

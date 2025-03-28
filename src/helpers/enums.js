@@ -26,9 +26,9 @@ const enums = () => {
     });
 
     const AppFormStatusType = Object.freeze({
-        nothing: 0,            // Nuevo registro
+        nothing: 0,            // Nuevo registro temporal
         new: 1,                // Nuevo registro almacenado con la información mínima
-        send: 2,               // El cliente envío su información
+        startOrg: 2,           // Nuevo registro desde la organización
         salesReview: 3,        // Ventas revisa y aprueba el appForm recibido por el cliente
         salesRejected: 4,      // Rechazado por ventas, el cliente debe de completar más información
         applicantReview: 5,    // Revisa que todo esté bien y es quien aprueba el appForm

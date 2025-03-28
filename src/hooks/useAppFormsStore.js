@@ -36,7 +36,7 @@ const getSearchQuery = (options = {}) => {
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
     query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
-    query += options?.appFormCycleID ? `&appFormcycleid=${options.appFormCycleID}` : '';
+    query += options?.auditCycleID ? `&auditcycleid=${options.auditCycleID}` : '';
     query += options?.standardID ? `&standardid=${options.standardID}` : '';
     query += options?.text ? `&text=${options.text}` : '';
     query += options?.status ? `&status=${options.status}` : '';
@@ -208,10 +208,11 @@ export const useAppFormsStore = () => {
 
     // APP FORM NACE CODES
 
-    const naceCodeAddAsync = async (naceCodeID) => {
+    const naceCodeAddAsync = async (naceCodeID) => { //! Cambiar la devolucion del error en un objeto personalizado 
         if (!appForm) {
-            setError('The app form is not loaded');
-            return;
+            // setError('The app form is not loaded');
+            // return;
+            throw new Error('The app form is not loaded');
         }
         
         const toAdd = {
@@ -225,8 +226,10 @@ export const useAppFormsStore = () => {
 
             return Data;
         } catch (error) {   
-            const message = getError(error);
-            setError(message);
+            const errData = getError(error);
+            // setError(errData);
+            console.log(errData);
+            throw new Error(errData.message);
         }
 
         return null;

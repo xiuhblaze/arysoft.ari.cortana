@@ -9,12 +9,12 @@ const AppFormButtonNewItem = () => {
     const [showAppFormModal, setShowAppFormModal] = useState(false);
 
     const onShowAppFormModal = () => {
-        console.log('onShowAppFormModal: show new app form');
+        //console.log('onShowAppFormModal: show new app form');
         setShowAppFormModal(true);
     }; // onShowAppFormModal
 
     const onHideAppFormModal = () => {
-        console.log('onHideAppFormModal: hide');
+        //console.log('onHideAppFormModal: hide');
         setShowAppFormModal(false);
     }; // onHideAppFormModal
 
