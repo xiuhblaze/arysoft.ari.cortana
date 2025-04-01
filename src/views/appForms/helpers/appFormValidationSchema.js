@@ -57,6 +57,14 @@ const appFormValidationSchema = () => {
                 then: schema => schema.required('Design responsibility justification is required'),
                 otherwise: schema => schema.notRequired(),
             }),
+        nacecodeCountHidden: Yup.number()
+            .when('standardSelect', {
+                is: (standardSelect) => standardSelect == StandardBaseType.iso9k,
+                then: schema => schema
+                    .positive('Must be at least one sector clasification')
+                    .required('Must add at least one sector clasification'),
+                otherwise: schema => schema.notRequired(),
+            }),
         // General
         auditLanguageSelect: Yup.string()
             .required('Audit language is required'),
@@ -76,9 +84,6 @@ const appFormValidationSchema = () => {
                 then: schema => schema.required('Indicate by who the consultation is received is required'),
                 otherwise: schema => schema.notRequired(),
             }),
-        nacecodeCountHidden: Yup.number()
-            .positive('Must be at least one sector clasification')
-            .required('Must add at least one sector clasification'),
     });
 };
 

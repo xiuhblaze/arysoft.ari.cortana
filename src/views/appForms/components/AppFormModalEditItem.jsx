@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, Col, Modal, Row } from "react-bootstrap";
+import { Card, Col, Modal, Nav, Row } from "react-bootstrap";
 
-import { faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -23,8 +23,14 @@ import appFormStatusOptions from "../helpers/appFormStatusOptions";
 import appFormValidationSchema from "../helpers/appFormValidationSchema";
 import AryFormDebug from "../../../components/Forms/AryFormDebug";
 import AppFormEditNaceCodes from "./AppFormEditNaceCodes";
+import AppFormOrganizationStep from "./AppFormOrganizationStep";
 
 const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
+    const navOptions = {
+        organization: 'Organization',
+        standard: 'Standard',
+        general: 'General',
+    };
 
     const { 
         AppFormStatusType,
@@ -33,9 +39,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     } = enums();
 
     // Faltan (no van directamente en el formulario):
-    // - NACE codes
+    // - NACE codes -> YA
     // - Contacts
-    // - Sites
+    // - Sites -> Aqui voy
 
     const formDefaultValues = {
         standardSelect: '',
@@ -63,6 +69,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         reviewJustificationInput: '',
         reviewCommentsInput: '',
         // Hidden
+        sitesCountHidden: 0,
         nacecodeCountHidden: 0,
     }; // formDefaultValues
 
@@ -108,7 +115,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     const anyCriticalComplaintRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
-    // const [step, setStep] = useState(1); // TODO: Para ver si se puede implementar a futuro
+    const [navOption, setNavOption] = useState(null);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [standardSelected, setStandardSelected] = useState(null);
     const [appFormPreviewData, setAppFormPreviewData] = useState({
@@ -125,6 +132,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     useEffect(() => {
 //console.log('AppFormModalEditItem', show, id);
         if (!!show) {
+
+            setShowModal(true);
+
             if (!!id) {
                 appFormAsync(id);
                 // setStep(2);
@@ -154,10 +164,11 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     }, [show]);
 
     useEffect(() => {
+
         if (!!appForm && !!show) {
-            //console.log('useEffect: appForm', appForm);
             setInitialValues({
                 standardSelect: appForm.Standard?.StandardBase ?? '',
+                // 9K
                 activitiesScopeInput: appForm.ActivitiesScope ?? '',
                 processServicesCountInput: appForm.ProcessServicesCount ?? '',
                 processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
@@ -183,7 +194,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                 reviewJustificationInput: appForm.ReviewJustification ?? '',
                 reviewCommentsInput: appForm.ReviewComments ?? '',
                 // Hidden
-                nacecodeCountHidden: !!appForm?.Nacecodes ? appForm.Nacecodes.length : 0,
+                sitesCountHidden: !!appForm.Sites ? appForm.Sites.length : 0,
+                nacecodeCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
             });
 
             if (!organization || organization.ID != appForm.OrganizationID) {
@@ -202,15 +214,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             setOriginalStatus(appForm.Status);
             setStandardSelected(appForm.Standard?.StandardBase);
 
-            setShowModal(true);
+            setNavOption(navOptions.organization);
+            // setShowModal(true);
         }
     }, [appForm]);
-
-    // useEffect(() => {
-    //     if (!!standardSelected) {
-    //         console.log('AppFormModalEditItem: useEffect: standardSelected', standardSelected);
-    //     }
-    // }, [standardSelected]);
 
     useEffect(() => {
         if (!!appFormSavedOk) {
@@ -218,19 +225,26 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             appFormClear();
             onCloseModal();
         }
-    }, [appFormSavedOk]);    
+    }, [appFormSavedOk]);
 
     useEffect(() => {
-        if (!!organizationsErrorMessage) {
-            Swal.fire('App Form', organizationsErrorMessage, 'error');
-            //TODO: Ver con que acción continuar
+        if (!!appFormsErrorMessage) {
+            Swal.fire('App Form', appFormsErrorMessage, 'error');
         }
-    }, [organizationsErrorMessage]);
+    }, [appFormsErrorMessage]);
+    
+
+    // useEffect(() => {
+    //     if (!!organizationsErrorMessage) {
+    //         Swal.fire('App Form', organizationsErrorMessage, 'error');
+    //         //TODO: Ver con que acción continuar
+    //     }
+    // }, [organizationsErrorMessage]);
     
     // METHODS
 
     const auditLanguageOptions = [
-        { value: '', label: 'Select a language' },
+        { value: '', label: '(select a language)' },
         { value: 'en', label: 'English' },
         { value: 'es', label: 'Spanish' },
     ];
@@ -270,10 +284,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             SalesComments: values.salesCommentsInput,
             ReviewJustification: values.reviewJustificationInput,
             ReviewComments: values.reviewCommentsInput,            
-        }
+        } // toSave
 
         
-        console.log('AppFormModalEditItem: onFormSubmit: toSave', toSave);
+        //console.log('AppFormModalEditItem: onFormSubmit: toSave', toSave);
         appFormSaveAsync(toSave);
     }; // onFormSubmit
 
@@ -288,6 +302,13 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
         if (!!onHide) onHide();
     }; // onCloseModal
+
+    // Sites
+    
+    const onSitesChange = (count) => {
+
+        formikRef.current.setFieldValue('sitesCountHidden', count);
+    };
 
     // Nacecodes
 
@@ -305,6 +326,16 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             { 
                 isAppFormLoading || isAppFormCreating || isOrganizationLoading || isAuditCycleLoading ? (
                     <Modal.Body>
+                        <div 
+                            className="page-header min-height-150 border-radius-xl"
+                            style={{
+                                backgroundImage: `url(${bgHeadModal})`,
+                                backgroundPositionY: '50%'
+                            }}
+                        >
+                            <h4 className="text-white mx-4 pb-5" style={{ zIndex: 1 }}>Loading...</h4>
+                            <span className={`mask bg-gradient-secondary opacity-6`} />
+                        </div>
                         <ViewLoading />
                     </Modal.Body>
                 ) : !!appForm &&
@@ -361,6 +392,42 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                         <Col xs="12" sm="6">
                                             <Card>
                                                 <Card.Body className="p-3">
+                                                    <Row>
+                                                        <Col xs="12">
+                                                            <Nav
+                                                                variant="pills"
+                                                                className="nav-fill p-1 mb-3"
+                                                                activeKey={ navOption }
+                                                                onSelect={ selectKey => setNavOption(selectKey) }
+                                                            >
+                                                                <Nav.Item className="d-flex justify-content-between align-items-center">
+                                                                    <Nav.Link eventKey={navOptions.organization} className="mb-0 px-3 py-1">
+                                                                        <FontAwesomeIcon icon={ faBuilding } className="me-2" />
+                                                                        Organization
+                                                                    </Nav.Link>
+                                                                </Nav.Item>
+                                                                <Nav.Item className="d-flex justify-content-between align-items-center">
+                                                                    <Nav.Link eventKey={navOptions.standard} className="mb-0 px-3 py-1">
+                                                                        <FontAwesomeIcon icon={ faLandmark } className="me-2" />
+                                                                        Standard
+                                                                    </Nav.Link>
+                                                                </Nav.Item>
+                                                                <Nav.Item className="d-flex justify-content-between align-items-center">
+                                                                    <Nav.Link eventKey={navOptions.general} className="mb-0 px-3 py-1">
+                                                                        <FontAwesomeIcon icon={ faGear } className="me-2" />
+                                                                        General
+                                                                    </Nav.Link>
+                                                                </Nav.Item>
+                                                            </Nav>
+                                                            {
+                                                                navOption == navOptions.organization &&
+                                                                <AppFormOrganizationStep 
+                                                                    formik={ formik } 
+                                                                    onSitesChange={ onSitesChange }
+                                                                />
+                                                            }
+                                                        </Col>
+                                                    </Row>
                                                     <Row>
                                                         <Col xs="12">
                                                             <AryFormikSelectInput
