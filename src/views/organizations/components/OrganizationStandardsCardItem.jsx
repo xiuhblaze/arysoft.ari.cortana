@@ -9,7 +9,7 @@ const OrganizationStandardsCardItem = ({ item, readOnly = false, ...props }) => 
         DefaultStatusType
     } = enums();
     
-    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0${item.Status == DefaultStatusType.inactive ? ' opacity-6' : ''}`;
+    const itemStyle = `border-0 d-flex justify-content-between align-items-center px-0${(item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active)? ' opacity-6' : ''}`;  
 
     return (
         <ListGroup.Item {...props} className={itemStyle}>

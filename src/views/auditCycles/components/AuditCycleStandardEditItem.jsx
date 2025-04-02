@@ -194,7 +194,8 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                                                 key={item.StandardID}
                                                                 value={item.StandardID}
                                                                 className="text-capitalize"
-                                                                disabled={ item.Status != DefaultStatusType.active }
+                                                                disabled={ item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active }
+                                                                title={ item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active ? 'Inactive' : 'Select' }
                                                             >
                                                                 {item.StandardName}
                                                             </option>

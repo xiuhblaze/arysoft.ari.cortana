@@ -222,15 +222,16 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             }
 
             if (!!appForm.Contacts && appForm.Contacts.length > 0) {
-                setContactsList(dispatch, appForm.Contacts
-                    .map(contact => ({
-                        ID: contact.ID,
-                        FullName: contact.FullName,
-                        Email: contact.Email,
-                        Phone: contact.Phone,
-                        Position: contact.Position,
-                        Status: contact.Status,
-                    })));
+                // setContactsList(dispatch, appForm.Contacts
+                //     .map(contact => ({
+                //         ID: contact.ID,
+                //         FullName: contact.FullName,
+                //         Email: contact.Email,
+                //         Phone: contact.Phone,
+                //         Position: contact.Position,
+                //         Status: contact.Status,
+                //     })));
+                setContactsList(dispatch, appForm.Contacts);
             }
 
             if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
@@ -246,14 +247,15 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             }
 
             if (!!appForm.Sites && appForm.Sites.length > 0) {
-                setSitesList(dispatch, appForm.Sites
-                    .map(site => ({
-                        ID: site.ID,
-                        Description: site.Description,
-                        Address: site.Address,
-                        EmployeesCount: site.EmployeesCount,
-                        Status: site.Status,
-                    })));
+                // setSitesList(dispatch, appForm.Sites
+                //     .map(site => ({
+                //         ID: site.ID,
+                //         Description: site.Description,
+                //         Address: site.Address,
+                //         EmployeesCount: site.EmployeesCount,
+                //         Status: site.Status,
+                //     })));
+                setSitesList(dispatch, appForm.Sites);
             }
 
             setStandardData(dispatch, {

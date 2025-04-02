@@ -168,7 +168,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
                         <div className="d-flex justify-content-center align-items-center flex-wrap text-xs gap-1 mb-0">
                             {
                                 item.Standards.map(i => (
-                                    <div key={i.ID} className={`badge bg-gradient-${i.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-white me-1`}>
+                                    <div key={i.ID} className={`badge bg-gradient-${(i.Status == DefaultStatusType.active && i.StandardStatus == DefaultStatusType.active) ? 'secondary' : 'light' } text-white me-1`}>
                                         { i.StandardName }
                                     </div>
                                 ))

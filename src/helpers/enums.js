@@ -28,40 +28,14 @@ const enums = () => {
     const AppFormStatusType = Object.freeze({
         nothing: 0,            // Nuevo registro temporal
         new: 1,                // Nuevo registro almacenado con la información mínima
-        startOrg: 2,           // Nuevo registro desde la organización
-        salesReview: 3,        // Ventas revisa y aprueba el appForm recibido por el cliente
-        salesRejected: 4,      // Rechazado por ventas, el cliente debe de completar más información
-        applicantReview: 5,    // Revisa que todo esté bien y es quien aprueba el appForm
-        applicantRejected: 6,  // Rechazado por el revisor del appForm, sales debe de completar más información
-        active: 7,             // AppForm activo
-        inactive: 8,           // Ya no está en uso este appForm
-        cancel: 9,             // En algún momento el appForm fué cancelado
-        deleted: 10,           // Eliminación logica
-    });
-
-    const ApplicationFormStatusType = Object.freeze({ // Obsoleto
-        nothing: 0,
-        new: 1,
-        send: 2,
-        salesReview: 3,
-        applicantReview: 4,
-        salesEvaluation: 5,
-        acceptedClient: 6,
-        rejectedClient: 7,
-        acreditedAuditor: 8,
-        // Todo: Faltan estados
-        active: 9,
-        // Todo: Faltan estados
-        cancel: 10,
-        deleted: 11,
-    });
-
-    const ApplicationFormOrderType = Object.freeze({
-        nothing: 0,
-        organization: 1,
-        created: 2,
-        organizationDesc: 3,
-        createdDesc: 4,
+        salesReview: 2,        // Ventas revisa y aprueba el appForm recibido por el cliente
+        salesRejected: 3,      // Rechazado por ventas, el cliente debe de completar más información
+        applicantReview: 4,    // Revisa que todo esté bien y es quien aprueba el appForm
+        applicantRejected: 5,  // Rechazado por el revisor del appForm, sales debe de completar más información
+        active: 6,             // AppForm activo
+        inactive: 7,           // Ya no está en uso este appForm
+        cancel: 8,             // En algún momento el appForm fué cancelado
+        deleted: 9,           // Eliminación logica
     });
 
     // Audits cycles
@@ -99,11 +73,11 @@ const enums = () => {
         nothing: 0,
         stage1: 1,
         stage2: 2,
-        survey1: 3,
-        survey2: 4,
+        surveillance1: 3,
+        surveillance2: 4,
         recertification: 5,
-        transfer: 6,
-        special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+        transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+        special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     });
 
     const AuditDocumentType = Object.freeze({
@@ -429,8 +403,6 @@ const enums = () => {
 
         AppFormOrderType,
         AppFormStatusType,
-        ApplicationFormOrderType,
-        ApplicationFormStatusType,
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,

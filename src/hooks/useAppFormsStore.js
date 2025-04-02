@@ -306,6 +306,7 @@ export const useAppFormsStore = () => {
 
             console.log('contactDelAsync.Data', Data);
             
+            return Data;
         } catch (error) {
             const message = getError(error);
             setError(message);

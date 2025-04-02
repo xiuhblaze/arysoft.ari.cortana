@@ -64,17 +64,18 @@ const AppFormEditContacts = ({ ...props }) => {
                 if (!!data) {
                     const myContact = organization.Contacts.find(i => i.ID == contactSelected);
 
-                    if(!!myContact) {
+                    if (!!myContact) {
                         setContactsList(dispatch, [
                             ...contactsList,
-                            { 
-                                ID: myContact.ID, 
-                                FullName: myContact.FullName,
-                                Email: myContact.Email,
-                                Phone: myContact.Phone,
-                                Position: myContact.Position,
-                                Status: myContact.Status,
-                            },
+                            // { 
+                            //     ID: myContact.ID, 
+                            //     FullName: myContact.FullName,
+                            //     Email: myContact.Email,
+                            //     Phone: myContact.Phone,
+                            //     Position: myContact.Position,
+                            //     Status: myContact.Status,
+                            // },
+                            myContact,
                         ]);
                     }
                     //onChange(contactsList.length + 1);
@@ -92,10 +93,16 @@ const AppFormEditContacts = ({ ...props }) => {
         contactDelAsync(id)
             .then(data => {
                 //console.log('onClickRemove', data);
+                console.log(data, contactsList, id);
                 if (!!data) {
                     setContactsList(dispatch, contactsList.filter(i => i.ID != id));
                     // onChange(contactsList.length < 1 ? 0 : contactsList.length - 1);
+                    console.log(contactsList.filter(i => i.ID != id))
                 }
+            })
+            .catch(err => {
+                console.log('onClickRemove', err);
+                Swal.fire('Remove contact', err, 'error');
             });
         setDisabledButtons(false);
     } // onClickRemove

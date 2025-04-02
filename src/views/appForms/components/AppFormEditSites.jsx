@@ -66,13 +66,14 @@ const AppFormEditSites = ({ ...props }) => {
                     if(!!mySite) {
                         setSitesList(dispatch,[
                             ...sitesList,
-                            { 
-                                ID: mySite.ID, 
-                                Description: mySite.Description,
-                                Address: mySite.Address,
-                                EmployeesCount: mySite.EmployeesCount,
-                                Status: mySite.Status,
-                            },
+                            // { 
+                            //     ID: mySite.ID, 
+                            //     Description: mySite.Description,
+                            //     Address: mySite.Address,
+                            //     EmployeesCount: mySite.EmployeesCount,
+                            //     Status: mySite.Status,
+                            // },
+                            mySite,
                         ]);
                     }
                     setSiteSelected(null);
@@ -94,7 +95,7 @@ const AppFormEditSites = ({ ...props }) => {
                 }
             })
             .catch(err => {
-                console.log('onClickAdd', err);
+                console.log('onClickRemove', err);
                 Swal.fire('Remove site', err, 'error');
             });
         setDisabledButtons(false);

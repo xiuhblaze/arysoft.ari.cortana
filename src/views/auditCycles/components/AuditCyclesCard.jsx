@@ -164,7 +164,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                     {auditCycle.Name}
                                                 </h6>
                                                 { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
-                                                    <div className="d-flex justify-content-start align-items-start my-1 gap-2">
+                                                    <div className="d-flex justify-content-start align-items-start flex-wrap my-1 gap-2">
                                                         {
                                                             auditCycle.AuditCycleStandards.map(item => (
                                                                 <span key={item.ID} 
