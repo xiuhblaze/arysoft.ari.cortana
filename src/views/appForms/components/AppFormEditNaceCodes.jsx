@@ -10,8 +10,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLandmark, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 import Swal from 'sweetalert2';
+import { setNacecodesList, useAppFormController } from '../context/appFormContext';
 
-const AppFormEditNaceCodes = ({ onChange, ...props }) => {
+const AppFormEditNaceCodes = ({ ...props }) => {
+
+    const [ controller, dispatch ] = useAppFormController();
+    const { nacecodesList } = controller;
 
     const { 
         NaceCodeOnlyOptionType,
@@ -37,7 +41,7 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
     // HOOKS
 
     const [nacecodeSelected, setNacecodeSelected] = useState(null);
-    const [nacecodesList, setNacecodesList] = useState([]);
+    // const [nacecodesList, setNacecodesList] = useState([]);
     const [disabledButtons, setDisabledButtons] = useState(false);
 
     useEffect(() => {
@@ -51,20 +55,20 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
             order: NacecodeOrderType.sector,
         });
 
-        if (!!appForm && !!appForm?.Nacecodes && appForm.Nacecodes.length > 0) {
-            setNacecodesList(appForm.Nacecodes
-                .map(nace => (
-                    { 
-                        ID: nace.ID,
-                        Sector: nace.Sector,
-                        // Division: nace.Division,
-                        // Group: nace.Group,
-                        // Class: nace.Class,
-                        Description: nace.Description 
-                    }
-                ))
-            );
-        }
+        // if (!!appForm && !!appForm?.Nacecodes && appForm.Nacecodes.length > 0) {
+        //     setNacecodesList(dispatch, appForm.Nacecodes
+        //         .map(nace => (
+        //             { 
+        //                 ID: nace.ID,
+        //                 Sector: nace.Sector,
+        //                 // Division: nace.Division,
+        //                 // Group: nace.Group,
+        //                 // Class: nace.Class,
+        //                 Description: nace.Description 
+        //             }
+        //         ))
+        //     );
+        // }
     }, []);
 
     // METHODS
@@ -81,7 +85,7 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
                     //console.log('AppFormEditNaceCodes: onClickAdd: myNacecode', myNacecode);
 
                     if (!!myNacecode) {
-                        setNacecodesList([
+                        setNacecodesList(dispatch, [
                             ...nacecodesList,
                             { 
                                 ID: myNacecode.ID,
@@ -91,13 +95,13 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
                         ]);
                     }
 
-                    onChange(nacecodesList.length + 1);
+                    //onChange(nacecodesList.length + 1);
                     setNacecodeSelected(null);
                     // console.log('AppFormEditNaceCodes: onClickAdd: nacecodesList', nacecodesList);
                 }
             }).catch(err => {
                 console.log(err);
-                Swal.fire('Error', err, 'error');
+                Swal.fire('Add NACE code', err, 'error');
             });
         setDisabledButtons(false);
     }; // onClickAdd
@@ -108,20 +112,12 @@ const AppFormEditNaceCodes = ({ onChange, ...props }) => {
             .then(data => {
                 //console.log('data', data);
                 if (!!data) {
-                    
-                    const myNacecode = nacecodes.find(i => i.ID == id);
-
-                    //console.log('AppFormEditNaceCodes: onClickRemove: myNacecode', myNacecode);
-
-                    if (!!myNacecode) {
-                        setNacecodesList(nacecodesList.filter(item => item.ID != id));
-                    }
-
-                    onChange(nacecodesList.length < 1 ? 0 : nacecodesList.length - 1);
+                    setNacecodesList(dispatch, nacecodesList.filter(item => item.ID != id));
+                    //onChange(nacecodesList.length < 1 ? 0 : nacecodesList.length - 1);
                 }
-
             }).catch(err =>{
                 console.log(err);
+                Swal.fire('Remove NACE code', err, 'error');
             });
         setDisabledButtons(false);
     }; // onClickRemove

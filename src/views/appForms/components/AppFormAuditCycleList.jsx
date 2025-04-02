@@ -8,6 +8,7 @@ import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import AppFormModalEditItem from './AppFormModalEditItem';
 import appFormStatusProps from "../helpers/appFormStatusProps";
 import { ViewLoading } from "../../../components/Loaders";
+import { AppFormControllerProvider } from "../context/appFormContext";
 
 const AppFormAuditCycleList = () => {
 
@@ -110,7 +111,9 @@ const AppFormAuditCycleList = () => {
                     )}
                 )}
             </div>
-            <AppFormModalEditItem show={ showModal } onHide={ onCloseModal } id={ appFormID } />
+            <AppFormControllerProvider>
+                <AppFormModalEditItem show={ showModal } onHide={ onCloseModal } id={ appFormID } />
+            </AppFormControllerProvider>
         </>
     )
 }

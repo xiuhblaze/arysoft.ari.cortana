@@ -250,7 +250,7 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.delete(`${APPFORM_URL}/${appForm.ID}/nace-code`, { data: toRemove });
             const { Data } = await resp.data;
 
-            console.log('naceCodeDelAsync.Data', Data);
+            //console.log('naceCodeDelAsync.Data', Data);
 
             return Data;
         } catch (error) {

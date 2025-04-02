@@ -5,10 +5,13 @@ import { AryFormikSelectInput } from "../../../components/Forms";
 import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import enums from "../../../helpers/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
+import { setSitesList, useAppFormController } from "../context/appFormContext";
 
-const AppFormEditSites = ({ onChange, ...props }) => {
-
+const AppFormEditSites = ({ ...props }) => {
+    const [ controller, dispatch ] = useAppFormController();
+    const { sitesList } = controller;
     const { DefaultStatusType} = enums();
 
     // CUSTOM HOOKS
@@ -26,26 +29,25 @@ const AppFormEditSites = ({ onChange, ...props }) => {
     // HOOKS
 
     const [siteSelected, setSiteSelected] = useState(null);
-    const [sitesList, setSitesList] = useState([]);
+    // const [sitesList, setSitesList] = useState(sitesListRef.current);
     const [disabledButtons, setDisabledButtons] = useState(false);
 
-    useEffect(() => {
-        console.log('AppFormEditSites: useEffect: void'); //! AQUI VOY - No mantiene el state si se cambia de Step :/
-        if (!!appForm && !!appForm.Sites && appForm.Sites.length > 0) {
-            setSitesList(appForm.Sites
-                .map(site => (
-                    { 
-                        ID: site.ID, 
-                        Description: site.Description,
-                        Address: site.Address,
-                        EmployeesCount: site.EmployeesCount,
-                        Status: site.Status,
-                    }
-                ))
-            );
-        }
-    }, []);
-    
+    // useEffect(() => {
+    //     // console.log('AppFormEditSites: useEffect: void'); 
+    //     if (!!appForm && !!appForm.Sites && appForm.Sites.length > 0) {
+    //         setSitesList(dispatch, appForm.Sites
+    //             .map(site => (
+    //                 { 
+    //                     ID: site.ID, 
+    //                     Description: site.Description,
+    //                     Address: site.Address,
+    //                     EmployeesCount: site.EmployeesCount,
+    //                     Status: site.Status,
+    //                 }
+    //             ))
+    //         );
+    //     }
+    // }, []);
 
     // METHODS
 
@@ -55,34 +57,52 @@ const AppFormEditSites = ({ onChange, ...props }) => {
 
     const onClickAdd = () => {
         setDisabledButtons(true);
-        console.log('onClickAdd', siteSelected);
+        siteAddAsync(siteSelected)
+            .then(data => {
+                console.log('onClickAdd', data);
+                if (!!data) {
+                    const mySite = organization.Sites.find(i => i.ID == siteSelected);
 
-        const mySite = organization.Sites.find(i => i.ID == siteSelected);
-        console.log('mySite', mySite);
-
-        if(!!mySite) {
-            setSitesList([
-                ...sitesList,
-                { 
-                    ID: mySite.ID, 
-                    Description: mySite.Description,
-                    Address: mySite.Address,
-                    EmployeesCount: mySite.EmployeesCount,
-                    Status: mySite.Status,
-                },
-            ]);
-        }
-
+                    if(!!mySite) {
+                        setSitesList(dispatch,[
+                            ...sitesList,
+                            { 
+                                ID: mySite.ID, 
+                                Description: mySite.Description,
+                                Address: mySite.Address,
+                                EmployeesCount: mySite.EmployeesCount,
+                                Status: mySite.Status,
+                            },
+                        ]);
+                    }
+                    setSiteSelected(null);
+                }
+            }).catch(err => {
+                console.log('onClickAdd', err);
+                Swal.fire('Add site', err, 'error');
+            });
         setDisabledButtons(false);
     }; // onClickAdd
 
     const onClickRemove = (id) => {
-        console.log('onClickRemove', id);
+        setDisabledButtons(true);
+        siteDelAsync(id)
+            .then(data => {
+                console.log('onClickRemove', data);
+                if (!!data) {
+                    setSitesList(dispatch, sitesList.filter(i => i.ID != id));
+                }
+            })
+            .catch(err => {
+                console.log('onClickAdd', err);
+                Swal.fire('Remove site', err, 'error');
+            });
+        setDisabledButtons(false);
     } // onClickRemove
 
     return (
         <Row {...props}>
-            <Col xs="8" sm="9">
+            <Col xs="8" sm="10">
                 <label className="form-label">Sites</label>
                 <select 
                     className="form-select" 
@@ -103,12 +123,13 @@ const AppFormEditSites = ({ onChange, ...props }) => {
                     }
                 </select>
             </Col>
-            <Col xs="4" sm="3">
+            <Col xs="4" sm="2">
                 <div className="d-grid gap-1 align-items-end">
                     <label className="form-label">&nbsp;</label>
                     <button type="button"
-                        className="btn bg-gradient-secondary text-white"
+                        className="btn btn-link text-dark px-2"
                         onClick={onClickAdd}
+                        disabled={disabledButtons}
                     >
                         Add
                     </button>
@@ -129,7 +150,12 @@ const AppFormEditSites = ({ onChange, ...props }) => {
                                                     {item.Description}
                                                 </span>
                                                 <span className="text-secondary ms-2">
+                                                    <FontAwesomeIcon icon={ faBuilding } className="me-1" />
                                                     {item.Address}
+                                                </span>
+                                                <span className="text-secondary ms-2">
+                                                    <FontAwesomeIcon icon={ faUsers } className="me-1" />
+                                                    {item.EmployeesCount}
                                                 </span>
                                             </span>
                                             <button

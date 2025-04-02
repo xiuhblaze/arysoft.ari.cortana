@@ -7,6 +7,9 @@ const appFormValidationSchema = () => {
     return Yup.object({
         standardSelect: Yup.string()
             .required('Standard is required'),
+        sitesCountHidden: Yup.number()
+            .positive('Must be at least one site associated')
+            .required('Must add at least one site'),
         // ISO 9K
         activitiesScopeInput: Yup.string()
             .max(1000, 'Process activities/scope must be less than 1000 characters')
@@ -57,7 +60,7 @@ const appFormValidationSchema = () => {
                 then: schema => schema.required('Design responsibility justification is required'),
                 otherwise: schema => schema.notRequired(),
             }),
-        nacecodeCountHidden: Yup.number()
+        nacecodesCountHidden: Yup.number()
             .when('standardSelect', {
                 is: (standardSelect) => standardSelect == StandardBaseType.iso9k,
                 then: schema => schema

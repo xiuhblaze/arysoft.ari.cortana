@@ -2,36 +2,47 @@ import { useEffect, useRef, useState } from "react";
 import { Card, Col, Modal, Nav, Row } from "react-bootstrap";
 
 import { faBuilding, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
 
 import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 
-import bgHeadModal from "../../../assets/img/bgWavesWhite.jpg";
-import { ViewLoading } from "../../../components/Loaders";
+import { setContactsList, setNacecodesList, setSitesList, setStandardData, useAppFormController } from "../context/appFormContext";
+
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
-import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
-import enums from "../../../helpers/enums";
-import standardBaseProps from "../../standards/helpers/standardBaseProps";
+import { ViewLoading } from "../../../components/Loaders";
+import AppFormEditNaceCodes from "./AppFormEditNaceCodes";
+import AppFormStepOrganization from "./AppFormStepOrganization";
 import AppFormPreview from "./AppFormPreview";
-import FormLoading from "../../../components/Loaders/FormLoading";
 import appFormStatusOptions from "../helpers/appFormStatusOptions";
 import appFormValidationSchema from "../helpers/appFormValidationSchema";
-import AryFormDebug from "../../../components/Forms/AryFormDebug";
-import AppFormEditNaceCodes from "./AppFormEditNaceCodes";
-import AppFormOrganizationStep from "./AppFormOrganizationStep";
+import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import bgHeadModal from "../../../assets/img/bgWavesWhite.jpg";
+import enums from "../../../helpers/enums";
+import FormLoading from "../../../components/Loaders/FormLoading";
+import standardBaseProps from "../../standards/helpers/standardBaseProps";
 
-const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
+import AryFormDebug from "../../../components/Forms/AryFormDebug";
+import AppFormStepStandard from "./AppFormStepStandard";
+import AppFormStepGeneral from "./AppFormStepGeneral";
+
+const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {    
+    const [ controller, dispatch ] = useAppFormController();
+    const { 
+        standardData,
+        contactsList,
+        nacecodesList,
+        sitesList,
+    } = controller;
+
     const navOptions = {
         organization: 'Organization',
         standard: 'Standard',
         general: 'General',
     };
-
     const { 
         AppFormStatusType,
         StandardBaseType,
@@ -69,8 +80,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         reviewJustificationInput: '',
         reviewCommentsInput: '',
         // Hidden
+        contactsCountHidden: 0,
+        nacecodesCountHidden: 0,
         sitesCountHidden: 0,
-        nacecodeCountHidden: 0,
     }; // formDefaultValues
 
     const validationSchema = appFormValidationSchema();
@@ -111,19 +123,21 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     // HOOKS
 
     const formikRef = useRef(null);
+    const sitesListRef = useRef([]);
+    const contactsListRef = useRef([]);
 
     const anyCriticalComplaintRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
     const [navOption, setNavOption] = useState(null);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-    const [standardSelected, setStandardSelected] = useState(null);
-    const [appFormPreviewData, setAppFormPreviewData] = useState({
-        standard: '',
-        organization: '',
-        mainSiteAddress: '',
-        legalEntity: '',
-    });
+    //const [standardSelected, setStandardSelected] = useState(null);
+    // const [appFormPreviewData, setAppFormPreviewData] = useState({
+    //     standard: '',
+    //     organization: '',
+    //     mainSiteAddress: '',
+    //     legalEntity: '',
+    // });
     const [showAnyCriticalComplaintComments, setShowAnyCriticalComplaintComments] = useState(false);
     const [statusOptions, setStatusOptions] = useState([]);
     const [originalStatus, setOriginalStatus] = useState(null);
@@ -165,7 +179,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
 
-        if (!!appForm && !!show) {
+        if (!!appForm && !!show) { //* Aquí se debe de iniciar todo del context 
             setInitialValues({
                 standardSelect: appForm.Standard?.StandardBase ?? '',
                 // 9K
@@ -194,8 +208,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                 reviewJustificationInput: appForm.ReviewJustification ?? '',
                 reviewCommentsInput: appForm.ReviewComments ?? '',
                 // Hidden
+                contactsCountHidden: !!appForm.Contacts ? appForm.Contacts.length : 0,
+                nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
                 sitesCountHidden: !!appForm.Sites ? appForm.Sites.length : 0,
-                nacecodeCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
             });
 
             if (!organization || organization.ID != appForm.OrganizationID) {
@@ -206,13 +221,53 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                 auditCycleAsync(appForm.AuditCycleID);
             }
 
+            if (!!appForm.Contacts && appForm.Contacts.length > 0) {
+                setContactsList(dispatch, appForm.Contacts
+                    .map(contact => ({
+                        ID: contact.ID,
+                        FullName: contact.FullName,
+                        Email: contact.Email,
+                        Phone: contact.Phone,
+                        Position: contact.Position,
+                        Status: contact.Status,
+                    })));
+            }
+
+            if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
+                setNacecodesList(dispatch, appForm.Nacecodes
+                    .map(nace => ({
+                        ID: nace.ID,
+                        Sector: nace.Sector,
+                        // Division: nace.Division,
+                        // Group: nace.Group,
+                        // Class: nace.Class,
+                        Description: nace.Description
+                    })));
+            }
+
+            if (!!appForm.Sites && appForm.Sites.length > 0) {
+                setSitesList(dispatch, appForm.Sites
+                    .map(site => ({
+                        ID: site.ID,
+                        Description: site.Description,
+                        Address: site.Address,
+                        EmployeesCount: site.EmployeesCount,
+                        Status: site.Status,
+                    })));
+            }
+
+            setStandardData(dispatch, {
+                ...standardData,
+                standardBase: appForm.Standard?.StandardBase ?? StandardBaseType.nothing,
+            });
+
             setStatusOptions(appFormStatusOptions(appForm.Status == AppFormStatusType.nothing 
                 ? AppFormStatusType.new 
                 : appForm.Status
             ));
 
             setOriginalStatus(appForm.Status);
-            setStandardSelected(appForm.Standard?.StandardBase);
+            //setStandardSelected(appForm.Standard?.StandardBase);
 
             setNavOption(navOptions.organization);
             // setShowModal(true);
@@ -232,6 +287,27 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             Swal.fire('App Form', appFormsErrorMessage, 'error');
         }
     }, [appFormsErrorMessage]);
+
+    useEffect(() => {        
+        if (!!contactsList && formikRef?.current != null) {
+            //console.log('AppFormModalEditItem: useEffect: contactsList', contactsList.length);
+            formikRef.current.setFieldValue('contactsCountHidden', contactsList.length);
+        }
+    }, [contactsList]);
+
+    useEffect(() => {
+        if (!!nacecodesList && formikRef?.current != null) {
+            //console.log('AppFormModalEditItem: useEffect: nacecodesList', nacecodesList.length);
+            formikRef.current.setFieldValue('nacecodesCountHidden', nacecodesList.length);
+        }
+    }, [nacecodesList]);
+
+    useEffect(() => {
+        if (!!sitesList && formikRef?.current != null) {
+            //console.log('AppFormModalEditItem: useEffect: sitesList', sitesList.length);
+            formikRef.current.setFieldValue('sitesCountHidden', sitesList.length);
+        }
+    }, [sitesList]);
     
 
     // useEffect(() => {
@@ -243,11 +319,11 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     
     // METHODS
 
-    const auditLanguageOptions = [
-        { value: '', label: '(select a language)' },
-        { value: 'en', label: 'English' },
-        { value: 'es', label: 'Spanish' },
-    ];
+    // const auditLanguageOptions = [
+    //     { value: '', label: '(select a language)' },
+    //     { value: 'en', label: 'English' },
+    //     { value: 'es', label: 'Spanish' },
+    // ];
 
     const onFormSubmit = (values) => {
         let status = AppFormStatusType.nothing;
@@ -296,26 +372,33 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         //console.log('AppFormModalEditItem: onCloseModal: Para hacer algo antes de cerrar el modal');
 
         // TODO: Limpiar valores
-        setStandardSelected(null);
-        setShowAnyCriticalComplaintComments(false);
+        //setStandardSelected(null);
+        //setShowAnyCriticalComplaintComments(false);
         setStatusChangedWith(null);
 
         if (!!onHide) onHide();
     }; // onCloseModal
 
+    // Contacts
+
+    // const onContactsChange = (count) => {
+
+    //     formikRef.current.setFieldValue('contactsCountHidden', count);
+    // };
+
     // Sites
     
-    const onSitesChange = (count) => {
+    // const onSitesChange = (count) => {
 
-        formikRef.current.setFieldValue('sitesCountHidden', count);
-    };
+    //     formikRef.current.setFieldValue('sitesCountHidden', count);
+    // };
 
     // Nacecodes
 
-    const onNacecodesChange = (count) => {
+    // const onNacecodesChange = (count) => {
 
-        formikRef.current.setFieldValue('nacecodeCountHidden', count);
-    };
+    //     formikRef.current.setFieldValue('nacecodesCountHidden', count);
+    // };
     
     return (
         <Modal {...props} show={showModal} onHide={ onCloseModal }
@@ -421,169 +504,20 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                             </Nav>
                                                             {
                                                                 navOption == navOptions.organization &&
-                                                                <AppFormOrganizationStep 
-                                                                    formik={ formik } 
-                                                                    onSitesChange={ onSitesChange }
-                                                                />
+                                                                <AppFormStepOrganization formik={ formik } />
+                                                            }
+                                                            { 
+                                                                navOption == navOptions.standard &&
+                                                                <AppFormStepStandard formik={ formik } />
+                                                            }
+                                                            {
+                                                                navOption == navOptions.general &&
+                                                                <AppFormStepGeneral formik={ formik } />
                                                             }
                                                         </Col>
                                                     </Row>
-                                                    <Row>
-                                                        <Col xs="12">
-                                                            <AryFormikSelectInput
-                                                                name="standardSelect"
-                                                                label="Standard"
-                                                                onChange={ (e) => {
-                                                                    const selectedValue = e.target.value;
-                                                                    formik.setFieldValue('standardSelect', selectedValue);
-                                                                    setStandardSelected(selectedValue);
-                                                                }}
-                                                            >
-                                                                <option value="">Select a standard</option>
-                                                                { auditCycle.AuditCycleStandards.map((standard) => (
-                                                                    <option key={standard.ID} value={standard.StandardBase}>{standard.StandardName}</option>
-                                                                )) }
-                                                            </AryFormikSelectInput>
-
-                                                        </Col>
-                                                    </Row>
-                                                    { 
-                                                        (!standardSelected || standardSelected == StandardBaseType.nothing) && 
-                                                        <Row>
-                                                            <Col xs="12">
-                                                                <FormLoading />
-                                                            </Col>
-                                                        </Row>
-                                                    }
-                                                    {
-                                                        standardSelected == StandardBaseType.iso9k &&
-                                                        <Row>
-                                                            <Col xs="12">
-                                                                <div className="mb-3">
-                                                                    <div className="bg-light border-radius-md p-3 pb-0">
-                                                                        <AppFormEditNaceCodes 
-                                                                            onChange={ onNacecodesChange }
-                                                                        />
-                                                                    </div>
-                                                                    <Field name="nacecodeCountHidden" type="hidden" value={ formik.values.nacecodeCountHidden } />
-                                                                    {
-                                                                        formik.touched.nacecodeCountHidden && formik.errors.nacecodeCountHidden &&
-                                                                        <span className="text-danger text-xs">{formik.errors.nacecodeCountHidden}</span>
-                                                                    }
-                                                                </div>
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="activitiesScopeInput"
-                                                                    label="Process activities/scope"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12" sm="4">
-                                                                <AryFormikTextInput
-                                                                    name="processServicesCountInput"
-                                                                    label="Num Process/services"
-                                                                    placeholder="0"
-                                                                    className="text-end"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12" sm="8">
-                                                                <AryFormikTextInput
-                                                                    name="processServicesDescriptionInput"
-                                                                    label="Process/services description"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="legalRequirementsInput"
-                                                                    label="Legal requirements associated with product/service"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <div className="bg-light border-radius-md p-3 pb-0 mb-3">
-                                                                    <Row>
-                                                                        <Col xs="12">
-                                                                            <div className="form-check form-switch">
-                                                                                <input type="checkbox" 
-                                                                                    id="anyCriticalComplaintCheck" 
-                                                                                    className="form-check-input" 
-                                                                                    onChange={ (e) => {
-                                                                                        const isChecked = e.target.checked;
-                                                                                        formik.setFieldValue('anyCriticalComplaintCheck', isChecked);
-                                                                                        setShowAnyCriticalComplaintComments(isChecked);
-                                                                                    }}
-                                                                                    checked={ formik.values.anyCriticalComplaintCheck }
-                                                                                />
-                                                                                <label 
-                                                                                    className="form-check-label"
-                                                                                    htmlFor="anyCriticalComplaintCheck"
-                                                                                >
-                                                                                    Any critical complaint?
-                                                                                </label>
-                                                                            </div>
-                                                                        </Col>
-                                                                    </Row>
-                                                                    <Row ref={ anyCriticalComplaintRef }
-                                                                        style={{
-                                                                            maxHeight: showAnyCriticalComplaintComments
-                                                                                ? `${anyCriticalComplaintRef?.current?.scrollHeight ?? 0}px`
-                                                                                : '0px',
-                                                                            overflow: 'hidden',
-                                                                            transition: 'max-height 0.5s ease-in-out',
-                                                                        }}
-                                                                    >
-                                                                        <Col xs="12">
-                                                                            <AryFormikTextInput
-                                                                                name="criticalComplaintCommentsInput"
-                                                                                label="Critical complaint comments"
-                                                                            />
-                                                                        </Col>
-                                                                    </Row>
-                                                                </div>
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="automationLevelInput"
-                                                                    label="Process automation level"
-                                                                    helpText="Degree of implementation of processes in which labor is little involved"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <div className="bg-light border-radius-md p-3 pb-0 mb-3">
-                                                                    <Row>
-                                                                        <Col xs="12">
-                                                                            <div className="form-check form-switch">
-                                                                                <input type="checkbox" 
-                                                                                    id="isDesignResponsibilityCheck" 
-                                                                                    className="form-check-input" 
-                                                                                    onChange={ (e) => {
-                                                                                        const isChecked = e.target.checked;
-                                                                                        formik.setFieldValue('isDesignResponsibilityCheck', isChecked);
-                                                                                    }}
-                                                                                    checked={ formik.values.isDesignResponsibilityCheck }
-                                                                                />
-                                                                                <label 
-                                                                                    className="form-check-label"
-                                                                                    htmlFor="isDesignResponsibilityCheck"
-                                                                                >
-                                                                                    Design responsibility
-                                                                                </label>
-                                                                            </div>
-                                                                        </Col>
-                                                                    </Row>
-                                                                    <Row>
-                                                                        <Col xs="12">
-                                                                            <AryFormikTextInput
-                                                                                name="designResponsibilityJustificationInput"
-                                                                                label="Design responsibility justification"
-                                                                                helpText="If you're NOT responsible for design, explain why and who is in charge of this process"
-                                                                            />
-                                                                        </Col>
-                                                                    </Row>
-                                                                </div>
-                                                            </Col>
-                                                        </Row>
-                                                    }
-                                                    <Row>
+                                                    
+                                                    {/* <Row>
                                                         <Col xs="12">
                                                             <AryFormikSelectInput
                                                                 name="auditLanguageSelect"
@@ -594,8 +528,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 )) }
                                                             </AryFormikSelectInput>
                                                         </Col>
-                                                    </Row>
-                                                    <div className="bg-light border-radius-md p-3 pb-0 mb-3">
+                                                    </Row> */}
+                                                    {/* <div className="bg-light border-radius-md p-3 pb-0 mb-3">
                                                         <Row>
                                                             <Col xs="12" className="mb-3">
                                                                 <h6 className="text-sm text-dark mb-0">Current certifications</h6>
@@ -631,8 +565,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 helpText="It refers to those that are part of the main process of the company and are subcontracted by a supplier as an extension of the company"
                                                             />
                                                         </Col>
-                                                    </Row>
-                                                    <Row>
+                                                    </Row> */}
+                                                    {/* <Row>
                                                         <Col xs="12">
                                                             <div className="bg-light border-radius-md p-3 pb-0 mb-3">
                                                                 <Row>
@@ -666,7 +600,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 </Row>
                                                             </div>
                                                         </Col>
-                                                    </Row>                                                    
+                                                    </Row>                                                     */}
                                                     <Row>
                                                         <Col xs="12">
                                                             <AryFormikSelectInput
@@ -747,8 +681,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                         <Col xs="12" sm="6">
                                             <Card>
                                                 <Card.Body className="p-3">
-                                                    <AppFormPreview appForm={ appFormPreviewData } />
-                                                    <h6>Preview</h6>
+                                                    <AppFormPreview />
+                                                    {/* <h6>Preview</h6>
                                                     <hr className="horizontal dark mt-0" />
                                                     <Row className="justify-content-end">
                                                         <Col xs="8">
@@ -768,7 +702,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                     <Row>
                                                         <Col xs="4" className="text-sm text-end font-weight-bold text-dark">Legal entity</Col>
                                                         <Col xs="8">CASA771312</Col>
-                                                    </Row>
+                                                    </Row> */}
                                                     <hr className="horizontal dark mt-0" />
                                                     <div className="text-xs">
                                                         { process.env.NODE_ENV == 'development' && <AryFormDebug formik={ formik } /> }

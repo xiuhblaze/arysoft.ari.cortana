@@ -4,6 +4,7 @@ import { faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import AppFormModalEditItem from './AppFormModalEditItem';
+import { AppFormControllerProvider } from '../context/appFormContext';
 
 const AppFormButtonNewItem = () => {
     const [showAppFormModal, setShowAppFormModal] = useState(false);
@@ -28,10 +29,12 @@ const AppFormButtonNewItem = () => {
             >
                 <FontAwesomeIcon icon={faWindowMaximize} size="lg" />
             </button>
-            <AppFormModalEditItem 
-                show={showAppFormModal}
-                onHide={onHideAppFormModal}
-            />
+            <AppFormControllerProvider>
+                <AppFormModalEditItem 
+                    show={showAppFormModal}
+                    onHide={onHideAppFormModal}
+                />
+            </AppFormControllerProvider>
         </div>
     )
 }
