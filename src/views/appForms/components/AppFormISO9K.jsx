@@ -3,7 +3,7 @@ import { Col, Row } from 'react-bootstrap'
 import { Field } from 'formik'
 
 import AppFormEditNaceCodes from './AppFormEditNaceCodes'
-import { AryFormikTextInput } from '../../../components/Forms'
+import { AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms'
 
 const AppFormISO9K = ({ formik, ...props }) => {
 
@@ -34,20 +34,25 @@ const AppFormISO9K = ({ formik, ...props }) => {
                         label="Process activities/scope"
                     />
                 </Col>
-                <Col xs="12" sm="4">
-                    <AryFormikTextInput
-                        name="processServicesCountInput"
-                        label="Num Process/services"
-                        placeholder="0"
-                        className="text-end"
-                    />
-                </Col>
-                <Col xs="12" sm="8">
-                    <AryFormikTextInput
-                        name="processServicesDescriptionInput"
-                        label="Process/services description"
-                    />
-                </Col>
+                <Row>
+                    <Col xs="12">
+                        <label className="form-label">Process/services</label>
+                    </Col>
+                    <Col xs="12" sm="3">
+                        <AryFormikTextInput
+                            name="processServicesCountInput"                            
+                            placeholder="0"
+                            className="text-end"
+                            helpText="Number of process/services"
+                        />
+                    </Col>
+                    <Col xs="12" sm="9">
+                        <AryFormikTextArea
+                            name="processServicesDescriptionInput"
+                            helpText="Description of process/services"
+                        />
+                    </Col>
+                </Row>
                 <Col xs="12">
                     <AryFormikTextInput
                         name="legalRequirementsInput"
@@ -88,9 +93,9 @@ const AppFormISO9K = ({ formik, ...props }) => {
                             }}
                         >
                             <Col xs="12">
-                                <AryFormikTextInput
+                                <AryFormikTextArea
                                     name="criticalComplaintCommentsInput"
-                                    label="Critical complaint comments"
+                                    label="Comments"
                                 />
                             </Col>
                         </Row>
@@ -100,6 +105,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                     <AryFormikTextInput
                         name="automationLevelInput"
                         label="Process automation level"
+                        placeholder="Justification"
                         helpText="Degree of implementation of processes in which labor is little involved"
                     />
                 </Col>
@@ -128,9 +134,9 @@ const AppFormISO9K = ({ formik, ...props }) => {
                         </Row>
                         <Row>
                             <Col xs="12">
-                                <AryFormikTextInput
+                                <AryFormikTextArea
                                     name="designResponsibilityJustificationInput"
-                                    label="Design responsibility justification"
+                                    label="Justification"
                                     helpText="If you're NOT responsible for design, explain why and who is in charge of this process"
                                 />
                             </Col>

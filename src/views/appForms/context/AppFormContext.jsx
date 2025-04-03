@@ -27,6 +27,9 @@ const AppFormControllerProvider = ({ children }) => {
             case 'SET_SITES_LIST': {
                 return { ...state, sitesList: action.value };
             }
+            case 'CLEAR_CONTROLLER': {
+                return { ...initialState };
+            }
             default: {
                 throw new Error(`Unhandled action type: ${action.type}`);
             }
@@ -54,7 +57,7 @@ const setStandardData = (dispatch, value) => dispatch({ type: "SET_STANDARD_DATA
 const setContactsList = (dispatch, value) => dispatch({ type: "SET_CONTACTS_LIST", value });
 const setNacecodesList = (dispatch, value) => dispatch({ type: "SET_NACECODES_LIST", value });
 const setSitesList = (dispatch, value) => dispatch({ type: "SET_SITES_LIST", value });
-
+const clearAppFormController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
 export { 
     AppFormControllerProvider, 
@@ -63,4 +66,5 @@ export {
     setContactsList,
     setNacecodesList,
     setSitesList,
+    clearAppFormController,
 };

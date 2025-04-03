@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Card, Col, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faChevronLeft, faChevronRight, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -10,7 +10,7 @@ import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 
-import { setContactsList, setNacecodesList, setSitesList, setStandardData, useAppFormController } from "../context/appFormContext";
+import { clearAppFormController, setContactsList, setNacecodesList, setSitesList, setStandardData, useAppFormController } from "../context/appFormContext";
 
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import { ViewLoading } from "../../../components/Loaders";
@@ -29,6 +29,60 @@ import AryFormDebug from "../../../components/Forms/AryFormDebug";
 import AppFormStepStandard from "./AppFormStepStandard";
 import AppFormStepGeneral from "./AppFormStepGeneral";
 
+const navOptions = {
+    organization: 'Organization',
+    standard: 'Standard',
+    general: 'General',
+};
+
+const NavigationButtons = ({navOption, setNavOption}) => {
+
+    const onClickBack = () => {
+
+        if (navOption == navOptions.general) {
+            setNavOption(navOptions.standard);
+        } else if (navOption == navOptions.standard) {
+            setNavOption(navOptions.organization);
+        }        
+    }; // onClickBack
+
+    const onClickNext = () => {
+
+        if (navOption == navOptions.organization) {
+            setNavOption(navOptions.standard);
+        } else if (navOption == navOptions.standard) {
+            setNavOption(navOptions.general);
+        }
+    };
+
+    return (
+        <Row>
+            <Col xs="12">
+                <div className="d-flex justify-content-between align-items-center">                                                                        
+                    <button 
+                        type="button"
+                        className={`btn btn-link text-${ navOption == navOptions.organization ? 'secondary' : 'dark' } px-0`}
+                        onClick={ onClickBack }
+                        disabled={ navOption == navOptions.organization }
+                    >
+                        <FontAwesomeIcon icon={ faChevronLeft } className="me-1" />
+                        Back
+                    </button>
+                    <button 
+                        type="button"
+                        className={`btn btn-link text-${ navOption == navOptions.general ? 'secondary' : 'dark' } px-0`}
+                        onClick={ onClickNext }
+                        disabled={ navOption == navOptions.general }
+                    >
+                        Next
+                        <FontAwesomeIcon icon={ faChevronRight } className="ms-1" />
+                    </button>
+                </div>
+            </Col>
+        </Row>
+    );
+}; 
+
 const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {    
     const [ controller, dispatch ] = useAppFormController();
     const { 
@@ -37,13 +91,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         nacecodesList,
         sitesList,
     } = controller;
-
-    const navOptions = {
-        organization: 'Organization',
-        standard: 'Standard',
-        general: 'General',
-    };
     const { 
+        AppFormOrderType,
         AppFormStatusType,
         StandardBaseType,
         OrganizationStatusType,
@@ -123,28 +172,16 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     // HOOKS
 
     const formikRef = useRef(null);
-    const sitesListRef = useRef([]);
-    const contactsListRef = useRef([]);
-
-    const anyCriticalComplaintRef = useRef(null);
 
     const [showModal, setShowModal] = useState(false);
     const [navOption, setNavOption] = useState(null);
-    const [initialValues, setInitialValues] = useState(formDefaultValues);
-    //const [standardSelected, setStandardSelected] = useState(null);
-    // const [appFormPreviewData, setAppFormPreviewData] = useState({
-    //     standard: '',
-    //     organization: '',
-    //     mainSiteAddress: '',
-    //     legalEntity: '',
-    // });
-    const [showAnyCriticalComplaintComments, setShowAnyCriticalComplaintComments] = useState(false);
+    const [initialValues, setInitialValues] = useState(formDefaultValues);        
     const [statusOptions, setStatusOptions] = useState([]);
     const [originalStatus, setOriginalStatus] = useState(null);
     const [statusChangedWith, setStatusChangedWith] = useState(null);
 
     useEffect(() => {
-//console.log('AppFormModalEditItem', show, id);
+
         if (!!show) {
 
             setShowModal(true);
@@ -161,18 +198,17 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             } else {
                 Swal.fire('App Form', 'You must specify the App Form ID or the audit cycle and the organization', 'warning');
                 onCloseModal();
-                // setStep(1);
-
-                // Cargar lista de organizaciones para seleccionar, 
-                // una vez seleccionada, cargar lista de ciclos de auditoría para seleccionar
-                organizationsAsync({
-                    includeDeleted: false,
-                    order: OrganizationOrderType.name,
-                    pageSize: 0,
-                });
             }
 
-            //! Aquí también va a ser cosa de reiniciar valores
+            // Limpiando valores del AppFormContext
+
+            setSitesList(dispatch, []);
+            setContactsList(dispatch, []);
+            setNacecodesList(dispatch, []);
+            setStandardData(dispatch, {
+                standardBase: StandardBaseType.nothing,
+            });
+
             setOriginalStatus(null);
         }
     }, [show]);
@@ -222,39 +258,14 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             }
 
             if (!!appForm.Contacts && appForm.Contacts.length > 0) {
-                // setContactsList(dispatch, appForm.Contacts
-                //     .map(contact => ({
-                //         ID: contact.ID,
-                //         FullName: contact.FullName,
-                //         Email: contact.Email,
-                //         Phone: contact.Phone,
-                //         Position: contact.Position,
-                //         Status: contact.Status,
-                //     })));
                 setContactsList(dispatch, appForm.Contacts);
             }
 
             if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
-                setNacecodesList(dispatch, appForm.Nacecodes
-                    .map(nace => ({
-                        ID: nace.ID,
-                        Sector: nace.Sector,
-                        // Division: nace.Division,
-                        // Group: nace.Group,
-                        // Class: nace.Class,
-                        Description: nace.Description
-                    })));
+                setNacecodesList(dispatch, appForm.Nacecodes);
             }
 
             if (!!appForm.Sites && appForm.Sites.length > 0) {
-                // setSitesList(dispatch, appForm.Sites
-                //     .map(site => ({
-                //         ID: site.ID,
-                //         Description: site.Description,
-                //         Address: site.Address,
-                //         EmployeesCount: site.EmployeesCount,
-                //         Status: site.Status,
-                //     })));
                 setSitesList(dispatch, appForm.Sites);
             }
 
@@ -279,7 +290,13 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     useEffect(() => {
         if (!!appFormSavedOk) {
             Swal.fire('App Form', 'Changes made successfully', 'success');
-            appFormClear();
+            
+            appFormsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+                order: AppFormOrderType.createdDesc,
+            });
+
             onCloseModal();
         }
     }, [appFormSavedOk]);
@@ -292,40 +309,32 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
     useEffect(() => {        
         if (!!contactsList && formikRef?.current != null) {
-            //console.log('AppFormModalEditItem: useEffect: contactsList', contactsList.length);
             formikRef.current.setFieldValue('contactsCountHidden', contactsList.length);
         }
     }, [contactsList]);
 
     useEffect(() => {
         if (!!nacecodesList && formikRef?.current != null) {
-            //console.log('AppFormModalEditItem: useEffect: nacecodesList', nacecodesList.length);
             formikRef.current.setFieldValue('nacecodesCountHidden', nacecodesList.length);
         }
     }, [nacecodesList]);
 
     useEffect(() => {
         if (!!sitesList && formikRef?.current != null) {
-            //console.log('AppFormModalEditItem: useEffect: sitesList', sitesList.length);
             formikRef.current.setFieldValue('sitesCountHidden', sitesList.length);
         }
     }, [sitesList]);
     
+    // METHODS 
 
-    // useEffect(() => {
-    //     if (!!organizationsErrorMessage) {
-    //         Swal.fire('App Form', organizationsErrorMessage, 'error');
-    //         //TODO: Ver con que acción continuar
-    //     }
-    // }, [organizationsErrorMessage]);
-    
-    // METHODS
-
-    // const auditLanguageOptions = [
-    //     { value: '', label: '(select a language)' },
-    //     { value: 'en', label: 'English' },
-    //     { value: 'es', label: 'Spanish' },
-    // ];
+    const onStandardSelectChange = (e) => {
+        const selectedValue = e.target.value;
+        formikRef.current.setFieldValue('standardSelect', selectedValue);
+        setStandardData(dispatch, {
+            ...standardData,
+            standardBase: selectedValue,
+        });
+    };
 
     const onFormSubmit = (values) => {
         let status = AppFormStatusType.nothing;
@@ -364,44 +373,20 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             ReviewComments: values.reviewCommentsInput,            
         } // toSave
 
-        
-        //console.log('AppFormModalEditItem: onFormSubmit: toSave', toSave);
         appFormSaveAsync(toSave);
     }; // onFormSubmit
 
     const onCloseModal = () => {
         setShowModal(false);
-        //console.log('AppFormModalEditItem: onCloseModal: Para hacer algo antes de cerrar el modal');
 
-        // TODO: Limpiar valores
-        //setStandardSelected(null);
-        //setShowAnyCriticalComplaintComments(false);
+        // Limpiar valores
+        appFormClear();
+        clearAppFormController(dispatch);
         setStatusChangedWith(null);
 
         if (!!onHide) onHide();
     }; // onCloseModal
 
-    // Contacts
-
-    // const onContactsChange = (count) => {
-
-    //     formikRef.current.setFieldValue('contactsCountHidden', count);
-    // };
-
-    // Sites
-    
-    // const onSitesChange = (count) => {
-
-    //     formikRef.current.setFieldValue('sitesCountHidden', count);
-    // };
-
-    // Nacecodes
-
-    // const onNacecodesChange = (count) => {
-
-    //     formikRef.current.setFieldValue('nacecodesCountHidden', count);
-    // };
-    
     return (
         <Modal {...props} show={showModal} onHide={ onCloseModal }
             size="xl"
@@ -479,6 +464,21 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                 <Card.Body className="p-3">
                                                     <Row>
                                                         <Col xs="12">
+                                                            <AryFormikSelectInput
+                                                                name="standardSelect"
+                                                                label="Standard"
+                                                                onChange={ onStandardSelectChange}
+                                                                disabled={ !!id }
+                                                            >
+                                                                <option value="">Select a standard</option>
+                                                                { auditCycle.AuditCycleStandards.map((standard) => (
+                                                                    <option key={standard.ID} value={standard.StandardBase}>{standard.StandardName}</option>
+                                                                )) }
+                                                            </AryFormikSelectInput>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col xs="12">
                                                             <Nav
                                                                 variant="pills"
                                                                 className="nav-fill p-1 mb-3"
@@ -504,6 +504,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     </Nav.Link>
                                                                 </Nav.Item>
                                                             </Nav>
+                                                            <NavigationButtons 
+                                                                navOption={navOption} 
+                                                                setNavOption={setNavOption} 
+                                                            />
                                                             {
                                                                 navOption == navOptions.organization &&
                                                                 <AppFormStepOrganization formik={ formik } />
@@ -516,93 +520,12 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 navOption == navOptions.general &&
                                                                 <AppFormStepGeneral formik={ formik } />
                                                             }
-                                                        </Col>
-                                                    </Row>
-                                                    
-                                                    {/* <Row>
-                                                        <Col xs="12">
-                                                            <AryFormikSelectInput
-                                                                name="auditLanguageSelect"
-                                                                label="Audit language"
-                                                            >
-                                                                { auditLanguageOptions.map((option) => (
-                                                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                                                )) }
-                                                            </AryFormikSelectInput>
-                                                        </Col>
-                                                    </Row> */}
-                                                    {/* <div className="bg-light border-radius-md p-3 pb-0 mb-3">
-                                                        <Row>
-                                                            <Col xs="12" className="mb-3">
-                                                                <h6 className="text-sm text-dark mb-0">Current certifications</h6>
-                                                                <p className="text-xs text-dark mb-0">
-                                                                    You can specify if there is more than one certification separated by commas
-                                                                </p>
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="currentStandardsInput"
-                                                                    label="Current standards"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="currentCertificationsByInput"
-                                                                    label="Certified by"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="currentCertificationsExpirationInput"
-                                                                    label="Expiration date"
-                                                                />
-                                                            </Col>
-                                                        </Row>
-                                                    </div>
-                                                    <Row>
-                                                        <Col xs="12">
-                                                            <AryFormikTextInput
-                                                                name="outsourcedProcessInput"
-                                                                label="Outsourced process related with product/service"
-                                                                helpText="It refers to those that are part of the main process of the company and are subcontracted by a supplier as an extension of the company"
+                                                            <NavigationButtons 
+                                                                navOption={navOption} 
+                                                                setNavOption={setNavOption} 
                                                             />
                                                         </Col>
-                                                    </Row> */}
-                                                    {/* <Row>
-                                                        <Col xs="12">
-                                                            <div className="bg-light border-radius-md p-3 pb-0 mb-3">
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <div className="form-check form-switch">
-                                                                            <input type="checkbox" 
-                                                                                id="anyConsultancyCheck" 
-                                                                                className="form-check-input" 
-                                                                                onChange={ (e) => {
-                                                                                    const isChecked = e.target.checked;
-                                                                                    formik.setFieldValue('anyConsultancyCheck', isChecked);
-                                                                                }}
-                                                                                checked={ formik.values.anyConsultancyCheck }
-                                                                            />
-                                                                            <label 
-                                                                                className="form-check-label"
-                                                                                htmlFor="anyConsultancyCheck"
-                                                                            >
-                                                                                Do you received any consultancy?
-                                                                            </label>
-                                                                        </div>
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <AryFormikTextInput
-                                                                            name="anyConsultancyByInput"
-                                                                            label="By who"
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>                                                     */}
+                                                    </Row>
                                                     <Row>
                                                         <Col xs="12">
                                                             <AryFormikSelectInput
@@ -683,7 +606,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                         <Col xs="12" sm="6">
                                             <Card>
                                                 <Card.Body className="p-3">
-                                                    <AppFormPreview />
+                                                    <AppFormPreview formik={formik} />
                                                     {/* <h6>Preview</h6>
                                                     <hr className="horizontal dark mt-0" />
                                                     <Row className="justify-content-end">
@@ -705,10 +628,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                         <Col xs="4" className="text-sm text-end font-weight-bold text-dark">Legal entity</Col>
                                                         <Col xs="8">CASA771312</Col>
                                                     </Row> */}
-                                                    <hr className="horizontal dark mt-0" />
+                                                    {/* <hr className="horizontal dark mt-0" />
                                                     <div className="text-xs">
                                                         { process.env.NODE_ENV == 'development' && <AryFormDebug formik={ formik } /> }
-                                                    </div>
+                                                    </div> */}
                                                 </Card.Body>
                                             </Card>
                                         </Col>

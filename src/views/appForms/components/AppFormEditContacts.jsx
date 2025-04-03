@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useContactsStore } from '../../../hooks/useContactStore';
 import enums from '../../../helpers/enums';
 import { faEnvelope, faPhone, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,7 +20,7 @@ const AppFormEditContacts = ({ ...props }) => {
     // CUSTOM HOOKS
 
     const { organization } = useOrganizationsStore();
-
+    const { contacts } = useContactsStore();
     const {
         appForm,
         contactAddAsync,
@@ -29,26 +30,7 @@ const AppFormEditContacts = ({ ...props }) => {
     // HOOKS
 
     const [contactSelected, setContactSelected] = useState(null);
-    //const [contactsList, setContactsList] = useState(contactsListRef.current);
     const [disabledButtons, setDisabledButtons] = useState(false);
-
-    // useEffect(() => {
-    //     // console.log('AppFormEditContacts: useEffect: void');
-    //     if (!!appForm && !!appForm.Contacts && appForm.Contacts.length > 0) {
-    //         setContactsList(dispatch, appForm.Contacts
-    //             .map(contact => (
-    //                 { 
-    //                     ID: contact.ID, 
-    //                     FullName: contact.FullName,
-    //                     Email: contact.Email,
-    //                     Phone: contact.Phone,
-    //                     Position: contact.Position,
-    //                     Status: contact.Status,
-    //                 }
-    //             ))
-    //         );
-    //     }
-    // }, []);
 
     // METHODS
 
@@ -60,25 +42,15 @@ const AppFormEditContacts = ({ ...props }) => {
         setDisabledButtons(true);
         contactAddAsync(contactSelected)
             .then(data => {
-                //console.log('onClickAdd', data);
                 if (!!data) {
-                    const myContact = organization.Contacts.find(i => i.ID == contactSelected);
+                    const myContact = contacts.find(i => i.ID == contactSelected);
 
                     if (!!myContact) {
                         setContactsList(dispatch, [
                             ...contactsList,
-                            // { 
-                            //     ID: myContact.ID, 
-                            //     FullName: myContact.FullName,
-                            //     Email: myContact.Email,
-                            //     Phone: myContact.Phone,
-                            //     Position: myContact.Position,
-                            //     Status: myContact.Status,
-                            // },
                             myContact,
                         ]);
                     }
-                    //onChange(contactsList.length + 1);
                     setContactSelected(null);
                 }
             }).catch(err => {
@@ -92,12 +64,8 @@ const AppFormEditContacts = ({ ...props }) => {
         setDisabledButtons(true);
         contactDelAsync(id)
             .then(data => {
-                //console.log('onClickRemove', data);
-                console.log(data, contactsList, id);
                 if (!!data) {
                     setContactsList(dispatch, contactsList.filter(i => i.ID != id));
-                    // onChange(contactsList.length < 1 ? 0 : contactsList.length - 1);
-                    console.log(contactsList.filter(i => i.ID != id))
                 }
             })
             .catch(err => {
@@ -118,7 +86,7 @@ const AppFormEditContacts = ({ ...props }) => {
                 >
                     <option value="">(select a contact)</option>
                     {
-                        !!organization.Contacts && organization.Contacts.length > 0 && organization.Contacts.map(contact => (
+                        !!contacts && contacts.length > 0 && contacts.map(contact => (
                             <option 
                                 key={contact.ID} 
                                 value={contact.ID}
@@ -146,7 +114,7 @@ const AppFormEditContacts = ({ ...props }) => {
                 <ListGroup variant='flush' className="mb-3">
                     {
                         contactsList
-                            .sort((a, b) => a.FullName.localeCompare(b.FullName))
+                            //.sort((a, b) => a.FullName.localeCompare(b.FullName))
                             .map(item => 
                                 <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
                                     <div className="d-flex justify-content-between align-items-center">

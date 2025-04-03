@@ -87,6 +87,8 @@ const appFormValidationSchema = () => {
                 then: schema => schema.required('Indicate by who the consultation is received is required'),
                 otherwise: schema => schema.notRequired(),
             }),
+        statusSelect: Yup.string()
+            .required('Standard is required'),
     });
 };
 

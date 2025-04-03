@@ -41,12 +41,9 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     // HOOKS
 
     const [nacecodeSelected, setNacecodeSelected] = useState(null);
-    // const [nacecodesList, setNacecodesList] = useState([]);
     const [disabledButtons, setDisabledButtons] = useState(false);
 
     useEffect(() => {
-        //console.log('AppFormEditNaceCodes: useEffect: void');
-
         // Cargar lista de nacecodes para seleccionar
         nacecodesAsync({
             onlyOption: NaceCodeOnlyOptionType.sectors,
@@ -54,21 +51,7 @@ const AppFormEditNaceCodes = ({ ...props }) => {
             includeDeleted: false,
             order: NacecodeOrderType.sector,
         });
-
-        // if (!!appForm && !!appForm?.Nacecodes && appForm.Nacecodes.length > 0) {
-        //     setNacecodesList(dispatch, appForm.Nacecodes
-        //         .map(nace => (
-        //             { 
-        //                 ID: nace.ID,
-        //                 Sector: nace.Sector,
-        //                 // Division: nace.Division,
-        //                 // Group: nace.Group,
-        //                 // Class: nace.Class,
-        //                 Description: nace.Description 
-        //             }
-        //         ))
-        //     );
-        // }
+        
     }, []);
 
     // METHODS
@@ -77,27 +60,15 @@ const AppFormEditNaceCodes = ({ ...props }) => {
         setDisabledButtons(true);
         naceCodeAddAsync(nacecodeSelected)
             .then(data => {
-                //console.log('data', data);
                 if (!!data) {
-                    
                     const myNacecode = nacecodes.find(i => i.ID == nacecodeSelected);
-
-                    //console.log('AppFormEditNaceCodes: onClickAdd: myNacecode', myNacecode);
-
                     if (!!myNacecode) {
                         setNacecodesList(dispatch, [
                             ...nacecodesList,
-                            { 
-                                ID: myNacecode.ID,
-                                Sector: myNacecode.Sector,
-                                Description: myNacecode.Description 
-                            },
+                            myNacecode,
                         ]);
                     }
-
-                    //onChange(nacecodesList.length + 1);
                     setNacecodeSelected(null);
-                    // console.log('AppFormEditNaceCodes: onClickAdd: nacecodesList', nacecodesList);
                 }
             }).catch(err => {
                 console.log(err);
@@ -110,10 +81,8 @@ const AppFormEditNaceCodes = ({ ...props }) => {
         setDisabledButtons(true);
         naceCodeDelAsync(id)
             .then(data => {
-                //console.log('data', data);
                 if (!!data) {
                     setNacecodesList(dispatch, nacecodesList.filter(item => item.ID != id));
-                    //onChange(nacecodesList.length < 1 ? 0 : nacecodesList.length - 1);
                 }
             }).catch(err =>{
                 console.log(err);
@@ -124,7 +93,7 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     
     return (
         <Row {...props}>
-            <Col xs="8" sm="9">
+            <Col xs="8" sm="10">
                 <label className="form-label">Sector</label>
                 <Select name="nacecodesSelect"
                     options={ 
@@ -154,11 +123,11 @@ const AppFormEditNaceCodes = ({ ...props }) => {
                     placeholder={ isNacecodeLoading ? 'Loading...' : 'select' }
                 />
             </Col>
-            <Col xs="4" sm="3">
+            <Col xs="4" sm="2">
                 <div className="d-grid gap-1 align-items-end">
                     <label className="form-label">&nbsp;</label>
                     <button type="button" 
-                        className="btn bg-gradient-secondary text-white"
+                        className="btn btn-link text-dark px-2"
                         onClick={onClickAdd}
                         disabled={disabledButtons}
                     >
@@ -172,7 +141,7 @@ const AppFormEditNaceCodes = ({ ...props }) => {
                     <ListGroup variant="flush" className="mb-3">
                         {
                             nacecodesList
-                                .sort((a, b) => a.Description.localeCompare(b.Description))
+                                //.sort((a, b) => a.Description.localeCompare(b.Description))
                                 .map(item => 
                                     <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
                                         <div className='d-flex justify-content-between align-items-center'>

@@ -38,18 +38,18 @@ const AppFormStepStandard = ({ formik }) => {
 
     // METHODS
 
-    const onStandardSelectChange = (e) => {
-        const selectedValue = e.target.value;
-        formik.setFieldValue('standardSelect', selectedValue);
-        setStandardData(dispatch, {
-            ...standardData,
-            standardBase: selectedValue,
-        });
-    };
+    // const onStandardSelectChange = (e) => {
+    //     const selectedValue = e.target.value;
+    //     formik.setFieldValue('standardSelect', selectedValue);
+    //     setStandardData(dispatch, {
+    //         ...standardData,
+    //         standardBase: selectedValue,
+    //     });
+    // };
     
     return (
         <div>
-            <Row>
+            {/* <Row>
                 <Col xs="12">
                     <AryFormikSelectInput
                         name="standardSelect"
@@ -62,7 +62,7 @@ const AppFormStepStandard = ({ formik }) => {
                         )) }
                     </AryFormikSelectInput>
                 </Col>
-            </Row>
+            </Row> */}
             {
                 (!standardBase || standardBase == StandardBaseType.nothing) &&
                 <Row>

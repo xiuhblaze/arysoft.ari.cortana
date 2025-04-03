@@ -77,7 +77,8 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                 standardSelect: auditCycleStandard?.StandardID ?? '',
                 initialStepSelect: auditCycleStandard?.InitialStep ?? '',
                 cycleTypeSelect: auditCycleStandard?.CycleType ?? '',
-                statusCheck: auditCycleStandard.Status === DefaultStatusType.active,
+                statusCheck: auditCycleStandard.Status === DefaultStatusType.active 
+                    || auditCycleStandard.Status === DefaultStatusType.nothing,
             });
 
             if (!organizationStandards) {
@@ -100,8 +101,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             });
             onCloseModal();
         }
-    }, [auditCycleStandardSavedOk]);
-    
+    }, [auditCycleStandardSavedOk]);    
 
     useEffect(() => {
         if (auditCycleStandardsErrorMessage && showModal) {
@@ -109,6 +109,12 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             onCloseModal();
         }        
     }, [auditCycleStandardsErrorMessage]);
+
+
+    // useEffect(() => {
+    //   console.log(organizationStandards);
+    // }, [organizationStandards]);
+    
     
     // METHODS
 
@@ -168,7 +174,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                         <Modal.Body>
                             <ViewLoading />
                         </Modal.Body>
-                    ) : !!auditCycleStandard && showModal &&
+                    ) : !!auditCycleStandard && !!organizationStandards && showModal &&
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}

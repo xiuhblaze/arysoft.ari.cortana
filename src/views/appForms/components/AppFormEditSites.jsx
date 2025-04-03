@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBuilding, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { setSitesList, useAppFormController } from "../context/appFormContext";
+import { useSitesStore } from "../../../hooks/useSiteStore";
 
 const AppFormEditSites = ({ ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -16,10 +17,8 @@ const AppFormEditSites = ({ ...props }) => {
 
     // CUSTOM HOOKS
 
-    const {
-        organization
-    } = useOrganizationsStore();
-
+    const { organization } = useOrganizationsStore();
+    const { sites } = useSitesStore();
     const {
         appForm,
         siteAddAsync,
@@ -29,25 +28,7 @@ const AppFormEditSites = ({ ...props }) => {
     // HOOKS
 
     const [siteSelected, setSiteSelected] = useState(null);
-    // const [sitesList, setSitesList] = useState(sitesListRef.current);
     const [disabledButtons, setDisabledButtons] = useState(false);
-
-    // useEffect(() => {
-    //     // console.log('AppFormEditSites: useEffect: void'); 
-    //     if (!!appForm && !!appForm.Sites && appForm.Sites.length > 0) {
-    //         setSitesList(dispatch, appForm.Sites
-    //             .map(site => (
-    //                 { 
-    //                     ID: site.ID, 
-    //                     Description: site.Description,
-    //                     Address: site.Address,
-    //                     EmployeesCount: site.EmployeesCount,
-    //                     Status: site.Status,
-    //                 }
-    //             ))
-    //         );
-    //     }
-    // }, []);
 
     // METHODS
 
@@ -59,20 +40,12 @@ const AppFormEditSites = ({ ...props }) => {
         setDisabledButtons(true);
         siteAddAsync(siteSelected)
             .then(data => {
-                console.log('onClickAdd', data);
                 if (!!data) {
-                    const mySite = organization.Sites.find(i => i.ID == siteSelected);
+                    const mySite = sites.find(i => i.ID == siteSelected);
 
                     if(!!mySite) {
                         setSitesList(dispatch,[
                             ...sitesList,
-                            // { 
-                            //     ID: mySite.ID, 
-                            //     Description: mySite.Description,
-                            //     Address: mySite.Address,
-                            //     EmployeesCount: mySite.EmployeesCount,
-                            //     Status: mySite.Status,
-                            // },
                             mySite,
                         ]);
                     }
@@ -89,7 +62,6 @@ const AppFormEditSites = ({ ...props }) => {
         setDisabledButtons(true);
         siteDelAsync(id)
             .then(data => {
-                console.log('onClickRemove', data);
                 if (!!data) {
                     setSitesList(dispatch, sitesList.filter(i => i.ID != id));
                 }
@@ -112,7 +84,7 @@ const AppFormEditSites = ({ ...props }) => {
                 >
                     <option value="">(select a site)</option>
                     {
-                        !!organization.Sites && organization.Sites.length > 0 && organization.Sites.map(site => (
+                        !!sites && sites.length > 0 && sites.map(site => ( 
                             <option 
                                 key={site.ID} 
                                 value={site.ID}
@@ -142,7 +114,7 @@ const AppFormEditSites = ({ ...props }) => {
                     <ListGroup variant="flush" className="mb-3">
                         {
                             sitesList
-                                .sort((a, b) => a.Description.localeCompare(b.Description))
+                                //.sort((a, b) => a.Description.localeCompare(b.Description))
                                 .map(item => 
                                     <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
                                         <div className='d-flex justify-content-between align-items-center'>

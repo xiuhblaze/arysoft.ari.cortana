@@ -29,7 +29,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                     <Col xs="12" className="mb-3">
                         <h6 className="text-sm text-dark mb-0">Current certifications</h6>
                         <p className="text-xs text-dark mb-0">
-                            You can specify if there is more than one certification separated by commas
+                            You can specify if there is more than one certification <strong className="text-warning">separated by commas</strong>
                         </p>
                     </Col>
                     <Col xs="12">
@@ -89,7 +89,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                             <Col xs="12">
                                 <AryFormikTextInput
                                     name="anyConsultancyByInput"
-                                    label="By who"
+                                    label="By"
                                 />
                             </Col>
                         </Row>

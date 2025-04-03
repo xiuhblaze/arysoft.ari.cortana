@@ -22,14 +22,14 @@ const auditStepProps = [
         variant: 'dark',
     },
     {
-        id: AuditStepType.survey1,
-        label: 'Survey 1',
+        id: AuditStepType.surveillance1,
+        label: 'Surveillance 1',
         abbreviation: 's1',
         variant: 'dark',
     },
     {
-        id: AuditStepType.survey2,
-        label: 'Survey 2',
+        id: AuditStepType.surveillance2,
+        label: 'Surveillance 2',
         abbreviation: 's2',
         variant: 'dark',
     },
