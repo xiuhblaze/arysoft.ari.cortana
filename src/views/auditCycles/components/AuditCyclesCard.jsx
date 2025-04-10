@@ -1,38 +1,38 @@
+import React, { useEffect, useState } from 'react';
+
 import { Card, Nav } from 'react-bootstrap';
-import { faArrowsSpin, faEdit, faLandmark, faPlay, faPlus, faStickyNote, faStop } from '@fortawesome/free-solid-svg-icons'; 
+import { faArrowsSpin, faLandmark, faPlay, faStickyNote, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
-import { useEffect, useState } from 'react';
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
-import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps';
+//import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { ViewLoading } from '../../../components/Loaders';
+import AuditCycleDocumentsList from './AuditCycleDocumentsList';
 import AuditCycleEditItem from './AuditCycleEditItem';
 import AuditCyclesCardItem from './AuditCyclesCardItem';
-import enums from '../../../helpers/enums';
-import envVariables from '../../../helpers/envVariables';
-import AuditCycleDocumentsList from './AuditCycleDocumentsList';
-import { ViewLoading } from '../../../components/Loaders';
 import auditStepProps from '../../audits/helpers/auditStepProps';
+import enums from '../../../helpers/enums';
+//import envVariables from '../../../helpers/envVariables';
 
-const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
-
-    const {         
-        AuditCycleDocumentType,
+const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props }) => {
+    const {
+        //AuditCycleDocumentType,
         DefaultStatusType,
     } = enums();
-    const { 
-        VITE_FILES_URL,
-        URL_ORGANIZATION_FILES
-    } = envVariables();
+    // const {
+    //     VITE_FILES_URL,
+    //     URL_ORGANIZATION_FILES
+    // } = envVariables();
 
     // CUSTOM HOOKS
 
-    const {
-        organization
-    } = useOrganizationsStore();
+    // const {
+    //     organization
+    // } = useOrganizationsStore();
 
     const {
-        isAuditCycleLoading,
+        //isAuditCycleLoading,
         auditCycle,
         auditCycleAsync,
         auditCycleClear,
@@ -40,12 +40,12 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
         isAuditCyclesLoading,
         auditCycles,
         auditCyclesAsync,
-        auditCyclesClear,        
+        //auditCyclesClear,
     } = useAuditCyclesStore();
 
     const {
-        isAuditCycleDocumentsLoading,
-        auditCycleDocuments,
+        // isAuditCycleDocumentsLoading,
+        // auditCycleDocuments,
         auditCycleDocumentsAsync,
     } = useAuditCycleDocumentsStore();
 
@@ -53,12 +53,6 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
 
     const [navOption, setNavOption] = useState(null);
     const [showAllFiles, setShowAllFiles] = useState(false);
-
-    // useEffect(() => {
-    //     console.log('AuditCyclesCard load');
-    //     console.log('AuditCycles', auditCycles[0]?.ID )
-    // }, []);
-    
 
     useEffect(() => {
         if (!!organizationID) {
@@ -76,7 +70,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
     useEffect(() => {
       //console.log('navOption cambió', navOption);
     }, [navOption]);
-    
+
 
     useEffect(() => {
         //console.log('useEffect auditCycles: auditCycles cambió');
@@ -105,7 +99,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
             });
         }
     }, [auditCycle]);
-    
+
     // METHODS
 
     const loadAuditCycle = (id) => {
@@ -118,7 +112,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
         <Card {...props}>
             {
                 isAuditCyclesLoading ? (
-                    <ViewLoading /> 
+                    <ViewLoading />
                 ) : !!auditCycles && (
                     <>
                         <Card.Header className="pb-0 p-3">
@@ -132,7 +126,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                         </Card.Header>
                         <Card.Body>
                             {
-                                auditCycles.length == 0 && 
+                                auditCycles.length == 0 &&
                                 <div className="d-flex justify-content-center align-items-center bg-gray-100 rounded-3 p-2">
                                     <p className="text-secondary text-sm my-3">
                                         No audit cycles found
@@ -167,10 +161,10 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                     <div className="d-flex justify-content-start align-items-start flex-wrap my-1 gap-2">
                                                         {
                                                             auditCycle.AuditCycleStandards.map(item => (
-                                                                <span key={item.ID} 
+                                                                <span key={item.ID}
                                                                     className={`badge bg-gradient-${ item.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-xs`}
                                                                     title={ item.Status == DefaultStatusType.active ? 'Active' : 'Inactive' }
-                                                                > 
+                                                                >
                                                                     <FontAwesomeIcon icon={ faLandmark } className="me-1" />
                                                                     <span className="text-xs">
                                                                         { item.StandardName } - { auditStepProps[item.InitialStep].abbreviation }
@@ -184,7 +178,7 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                         (no standards assigned)
                                                     </p>
                                                 )}
-                                            
+
                                                 <p className="text-xs text-secondary mb-0">
                                                     <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
                                                     <span className="font-weight-bold">{ new Date(auditCycle.StartDate).toLocaleDateString() }</span>
@@ -211,8 +205,8 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                                                     onChange={ () => setShowAllFiles(!showAllFiles) }
                                                     checked={ showAllFiles }
                                                 />
-                                                <label 
-                                                    className="form-check-label text-secondary mb-0" 
+                                                <label
+                                                    className="form-check-label text-secondary mb-0"
                                                     htmlFor="showAllFilesCheck"
                                                 >
                                                     Show all files
@@ -226,9 +220,9 @@ const AuditCyclesCard = ({ organizationID, readOnly = false, ...props }) => {
                     </>
                 )
             }
-            
+
         </Card>
     )
-}
+});
 
-export default AuditCyclesCard
+export default AuditCyclesCard;

@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Card, Col, Modal, Nav, Row } from "react-bootstrap";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Card, Col, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faChevronLeft, faChevronRight, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faChevronLeft, faChevronRight, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -30,8 +30,14 @@ import AppFormStepStandard from "./AppFormStepStandard";
 import AppFormStepGeneral from "./AppFormStepGeneral";
 import navOptions from "../helpers/appFormNavOptions";
 import AppFormNavPrevNext from "./AppFormNavPrevNext";
+import appFormStatusProps from "../helpers/appFormStatusProps";
+import { useNotesStore } from "../../../hooks/useNotesStore";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import NotesListModal from "../../notes/components/NotesListModal";
+import getFriendlyDate from "../../../helpers/getFriendlyDate";
 
-const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {    
+const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
+    // console.log('AppFormModalEditItem');
     const [ controller, dispatch ] = useAppFormController();
     const { 
         standardData,
@@ -45,11 +51,6 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         StandardBaseType,
         OrganizationStatusType,
     } = enums();
-
-    // Faltan (no van directamente en el formulario):
-    // - NACE codes -> YA
-    // - Contacts
-    // - Sites -> Aqui voy
 
     const formDefaultValues = {
         standardSelect: '',
@@ -116,7 +117,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         appFormClear,
     } = useAppFormsStore();
 
-    const validationSchema = appFormValidationSchema(appForm?.Status ?? AppFormStatusType.nothing);
+    const {
+        noteCreateAsync,
+    } = useNotesStore();
 
     // HOOKS
 
@@ -127,9 +130,16 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);        
     const [statusOptions, setStatusOptions] = useState([]);
     const [originalStatus, setOriginalStatus] = useState(null);
-    const [statusChangedWith, setStatusChangedWith] = useState(null);
+    //const [statusChangedWith, setStatusChangedWith] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
     const [showAddComments, setShowAddComments] = useState(false);
+    const [saveNote, setSaveNote] = useState(''); 
+
+    const validationSchema = useMemo(() => {
+        return appFormValidationSchema(appForm?.Status ?? AppFormStatusType.nothing);
+    }, [appForm?.Status ?? AppFormStatusType.nothing]);
+
+    
 
     useEffect(() => {
 
@@ -241,15 +251,12 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         if (!!appFormSavedOk) {
-            Swal.fire('App Form', 'Changes made successfully', 'success');
-            
-            // appFormsAsync({
-            //     auditCycleID: auditCycle.ID,
-            //     pageSize: 0,
-            //     order: AppFormOrderType.createdDesc,
-            // });
 
-            // onCloseModal();
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({ OwnerID: appForm.ID, Text: saveNote });
+                setSaveNote('');
+            }            
+            Swal.fire('App Form', 'Changes made successfully', 'success');            
             actionsForCloseModal();
         }
     }, [appFormSavedOk]);
@@ -290,16 +297,31 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     };
 
     const onFormSubmit = (values) => {
-        let status = AppFormStatusType.nothing;
+        let salesComments = appForm.SalesComments;
+        let applicantComments = appForm.ReviewComments;
+        let newStatus = appForm.Status == AppFormStatusType.nothing
+            ? AppFormStatusType.new
+            : values.statusSelect;
 
-        if (appForm.Status == AppFormStatusType.nothing) {
-            status = AppFormStatusType.new;
-        }
+        console.log('appForm.Status != newStatus', appForm.Status, newStatus); 
+        if (appForm.Status != newStatus) { // Si cambió el status crear una nota
+            const text = 'Status changed to ' + appFormStatusProps[newStatus].label.toUpperCase();
 
-        if (originalStatus != status) {
-            console.log('originalStatus != status', originalStatus, status);
+            setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
+
+            if (newStatus == AppFormStatusType.salesReview 
+                || newStatus == AppFormStatusType.salesRejected
+                || newStatus == AppFormStatusType.applicantReview) {
+                salesComments = values.commentsInput;
+            } 
+
+            if (newStatus == AppFormStatusType.applicantRejected || newStatus == AppFormStatusType.active) {
+                applicantComments = values.commentsInput;
+            } 
             
-        }
+            console.log('salesComments', salesComments);
+            console.log('applicantComments', applicantComments);
+        } 
 
         const standard = auditCycle.AuditCycleStandards.find(acs => acs.StandardBase == values.standardSelect);
 
@@ -324,12 +346,14 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             OutsourcedProcess: values.outsourcedProcessInput,
             AnyConsultancy: values.anyConsultancyCheck,
             AnyConsultancyBy: values.anyConsultancyByInput,
-            Status: status,
+            Status: newStatus,
             // Validations
-            SalesComments: values.salesCommentsInput,
-            ReviewJustification: values.reviewJustificationInput,
-            ReviewComments: values.reviewCommentsInput,            
+            SalesComments: salesComments,
+            // ReviewJustification: values.reviewJustificationInput,
+            ReviewComments: applicantComments,
         } // toSave
+
+        console.log('onFormSubmit: toSave', toSave);
 
         appFormSaveAsync(toSave);
     }; // onFormSubmit
@@ -504,6 +528,50 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                             />
                                                         </Col>
                                                     </Row>
+                                                    {
+                                                        !isNullOrEmpty(appForm.SalesComments) ?
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <Alert variant="info" className="text-sm text-white">
+                                                                    <h6 className="text-sm text-white font-weight-bold">
+                                                                        Sales comments
+                                                                    </h6>
+                                                                    <p className="text-xs text-white mb-0">
+                                                                        {appForm.SalesComments}
+                                                                    </p>
+                                                                    <p className="text-xs text-white text-end opacity-6 mb-0">
+                                                                        { getFriendlyDate(appForm.SalesDate) }
+                                                                    </p>
+                                                                </Alert>
+                                                            </Col>
+                                                        </Row> : null
+                                                    }   
+                                                    {
+                                                        !isNullOrEmpty(appForm.ReviewComments) ?
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <Alert variant="info" className="text-sm text-white">
+                                                                    <h6 className="text-sm text-white font-weight-bold">
+                                                                        Review comments
+                                                                    </h6>
+                                                                    <p className="text-xs text-white mb-0">
+                                                                        {appForm.ReviewComments}
+                                                                    </p>
+                                                                    <p className="text-xs text-white text-end opacity-6 mb-0">
+                                                                        { getFriendlyDate(appForm.ReviewDate) }
+                                                                    </p>
+                                                                </Alert>
+                                                            </Col>
+                                                        </Row> : null
+                                                    }                                                    
+                                                    {
+                                                        !!appForm.Notes && appForm.Notes.length > 0 &&
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <NotesListModal notes={appForm.Notes} buttonLabel="View notes" />
+                                                            </Col>
+                                                        </Row>
+                                                    }
                                                     <Row>
                                                         <Col xs="12">
                                                             <AryFormikSelectInput
@@ -511,13 +579,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 label="Status"
                                                                 onChange={ (e) => {
                                                                     const selectedValue = e.target.value;
-                                                                    formik.setFieldValue('statusSelect', selectedValue);
 
-                                                                    if (originalStatus != selectedValue) {
-                                                                        setStatusChangedWith(selectedValue);
-                                                                        setShowAddComments(true);
-                                                                    }
-                                                                    
+                                                                    formik.setFieldValue('statusSelect', selectedValue);
+                                                                    setShowAddComments(originalStatus != selectedValue);
+                                                                    // setStatusChangedWith(selectedValue);
                                                                 }}
                                                             >
                                                                 <option value="">(select a status)</option>
@@ -546,11 +611,36 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <AppFormPreview formik={formik} />
-                                                    <AryFormDebug formik={formik} />
+                                                    {/* <AryFormDebug formik={formik} /> */}
                                                 </Card.Body>
                                             </Card>
                                         </Col>
                                     </Row>
+                                    { 
+                                        formik.submitCount > 0 && 
+                                        Object.keys(formik.errors).length > 0 ?
+                                        <Row className="mt-3">
+                                            <Col xs="12">
+                                                <Alert variant="danger" className="text-sm text-white">
+                                                    <h6 className="text-sm text-white font-weight-bold"> 
+                                                        There are some errors in the form
+                                                    </h6>
+                                                    <ListGroup variant="flush" size="sm">
+                                                        { Object.keys(formik.errors).map(key => 
+                                                            <ListGroup.Item 
+                                                                key={key} 
+                                                                className="text-xs bg-transparent p-1 border-0"
+                                                            >
+                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                                                {formik.errors[key]}
+                                                            </ListGroup.Item>
+                                                        )} 
+                                                    </ListGroup>
+                                                </Alert>
+                                            </Col>
+                                        </Row>
+                                        : null
+                                    }
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
@@ -586,6 +676,6 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             }
         </Modal>
     );
-};
+});
 
 export default AppFormModalEditItem;

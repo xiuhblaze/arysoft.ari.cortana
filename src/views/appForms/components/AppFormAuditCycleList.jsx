@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBuilding, faEdit, faStickyNote, faUser, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,25 +9,23 @@ import AppFormModalEditItem from './AppFormModalEditItem';
 import appFormStatusProps from "../helpers/appFormStatusProps";
 import { ViewLoading } from "../../../components/Loaders";
 import { AppFormControllerProvider } from "../context/appFormContext";
+import { Spinner } from "react-bootstrap";
 
-const AppFormAuditCycleList = () => {
-
+const AppFormAuditCycleList = React.memo(() => {
     const {
         AppFormOrderType,
-        AppFormStatusType,
     } = enums();
 
     // CUSTOM HOOKS
 
     const {
         auditCycle
-    } =useAuditCyclesStore();
+    } = useAuditCyclesStore();
 
     const {
         isAppFormsLoading,
         appForms,
         appFormsAsync,
-        appFormsErrorMessage
     } = useAppFormsStore();
 
     // HOOKS
@@ -49,7 +47,6 @@ const AppFormAuditCycleList = () => {
     // METHODS
 
     const onShowModal = (id) => {
-        // console.log('onshowmodal', id);
         setAppFormID(id);
         setShowModal(true);
     };
@@ -70,9 +67,12 @@ const AppFormAuditCycleList = () => {
             <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
                 { 
                     isAppFormsLoading ? (
-                        <ViewLoading />
+                        <div className="ms-3 my-3">
+                            <Spinner animation="border" variant="secondary" role="status" size="sm">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>
                     ) : !!appForms && appForms.length > 0 && appForms.map(appForm => {
-                    // const bgStyle = 
                     const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action gap-2 px-2 py-1`;
 
                     return (
@@ -123,6 +123,6 @@ const AppFormAuditCycleList = () => {
             </AppFormControllerProvider>
         </>
     )
-}
+});
 
-export default AppFormAuditCycleList
+export default AppFormAuditCycleList;

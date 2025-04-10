@@ -34,25 +34,27 @@ const AppFormISO9K = ({ formik, ...props }) => {
                         label="Process activities/scope"
                     />
                 </Col>
-                <Row>
-                    <Col xs="12">
-                        <label className="form-label">Process/services</label>
-                    </Col>
-                    <Col xs="12" sm="3">
-                        <AryFormikTextInput
-                            name="processServicesCountInput"                            
-                            placeholder="0"
-                            className="text-end"
-                            helpText="Number of process/services"
-                        />
-                    </Col>
-                    <Col xs="12" sm="9">
-                        <AryFormikTextArea
-                            name="processServicesDescriptionInput"
-                            helpText="Description of process/services"
-                        />
-                    </Col>
-                </Row>
+                <Col xs="12">
+                    <Row>
+                        <Col xs="12">
+                            <label className="form-label">Process/services</label>
+                        </Col>
+                        <Col xs="12" sm="3">
+                            <AryFormikTextInput
+                                name="processServicesCountInput"                            
+                                placeholder="0"
+                                className="text-end"
+                                helpText="Number of process/services"
+                            />
+                        </Col>
+                        <Col xs="12" sm="9">
+                            <AryFormikTextArea
+                                name="processServicesDescriptionInput"
+                                helpText="Description of process/services"
+                            />
+                        </Col>
+                    </Row>
+                </Col>
                 <Col xs="12">
                     <AryFormikTextInput
                         name="legalRequirementsInput"

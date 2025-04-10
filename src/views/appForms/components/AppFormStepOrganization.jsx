@@ -22,16 +22,16 @@ const AppFormStepOrganization = ({ formik, ...props }) => {
                         </div>
                     </Col>
                     <Col xs="12">
-                            <div className="mb-3">
-                                <div className="bg-light border-radius-md p-3 pb-0">
-                                    <AppFormEditContacts />
-                                </div>
-                                <Field name="contactsCountHidden" type="hidden" value={formik.values.contactsCountHidden} />
-                                {
-                                    formik.touched.contactsCountHidden && formik.errors.contactsCountHidden &&
-                                    <span className="text-danger text-xs">{formik.errors.contactsCountHidden}</span>
-                                }
+                        <div className="mb-3">
+                            <div className="bg-light border-radius-md p-3 pb-0">
+                                <AppFormEditContacts />
                             </div>
+                            <Field name="contactsCountHidden" type="hidden" value={formik.values.contactsCountHidden} />
+                            {
+                                formik.touched.contactsCountHidden && formik.errors.contactsCountHidden &&
+                                <span className="text-danger text-xs">{formik.errors.contactsCountHidden}</span>
+                            }
+                        </div>
                     </Col>
                 </Row>
             </Col>

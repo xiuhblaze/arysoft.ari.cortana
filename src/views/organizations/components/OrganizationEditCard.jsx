@@ -100,9 +100,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     } = useAuditCyclesStore();
 
     const {
-        isNoteCreating,
-        noteCreatedOk,
-        note,
+        // isNoteCreating,
+        // noteCreatedOk,
+        // note,
         noteCreateAsync,
     } = useNotesStore();
 
@@ -232,18 +232,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         if (organization.Status != values.statusSelect) {
             const text = "Status changed to " + organizationStatusProps[values.statusSelect].label.toUpperCase();
             
-            // if (organization.Status == OrganizationStatusType.applicant 
-            //     && values.statusSelect == OrganizationStatusType.active) {
-            //     console.log('Cambió a activo, validar si ya tiene la documentación necesaria');
-            // }
-
             setSaveNote(`${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`);
-
-            // noteCreateAsync({
-            //     OwnerID: organization.ID,
-            //     Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,
-            // });
-
             setIsApplicant(
                 organization.Status == OrganizationStatusType.applicant
                 || organization.Status == OrganizationStatusType.nothing
@@ -258,9 +247,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         navigate('/organizations/');
     }; // onCancelButton
 
-    const onDeleteFile = (file) => {
+    // const onDeleteFile = (file) => {
 
-    }; // onDeleteFile
+    // }; // onDeleteFile
 
     const onDeleteButton = () => {    
         Swal.fire({

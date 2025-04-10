@@ -4,7 +4,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, ListGroup, Modal } from 'react-bootstrap'
 import { format, formatDistanceToNow } from "date-fns";
 
-const NotesListModal = ({notes, buttonLabel, ...props}) => {
+const NotesListModal = ({notes, buttonLabel, order = 'desc', ...props}) => {
+    const notesOrdered = !!notes 
+        ? [...notes].sort((a, b) => {
+                const aDate = new Date(a.Updated);
+                const bDate = new Date(b.Updated);
+
+                if (order == 'asc') {
+                    return aDate < bDate ? -1 : 1;
+                }                
+                return aDate > bDate ? -1 : 1;
+            }) 
+        : [];
 
     const [showModal, setShowModal] = useState(false);
 
@@ -39,7 +50,8 @@ const NotesListModal = ({notes, buttonLabel, ...props}) => {
                 <Modal.Body className="px-0 list-group-item-warning">
                     <ListGroup variant="flush">
                         {
-                            notes.map(item => {
+                            notesOrdered
+                                .map(item => {
                                 let updatedLocalDate = null;
                                 const updated = !!item.Updated ? new Date(item.Updated) : null;
                                 if (!!updated) {

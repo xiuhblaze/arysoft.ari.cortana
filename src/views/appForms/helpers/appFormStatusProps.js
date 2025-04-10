@@ -15,12 +15,6 @@ const appFormStatusProps = [
         variant: 'info',
         description: 'New recorded application form'
     },
-    { 
-        value: AppFormStatusType.startOrg, // Este es un appform nuevo desde una organización
-        label: 'New from org', 
-        variant: 'primary',
-        description: 'New application form registered from the organization'
-    }, 
     {
         value: AppFormStatusType.salesReview,
         label: 'Sales review', 

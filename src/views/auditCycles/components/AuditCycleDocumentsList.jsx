@@ -1,4 +1,4 @@
-import { useState } from 'react';
+//import { useState } from 'react';
 
 import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps';
 import enums from '../../../helpers/enums';
@@ -14,12 +14,13 @@ import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumen
 //import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import AuditCycleDocumentItem from './AuditCycleDocumentItem';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
-import { faFile, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
-import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
+// import { faFile, faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
+// import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
 import AppFormButtonNewItem from '../../appForms/components/AppFormButtonNewItem';
 import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleList';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
+    // console.log('AuditCycleDocumentsList');
     const { 
         AuditCycleDocumentType,
         DefaultStatusType,
@@ -38,19 +39,19 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
 
     // HOOKS
 
-    const [showAppFormModal, setShowAppFormModal] = useState(false);
+    // const [showAppFormModal, setShowAppFormModal] = useState(false);
 
     // METHODS
 
-    const onShowAppFormModal = () => {
-        console.log('onShowAppFormModal: show new app form');
-        setShowAppFormModal(true);
-    }; // onShowAppFormModal
+    // const onShowAppFormModal = () => {
+    //     console.log('onShowAppFormModal: show new app form');
+    //     setShowAppFormModal(true);
+    // }; // onShowAppFormModal
 
-    const onHideAppFormModal = () => {
-        console.log('onHideAppFormModal: hide');
-        setShowAppFormModal(false);
-    }; // onHideAppFormModal
+    // const onHideAppFormModal = () => {
+    //     console.log('onHideAppFormModal: hide');
+    //     setShowAppFormModal(false);
+    // }; // onHideAppFormModal
 
     return (
         <div {...props} className="timeline timeline-one-side">
@@ -73,7 +74,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                         return (    
                             <div key={item.id}>
                                 {
-                                    item.id == AuditCycleDocumentType.appForm &&
+                                    item.id == AuditCycleDocumentType.appForm ?
                                     <div  className="timeline-block mb-3">
                                         <div className="timeline-step">
                                             <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
@@ -100,7 +101,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                             </div>
                                             <AppFormAuditCycleList />
                                         </div>
-                                    </div>
+                                    </div> : null
                                 }
                                 {
                                     item.id != AuditCycleDocumentType.appForm && // TODOS LOS DEMAS

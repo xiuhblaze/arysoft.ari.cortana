@@ -1,13 +1,12 @@
 import * as Yup from 'yup';
+
 import enums from '../../../helpers/enums';
 
 const appFormValidationSchema = (currentStatus) => {
+    //console.log('appFormValidationSchema: currentStatus', currentStatus);
     const { 
-        AppFormStatusType,
         StandardBaseType
     } = enums();
-
-    console.log('appFormValidationSchema: currentStatus', currentStatus);
 
     return Yup.object({
         standardSelect: Yup.string()
@@ -15,6 +14,9 @@ const appFormValidationSchema = (currentStatus) => {
         sitesCountHidden: Yup.number()
             .positive('Must be at least one site associated')
             .required('Must add at least one site'),
+        contactsCountHidden: Yup.number()
+            .positive('Must be at least one contact associated')
+            .required('Must add at least one contact'),
         // ISO 9K
         activitiesScopeInput: Yup.string()
             .max(1000, 'Process activities/scope must be less than 1000 characters')
@@ -97,10 +99,7 @@ const appFormValidationSchema = (currentStatus) => {
         commentsInput: Yup.string()
             .max(1000, 'Comments must be less than 1000 characters')
             .when('statusSelect', {
-                is: (statusSelect) => {
-                    console.log('statusSelect', statusSelect, currentStatus); //! VER COMO EVITAR QUE SE EJECUTE TANTAS VECES
-                    return !!currentStatus && statusSelect != currentStatus;
-                },
+                is: (statusSelect) => !!currentStatus && statusSelect != currentStatus,
                 then: schema => schema.required('Comments are required'),
                 otherwise: schema => schema.notRequired(),
             }),
