@@ -2,7 +2,6 @@
 import { 
     faBuilding,
     faCity,
-    faClipboard,
     faFileCircleCheck,
     faHome,
     faLandmark,

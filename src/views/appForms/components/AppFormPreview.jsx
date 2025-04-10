@@ -1,13 +1,11 @@
-import { Col, Container, Row } from "react-bootstrap"
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import { Col, Container, Row } from "react-bootstrap";
+
 import { useAppFormController } from "../context/appFormContext";
-import standardBaseProps from "../../standards/helpers/standardBaseProps";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding } from "@fortawesome/free-solid-svg-icons";
+import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import AppFormPreviewStandardLoading from "./AppFormPreviewStandardLoading";
 import enums from "../../../helpers/enums";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import { useEffect } from "react";
-import AppFormPreviewStandardLoading from "./AppFormPreviewStandardLoading";
+import standardBaseProps from "../../standards/helpers/standardBaseProps";
 
 const AppFormPreview = ({formik}) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -20,7 +18,7 @@ const AppFormPreview = ({formik}) => {
     const { DefaultStatusType, StandardBaseType } = enums();
     const { organization } = useOrganizationsStore();
 
-    const headerStyle = 'text-xs text-wrap font-weight-bold bg-light';
+    const headerStyle = 'col-4 text-xs text-wrap font-weight-bold bg-light';
     const bodyStyle = 'text-xs text-dark text-wrap';
     const separatorStyle = { height: '.25rem' };
     const internalTableStyle= 'table table-sm table-borderless pt-0 mb-0'; 
@@ -67,8 +65,7 @@ const AppFormPreview = ({formik}) => {
                                             .filter(company => company.Status == DefaultStatusType.active)
                                             .map(company => <div key={company.ID}>
                                             <span className="text-dark">{ company.Name }</span>
-                                            <span className="text-secondary ms-1">
-                                                <FontAwesomeIcon icon={ faBuilding } className="me-1" />
+                                            <span className="ms-1">
                                                 { company.LegalEntity }
                                             </span>
 

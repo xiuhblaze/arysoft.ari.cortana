@@ -7,11 +7,10 @@ const appFormStatusOptions = (appFormCurrentStatus) => {
     const optionsProps = [
         { value: AppFormStatusType.nothing, label: 'Nothing' },
         { value: AppFormStatusType.new, label: 'New' },
-        { value: AppFormStatusType.send, label: 'Send to sales review' },
-        { value: AppFormStatusType.salesReview, label: 'Sales review' },
-        { value: AppFormStatusType.salesRejected, label: 'Rejected' },
+        { value: AppFormStatusType.salesReview, label: 'Send to sales review' },
+        { value: AppFormStatusType.salesRejected, label: 'Rejected by sales' },
         { value: AppFormStatusType.applicantReview, label: 'Send to applicant review' },
-        { value: AppFormStatusType.applicantRejected, label: 'Rejected' },
+        { value: AppFormStatusType.applicantRejected, label: 'Rejected by applicant' },
         { value: AppFormStatusType.active, label: 'Active' },
         { value: AppFormStatusType.inactive, label: 'Inactive' },
         { value: AppFormStatusType.cancel, label: 'Cancel' },
@@ -26,36 +25,35 @@ const appFormStatusOptions = (appFormCurrentStatus) => {
 
     switch (appFormCurrentStatus) {
         case AppFormStatusType.nothing:
-        case AppFormStatusType.new:
-        case AppFormStatusType.send:
+        case AppFormStatusType.new:        
             return [
                 currentOption,
                 { value: AppFormStatusType.salesReview, label: 'Send to sales review' },
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
-            ]
-            break;
+            ];
+
         case AppFormStatusType.salesReview:
             return [
                 currentOption,
                 { value: AppFormStatusType.salesRejected, label: 'Rejected' },
                 { value: AppFormStatusType.applicantReview, label: 'Send to review' },
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
-            ]
-            break;
+            ];
+
         case AppFormStatusType.salesRejected:
             return [
                 currentOption,
                 { value: AppFormStatusType.salesReview, label: 'Sales review' },
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
-            ]
-            break;
+            ];
+
         case AppFormStatusType.applicantReview:
             return [
                 currentOption,
                 { value: AppFormStatusType.applicantRejected, label: 'Rejected' },
                 { value: AppFormStatusType.active, label: 'Approved' },
-            ]
-            break;
+            ];
+            
         case AppFormStatusType.applicantRejected:
             return [
                 currentOption,

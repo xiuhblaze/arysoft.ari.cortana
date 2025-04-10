@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, isImmutableDefault } from "@reduxjs/toolkit";
 
 import appFormsSlice from "./slices/appFormsSlice";
 import auditAuditorsSlice from "./slices/auditAuditorsSlice";
@@ -52,7 +52,19 @@ export const store = configureStore({
         standards: standardsSlice.reducer,
         users: usersSlice.reducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+    middleware: (getDefaultMiddleware) => 
+        {
+            return process.env.NODE_ENV === 'development'
+                ? getDefaultMiddleware({ 
+                    serializableCheck: false,
+                    immutableCheck: true,
+                })
+                : getDefaultMiddleware({
+                    serializableCheck: false,
+                    immutableCheck: false,
+                });
+        },
+          
 });
 
 export default store;

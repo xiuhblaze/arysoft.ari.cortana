@@ -1,8 +1,13 @@
 import * as Yup from 'yup';
 import enums from '../../../helpers/enums';
 
-const appFormValidationSchema = () => {
-    const { StandardBaseType } = enums();
+const appFormValidationSchema = (currentStatus) => {
+    const { 
+        AppFormStatusType,
+        StandardBaseType
+    } = enums();
+
+    console.log('appFormValidationSchema: currentStatus', currentStatus);
 
     return Yup.object({
         standardSelect: Yup.string()
@@ -89,6 +94,16 @@ const appFormValidationSchema = () => {
             }),
         statusSelect: Yup.string()
             .required('Standard is required'),
+        commentsInput: Yup.string()
+            .max(1000, 'Comments must be less than 1000 characters')
+            .when('statusSelect', {
+                is: (statusSelect) => {
+                    console.log('statusSelect', statusSelect, currentStatus); //! VER COMO EVITAR QUE SE EJECUTE TANTAS VECES
+                    return !!currentStatus && statusSelect != currentStatus;
+                },
+                then: schema => schema.required('Comments are required'),
+                otherwise: schema => schema.notRequired(),
+            }),
     });
 };
 

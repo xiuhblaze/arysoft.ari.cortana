@@ -107,14 +107,8 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     const [statusOptions, setStatusOptions] = useState(false);
     
     useEffect(() => {
-        // console.log('AuditModalEditItem', id);
-    }, []);
-    
-
-    useEffect(() => {
         
         if (!!show) {
-            // console.log('AuditModalEditItem Show', id);
             if (!!id) {
                 auditAsync(id);
             } else if (!!auditCycle) {
@@ -226,16 +220,16 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     useEffect(() => {
             if (!!auditSavedOk && show) {
                 Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
-                onCloseModal();
+                // onCloseModal(); // Probando el evitar cerrar la modal al guardar
             }
         }, [auditSavedOk]);
         
-        useEffect(() => {
-            if (!!auditsErrorMessage && show) {
-                Swal.fire('Audit', auditsErrorMessage, 'error');
-                onCloseModal();
-            }
-        }, [auditsErrorMessage]);
+    useEffect(() => {
+        if (!!auditsErrorMessage && show) {
+            Swal.fire('Audit', auditsErrorMessage, 'error');
+            // onCloseModal(); // Probando el evitar cerrar la modal al ocurrir un error
+        }
+    }, [auditsErrorMessage]);
 
     // METHODS
 
@@ -255,13 +249,31 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     };
 
     const onCloseModal = () => {
-        
-        auditClear();
-        setShowModal(false); //* IMPORTANTE: Único lugar donde se cierra el modal
 
-        if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
-                                // asi como cargar nuevamente el listado de audits
+        if (hasChanges) {
+            Swal.fire({
+                title: 'Discard changes?',
+                text: 'Are you sure you want to discard changes? The changes will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard changes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    auditClear();
+                    setShowModal(false);
 
+                    if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
+                                            // asi como cargar nuevamente el listado de audits
+                }
+            })
+        } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
+            auditClear();
+            setShowModal(false);
+
+            if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
+        }
     };  // onCloseModal
 
     return (

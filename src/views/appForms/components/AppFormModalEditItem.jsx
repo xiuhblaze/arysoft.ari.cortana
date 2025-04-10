@@ -28,60 +28,8 @@ import standardBaseProps from "../../standards/helpers/standardBaseProps";
 import AryFormDebug from "../../../components/Forms/AryFormDebug";
 import AppFormStepStandard from "./AppFormStepStandard";
 import AppFormStepGeneral from "./AppFormStepGeneral";
-
-const navOptions = {
-    organization: 'Organization',
-    standard: 'Standard',
-    general: 'General',
-};
-
-const NavigationButtons = ({navOption, setNavOption}) => {
-
-    const onClickBack = () => {
-
-        if (navOption == navOptions.general) {
-            setNavOption(navOptions.standard);
-        } else if (navOption == navOptions.standard) {
-            setNavOption(navOptions.organization);
-        }        
-    }; // onClickBack
-
-    const onClickNext = () => {
-
-        if (navOption == navOptions.organization) {
-            setNavOption(navOptions.standard);
-        } else if (navOption == navOptions.standard) {
-            setNavOption(navOptions.general);
-        }
-    };
-
-    return (
-        <Row>
-            <Col xs="12">
-                <div className="d-flex justify-content-between align-items-center">                                                                        
-                    <button 
-                        type="button"
-                        className={`btn btn-link text-${ navOption == navOptions.organization ? 'secondary' : 'dark' } px-0`}
-                        onClick={ onClickBack }
-                        disabled={ navOption == navOptions.organization }
-                    >
-                        <FontAwesomeIcon icon={ faChevronLeft } className="me-1" />
-                        Back
-                    </button>
-                    <button 
-                        type="button"
-                        className={`btn btn-link text-${ navOption == navOptions.general ? 'secondary' : 'dark' } px-0`}
-                        onClick={ onClickNext }
-                        disabled={ navOption == navOptions.general }
-                    >
-                        Next
-                        <FontAwesomeIcon icon={ faChevronRight } className="ms-1" />
-                    </button>
-                </div>
-            </Col>
-        </Row>
-    );
-}; 
+import navOptions from "../helpers/appFormNavOptions";
+import AppFormNavPrevNext from "./AppFormNavPrevNext";
 
 const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {    
     const [ controller, dispatch ] = useAppFormController();
@@ -125,16 +73,15 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         anyConsultancyByInput: '',
         statusSelect: '',
         // Validations
-        salesCommentsInput: '',
-        reviewJustificationInput: '',
-        reviewCommentsInput: '',
+        commentsInput: '',
+        // salesCommentsInput: '',
+        // reviewJustificationInput: '',
+        // reviewCommentsInput: '',
         // Hidden
         contactsCountHidden: 0,
         nacecodesCountHidden: 0,
         sitesCountHidden: 0,
     }; // formDefaultValues
-
-    const validationSchema = appFormValidationSchema();
 
     // CUSTOM HOOKS
 
@@ -169,6 +116,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         appFormClear,
     } = useAppFormsStore();
 
+    const validationSchema = appFormValidationSchema(appForm?.Status ?? AppFormStatusType.nothing);
+
     // HOOKS
 
     const formikRef = useRef(null);
@@ -179,6 +128,8 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     const [statusOptions, setStatusOptions] = useState([]);
     const [originalStatus, setOriginalStatus] = useState(null);
     const [statusChangedWith, setStatusChangedWith] = useState(null);
+    const [hasChanges, setHasChanges] = useState(false);
+    const [showAddComments, setShowAddComments] = useState(false);
 
     useEffect(() => {
 
@@ -188,16 +139,15 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
             if (!!id) {
                 appFormAsync(id);
-                // setStep(2);
             } else if (!!auditCycle && !!organization) {
-                appFormCreateAsync({ // O mostrar un primer paso para seleccionar la organización y el ciclo de auditoría
+                appFormCreateAsync({
                     AuditCycleID: auditCycle.ID,
                     OrganizationID: organization.ID,
                 });
-                // setStep(2);
             } else {
                 Swal.fire('App Form', 'You must specify the App Form ID or the audit cycle and the organization', 'warning');
-                onCloseModal();
+                //onCloseModal();
+                actionsForCloseModal();
             }
 
             // Limpiando valores del AppFormContext
@@ -240,9 +190,10 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                     ? appForm.Status
                     : AppFormStatusType.new,
                 // Validations
-                salesCommentsInput: appForm.SalesComments ?? '',
-                reviewJustificationInput: appForm.ReviewJustification ?? '',
-                reviewCommentsInput: appForm.ReviewComments ?? '',
+                commentsInput: '',
+                // salesCommentsInput: appForm.SalesComments ?? '',
+                // reviewJustificationInput: appForm.ReviewJustification ?? '',
+                // reviewCommentsInput: appForm.ReviewComments ?? '',
                 // Hidden
                 contactsCountHidden: !!appForm.Contacts ? appForm.Contacts.length : 0,
                 nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
@@ -280,6 +231,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             ));
 
             setOriginalStatus(appForm.Status);
+            setShowAddComments(false);
             //setStandardSelected(appForm.Standard?.StandardBase);
 
             setNavOption(navOptions.organization);
@@ -291,13 +243,14 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
         if (!!appFormSavedOk) {
             Swal.fire('App Form', 'Changes made successfully', 'success');
             
-            appFormsAsync({
-                auditCycleID: auditCycle.ID,
-                pageSize: 0,
-                order: AppFormOrderType.createdDesc,
-            });
+            // appFormsAsync({
+            //     auditCycleID: auditCycle.ID,
+            //     pageSize: 0,
+            //     order: AppFormOrderType.createdDesc,
+            // });
 
-            onCloseModal();
+            // onCloseModal();
+            actionsForCloseModal();
         }
     }, [appFormSavedOk]);
 
@@ -343,6 +296,11 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
             status = AppFormStatusType.new;
         }
 
+        if (originalStatus != status) {
+            console.log('originalStatus != status', originalStatus, status);
+            
+        }
+
         const standard = auditCycle.AuditCycleStandards.find(acs => acs.StandardBase == values.standardSelect);
 
         const toSave = {
@@ -377,15 +335,32 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
     }; // onFormSubmit
 
     const onCloseModal = () => {
-        setShowModal(false);
 
-        // Limpiar valores
-        appFormClear();
-        clearAppFormController(dispatch);
-        setStatusChangedWith(null);
-
-        if (!!onHide) onHide();
+        if (hasChanges) {
+            Swal.fire({
+                title: 'Discard changes?',
+                text: 'Are you sure you want to discard changes? The changes will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard changes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    actionsForCloseModal();
+                }
+            })
+        } else { 
+            actionsForCloseModal();
+        }
     }; // onCloseModal
+
+    const actionsForCloseModal = () => {
+        if (!!onHide) onHide();
+
+        appFormClear();
+        setShowModal(false);
+    };
 
     return (
         <Modal {...props} show={showModal} onHide={ onCloseModal }
@@ -417,6 +392,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                     innerRef={formikRef}
                 >
                     {(formik) => {
+                        useEffect(() => {
+                            setHasChanges(formik.dirty);
+                        }, [formik.dirty]);
                         return (
                             <Form>
                                 <Modal.Body>
@@ -504,7 +482,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     </Nav.Link>
                                                                 </Nav.Item>
                                                             </Nav>
-                                                            <NavigationButtons 
+                                                            <AppFormNavPrevNext
                                                                 navOption={navOption} 
                                                                 setNavOption={setNavOption} 
                                                             />
@@ -520,7 +498,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 navOption == navOptions.general &&
                                                                 <AppFormStepGeneral formik={ formik } />
                                                             }
-                                                            <NavigationButtons 
+                                                            <AppFormNavPrevNext 
                                                                 navOption={navOption} 
                                                                 setNavOption={setNavOption} 
                                                             />
@@ -537,7 +515,9 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
 
                                                                     if (originalStatus != selectedValue) {
                                                                         setStatusChangedWith(selectedValue);
+                                                                        setShowAddComments(true);
                                                                     }
+                                                                    
                                                                 }}
                                                             >
                                                                 <option value="">(select a status)</option>
@@ -548,58 +528,17 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                                         </Col>
                                                     </Row>
                                                     {
-                                                        originalStatus == AppFormStatusType.salesReview &&
-                                                        !!statusChangedWith && 
-                                                            (statusChangedWith == AppFormStatusType.applicantReview ||
-                                                            statusChangedWith == AppFormStatusType.salesRejected) &&
+                                                        showAddComments &&
                                                         <Row>
                                                             <Col xs="12">
                                                                 <AryFormikTextInput
-                                                                    name="salesCommentsInput"
-                                                                    label="Comments for sales"
-                                                                    helpText="Comments for the status change"
+                                                                    name="commentsInput"
+                                                                    label="Comments"
+                                                                    helpText="Add any comments for the status change"
                                                                 />
                                                             </Col>
-                                                        </Row>
+                                                        </Row>  
                                                     }
-                                                    {
-                                                        originalStatus == AppFormStatusType.applicantReview &&
-                                                        !!statusChangedWith && 
-                                                            (statusChangedWith == AppFormStatusType.active || 
-                                                            statusChangedWith == AppFormStatusType.applicantRejected) &&
-                                                        <Row>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="reviewCommentsInput"
-                                                                    label="Comments for applicant"
-                                                                    helpText="Comments for the status change"
-                                                                />
-                                                            </Col>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="reviewJustificationInput"
-                                                                    label="Justification for applicant"
-                                                                    helpText="Justification for the status change"
-                                                                />
-                                                            </Col>
-                                                        </Row>
-                                                    }
-                                                    <Row>
-                                                        <Col xs="12" className="d-flex justify-content-end">
-                                                            <button 
-                                                                type="submit"
-                                                                className="btn bg-gradient-dark mb-0"
-                                                                disabled={ isAppFormSaving }
-                                                            >
-                                                                {
-                                                                    isAppFormSaving 
-                                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
-                                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
-                                                                }
-                                                                Save
-                                                            </button>
-                                                        </Col>
-                                                    </Row>
                                                 </Card.Body>
                                             </Card>
                                         </Col>
@@ -607,31 +546,7 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <AppFormPreview formik={formik} />
-                                                    {/* <h6>Preview</h6>
-                                                    <hr className="horizontal dark mt-0" />
-                                                    <Row className="justify-content-end">
-                                                        <Col xs="8">
-                                                            <h6 className="text-info text-gradient text-sm">
-                                                                { !!standardSelected ? standardBaseProps[standardSelected].label : '-' }
-                                                            </h6>
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col xs="4" className="text-sm text-end font-weight-bold text-dark">Organization</Col>
-                                                        <Col xs="8" className="text-sm text-dark">{ organization.Name }</Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col xs="4" className="text-sm text-end font-weight-bold text-dark">Main site address</Col>
-                                                        <Col xs="8"></Col>  
-                                                    </Row>
-                                                    <Row>
-                                                        <Col xs="4" className="text-sm text-end font-weight-bold text-dark">Legal entity</Col>
-                                                        <Col xs="8">CASA771312</Col>
-                                                    </Row> */}
-                                                    {/* <hr className="horizontal dark mt-0" />
-                                                    <div className="text-xs">
-                                                        { process.env.NODE_ENV == 'development' && <AryFormDebug formik={ formik } /> }
-                                                    </div> */}
+                                                    <AryFormDebug formik={formik} />
                                                 </Card.Body>
                                             </Card>
                                         </Col>
@@ -643,6 +558,18 @@ const AppFormModalEditItem = ({ id, show, onHide, ...props }) => {
                                             <AryLastUpdatedInfo item={ appForm } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                            <button 
+                                                type="submit"
+                                                className="btn bg-gradient-dark mb-0"
+                                                disabled={ isAppFormSaving || !hasChanges }
+                                            >
+                                                {
+                                                    isAppFormSaving 
+                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                }
+                                                Save
+                                            </button>
                                             <button type="button"
                                                 className="btn btn-link text-secondary mb-0"
                                                 onClick={ onCloseModal }

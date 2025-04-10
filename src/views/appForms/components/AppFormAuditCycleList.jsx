@@ -55,6 +55,13 @@ const AppFormAuditCycleList = () => {
     };
 
     const onCloseModal = () => {
+
+        appFormsAsync({
+            auditCycleID: auditCycle.ID,
+            pageSize: 0,
+            order: AppFormOrderType.createdDesc,
+        });
+        
         setShowModal(false);
     };
     
