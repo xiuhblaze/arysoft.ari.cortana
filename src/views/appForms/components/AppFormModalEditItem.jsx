@@ -303,7 +303,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             ? AppFormStatusType.new
             : values.statusSelect;
 
-        console.log('appForm.Status != newStatus', appForm.Status, newStatus); 
+        //console.log('appForm.Status != newStatus', appForm.Status, newStatus); 
         if (appForm.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + appFormStatusProps[newStatus].label.toUpperCase();
 
@@ -319,8 +319,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 applicantComments = values.commentsInput;
             } 
             
-            console.log('salesComments', salesComments);
-            console.log('applicantComments', applicantComments);
+            // console.log('salesComments', salesComments);
+            // console.log('applicantComments', applicantComments);
         } 
 
         const standard = auditCycle.AuditCycleStandards.find(acs => acs.StandardBase == values.standardSelect);
@@ -353,7 +353,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             ReviewComments: applicantComments,
         } // toSave
 
-        console.log('onFormSubmit: toSave', toSave);
+        //console.log('onFormSubmit: toSave', toSave);
 
         appFormSaveAsync(toSave);
     }; // onFormSubmit
@@ -430,7 +430,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         }}
                                     >
                                         <h4 className="text-white mx-4 pb-5" style={{ zIndex: 1 }}>Application Form</h4>
-                                        <span className={`mask bg-gradient-info opacity-6`} />
+                                        <span className={`mask bg-gradient-${ appFormStatusProps[appForm.Status].variant } opacity-6`} />
                                     </div>
                                     <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
                                         <Row className="gx-4">
@@ -453,8 +453,11 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                     </div>
                                                 </div>
                                                 <div className="d-flex align-items-center">
-                                                    <div className={`badge bg-gradient-info text-white`}>
-                                                        New
+                                                    <div 
+                                                        className={`badge bg-gradient-${ appFormStatusProps[appForm.Status].variant } text-white`}
+                                                        title={ appFormStatusProps[appForm.Status].description } 
+                                                    >
+                                                        {appFormStatusProps[appForm.Status].label}
                                                     </div>
                                                 </div>
                                             </Col>
@@ -532,7 +535,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         !isNullOrEmpty(appForm.SalesComments) ?
                                                         <Row>
                                                             <Col xs="12">
-                                                                <Alert variant="info" className="text-sm text-white">
+                                                                <Alert className="text-sm text-white list-group-item-warning">
                                                                     <h6 className="text-sm text-white font-weight-bold">
                                                                         Sales comments
                                                                     </h6>
@@ -550,7 +553,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         !isNullOrEmpty(appForm.ReviewComments) ?
                                                         <Row>
                                                             <Col xs="12">
-                                                                <Alert variant="info" className="text-sm text-white">
+                                                                <Alert className="text-sm text-white list-group-item-warning">
                                                                     <h6 className="text-sm text-white font-weight-bold">
                                                                         Review comments
                                                                     </h6>

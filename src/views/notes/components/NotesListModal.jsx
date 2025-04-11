@@ -6,7 +6,7 @@ import { format, formatDistanceToNow } from "date-fns";
 
 const NotesListModal = ({notes, buttonLabel, order = 'desc', ...props}) => {
     const notesOrdered = !!notes 
-        ? [...notes].sort((a, b) => {
+        ? [...notes].sort((a, b) => { // Sino se hace así, marca: 0 is read-only
                 const aDate = new Date(a.Updated);
                 const bDate = new Date(b.Updated);
 
