@@ -5,17 +5,20 @@ import {
     faFileCircleCheck,
     faHome,
     faLandmark,
+    faMagnifyingGlass,
     faUsers
 } from "@fortawesome/free-solid-svg-icons";
 
 import { lazy } from "react";
 
+const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
+const laztAudits = lazy(() => import('../views/audits'));
 const lazyApplicants = lazy(() => import('../views/applicants'));
 const lazyAuditors = lazy(() => import('../views/auditors'));
-const lazyCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
-const lazyDashboard = lazy(() => import('../views/Dashboard/Dashboard'));
-const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyOrganizations = lazy(() => import('../views/organizations'));
+
+const lazyCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
+const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyStandards = lazy(() => import('../views/standards'));
 
 const privateRoute = [
@@ -26,6 +29,14 @@ const privateRoute = [
         path: '/dashboard',
         icon: faHome,
         element: lazyDashboard
+    },
+    {
+        type: 'collapse',
+        title: 'Audits',
+        key: 'audits',
+        path: '/audits/*',
+        icon: faMagnifyingGlass,
+        element: laztAudits
     },
     {
         type: 'collapse',

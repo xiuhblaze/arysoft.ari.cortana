@@ -1,6 +1,7 @@
 const envVariables = () => {
     const APPLICANTS_OPTIONS = 'arysoft-ari-applicantsOptions';
     const APPLICATION_FORM_OPTIONS = 'arysoft-ari-applicationFormOptions';
+    const AUDITS_OPTIONS = 'arysoft-ari-auditsOptions';
     const AUDITORS_OPTIONS = 'arysoft-ari-auditorsOptions';
     const CATAUDITORDOCUMENTS_OPTIONS = 'arysoft-ari-catAuditorDocumentsOptions';
     const CONTACTS_OPTIONS = 'arysoft-ari-contactsOptions';
@@ -35,6 +36,7 @@ const envVariables = () => {
 
         APPLICANTS_OPTIONS,
         APPLICATION_FORM_OPTIONS,
+        AUDITS_OPTIONS,
         AUDITORS_OPTIONS,
         CATAUDITORDOCUMENTS_OPTIONS,
         CONTACTS_OPTIONS,

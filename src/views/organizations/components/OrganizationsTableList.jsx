@@ -52,7 +52,7 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
     // HOOKS
     
     const [showModal, setShowModal] = useState(false);
-        const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
+    const [currentOrder, setCurrentOrder] = useState(OrganizationOrderType.name);
 
     useEffect(() => {
         if (!!organizations) {
@@ -85,73 +85,74 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
 
     return (
         <>
-            {isOrganizationsLoading ? (
-                <ViewLoading />
-            ) : !!organizations ? (
-                <div className="table-responsive p-0">
-                    <table className="table align-items-center mb-0">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <div className="d-flex justify-content-start align-items-center gap-1">
-                                        <SortItem
-                                            activeAsc={currentOrder === OrganizationOrderType.folio}
-                                            activeDesc={currentOrder === OrganizationOrderType.folioDesc}
-                                            onOrderAsc={() => { onClickOrderList(OrganizationOrderType.folio) }}
-                                            onOrderDesc={() => { onClickOrderList(OrganizationOrderType.folioDesc) }}
-                                        />
-                                        <div className={headStyle}>
-                                            Folio 
+            {
+                isOrganizationsLoading ? (
+                    <ViewLoading />
+                ) : !!organizations ? (
+                    <div className="table-responsive p-0">
+                        <table className="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div className="d-flex justify-content-start align-items-center gap-1">
+                                            <SortItem
+                                                activeAsc={currentOrder === OrganizationOrderType.folio}
+                                                activeDesc={currentOrder === OrganizationOrderType.folioDesc}
+                                                onOrderAsc={() => { onClickOrderList(OrganizationOrderType.folio) }}
+                                                onOrderDesc={() => { onClickOrderList(OrganizationOrderType.folioDesc) }}
+                                            />
+                                            <div className={headStyle}>
+                                                Folio 
+                                            </div>
+                                            <SortItem
+                                                activeAsc={currentOrder === OrganizationOrderType.name}
+                                                activeDesc={currentOrder === OrganizationOrderType.nameDesc}
+                                                onOrderAsc={() => { onClickOrderList(OrganizationOrderType.name) }}
+                                                onOrderDesc={() => { onClickOrderList(OrganizationOrderType.nameDesc) }}
+                                            />
+                                            <div className={headStyle}>
+                                                {
+                                                    applicantsOnly
+                                                        ? 'Applicant'
+                                                        : 'Organization'
+                                                }
+                                            </div>
                                         </div>
-                                        <SortItem
-                                            activeAsc={currentOrder === OrganizationOrderType.name}
-                                            activeDesc={currentOrder === OrganizationOrderType.nameDesc}
-                                            onOrderAsc={() => { onClickOrderList(OrganizationOrderType.name) }}
-                                            onOrderDesc={() => { onClickOrderList(OrganizationOrderType.nameDesc) }}
-                                        />
-                                        <div className={headStyle}>
-                                            {
-                                                applicantsOnly
-                                                    ? 'Applicant'
-                                                    : 'Organization'
-                                            }
+                                    </th>
+                                    <th className={headStyle}>Info</th>
+                                    <th className={headStyle}>Contact</th>
+                                    <th className={headStyle}>Sites</th>
+                                    <th className={headStyle}>Standards</th>
+                                    <th>
+                                        <div className="d-flex justify-content-center align-items-center gap-1">
+                                            <SortItem
+                                                activeAsc={currentOrder === OrganizationOrderType.status}
+                                                activeDesc={currentOrder === OrganizationOrderType.statusDesc}
+                                                onOrderAsc={() => { onClickOrderList(OrganizationOrderType.status) }}
+                                                onOrderDesc={() => { onClickOrderList(OrganizationOrderType.statusDesc) }}
+                                            />
+                                            <div className={headStyle}>
+                                                Status
+                                            </div>
                                         </div>
-                                    </div>
-                                </th>
-                                <th className={headStyle}>Info</th>
-                                <th className={headStyle}>Contact</th>
-                                <th className={headStyle}>Sites</th>
-                                <th className={headStyle}>Standards</th>
-                                <th>
-                                    <div className="d-flex justify-content-center align-items-center gap-1">
-                                        <SortItem
-                                            activeAsc={currentOrder === OrganizationOrderType.status}
-                                            activeDesc={currentOrder === OrganizationOrderType.statusDesc}
-                                            onOrderAsc={() => { onClickOrderList(OrganizationOrderType.status) }}
-                                            onOrderDesc={() => { onClickOrderList(OrganizationOrderType.statusDesc) }}
+                                    </th>
+                                    <th className={`${headStyle} text-center`}>{/* Action */}</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    organizations.map(item => 
+                                        <OrganizationTableItem 
+                                            key={ item.ID } 
+                                            item={ item }
+                                            onShowModal={ () => onShowModal(item.ID) }
                                         />
-                                        <div className={headStyle}>
-                                            Status
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className={`${headStyle} text-center`}>{/* Action */}</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                organizations.map(item => 
-                                    <OrganizationTableItem 
-                                        key={ item.ID } 
-                                        item={ item }
-                                        onShowModal={ () => onShowModal(item.ID) }
-                                    />
-                                )
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            ) : null
+                                    )
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                ) : null
             }
             <DetailsModal show={showModal} onHide={onCloseModal} />
         </>
