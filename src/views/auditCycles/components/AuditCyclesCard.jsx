@@ -162,7 +162,7 @@ const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props
                                                         {
                                                             auditCycle.AuditCycleStandards.map(item => (
                                                                 <span key={item.ID}
-                                                                    className={`badge bg-gradient-${ item.Status == DefaultStatusType.active ? 'secondary' : 'light' } text-xs`}
+                                                                    className={`badge bg-gradient-${ item.Status == DefaultStatusType.active && item.StandardStatus == DefaultStatusType.active ? 'secondary' : 'light' } text-xs`}
                                                                     title={ item.Status == DefaultStatusType.active ? 'Active' : 'Inactive' }
                                                                 >
                                                                     <FontAwesomeIcon icon={ faLandmark } className="me-1" />

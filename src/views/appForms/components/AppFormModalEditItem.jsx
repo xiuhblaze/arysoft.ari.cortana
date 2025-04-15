@@ -48,6 +48,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const { 
         AppFormOrderType,
         AppFormStatusType,
+        DefaultStatusType,
         StandardBaseType,
         OrganizationStatusType,
     } = enums();
@@ -477,7 +478,13 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             >
                                                                 <option value="">Select a standard</option>
                                                                 { auditCycle.AuditCycleStandards.map((standard) => (
-                                                                    <option key={standard.ID} value={standard.StandardBase}>{standard.StandardName}</option>
+                                                                    <option 
+                                                                        key={standard.ID} 
+                                                                        value={standard.StandardBase}
+                                                                        disabled={standard.Status != DefaultStatusType.active || standard.StandardStatus != DefaultStatusType.active}   
+                                                                    >
+                                                                        {standard.StandardName}
+                                                                    </option>
                                                                 )) }
                                                             </AryFormikSelectInput>
                                                         </Col>

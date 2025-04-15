@@ -60,7 +60,7 @@ const auditStatusProps = [
         id: AuditStatusType.canceled,
         icon: faBan,
         label: 'Canceled',
-        variant: 'ligth',
+        variant: 'light',
     },
     {
         id: AuditStatusType.deleted,

@@ -355,7 +355,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                                     <option 
                                                                         key={standard.ID} 
                                                                         value={standard.ID}
-                                                                        disabled={ standard.Status != DefaultStatusType.active }
+                                                                        disabled={ standard.Status != DefaultStatusType.active || standard.StandardStatus != DefaultStatusType.active }
                                                                     >
                                                                         {standard.StandardName}
                                                                     </option>

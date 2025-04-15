@@ -1,12 +1,18 @@
-import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faEdit, faEye, faStar, faStarHalfStroke, faStickyNote, faUser } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 
-import { useAuditNavigation } from '../hooks/useAuditNavigation'
 import auditStatusProps from '../helpers/auditStatusProps'
+import getDateDifferenceInUpperDays from '../../../helpers/getDateDiffereceInUpperDays';
+import auditStepProps from '../helpers/auditStepProps';
+import enums from '../../../helpers/enums';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
 const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
+
+    const {
+        DefaultStatusType
+    } = enums();
 
     return (
         <tr {...props} className={className}>
@@ -23,13 +29,14 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                     <div className="d-flex flex-column align-items-start">
                         <h6 className="mb-0 text-sm text-wrap">{item.Description}</h6>
                         <p className="text-xs text-secondary mb-0">
-                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') }
+                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') } / { getDateDifferenceInUpperDays(item.StartDate, item.EndDate) + 1 } Days
                         </p>
                     </div>
                 </div>
             </td>
             <td>
                 <p className="text-xs font-weight-bold text-wrap mb-0">
+                    <FontAwesomeIcon icon={ faBuilding } className="me-1" />
                     {item.OrganizationName}
                 </p>
                 <p className="text-xs text-secondary mb-0">
@@ -37,17 +44,51 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                 </p>
             </td>
             <td>
-                <div className="d-flex align-items-center gap-1">
-                    <p className="text-xs text-wrap font-weight-bold mb-0">
-                        {item.Auditors.map(i => i.AuditorName).join(', ')}
-                    </p>
+                <div className="d-flex align-items-start flex-column mb-0 gap-1">
+                    { item.Auditors.map(i => {
+                        let title = i.Status != DefaultStatusType.active ? 'Inactive - ' : '';
+                        title += i.IsLeader ? 'Auditor leader' : i.IsWitness ? 'Witness' : 'Auditor';
+                        return (
+                            // <div key={i.ID} className="d-flex flex-column align-items-start item-action p-1 rounded-1 gap-1">
+                            <div 
+                                key={i.ID}
+                                className={`d-flex flex-column align-items-start gap-1 ${ i.Status != DefaultStatusType.active ? 'opacity-6' : '' }`} 
+                                title={ title }
+                            > 
+                                <span className="text-xs">
+                                    <FontAwesomeIcon icon={ i.IsLeader ? faStar : i.IsWitness ? faEye : faUser } className="me-1"/>
+                                    <span className={`text-${ i.IsLeader ? 'info text-gradient' : i.IsWitness ? 'secondary' : 'body' } font-weight-bold`}>{i.AuditorName}</span>
+                                </span>
+                                { i.StandardsNames.length > 0 && <span className="text-xs text-secondary ms-1">{i.StandardsNames.join(', ')}</span> }
+                            </div>
+                        );
+                    })}
                 </div>
             </td>
             <td>
-                <div className="d-flex align-items-center gap-1">
-                    <p className="text-xs text-wrap font-weight-bold mb-0">
-                        {item.Standards.map(i => i.StandardName).join(', ')}
-                    </p>
+                <div className="d-flex align-items-start flex-column gap-1">
+                    { item.Standards.map(i => 
+                        <div 
+                            key={i.ID} 
+                            className={ i.Status != DefaultStatusType.active || i.StandardStatus != DefaultStatusType.active ? 'opacity-6' : '' }
+                            title={ i.Status != DefaultStatusType.active || i.StandardStatus != DefaultStatusType.active ? 'Inactive' : 'Active' }
+                        >
+                            <span className="text-xs font-weight-bold">{i.StandardName}</span>
+                            <span className="text-xs text-secondary ms-1">{ auditStepProps[i.Step].abbreviation.toUpperCase() }</span>
+                        </div>
+                    )}
+                </div>
+            </td>
+            <td>
+                <div className="d-flex justify-content-center align-items-center gap-2">
+                    { 
+                        !isNullOrEmpty(item.ExtraInfo) ? (
+                            <FontAwesomeIcon icon={ faStickyNote } className="text-warning me-1" title={item.ExtraInfo} />
+                        ) : (
+                            <FontAwesomeIcon icon={ faStickyNote } className="text-secondary me-1" title="no extra info" />
+                        )
+
+                    }
                 </div>
             </td>
             <td>

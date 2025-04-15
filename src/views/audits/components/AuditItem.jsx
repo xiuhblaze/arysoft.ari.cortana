@@ -6,8 +6,12 @@ import auditStatusProps from '../helpers/auditStatusProps';
 import AuditEditItem from './AuditEditItem';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 
+const { 
+    AuditStatusType,
+    DefaultStatusType,
+} = enums();
+
 const StandardItem = ({ standard, ...props }) => {
-    const { DefaultStatusType } = enums();
     const itemStyle = standard.Status != DefaultStatusType.active ? 'opacity-5' : '';
     return (
         <div {...props} className={ itemStyle }>
@@ -18,13 +22,10 @@ const StandardItem = ({ standard, ...props }) => {
 
 const AuditItem = ({ item, ...props }) => {
 
-    // if (!auditCycle) {
-    //     console.log('AuditItem: auditCycle is empty');
-    //     return;
-    // }
+    const itemStatusStyle = item.Status == AuditStatusType.canceled ? 'opacity-6' : ''; 
 
     return (
-        <div {...props} className="d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-2">
+        <div {...props} className={`d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-2 ${itemStatusStyle}`}>
             <div>
                 <FontAwesomeIcon 
                     icon={ auditStatusProps[item.Status].icon }
