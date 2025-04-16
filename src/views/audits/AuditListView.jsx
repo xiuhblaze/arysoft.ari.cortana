@@ -27,7 +27,7 @@ const AuditListView = () => {
     // HOOKS
 
     useEffect(() => {
-        console.log('AuditListView.useEffect[]:');   
+        // console.log('AuditListView.useEffect[]:');   
         onSearch();
 
         setNavbarTitle(dispatch, null);

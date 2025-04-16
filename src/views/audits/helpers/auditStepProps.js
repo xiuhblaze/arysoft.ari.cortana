@@ -42,13 +42,13 @@ const auditStepProps = [
     {
         id: AuditStepType.transfer,
         label: 'Transfer',
-        abbreviation: 't',
+        abbreviation: 'tt',
         variant: 'info',
     },
     {
         id: AuditStepType.special,
         label: 'Special',
-        abbreviation: 's',
+        abbreviation: 'sp',
         variant: 'warning',
     }
 ];

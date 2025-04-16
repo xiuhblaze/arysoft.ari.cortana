@@ -35,6 +35,16 @@ const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
     return (
         <tr {...props} className={myClassName}>
             <td>
+                <div className="d-flex justify-content-center mx-1 gap-2">
+                    {/* <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
+                        <FontAwesomeIcon icon={faClone} />
+                    </a> */}
+                    <Link to={`${item.ID}`} title="Edit" className="text-dark">
+                        <FontAwesomeIcon icon={faEdit} />
+                    </Link>
+                </div>
+            </td>
+            <td>
                 <div className="d-flex align-items-center me-2">
                     <div className="avatar m-3" style={{ minWidth: '48px'}}>
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
@@ -51,7 +61,7 @@ const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
                                     .map(c => 
                                         <span 
                                             key={c.ID}
-                                            className={`d-flex flex-wrap ${ c.Status != DefaultStatusType.active ? 'text-secondary' : '' } me-1`}
+                                            className={`text-wrap ${ c.Status != DefaultStatusType.active ? 'text-secondary' : '' } me-1`}
                                             title={ c.Status != DefaultStatusType.active ? 'Inactive' : 'Active' }
                                         >
                                             {c.Name} - {c.LegalEntity}
@@ -180,16 +190,6 @@ const OrganizationTableItem = ({ item, className, onShowModal, ...props }) => {
             <td>
                 <div className="align-middle text-center text-sm">
                     <Status value={ item.Status } />
-                </div>
-            </td>
-            <td>
-                <div className="d-flex justify-content-center mx-3 gap-2">
-                    {/* <a href="#" onClick={() => onShowModal(item.ID)} title="Details">
-                        <FontAwesomeIcon icon={faClone} />
-                    </a> */}
-                    <Link to={`${item.ID}`} title="Edit" className="text-dark">
-                        <FontAwesomeIcon icon={faEdit} />
-                    </Link>
                 </div>
             </td>
         </tr>

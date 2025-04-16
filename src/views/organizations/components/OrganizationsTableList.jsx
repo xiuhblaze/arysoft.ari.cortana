@@ -93,6 +93,7 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>
+                                    <th className={`${headStyle} text-center`}>{/* Action */}</th>
                                     <th>
                                         <div className="d-flex justify-content-start align-items-center gap-1">
                                             <SortItem
@@ -136,7 +137,6 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                                             </div>
                                         </div>
                                     </th>
-                                    <th className={`${headStyle} text-center`}>{/* Action */}</th> 
                                 </tr>
                             </thead>
                             <tbody>

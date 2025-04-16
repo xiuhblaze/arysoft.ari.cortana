@@ -17,9 +17,22 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
     return (
         <tr {...props} className={className}>
             <td>
+                <div className="d-flex justify-content-center align-items-center mx-1">
+                    {
+                        !!onEditClick ?  
+                        <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
+                            <FontAwesomeIcon icon={faEdit} />
+                        </a> : null
+                    }
+                </div>
+            </td>
+            <td>
                 <div className="d-flex align-items-center me-2">
                     <div>
-                        <div className={`icon icon-sm icon-shape bg-gradient-${ auditStatusProps[item.Status].variant} border-radius-md me-2 d-flex align-items-center justify-content-center`}>
+                        <div 
+                            className={`icon icon-sm icon-shape bg-gradient-${ auditStatusProps[item.Status].variant} border-radius-md me-2 d-flex align-items-center justify-content-center`}
+                            title={ auditStatusProps[item.Status].label }
+                        >
                             <FontAwesomeIcon 
                                 icon={ auditStatusProps[item.Status].icon }
                                 className="text-white" aria-hidden="true"
@@ -57,9 +70,9 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                             > 
                                 <span className="text-xs">
                                     <FontAwesomeIcon icon={ i.IsLeader ? faStar : i.IsWitness ? faEye : faUser } className="me-1"/>
-                                    <span className={`text-${ i.IsLeader ? 'info text-gradient' : i.IsWitness ? 'secondary' : 'body' } font-weight-bold`}>{i.AuditorName}</span>
+                                    <span className={`text-${ i.IsLeader ? 'info text-gradient' : i.IsWitness ? 'secondary' : 'body' } text-wrap font-weight-bold`}>{i.AuditorName}</span>
                                 </span>
-                                { i.StandardsNames.length > 0 && <span className="text-xs text-secondary ms-1">{i.StandardsNames.join(', ')}</span> }
+                                { i.StandardsNames.length > 0 && <span className="text-xs text-secondary text-wrap ms-1">{i.StandardsNames.join(', ')}</span> }
                             </div>
                         );
                     })}
@@ -88,16 +101,6 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                             <FontAwesomeIcon icon={ faStickyNote } className="text-secondary me-1" title="no extra info" />
                         )
 
-                    }
-                </div>
-            </td>
-            <td>
-                <div className="d-flex justify-content-center align-items-center mx-3">
-                    {
-                        !!onEditClick ?  
-                        <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
-                            <FontAwesomeIcon icon={faEdit} />
-                        </a> : null
                     }
                 </div>
             </td>

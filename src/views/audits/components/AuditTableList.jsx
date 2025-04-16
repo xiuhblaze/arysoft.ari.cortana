@@ -43,9 +43,9 @@ const AuditTableList = () => {
 
     // }, [audits]);
 
-    useEffect(() => {
-        console.log('AuditTableList.useEffect[]:');
-    }, []);
+    // useEffect(() => {
+    //     console.log('AuditTableList.useEffect[]:');
+    // }, []);
     
     
     // METHODS
@@ -76,6 +76,7 @@ const AuditTableList = () => {
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>
                                         <div className="d-flex justify-content-start align-items-center gap-1">
                                             <AryTableSortItem
@@ -88,11 +89,10 @@ const AuditTableList = () => {
                                         </div>
                                         
                                     </th>
-                                    <td className={headStyle}>Organization</td>
-                                    <td className={headStyle}>Auditors</td>
-                                    <td className={headStyle}>Standards</td>
-                                    <td></td>
-                                    <td></td>
+                                    <th className={headStyle}>Organization</th>
+                                    <th className={headStyle}>Auditors</th>
+                                    <th className={headStyle}>Standards</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>

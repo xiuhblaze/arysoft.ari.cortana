@@ -148,9 +148,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
         if (!!audit && !!show) {
 
-            let standardsActiveCount = audit.Standards.filter(i => 
-                i.Status == DefaultStatusType.active && i.StandardStatus == DefaultStatusType.active)
-                .length;
+            let standardsActiveCount = !!audit.Standards 
+                ? audit.Standards.filter(i => 
+                    i.Status == DefaultStatusType.active && i.StandardStatus == DefaultStatusType.active)
+                    .length
+                : 0;
 
             setInitialValues({
                 descriptionInput: audit.Description ?? '',

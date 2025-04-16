@@ -84,13 +84,10 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                     || auditStandard.Status == DefaultStatusType.nothing,
             });
 
-            if (!auditCycleStandards || auditCycleStandards.length === 0) {
-                // console.log('AuditStandardEditItem: auditCycleStandards is empty');
-                auditCycleStandardsAsync({ 
-                    auditCycleID: audit.AuditCycleID,
-                    pageSize: 0,
-                });
-            }
+            auditCycleStandardsAsync({ 
+                auditCycleID: audit.AuditCycleID,
+                pageSize: 0,
+            });
         }
     }, [auditStandard]);
     

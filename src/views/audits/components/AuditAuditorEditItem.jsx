@@ -96,9 +96,23 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
     useEffect(() => {
 
         if (!!auditAuditor && showModal) {
-            const standardsActiveCount = audit.Standards.filter(i => i.Status == DefaultStatusType.active).length;
-            const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active && standardsActiveCount == 1);            
-            const standard = auditAuditor.AuditStandards?.find(i => !!oneStandardActive && i.ID == oneStandardActive.ID); 
+            // const standardsActiveCount = !!audit && !!audit.Standards
+            //     ? audit.Standards.filter(i => i.Status == DefaultStatusType.active).length
+            //     : 0;
+            // const oneStandardActive = !!audit && !!audit.Standards
+            //     ? audit.Standards.find(i => i.Status == DefaultStatusType.active && standardsActiveCount == 1)
+            //     : null;
+            // const standard = auditAuditor.AuditStandards?.find(i => !!oneStandardActive && i.ID == oneStandardActive.ID); 
+
+            const standardsActiveCount = !!auditStandards
+                ? auditStandards.filter(i => i.Status == DefaultStatusType.active).length
+                : 0;
+            const oneStandardActive = !!auditStandards
+                ? auditStandards.find(i => i.Status == DefaultStatusType.active && standardsActiveCount == 1)
+                : null;
+            const standard = !!auditStandards
+                ? auditStandards.find(i => !!oneStandardActive && i.ID == oneStandardActive.ID)
+                : null;
 
             setInitialValues({
                 auditorSelect: auditAuditor?.AuditorID ?? '',
@@ -118,7 +132,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                     pageSize: 0,
                 });
             }
-
+// console.log('AuditAuditorEditItem.useEffect[]: auditStandards', auditStandards);
             // Cargar lista de standards asociado al auditAuditor
             if (auditAuditor.AuditStandards != null) {
                 setStandardsList(auditAuditor.AuditStandards.map(i => ({
@@ -130,9 +144,9 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
             }
 
             setStandardSelect(!standard && !!oneStandardActive ? oneStandardActive.ID : '');
-        } else if (!!auditAuditor && showModal && isForUpdateStandard) {
-            // setStandardsCount(auditAuditor?.AuditStandards?.length ?? 0);
-            formikRef.current.setFieldValue('standardsCountHidden', auditAuditor?.AuditStandards?.length ?? 0);
+        // } else if (!!auditAuditor && showModal && isForUpdateStandard) { // xBlaze: No se para que era esto???!
+        //     // setStandardsCount(auditAuditor?.AuditStandards?.length ?? 0);
+        //     formikRef.current.setFieldValue('standardsCountHidden', auditStandards ? auditStandards.length : 0); // auditAuditor?.AuditStandards?.length ?? 0);
         }
 
     }, [auditAuditor]);
@@ -221,12 +235,12 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
 
             auditStandardAddAsync(standardSelect)
                 .then(data => {
-                    // console.log('data', data);
+                    console.log('data', data);
                     if (!!data) {
                         //auditAuditorAsync(auditAuditor.ID); // Refrescar la lista de standards
                         //setIsForUpdateStandard(true); // Para que no actualice los initialValues
                         setStandardSelect(''); // reiniciar el select
-                        const currentStandard = audit.Standards.find(i => i.ID == standardSelect);
+                        const currentStandard = auditStandards.find(i => i.ID == standardSelect); // audit.Standards.find(i => i.ID == standardSelect);
                         setStandardsList([
                             ...standardsList,
                             {
@@ -350,8 +364,8 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                         >
                                                             <option value="">(select standard)</option>
                                                             {
-                                                                !!audit && audit.Standards && audit.Standards.length > 0 && 
-                                                                audit.Standards.map(standard => (
+                                                                !!auditStandards && auditStandards.length > 0 && 
+                                                                auditStandards.map(standard => (
                                                                     <option 
                                                                         key={standard.ID} 
                                                                         value={standard.ID}
