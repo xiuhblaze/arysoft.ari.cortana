@@ -9,7 +9,10 @@ import App from './App.jsx';
 import store from './store/store.jsx';
 import Loading from './views/loading.jsx';
 
-import './assets/css/soft-ui-dashboard.min.css';
+import './assets/fontawesome/css/fontawesome.min.css';
+import './assets/fontawesome/css/solid.min.css';
+
+import './assets/css/soft-ui-dashboard.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

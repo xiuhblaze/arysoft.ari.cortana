@@ -38,6 +38,7 @@ const getSearhQuery = (options = {}) => {
     query += options?.group ? `&group=${options.group}` : '';
     query += options?.class ? `&class=${options.class}` : '';
     query += options?.onlyOption ? `&onlyoption=${options.onlyOption}` : '';
+    query += options?.accreditedStatus ? `&accreditedstatus=${options.accreditedStatus}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
@@ -192,7 +193,7 @@ export const useNacecodesStore = () => {
         dispatch(onNacecodeDeleting());
 
         const toDelete = {
-            NaceCodeID: id,
+            ID: id,
             UpdatedUser: user.username,
         }
 

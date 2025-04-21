@@ -278,7 +278,7 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.post(`${APPFORM_URL}/${appForm.ID}/contact`, toAdd);
             const { Data } = await resp.data;
 
-            console.log('contactAddAsync.Data', Data);
+            //console.log('contactAddAsync.Data', Data);
 
             return Data;
         } catch (error) {
@@ -304,7 +304,7 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.delete(`${APPFORM_URL}/${appForm.ID}/contact`, { data: toRemove });
             const { Data } = await resp.data;
 
-            console.log('contactDelAsync.Data', Data);
+            //console.log('contactDelAsync.Data', Data);
             
             return Data;
         } catch (error) {
@@ -332,7 +332,7 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.post(`${APPFORM_URL}/${appForm.ID}/site`, toAdd);
             const { Data } = await resp.data;
 
-            console.log('siteAddAsync.Data', Data);
+            //console.log('siteAddAsync.Data', Data);
 
             return Data;
         } catch (error) {
@@ -358,7 +358,7 @@ export const useAppFormsStore = () => {
             const resp = await cortanaApi.delete(`${APPFORM_URL}/${appForm.ID}/site`, { data: toRemove });
             const { Data } = await resp.data;
 
-            console.log('siteDelAsync.Data', Data);
+            //console.log('siteDelAsync.Data', Data);
             
             return Data;
         } catch (error) {

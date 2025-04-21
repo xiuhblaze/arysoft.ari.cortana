@@ -12,8 +12,9 @@ import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Fo
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import debounce from "lodash.debounce";
 import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
+import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
 
-export const ToolbarForm = () => {
+export const NacecodesToolbar = () => {
     const { DefaultStatusType, NacecodeOrderType } = enums();
     const { NACECODES_OPTIONS, VITE_PAGE_SIZE } = envVariables();
     const {
@@ -29,6 +30,7 @@ export const ToolbarForm = () => {
         groupInput: '',
         classInput: '',
         onlySelect: '',
+        accreditedStatusSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
@@ -55,6 +57,7 @@ export const ToolbarForm = () => {
                 groupInput: savedSearch?.group ?? '',
                 classInput: savedSearch?.class ?? '',
                 onlySelect: savedSearch?.onlyOption ?? '',
+                accreditedStatusSelect: savedSearch?.accreditedStatus ?? '',
                 statusSelect: savedSearch?.status ?? '',
                 includeDeletedCheck: savedSearch?.includeDeleted ?? false,
             });
@@ -73,6 +76,7 @@ export const ToolbarForm = () => {
             group: values.groupInput,
             class: values.classInput,
             onlyOption: values.onlySelect,
+            accreditedStatus: values.accreditedStatusSelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
@@ -194,6 +198,15 @@ export const ToolbarForm = () => {
                                             </AryFormikSelectInput>
                                         </div>
                                         <div className="col-12 col-sm-auto ps-sm-0">
+                                            <AryFormikSelectInput name="accreditedStatusSelect">
+                                                {
+                                                    nacecodeAccreditedStatusProps.map((option) => (
+                                                        <option key={option.id} value={option.id}>{option.label}</option>
+                                                    ))
+                                                }
+                                            </AryFormikSelectInput>
+                                        </div>
+                                        <div className="col-12 col-sm-auto ps-sm-0">
                                             <AryFormikSelectInput name="statusSelect">
                                                 {
                                                     Object.keys(DefaultStatusType).map((key) => {
@@ -244,4 +257,4 @@ export const ToolbarForm = () => {
     )
 }
 
-export default ToolbarForm;
+export default NacecodesToolbar;

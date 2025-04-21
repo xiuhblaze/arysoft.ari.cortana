@@ -281,14 +281,23 @@ const enums = () => {
         classes: 4,
     });
 
+    const NaceCodeAccreditedType = Object.freeze({
+        nothing: 0,
+        accredited: 1,
+        mustAccredited: 2,
+        notAccredited: 3,
+    });
+
     const NacecodeOrderType = Object.freeze({
         nothing: 0,
         sector: 1,
         description: 2,
-        updated: 3,
-        sectorDesc: 4,
-        descriptionDesc: 5,
-        updatedDesc: 6
+        accredited: 3,
+        updated: 4,
+        sectorDesc: 5,
+        descriptionDesc: 6,
+        accreditedDesc: 7,
+        updatedDesc: 8
     });
 
     // Organizations
@@ -428,6 +437,7 @@ const enums = () => {
         CompanyOrderType,
         ContactOrderType,
         NaceCodeOnlyOptionType,
+        NaceCodeAccreditedType,
         NacecodeOrderType,
         OrganizationOrderType,
         OrganizationStatusType,

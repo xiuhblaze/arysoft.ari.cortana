@@ -9,11 +9,11 @@ import enums from "../../helpers/enums";
 
 import AryPagination from "../../components/AryPagination/AryPagination";
 import NaceTableList from "./components/NaceTableList";
-import ToolbarForm from "./components/ToolbarForm";
+import NacecodesToolbar from "./components/NacecodesToolbar";
 import useNacecodesStore from "../../hooks/useNaceCodesStore";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 
-export const ListView = () => {
+export const NacecodesListView = () => {
     const navigate = useNavigate();
     const {
         NACECODES_OPTIONS,
@@ -91,7 +91,7 @@ export const ListView = () => {
                 <Col>
                     <Card className="mb-4">
                         <Card.Header className="pb-0">
-                            <ToolbarForm />
+                            <NacecodesToolbar />
                         </Card.Header>
                         <Card.Body className="px-0 pt-0 pb-2">
                             {!!nacecodesMeta && (
@@ -121,4 +121,4 @@ export const ListView = () => {
     )
 };
 
-export default ListView;
+export default NacecodesListView;

@@ -80,6 +80,19 @@
   box-sizing: border-box;
 }
 
+/* xBlaze: Actualizdo por mi, no soft ui no mostraba los iconos */
+:root, :host {
+  --fa-style-family-classic: 'FontAwesome';
+  --fa-font-solid: normal 900 1em/1 'FontAwesome'; }
+
+@font-face {
+  font-family: 'FontAwesome'; /* xBlaze: Cambio de nombre - original: Font Awesome 6 Free */
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("../fontawesome/webfonts/fa-solid-900.woff2") format("woff2"), url("../fontawesome/webfonts/fa-solid-900.ttf") format("truetype"); }
+/* xBlaze: Fin de actualizacion */
+
 @media (prefers-reduced-motion: no-preference) {
   :root {
     scroll-behavior: smooth;

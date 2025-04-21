@@ -5,7 +5,7 @@ import { AryFormikSelectInput } from "../../../components/Forms";
 import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import enums from "../../../helpers/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faPlus, faSpinner, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { setSitesList, useAppFormController } from "../context/appFormContext";
 import { useSitesStore } from "../../../hooks/useSiteStore";
@@ -17,19 +17,18 @@ const AppFormEditSites = ({ ...props }) => {
 
     // CUSTOM HOOKS
 
-    const { organization } = useOrganizationsStore();
-    const { sites } = useSitesStore();
+    const { sites } = useSitesStore(); // Este viene cargado desde OrganizationEditView
     const {
-        appForm,
         siteAddAsync,
         siteDelAsync,
     } = useAppFormsStore();
 
     // HOOKS
 
-    const [siteSelected, setSiteSelected] = useState(null);
-    const [disabledButtons, setDisabledButtons] = useState(false);
-
+    const [siteSelected, setSiteSelected] = useState(null);    
+    const [isAdding, setIsAddging] = useState(false); 
+    const [isDeleting, setIsDeleting] = useState(null);
+    
     // METHODS
 
     const onSiteSelected = (e) => {
@@ -37,7 +36,7 @@ const AppFormEditSites = ({ ...props }) => {
     };
 
     const onClickAdd = () => {
-        setDisabledButtons(true);
+        setIsAddging(true);
         siteAddAsync(siteSelected)
             .then(data => {
                 if (!!data) {
@@ -51,26 +50,29 @@ const AppFormEditSites = ({ ...props }) => {
                     }
                     setSiteSelected(null);
                 }
+                setIsAddging(false);
             }).catch(err => {
                 console.log('onClickAdd', err);
                 Swal.fire('Add site', err, 'error');
+                setIsAddging(false);
             });
-        setDisabledButtons(false);
+        
     }; // onClickAdd
 
     const onClickRemove = (id) => {
-        setDisabledButtons(true);
+        setIsDeleting(id);
         siteDelAsync(id)
             .then(data => {
                 if (!!data) {
                     setSitesList(dispatch, sitesList.filter(i => i.ID != id));
                 }
+                setIsDeleting(null);
             })
             .catch(err => {
                 console.log('onClickRemove', err);
                 Swal.fire('Remove site', err, 'error');
-            });
-        setDisabledButtons(false);
+                setIsDeleting(null);
+            });        
     } // onClickRemove
 
     return (
@@ -81,6 +83,7 @@ const AppFormEditSites = ({ ...props }) => {
                     className="form-select" 
                     value={siteSelected ?? ''} 
                     onChange={onSiteSelected}
+                    disabled={ isAdding || isDeleting }
                 >
                     <option value="">(select a site)</option>
                     {
@@ -102,9 +105,9 @@ const AppFormEditSites = ({ ...props }) => {
                     <button type="button"
                         className="btn btn-link text-dark px-2"
                         onClick={onClickAdd}
-                        disabled={disabledButtons}
+                        disabled={isAdding}
                     >
-                        Add
+                        { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
                     </button>
                 </div>
             </Col>
@@ -136,9 +139,13 @@ const AppFormEditSites = ({ ...props }) => {
                                                 className="btn btn-link p-0 mb-0 text-secondary"
                                                 onClick={() => onClickRemove(item.ID)}
                                                 title="Delete"
-                                                disabled={disabledButtons}
+                                                disabled={isDeleting == item.ID}
                                             >
-                                                <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                                                {
+                                                    isDeleting == item.ID 
+                                                        ? <FontAwesomeIcon icon={ faSpinner } spin />
+                                                        : <FontAwesomeIcon icon={ faTrashCan } size="lg" />
+                                                }                                                
                                             </button>
                                         </div>
                                     </ListGroup.Item>

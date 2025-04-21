@@ -6,7 +6,7 @@ import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { useContactsStore } from '../../../hooks/useContactStore';
 import enums from '../../../helpers/enums';
-import { faEnvelope, faPhone, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faPhone, faSpinner, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import isString from '../../../helpers/isString';
 import { setContactsList, useAppFormController } from '../context/appFormContext';
@@ -19,10 +19,8 @@ const AppFormEditContacts = ({ ...props }) => {
 
     // CUSTOM HOOKS
 
-    const { organization } = useOrganizationsStore();
-    const { contacts } = useContactsStore();
+    const { contacts } = useContactsStore(); // Este viene cargado desde OrganizationEditView
     const {
-        appForm,
         contactAddAsync,
         contactDelAsync,
     } = useAppFormsStore();
@@ -30,7 +28,8 @@ const AppFormEditContacts = ({ ...props }) => {
     // HOOKS
 
     const [contactSelected, setContactSelected] = useState(null);
-    const [disabledButtons, setDisabledButtons] = useState(false);
+    const [isAdding, setIsAddging] = useState(false); 
+    const [isDeleting, setIsDeleting] = useState(null);
 
     // METHODS
 
@@ -39,7 +38,7 @@ const AppFormEditContacts = ({ ...props }) => {
     };
 
     const onClickAdd = () => {
-        setDisabledButtons(true);
+        setIsAddging(true);
         contactAddAsync(contactSelected)
             .then(data => {
                 if (!!data) {
@@ -53,26 +52,29 @@ const AppFormEditContacts = ({ ...props }) => {
                     }
                     setContactSelected(null);
                 }
+                setIsAddging(false);
             }).catch(err => {
                 console.log('onClickAdd', err);
                 Swal.fire('Add contact', err, 'error');
+                setIsAddging(false);
             });
-        setDisabledButtons(false);
+        
     }; // onClickAdd
 
     const onClickRemove = (id) => {
-        setDisabledButtons(true);
+        setIsDeleting(id);
         contactDelAsync(id)
             .then(data => {
                 if (!!data) {
                     setContactsList(dispatch, contactsList.filter(i => i.ID != id));
                 }
+                setIsDeleting(null);
             })
             .catch(err => {
                 console.log('onClickRemove', err);
                 Swal.fire('Remove contact', err, 'error');
+                setIsDeleting(null);
             });
-        setDisabledButtons(false);
     } // onClickRemove
 
     return (
@@ -83,6 +85,7 @@ const AppFormEditContacts = ({ ...props }) => {
                     className="form-select" 
                     value={contactSelected ?? ''} 
                     onChange={onContactSelected}
+                    disabled={ isAdding || isDeleting }
                 >
                     <option value="">(select a contact)</option>
                     {
@@ -104,9 +107,9 @@ const AppFormEditContacts = ({ ...props }) => {
                     <button type="button"
                         className="btn btn-link text-dark px-2"
                         onClick={onClickAdd}
-                        disabled={disabledButtons}
+                        disabled={ isAdding }
                     >
-                        Add
+                        { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
                     </button>
                 </div>
             </Col>
@@ -157,9 +160,13 @@ const AppFormEditContacts = ({ ...props }) => {
                                             className="btn btn-link p-0 mb-0 text-secondary"
                                             onClick={() => onClickRemove(item.ID)}
                                             title="Delete"
-                                            disabled={disabledButtons}
+                                            disabled={isDeleting == item.ID}
                                         >   
-                                            <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                                            {
+                                                isDeleting == item.ID 
+                                                    ? <FontAwesomeIcon icon={ faSpinner } spin size="lg" />
+                                                    : <FontAwesomeIcon icon={ faTrashCan } size="lg" />
+                                            }
                                         </button>
                                     </div>
                                 </ListGroup.Item>
