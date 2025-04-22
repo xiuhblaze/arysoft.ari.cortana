@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBuilding, faEdit, faEye, faStar, faStarHalfStroke, faStickyNote, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faEdit, faEye, faStar, faStickyNote, faUser } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 
 import auditStatusProps from '../helpers/auditStatusProps'

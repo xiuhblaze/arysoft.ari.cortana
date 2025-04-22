@@ -33,6 +33,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         phoneInput: '',
         logoInputFile: '',
         extraInfoInput: '',
+        folderFolioInput: '',
         statusSelect: '',
         noteInput: '',
         companiesCountHidden: 0,
@@ -49,6 +50,10 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             .matches(PHONE_REGEX, 'Phone number is not valid'),
         extraInfoInput: Yup.string()
             .max(1000, 'Extra info must be at most 1000 characters'),
+        folderFolioInput: Yup.number()
+            .typeError('Must be a number')
+            .positive('Must be a positive number')
+            .integer('Must be an integer'),
         logoInputFile: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -128,6 +133,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 phoneInput: organization?.Phone ?? '',
                 logoInputFile: '',
                 extraInfoInput: organization?.ExtraInfo ?? '',
+                folderFolioInput: organization?.FolderFolio ?? '',
                 statusSelect: organization.Status == OrganizationStatusType.nothing 
                     ? OrganizationStatusType.applicant 
                     : organization?.Status ?? '',
@@ -226,6 +232,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             Website: values.websiteInput,
             Phone: values.phoneInput,
             ExtraInfo: values.extraInfoInput,
+            FolderFolio: values.folderFolioInput,
             Status: values.statusSelect,
         };
 
@@ -396,7 +403,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 <span className="text-danger text-xs">{formik.errors.companiesCountHidden}</span>
                                             }
                                         </Col>
-                                        <Col xs="12">
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs="12">
+                                    <Row>
+                                        
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 type="text"
                                                 name="websiteInput"
@@ -405,7 +419,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 helpText="Include http:// or https://"
                                             />
                                         </Col>
-                                        <Col xs="12">
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 name="phoneInput"
                                                 label="Phone"
@@ -420,6 +434,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 label="Extra info"
                                                 helpText="Add any extra info about the organization"
                                                 rows="3"
+                                            />
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <AryFormikTextInput
+                                                name="folderFolioInput"
+                                                label="Folder folio"
+                                                type="text"
+                                                helpText="Folio number of the folder where the organization is located"
                                             />
                                         </Col>
                                         <Col xs="12">

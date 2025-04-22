@@ -18,7 +18,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
         folioInput: '',
         textInput: '',
         standardSelect: '',
-        certificatesValidityStatusSelect: '',
+        // certificatesValidityStatusSelect: '',
         statusSelect: '',
         includeDeletedCheck: false,
     };
@@ -73,7 +73,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                 folioInput: savedSearch.folio ?? '',
                 textInput: savedSearch.text ?? '',
                 standardSelect: savedSearch.standardID ?? '',
-                certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
+                // certificatesValidityStatusSelect: savedSearch.certificatesValidityStatus ?? '',
                 statusSelect: applicantsOnly
                     ? OrganizationStatusType.applicant
                     : savedSearch.status ?? '',
@@ -123,7 +123,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
             status: applicantsOnly
                 ? OrganizationStatusType.applicant
                 : values.statusSelect,
-            certificatesValidityStatus: values.certificatesValidityStatusSelect,
+            // certificatesValidityStatus: values.certificatesValidityStatusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
@@ -206,7 +206,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                                                 }
                                             </AryFormikSelectInput>
                                         </div>
-                                        {
+                                        {/* {
                                             !applicantsOnly &&
                                             <div className="col-12 col-sm-3 col-xxl-2">
                                                 <AryFormikSelectInput name="certificatesValidityStatusSelect">
@@ -222,7 +222,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                                                         )}
                                                 </AryFormikSelectInput>
                                             </div>
-                                        }
+                                        } */}
                                         <div className="col-12 col-sm-auto">
                                             <AryFormikSelectInput
                                                 name="statusSelect"

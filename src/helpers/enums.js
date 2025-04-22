@@ -315,12 +315,12 @@ const enums = () => {
         folio: 1,
         name: 2,        
         status: 3,
-        certificatesValidityStatus: 4,
+        folderFolio: 4,
         updated: 5,
         folioDesc: 6,
         nameDesc: 7,
         statusDesc: 8,
-        certificatesValidityStatusDesc: 9,
+        folderFolioDesc: 9,
         updatedDesc: 10,
     });
 
