@@ -1,63 +1,78 @@
-import { Field, Form, Formik } from "formik";
-import { Alert, Card, Col, Modal, Row } from "react-bootstrap";
-import { useAuditsStore } from "../../../hooks/useAuditsStore";
 import { useEffect, useRef, useState } from "react";
-import { ViewLoading } from "../../../components/Loaders";
-import * as Yup from "yup";
-import enums from "../../../helpers/enums";
-import { useAuditAuditorsStore } from "../../../hooks/useAuditAuditorsStore";
-import { useAuditStandardsStore } from "../../../hooks/useAuditStandardsStore";
-import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import Swal from "sweetalert2";
-import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
-import AuditStandardsList from "./AuditStandardsList";
-import AuditAuditorsList from "./AuditAuditorsList";
-import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
-import getISODate from "../../../helpers/getISODate";
+import { Alert, Card, Col, Modal, Row } from "react-bootstrap";
 import { faExclamationTriangle, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import AuditDocumentsList from "./AuditDocumentsList";
+import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as Yup from "yup";
+import Swal from "sweetalert2";
+
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
+import { useAuditAuditorsStore } from "../../../hooks/useAuditAuditorsStore";
+import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
+import { useAuditsStore } from "../../../hooks/useAuditsStore";
+import { useAuditStandardsStore } from "../../../hooks/useAuditStandardsStore";
+import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+import { ViewLoading } from "../../../components/Loaders";
+import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import AuditAuditorsList from "./AuditAuditorsList";
+import AuditDocumentsList from "./AuditDocumentsList";
+import AuditStandardsList from "./AuditStandardsList";
 import auditStatusProps from "../helpers/auditStatusProps";
+import enums from "../../../helpers/enums";
+import getISODate from "../../../helpers/getISODate";
+
 import bgHeadModal from "../../../assets/img/bgWavesWhite.jpg";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import { useNotesStore } from "../../../hooks/useNotesStore";
+import NotesListModal from "../../notes/components/NotesListModal";
 
 const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
     const {
-        AuditStatusType
+        AuditStatusType,
+        DefaultStatusType,
     } = enums();
     const formDefaultValues = {
         descriptionInput: '',
         startDateInput: '',
         endDateInput: '',
+        extraInfoInput: '',
         statusSelect: AuditStatusType.scheduled,
         hasWitnessCheck: false,
+        noteInput: '',
         standardsCountHidden: 0,
         auditorsCountHidden: 0,
     }; // formDefaultValues
     const validationSchema = Yup.object({
-            descriptionInput: Yup.string()
-                .max(1000, ''),
-            startDateInput: Yup.date()
-                .typeError('Start date has an invalid format')
-                .required('Must specify start date'),
-            endDateInput: Yup.date()
-                .typeError('End date has an invalid format')
-                .required('Must specify end date'),
-            statusSelect: Yup.string()
-                .oneOf(Object.values(AuditStatusType)
-                        .filter(ast => ast != AuditStatusType.nothing)
-                        .map(ast => ast + ''), 
-                    'Select a valid option')
-                .required('Must select a status'),
-            standardsCountHidden: Yup.number()
-                .min(1, 'Must have at least one standard'),
-            auditorsCountHidden: Yup.number()
-                .when('statusSelect', {
-                    is: (statusSelect) => statusSelect > AuditStatusType.scheduled,
-                    then: schema => schema.min(1, 'From the Confirmed status, there must be at least one auditor assigned')
-                }),
-        }); 
+        descriptionInput: Yup.string()
+            .max(1000, 'Audit description must be at most 1000 characters'),
+        extraInfoInput: Yup.string()
+            .max(1000, 'Extra info must be at most 1000 characters'),
+        startDateInput: Yup.date()
+            .typeError('Start date has an invalid format')
+            .required('Must specify start date'),
+        endDateInput: Yup.date()
+            .typeError('End date has an invalid format')
+            .required('Must specify end date'),
+        statusSelect: Yup.string()
+            // .oneOf(Object.values(AuditStatusType)
+            //         .filter(ast => ast != AuditStatusType.nothing)
+            //         .map(ast => ast + ''), 
+            //    'Select a valid option')
+            .required('Must select a status'),
+        noteInput: Yup.string()
+            .max(1000, 'The note must be at most 1000 characters'),
+        standardsCountHidden: Yup.number()
+            .when('statusSelect', {
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled && statusSelect < AuditStatusType.canceled,
+                then: schema => schema.min(1, 'For this status change, there must be at least one active standard assigned')
+            }),
+        auditorsCountHidden: Yup.number()
+            .when('statusSelect', {
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled && statusSelect < AuditStatusType.canceled,
+                then: schema => schema.min(1, 'For this status change, there must be at least one active auditor assigned')
+            }),
+    }); 
 
     // CUSTOM HOOKS
 
@@ -96,6 +111,10 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         auditClear,
     } = useAuditsStore();
 
+    const {
+            noteCreateAsync,
+        } = useNotesStore();
+
     // HOOKS
 
     const formikRef = useRef(null);
@@ -105,16 +124,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     const [showAllFiles, setShowAllFiles] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
     const [statusOptions, setStatusOptions] = useState(false);
+    const [showAddNote, setShowAddNote] = useState(false);
+    const [saveNote, setSaveNote] = useState(''); 
     
-    useEffect(() => {
-        console.log('AuditModalEditItem', id);
-    }, []);
-    
-
     useEffect(() => {
         
         if (!!show) {
-            console.log('AuditModalEditItem Show', id);
             if (!!id) {
                 auditAsync(id);
             } else if (!!auditCycle) {
@@ -132,16 +147,25 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     useEffect(() => {
 
         if (!!audit && !!show) {
+
+            let standardsActiveCount = !!audit.Standards 
+                ? audit.Standards.filter(i => 
+                    i.Status == DefaultStatusType.active && i.StandardStatus == DefaultStatusType.active)
+                    .length
+                : 0;
+
             setInitialValues({
-                descriptionInput: audit?.Description ?? '',
-                startDateInput: !!audit?.StartDate ? getISODate(audit.StartDate) : '',
-                endDateInput: !!audit?.EndDate ? getISODate(audit.EndDate) : '',
-                statusSelect: !!audit?.Status && audit?.Status != AuditStatusType.nothing
-                    ? audit?.Status
+                descriptionInput: audit.Description ?? '',
+                startDateInput: !!audit.StartDate ? getISODate(audit.StartDate) : '',
+                endDateInput: !!audit.EndDate ? getISODate(audit.EndDate) : '',
+                extraInfoInput: audit.ExtraInfo ?? '',
+                statusSelect: !!audit.Status && audit.Status != AuditStatusType.nothing
+                    ? audit.Status
                     : AuditStatusType.scheduled,
-                hasWitnessCheck: audit?.HasWitness ?? false,
-                standardsCountHidden: audit?.Standards?.length ?? 0,
-                auditorsCountHidden: audit?.Auditors?.length ?? 0,
+                hasWitnessCheck: audit.HasWitness ?? false,
+                noteInput: '',
+                standardsCountHidden: standardsActiveCount, //audit.Standards?.length ?? 0,
+                auditorsCountHidden: audit.Auditors?.length ?? 0,
             });
 
             switch (audit.Status) {
@@ -184,6 +208,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                         { label: 'Closed', value: AuditStatusType.closed },
                     ]);
                     break;
+                case AuditStatusType.canceled:
+                    setStatusOptions([
+                        { label: 'Scheduled', value: AuditStatusType.scheduled },
+                        { label: 'Canceled', value: AuditStatusType.canceled },
+                    ]);
+                    break;
                 default:
                     setStatusOptions([
                         { label: '(select)', value: AuditStatusType.nothing },
@@ -198,13 +228,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     break;
             } // switch
             
-            if (!organization || organization.ID != audit.AuditCycle?.OrganizationID) {
-                console.log('AuditEditItem: loading organization');
+            if (!organization || (!!audit.AuditCycle && organization.ID != audit.AuditCycle?.OrganizationID)) {
                 organizationAsync(audit.AuditCycle.OrganizationID);
             }
             
-            if (!auditCycle || auditCycle.ID != audit.AuditCycle.ID) {
-                console.log('AuditEditItem: loading audit cycle');
+            if (!auditCycle || (!!audit.AuditCycle && auditCycle.ID != audit.AuditCycle.ID)) {
                 auditCycleAsync(audit.AuditCycle.ID);
             }
             
@@ -215,7 +243,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     
     useEffect(() => {
         if (!!auditStandards && show && !!formikRef?.current) {
-            formikRef.current.setFieldValue('standardsCountHidden', auditStandards.length);
+            const standardsActive = auditStandards.filter(item => 
+                item.Status == DefaultStatusType.active && item.StandardStatus == DefaultStatusType.active);
+            formikRef.current.setFieldValue('standardsCountHidden', standardsActive.length);
         }
     }, [auditStandards]);
 
@@ -227,43 +257,78 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
             if (!!auditSavedOk && show) {
+                if (!isNullOrEmpty(saveNote)) {
+                    noteCreateAsync({ OwnerID: audit.ID, Text: saveNote });
+                    setSaveNote('');
+                }
                 Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
-                onCloseModal();
+                auditAsync(audit.ID); // Refrescar los datos de la audit
+                // onCloseModal(); // Probando el evitar cerrar la modal al guardar
             }
         }, [auditSavedOk]);
         
-        useEffect(() => {
-            if (!!auditsErrorMessage && show) {
-                Swal.fire('Audit', auditsErrorMessage, 'error');
-                onCloseModal();
-            }
-        }, [auditsErrorMessage]);
+    useEffect(() => {
+        if (!!auditsErrorMessage && show) {
+            Swal.fire('Audit', auditsErrorMessage, 'error');
+            // onCloseModal(); // Probando el evitar cerrar la modal al ocurrir un error
+        }
+    }, [auditsErrorMessage]);
 
     // METHODS
 
     const onFormSubmit = (values) => {
+
+        const newStatus = audit.Status == AuditStatusType.nothing
+            ? AuditStatusType.scheduled
+            : values.statusSelect;
+
+        if (audit.Status != newStatus) { // Si cambió el status crear una nota
+            const text = 'Status changed to ' + auditStatusProps[newStatus].label.toUpperCase();
+
+            setSaveNote(`${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`);
+            //setSaveNote(text);
+        }
 
         const toSave = {
             ID: audit.ID,
             Description: values.descriptionInput,
             StartDate: values.startDateInput,
             EndDate: values.endDateInput,
+            ExtraInfo: values.extraInfoInput,
             Status: values.statusSelect,
             HasWitness: values.hasWitnessCheck,
         };
 
-        //console.log(toSave);
+        // console.log('AuditModalEditItem.onFormSubmit: toSave', toSave);
         auditSaveAsync(toSave);
     };
 
     const onCloseModal = () => {
-        
-        auditClear();
-        setShowModal(false); //* IMPORTANTE: Único lugar donde se cierra el modal
 
-        if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
-                                // asi como cargar nuevamente el listado de audits
+        if (hasChanges) {
+            Swal.fire({
+                title: 'Discard changes?',
+                text: 'Are you sure you want to discard changes? The changes will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard changes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    auditClear();
+                    setShowModal(false);
 
+                    if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
+                                            // asi como cargar nuevamente el listado de audits
+                }
+            })
+        } else { // No se puede omitir la duplicación de este código porque Swal es asincrono
+            auditClear();
+            setShowModal(false);
+
+            if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
+        }
     };  // onCloseModal
 
     return (
@@ -308,7 +373,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                     <div className="d-flex align-items-center">
                                                         <div 
                                                             className={`icon icon-md icon-shape bg-gradient-${ auditStatusProps[audit.Status].variant } border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`} 
-                                                            title="Lorem ipsum"
+                                                            title={ auditStatusProps[audit.Status].label }
                                                             style={{ minWidth: '48px' }}
                                                         >
                                                             <FontAwesomeIcon icon={ auditStatusProps[audit.Status].icon  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
@@ -372,21 +437,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 />
                                                             </Col>
                                                             <Col xs="12">
-                                                                <AryFormikSelectInput
-                                                                    name="statusSelect"
-                                                                    label="Status"
-                                                                >
-                                                                    {
-                                                                        !!statusOptions && statusOptions.map(item =>
-                                                                            <option
-                                                                                key={item.value}
-                                                                                value={item.value}
-                                                                            >
-                                                                                {item.label}
-                                                                            </option>
-                                                                        )
-                                                                    }
-                                                                </AryFormikSelectInput>
+                                                                <AryFormikTextArea
+                                                                    name="extraInfoInput"
+                                                                    label="Extra info"
+                                                                    helpText="Add any extra info for the audit"
+                                                                />
                                                             </Col>
                                                             <Col xs="12" sm="6">
                                                                 <div className="form-check form-switch mb-3">
@@ -404,6 +459,48 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     </label>
                                                                 </div>
                                                             </Col>
+                                                            {
+                                                                !!audit.Notes && audit.Notes.length > 0 &&
+                                                                <Col xs="12" sm="6" className="text-end">
+                                                                    <NotesListModal notes={audit.Notes} buttonLabel="View notes" />
+                                                                </Col>
+                                                            }
+                                                            <Col xs="12">
+                                                                <AryFormikSelectInput
+                                                                    name="statusSelect"
+                                                                    label="Status"
+                                                                    onChange={ (e) => {
+                                                                        const selectedValue = e.target.value;
+
+                                                                        formik.setFieldValue('statusSelect', selectedValue);
+                                                                        setShowAddNote(audit.Status != selectedValue);
+                                                                    }}
+                                                                    helpText={ audit.Status == AuditStatusType.confirmed 
+                                                                        || audit.Status == AuditStatusType.inProcess 
+                                                                        || audit.Status == AuditStatusType.finished || audit.Status == AuditStatusType.completed || audit.Status == AuditStatusType.closed ? 'Add a note for the status change' : '' }
+                                                                >
+                                                                    {
+                                                                        !!statusOptions && statusOptions.map(item =>
+                                                                            <option
+                                                                                key={item.value}
+                                                                                value={item.value}
+                                                                            >
+                                                                                {item.label}
+                                                                            </option>
+                                                                        )
+                                                                    }
+                                                                </AryFormikSelectInput>
+                                                            </Col>
+                                                            {
+                                                                showAddNote &&
+                                                                <Col xs="12">
+                                                                    <AryFormikTextInput
+                                                                        name="noteInput"
+                                                                        label="Note"
+                                                                        helpText="Add any note for the audit status change"
+                                                                    />
+                                                                </Col>
+                                                            }
                                                         </Row>
                                                         <Row>
                                                             <Col xs="12" className="d-flex justify-content-end">

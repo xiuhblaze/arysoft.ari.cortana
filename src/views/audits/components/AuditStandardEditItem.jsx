@@ -1,4 +1,4 @@
-import { faEdit, faPlus, faSave } from "@fortawesome/free-solid-svg-icons"
+import { faEdit, faExclamationTriangle, faPlus, faSave } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import * as Yup from "yup";
 import { useAuditsStore } from "../../../hooks/useAuditsStore";
@@ -8,7 +8,7 @@ import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useEffect, useState } from "react";
 import { useAuditCycleStandardsStore } from "../../../hooks/useAuditCycleStandardsStore";
 import enums from "../../../helpers/enums";
-import { Col, Modal, Row } from "react-bootstrap";
+import { Alert, Col, Modal, Row } from "react-bootstrap";
 import { ViewLoading } from "../../../components/Loaders";
 import { Form, Formik } from "formik";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
@@ -84,13 +84,10 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                     || auditStandard.Status == DefaultStatusType.nothing,
             });
 
-            if (!auditCycleStandards || auditCycleStandards.length === 0) {
-                // console.log('AuditStandardEditItem: auditCycleStandards is empty');
-                auditCycleStandardsAsync({ 
-                    auditCycleID: audit.AuditCycleID,
-                    pageSize: 0,
-                });
-            }
+            auditCycleStandardsAsync({ 
+                auditCycleID: audit.AuditCycleID,
+                pageSize: 0,
+            });
         }
     }, [auditStandard]);
     
@@ -192,7 +189,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                                 key={item.StandardID}
                                                                 value={item.StandardID}
                                                                 className="text-capitalize"
-                                                                disabled={item.Status !== DefaultStatusType.active}
+                                                                disabled={item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active}
                                                             >
                                                                 {item.StandardName}
                                                             </option>
@@ -240,6 +237,18 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                 </label>
                                             </div>
                                         </Col>
+                                        {
+                                            !!id && !!auditStandard && auditStandard.StandardStatus != DefaultStatusType.active ?
+                                            <Col xs="12">
+                                                <Alert variant="warning">
+                                                    <FontAwesomeIcon icon={ faExclamationTriangle } className="text-white me-2" size="lg" />
+                                                    <span className="text-sm text-white">
+                                                        This standard is inactive
+                                                    </span>
+                                                </Alert>
+                                            </Col> : null
+                                        }
+                        
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>

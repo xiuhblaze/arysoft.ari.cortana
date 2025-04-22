@@ -4,7 +4,7 @@ import envVariables from "../../../helpers/envVariables"
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { faStickyNote } from "@fortawesome/free-solid-svg-icons";
+import { faFile, faStickyNote } from "@fortawesome/free-solid-svg-icons";
 import AuditCycleDocumentEditItem from "./AuditCycleDocumentEditItem";
 import getRandomNumber from "../../../helpers/getRandomNumber";
 
@@ -29,7 +29,7 @@ const AuditCycleDocumentItem = ({ item, readOnly = false, ...props }) => {
         auditCycle
     } = useAuditCyclesStore();
 
-    const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action px-2 py-1${ item.Status != DefaultStatusType.active ? ' opacity-5' : '' }`;
+    const itemStyle = `d-flex justify-content-start align-items-center rounded-1 item-action gap-2 px-2 py-1${ item.Status != DefaultStatusType.active ? ' opacity-5' : '' }`;
     const url = `${VITE_FILES_URL}/${URL_ORGANIZATION_FILES}/${organization.ID}/Cycles/${auditCycle.ID}`;
     const fileName = !!item.Filename
         ? `${url}/${item.Filename}?v=${ getRandomNumber(4) }`
@@ -57,6 +57,9 @@ const AuditCycleDocumentItem = ({ item, readOnly = false, ...props }) => {
 
     return (
         <div {...props} className={itemStyle}>
+            <div>
+                <FontAwesomeIcon icon={ faFile } className={`text-${ item.Status == DefaultStatusType.active ? 'dark' : 'secondary' } me-1`} />
+            </div>
             <div className="d-flex flex-column">
                 { !isNullOrEmpty(fileName) ? (
                     <a href={fileName} className="font-weight-bold text-xs" target="_blank" title={ `Open or download file: ${item.Filename}` }>

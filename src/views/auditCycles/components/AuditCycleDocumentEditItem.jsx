@@ -44,7 +44,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                 message: 'Some file error', // <- este solo es visible si el último return es false
                 test: (value, ctx) => {
                     if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
                         const validTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
@@ -111,6 +111,7 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                 otherDescriptionInput: auditCycleDocument?.OtherDescription ?? '',
                 statusCheck: auditCycleDocument?.Status == DefaultStatusType.active 
                     || auditCycleDocument?.Status == DefaultStatusType.nothing,
+                fileInput: '',
             });
         }
     }, [auditCycleDocument]);
@@ -257,6 +258,9 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                                                                 className="form-control"
                                                                 onChange={(e) => {
                                                                     formik.setFieldValue('fileInput', e.currentTarget.files[0]);
+                                                                }}
+                                                                onBlur={(e) => {
+                                                                    formik.handleBlur(e);
                                                                 }}
                                                             />
                                                             {/* <div className="text-xs text-secondary mt-1 me-2">If a file exists, the new one will overwrite the current one</div> */}

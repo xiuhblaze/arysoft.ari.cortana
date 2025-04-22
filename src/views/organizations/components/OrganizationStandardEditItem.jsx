@@ -78,7 +78,7 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
             });
 
             standardsAsync({
-                status: DefaultStatusType.active,
+                // status: DefaultStatusType.active,
                 pageSize: 0,
                 includeDeleted: false,
                 order: StandardOrderType.name,
@@ -192,6 +192,8 @@ const OrganizationStandardEditItem = ({ id, ...props }) => {
                                                                 key={item.ID}
                                                                 value={item.ID}
                                                                 className="text-capitalize"
+                                                                disabled={ item.Status != DefaultStatusType.active }
+                                                                title={ item.Status != DefaultStatusType.active ? 'Inactive' : 'Select' }
                                                             >
                                                                 {item.Name}
                                                             </option>

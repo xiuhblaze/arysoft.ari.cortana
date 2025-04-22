@@ -4,13 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAnglesRight, faArrowRightToBracket, faArrowRotateLeft, faBarcode, faCode, faEdit, faLayerGroup, faVectorSquare } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesRight, faArrowRightToBracket, faArrowRotateLeft, faBarcode, faCalendarCheck, faCircleInfo, faCode, faEdit, faLayerGroup, faStamp, faVectorSquare } from '@fortawesome/free-solid-svg-icons';
 
 import enums from '../../../helpers/enums';
 import useNacecodesStore from '../../../hooks/useNaceCodesStore';
 import { ViewLoading } from '../../../components/Loaders';
 import Code from './Code';
 import ListGroupItemData from '../../../components/ListGroup/ListGroupItemData';
+import nacecodeAccreditedStatusProps from '../helpers/nacecodeAccreditedStatusProps';
+import getFriendlyDate from '../../../helpers/getFriendlyDate';
 
 export const DetailsModal = ({ show, onHide, ...props }) => {
     const navigate = useNavigate();
@@ -98,7 +100,31 @@ export const DetailsModal = ({ show, onHide, ...props }) => {
                                     { nacecode.Class?.toString().padStart(2, '0') }
                                 </ListGroupItemData>
                             </ListGroup.Item>
+                            <div className="bg-light border-radius-md p-3 mb-3">
+                                <h6 className="text-sm text-wrap">Accreditation info</h6>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm bg-transparent">
+                                    <ListGroupItemData label="Accredited status" icon={ faStamp }>
+                                        <span 
+                                            className={`badge bg-gradient-${ nacecodeAccreditedStatusProps[nacecode.AccreditedStatus ?? 0].variant } text-white`} 
+                                            title={ nacecodeAccreditedStatusProps[nacecode.AccreditedStatus ?? 0].description }
+                                        >
+                                            { nacecodeAccreditedStatusProps[nacecode.AccreditedStatus ?? 0].label }
+                                        </span>
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm bg-transparent">
+                                    <ListGroupItemData label="Accreditation info" icon={ faCircleInfo }> 
+                                        { nacecode.AccreditationInfo }
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="border-0 ps-0 pt-0 text-sm bg-transparent">
+                                    <ListGroupItemData label="Accreditation change date" icon={ faCalendarCheck }> 
+                                        { !!nacecode.AccreditationDate ? getFriendlyDate(nacecode.AccreditationDate) : '-' }
+                                    </ListGroupItemData>
+                                </ListGroup.Item>
+                            </div>
                         </ListGroup>
+                            
                     </>
                 ) : null}
             </Modal.Body>

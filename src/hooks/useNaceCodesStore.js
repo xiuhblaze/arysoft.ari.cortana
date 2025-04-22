@@ -32,7 +32,13 @@ const getSearhQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
-    query += options?.text?.length > 0 ? `&text=${options.text}` : '';
+    query += options?.text ? `&text=${options.text}` : '';
+    query += options?.sector ? `&sector=${options.sector}` : '';
+    query += options?.division ? `&division=${options.division}` : '';
+    query += options?.group ? `&group=${options.group}` : '';
+    query += options?.class ? `&class=${options.class}` : '';
+    query += options?.onlyOption ? `&onlyoption=${options.onlyOption}` : '';
+    query += options?.accreditedStatus ? `&accreditedstatus=${options.accreditedStatus}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
@@ -64,13 +70,6 @@ export const useNacecodesStore = () => {
 
     // METHODS
 
-    // const setError = (message) => {
-    //     if (message.length === 0) return;
-    //     dispatch(setNacecodesErrorMessage(message));
-    //     setTimeout(() => {
-    //         dispatch(setNacecodesErrorMessage(null));
-    //     }, 10);
-    // };
     const setError = (value) => {    
             if (isString(value)) {
                 dispatch(setNacecodesErrorMessage(value));    
@@ -194,7 +193,7 @@ export const useNacecodesStore = () => {
         dispatch(onNacecodeDeleting());
 
         const toDelete = {
-            NaceCodeID: id,
+            ID: id,
             UpdatedUser: user.username,
         }
 

@@ -49,7 +49,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                 message: 'Some file error', // <- este solo es visible si el último return es false
                 test: (value, ctx) => {
                     if (!!value) {
-                        const extension = value.name.split(/[.]+/).pop(); // value.name.split('.').slice(-1)[0]; // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
+                        const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
                         const validTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
                         if (!validTypes.includes(extension)) {
                             return ctx.createError({
@@ -65,7 +65,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         otherDescriptionInput: Yup.string()
             .max(100, 'Other description must be at most 100 characters'),
         standardsCountHidden: Yup.number()
-                    .min(1, 'Must have at least one standard'),
+            .min(1, 'Must have at least one standard'),
     });
 
     // CUSTOM HOOKS
@@ -108,34 +108,42 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
     const [standardSelect, setStandardSelect] = useState('');
-    const [isForUpdateStandard, setIsForUpdateStandard] = useState(false);
-    const [standardsCount, setStandardsCount] = useState(0);
+    const [standardsList, setStandardsList] = useState([]);
 
     useEffect(() => {
         
-        // 
-        // console.log('isForUpdateStandard', isForUpdateStandard);
-
-        if (!!auditDocument && showModal && !isForUpdateStandard) {
-            // const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active);
-            // const standardSelect = audit.Standards.filter(acs => acs.Status == DefaultStatusType.active).length == 1 && !!oneStandardActive
-            //     ? oneStandardActive.StandardID 
-            //     : '';
+        //if (!!auditDocument && showModal && !isForUpdateStandard) {
+        if (!!auditDocument && showModal) {
+            const standardsActiveCount = audit.Standards.filter(i => i.Status == DefaultStatusType.active).length;
+            const oneStandardActive = audit.Standards.find(i => i.Status == DefaultStatusType.active && standardsActiveCount == 1);            
+            const standard = auditDocument.AuditStandards?.find(i => !!oneStandardActive && i.ID == oneStandardActive.ID); 
 
             setInitialValues({
-                // standardSelect: auditDocument?.StandardID ?? standardSelect,
                 fileInput: '',
                 commentsInput: auditDocument?.Comments ?? '',
                 otherDescriptionInput: auditDocument?.OtherDescription ?? '',
                 isWitnessIncludedCheck: auditDocument?.isWitnessIncluded ?? false,
                 statusCheck: auditDocument.Status == DefaultStatusType.active
                     || auditDocument.Status == DefaultStatusType.nothing,
-                standardsCountHidden: auditDocument?.AuditStandards?.length ?? 0,
+                standardsCountHidden: auditDocument.AuditStandards?.length > 0 
+                    ? auditDocument.AuditStandards?.length
+                    : (!standard && !!oneStandardActive ? 1 : 0),
             });
 
-            setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+            // Cargar lista de standards asociado al auditDocument
+            if (auditDocument.AuditStandards != null) {
+                setStandardsList(auditDocument.AuditStandards.map(i => ({
+                    ID: i.ID,
+                    StandardName: i.StandardName,
+                })));
+            } else {
+                setStandardsList([]);
+            }
+
+            // setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+            setStandardSelect(!standard && !!oneStandardActive ? oneStandardActive.ID : '');
         } else if (!!auditDocument && showModal && isForUpdateStandard) {
-            setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
+            // setStandardsCount(auditDocument?.AuditStandards?.length ?? 0);
             formikRef.current.setFieldValue('standardsCountHidden', auditDocument?.AuditStandards?.length ?? 0);
         }
     }, [auditDocument]);
@@ -157,7 +165,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
         if (!!auditDocumentsErrorMessage && showModal) {
             Swal.fire('Document', auditDocumentsErrorMessage, 'error');
             // auditDocumentClear();
-            onCloseModal();
+            //onCloseModal();
         }
     }, [auditDocumentsErrorMessage]);
 
@@ -208,28 +216,23 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     // AUDIT STANDARDS
 
     const addStandardSelected = () => {
-        // console.log('addStandardSelected', standardSelect);
 
         if (!isNullOrEmpty(standardSelect)) {
-            
-            // validar que el standard seleccionado no sea una que ya este asignado
-            if (!!auditDocument?.AuditStandards && auditDocument.AuditStandards.length > 0) {
-                const existStandard = auditDocument.AuditStandards.find(i => i.ID == standardSelect);
-                //console.log('existStandard', existStandard);
-                if (!!existStandard) {
-                    Swal.fire('Error', 'The standard is already assigned', 'error');
-                    // console.log('El standard seleccionado ya está asignado');
-                    return;
-                }
-            }
 
             auditStandardAddAsync(standardSelect)
                 .then(data => {
-                    // console.log('data', data);
                     if (!!data) {
-                        auditDocumentAsync(auditDocument.ID); // Refrescar la lista de standards
-                        setIsForUpdateStandard(true); // Para que no actualice los initialValues
+                        //setIsForUpdateStandard(true); // Para que no actualice los initialValues
                         setStandardSelect(''); // reiniciar el select
+                        const currentStandard = audit.Standards.find(i => i.ID == standardSelect);
+                        setStandardsList([
+                            ...standardsList,
+                            {
+                                ID: currentStandard.ID,
+                                StandardName: currentStandard.StandardName,
+                            }
+                        ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
+                        formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + 1);
                     }
                 })
                 .catch(err => {
@@ -239,15 +242,14 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     }; // addStandardSelected
 
     const delStandard = (auditStandardID) => {
-        // console.log('delStandard', auditStandardID);
 
         if (!!auditStandardID) {
             auditStandardDelAsync(auditStandardID)
                 .then(data => {
-                    // console.log('data', data);
                     if (!!data) {
-                        auditDocumentAsync(auditDocument.ID); // Refrescar la lista de standards
-                        setIsForUpdateStandard(true); // Para que no actualice los initialValues
+                        //setIsForUpdateStandard(true); // Para que no actualice los initialValues
+                        setStandardsList(standardsList.filter(i => i.ID != auditStandardID));                        
+                        formikRef.current.setFieldValue('standardsCountHidden', standardsList.length - 1 < 0 ? 0 : standardsList.length - 1); 
                     }
                 })
                 .catch(err => {
@@ -259,16 +261,15 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     const onStandardSelectChange = (e) => {
         setStandardSelect(e.target.value); // Creo que aquí con esto es suficiente
 
+        // console.log('onStandardSelectChange', formikRef.current.values.standardsCountHidden);
+        const standardsCount = formikRef.current.values.standardsCountHidden;
+
         // Para contar el numero de standards o si al menos esta uno seleccionado
         if (!isNullOrEmpty(e.target.value)) {
-            setStandardsCount(standardsCount + 1);
             formikRef.current.setFieldValue('standardsCountHidden', standardsCount + 1);
         } else {
-            setStandardsCount(standardsCount - 1);
-            formikRef.current.setFieldValue('standardsCountHidden', standardsCount - 1);
+            formikRef.current.setFieldValue('standardsCountHidden', standardsCount - 1 < 0 ? 0 : standardsCount - 1);
         }
-
-        // console.log('onStandardSelectChange', e.target.value);
     }; // onStandardSelectChange
 
     return (
@@ -354,10 +355,10 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                         </Col>
                                         <Col xs="12">
                                             <label className="form-label">Standards assigned</label>
-                                            { !!auditDocument && !!auditDocument?.AuditStandards && auditDocument.AuditStandards.length > 0 ? (
+                                            { !!auditDocument && !!standardsList && standardsList.length > 0 ? (
                                                 <ListGroup className="mb-3">
                                                     {
-                                                        auditDocument.AuditStandards.map(item => 
+                                                        standardsList.map(item => 
                                                             <ListGroup.Item key={item.ID} className="border-0 py-1 ps-0 text-xs">
                                                                 <div className='d-flex justify-content-between align-items-center'>
                                                                     <span>

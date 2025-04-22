@@ -33,6 +33,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         phoneInput: '',
         logoInputFile: '',
         extraInfoInput: '',
+        folderFolioInput: '',
         statusSelect: '',
         noteInput: '',
         companiesCountHidden: 0,
@@ -49,6 +50,10 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             .matches(PHONE_REGEX, 'Phone number is not valid'),
         extraInfoInput: Yup.string()
             .max(1000, 'Extra info must be at most 1000 characters'),
+        folderFolioInput: Yup.number()
+            .typeError('Must be a number')
+            .positive('Must be a positive number')
+            .integer('Must be an integer'),
         logoInputFile: Yup.mixed()
             .test({
                 name: 'is-type-valid',
@@ -100,9 +105,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
     } = useAuditCyclesStore();
 
     const {
-        isNoteCreating,
-        noteCreatedOk,
-        note,
+        // isNoteCreating,
+        // noteCreatedOk,
+        // note,
         noteCreateAsync,
     } = useNotesStore();
 
@@ -128,6 +133,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                 phoneInput: organization?.Phone ?? '',
                 logoInputFile: '',
                 extraInfoInput: organization?.ExtraInfo ?? '',
+                folderFolioInput: organization?.FolderFolio ?? '',
                 statusSelect: organization.Status == OrganizationStatusType.nothing 
                     ? OrganizationStatusType.applicant 
                     : organization?.Status ?? '',
@@ -226,24 +232,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
             Website: values.websiteInput,
             Phone: values.phoneInput,
             ExtraInfo: values.extraInfoInput,
+            FolderFolio: values.folderFolioInput,
             Status: values.statusSelect,
         };
 
         if (organization.Status != values.statusSelect) {
             const text = "Status changed to " + organizationStatusProps[values.statusSelect].label.toUpperCase();
             
-            // if (organization.Status == OrganizationStatusType.applicant 
-            //     && values.statusSelect == OrganizationStatusType.active) {
-            //     console.log('Cambió a activo, validar si ya tiene la documentación necesaria');
-            // }
-
             setSaveNote(`${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`);
-
-            // noteCreateAsync({
-            //     OwnerID: organization.ID,
-            //     Text: `${text}${!isNullOrEmpty(values.noteInput) ? ': ' + values.noteInput : ''}`,
-            // });
-
             setIsApplicant(
                 organization.Status == OrganizationStatusType.applicant
                 || organization.Status == OrganizationStatusType.nothing
@@ -258,9 +254,9 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         navigate('/organizations/');
     }; // onCancelButton
 
-    const onDeleteFile = (file) => {
+    // const onDeleteFile = (file) => {
 
-    }; // onDeleteFile
+    // }; // onDeleteFile
 
     const onDeleteButton = () => {    
         Swal.fire({
@@ -389,96 +385,6 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                             }
                                         </Col>
                                     </Row>
-                                    {/* <Row>
-                                        <Col xs="12">
-                                            <div className="d-flex justify-content-between">
-                                                <label className="form-label">QR Code</label>
-                                                {
-                                                    !newQRCode && !!organization.QRFile &&
-                                                    <div className="d-flex justify-content-end gap-3">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-link p-0 mb-0 text-secondary"
-                                                            onClick={() => setNewQRCode(true)}
-                                                            title="Upload new QR Code"
-                                                        >
-                                                            <FontAwesomeIcon icon={faRotateRight} size="lg" />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-link p-0 mb-0 text-secondary"
-                                                            onClick={onDeleteFile}
-                                                            title="Delete QR code file"
-                                                        >
-                                                            <FontAwesomeIcon icon={faTrash} size="lg" />
-                                                        </button>
-                                                    </div>
-                                                }
-                                                {
-                                                    !!newQRCode && !isNullOrEmpty(organization.QRFile) &&
-                                                    <div className="text-end">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-link p-0 mb-0 text-secondary"
-                                                            onClick={ () => {
-                                                                setNewQRCode(false);
-                                                                setQrcodePreview(null);
-                                                                formik.setFieldValue("qrcodeInputFile", '');
-                                                            }}
-                                                            title="Cancel upload new QR Code"
-                                                        >
-                                                            <FontAwesomeIcon icon={faBan} size="lg" />
-                                                        </button>
-                                                    </div>
-                                                }
-                                            </div>
-                                            {
-                                                !!newQRCode ? (
-                                                    <>
-                                                        {
-                                                            !!qrcodePreview && 
-                                                            <div>
-                                                                <Image src={qrcodePreview}
-                                                                    thumbnail
-                                                                    fluid
-                                                                    className="mb-3"
-                                                                />
-                                                            </div>
-                                                        }
-                                                        <input
-                                                            type="file"
-                                                            name="qrFile"
-                                                            accept="image/png,image/jpeg,image/jpg"
-                                                            className="form-control mb-3"
-                                                            onChange={(e) => {
-                                                                const fileReader = new FileReader();
-                                                                fileReader.onload = () => {
-                                                                    if (fileReader.readyState === 2) {
-                                                                        setQrcodePreview(fileReader.result);                                                                        
-                                                                    }
-                                                                };
-                                                                fileReader.readAsDataURL(e.target.files[0]);
-                                                                formik.setFieldValue('qrcodeInputFile', e.currentTarget.files[0]);
-                                                            }}
-                                                        />
-                                                        {
-                                                            formik.touched.qrcodeInputFile && formik.errors.qrcodeInputFile &&
-                                                            <span className="text-danger text-xs">{formik.errors.qrcodeInputFile}</span>
-                                                        }
-                                                    </>
-                                                ) : !!organization.QRFile && (
-                                                    <div>
-                                                        <Image 
-                                                            src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.QRFile}`}
-                                                            thumbnail
-                                                            fluid
-                                                            className="mb-3"
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </Col>
-                                    </Row> */}
                                 </Col>
                                 <Col xs="12" sm="8">
                                     <Row>
@@ -497,7 +403,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 <span className="text-danger text-xs">{formik.errors.companiesCountHidden}</span>
                                             }
                                         </Col>
-                                        <Col xs="12">
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs="12">
+                                    <Row>
+                                        
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 type="text"
                                                 name="websiteInput"
@@ -506,7 +419,7 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 helpText="Include http:// or https://"
                                             />
                                         </Col>
-                                        <Col xs="12">
+                                        <Col xs="12" sm="6">
                                             <AryFormikTextInput
                                                 name="phoneInput"
                                                 label="Phone"
@@ -521,6 +434,14 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
                                                 label="Extra info"
                                                 helpText="Add any extra info about the organization"
                                                 rows="3"
+                                            />
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <AryFormikTextInput
+                                                name="folderFolioInput"
+                                                label="Folder folio"
+                                                type="text"
+                                                helpText="Folio number of the folder where the organization is located"
                                             />
                                         </Col>
                                         <Col xs="12">

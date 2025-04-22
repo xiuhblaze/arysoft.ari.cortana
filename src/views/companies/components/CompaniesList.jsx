@@ -47,7 +47,7 @@ const CompaniesList = ({ readOnly = false, ...props }) => {
 
     return (
         <div {...props}>
-            <div className="d-flex justify-content-between align-items-center mb-2">
+            <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div>
                     <h6 className="text-sm mb-0">Legal entities</h6>
                     <p className="text-xs text-secondary mb-0">
@@ -66,23 +66,24 @@ const CompaniesList = ({ readOnly = false, ...props }) => {
                                     companies.map(item => {
                                         return (
                                             <tr key={item.ID} className={`border-0 ${item.Status != DefaultStatusType.active ? 'opacity-6' : ''}`}>
-                                                <td className="border-0 pe-0">
+                                                <td className="border-0 pe-0 ps-0">
                                                     <FontAwesomeIcon icon={item.Status == DefaultStatusType.active ? faBuildingCircleCheck : faBuildingCircleXmark } className={`text-${defaultStatusProps[item.Status].variant}`} />
                                                 </td>
                                                 <td className="border-0">
-                                                    <h6 className="d-flex flex-wrap text-sm mb-0">
+                                                    <h6 className="text-wrap text-sm mb-0">
                                                         {item.Name}
                                                     </h6>
-                                                    <p className="text-xs text-secondary mb-0">
+                                                    <p className="text-xs text-dark mb-0" title="Legal entity">
                                                         {item.LegalEntity}
                                                     </p>
-                                                </td>
-                                                <td className="border-0">
-                                                    <p className="text-xs text-secondary mb-0">
-                                                        {item.COID}
-                                                    </p>
-                                                </td>
-                                                <td className="border-0">
+                                                    {
+                                                        !!item.COID && 
+                                                        <p className="text-xs text-secondary mb-0" title="COID">
+                                                            {item.COID}
+                                                        </p>
+                                                    }
+                                                </td>                                                
+                                                <td className="text-end border-0 pe-0">
                                                     {
                                                         !readOnly && <CompaniesEditItem id={item.ID} />
                                                     }

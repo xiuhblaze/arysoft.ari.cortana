@@ -17,29 +17,25 @@ const enums = () => {
 
     // Application Forms
 
-    const ApplicationFormStatusType = Object.freeze({
+    const AppFormOrderType = Object.freeze({
         nothing: 0,
-        new: 1,
-        send: 2,
-        salesReview: 3,
-        applicantReview: 4,
-        salesEvaluation: 5,
-        acceptedClient: 6,
-        rejectedClient: 7,
-        acreditedAuditor: 8,
-        // Todo: Faltan estados
-        active: 9,
-        // Todo: Faltan estados
-        cancel: 10,
-        deleted: 11,
+        created: 1,
+        organization: 2,
+        createdDesc: 3,
+        organizationDesc: 4
     });
 
-    const ApplicationFormOrderType = Object.freeze({
-        nothing: 0,
-        organization: 1,
-        created: 2,
-        organizationDesc: 3,
-        createdDesc: 4,
+    const AppFormStatusType = Object.freeze({
+        nothing: 0,            // Nuevo registro temporal
+        new: 1,                // Nuevo registro almacenado con la información mínima
+        salesReview: 2,        // Ventas revisa y aprueba el appForm recibido por el cliente
+        salesRejected: 3,      // Rechazado por ventas, el cliente debe de completar más información
+        applicantReview: 4,    // Revisa que todo esté bien y es quien aprueba el appForm
+        applicantRejected: 5,  // Rechazado por el revisor del appForm, sales debe de completar más información
+        active: 6,             // AppForm activo
+        inactive: 7,           // Ya no está en uso este appForm
+        cancel: 8,             // En algún momento el appForm fué cancelado
+        deleted: 9,           // Eliminación logica
     });
 
     // Audits cycles
@@ -77,11 +73,11 @@ const enums = () => {
         nothing: 0,
         stage1: 1,
         stage2: 2,
-        survey1: 3,
-        survey2: 4,
+        surveillance1: 3,
+        surveillance2: 4,
         recertification: 5,
-        transfer: 6,
-        special: 7,     // Auditoria especial, puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+        transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+        special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     });
 
     const AuditDocumentType = Object.freeze({
@@ -277,14 +273,31 @@ const enums = () => {
 
     // NACE Codes
 
+    const NaceCodeOnlyOptionType = Object.freeze({
+        nothing: 0,
+        sectors: 1,
+        divisions: 2,
+        groups: 3,
+        classes: 4,
+    });
+
+    const NaceCodeAccreditedType = Object.freeze({
+        nothing: 0,
+        accredited: 1,
+        mustAccredited: 2,
+        notAccredited: 3,
+    });
+
     const NacecodeOrderType = Object.freeze({
         nothing: 0,
         sector: 1,
         description: 2,
-        updated: 3,
-        sectorDesc: 4,
-        descriptionDesc: 5,
-        updatedDesc: 6
+        accredited: 3,
+        updated: 4,
+        sectorDesc: 5,
+        descriptionDesc: 6,
+        accreditedDesc: 7,
+        updatedDesc: 8
     });
 
     // Organizations
@@ -302,12 +315,12 @@ const enums = () => {
         folio: 1,
         name: 2,        
         status: 3,
-        certificatesValidityStatus: 4,
+        folderFolio: 4,
         updated: 5,
         folioDesc: 6,
         nameDesc: 7,
         statusDesc: 8,
-        certificatesValidityStatusDesc: 9,
+        folderFolioDesc: 9,
         updatedDesc: 10,
     });
 
@@ -359,6 +372,19 @@ const enums = () => {
 
     // Standards
 
+    const StandardBaseType = Object.freeze({
+        nothing: 0,
+        iso9k: 1,
+        iso14K: 2,
+        iso22K: 3,
+        iso27K: 4,
+        iso37K: 5,
+        iso45K: 6,
+        fssc22K: 7,
+        haccp: 8,
+        gMarkets: 9,
+    });
+
     const StandardOrderType = Object.freeze({
         nothing: 0,
         name: 1,
@@ -384,8 +410,8 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
-        ApplicationFormOrderType,
-        ApplicationFormStatusType,
+        AppFormOrderType,
+        AppFormStatusType,
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
@@ -410,6 +436,8 @@ const enums = () => {
         CertificatesValidityStatusType,
         CompanyOrderType,
         ContactOrderType,
+        NaceCodeOnlyOptionType,
+        NaceCodeAccreditedType,
         NacecodeOrderType,
         OrganizationOrderType,
         OrganizationStatusType,
@@ -418,6 +446,7 @@ const enums = () => {
         ShiftType,
         SiteOrderType,
         StandardOrderType,
+        StandardBaseType,
         UserType,
     }
 };

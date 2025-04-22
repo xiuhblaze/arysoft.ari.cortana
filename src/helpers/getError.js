@@ -9,7 +9,7 @@ import isString from "./isString";
 export const getError = (error) => {
     let message = '';
 
-    // console.log(error);
+    //console.log(error);
 
     if (!!error.response && !!error.response.data && !!error.response.data.validation) {
         const { validation } = error.response.data;
@@ -33,6 +33,7 @@ export const getError = (error) => {
     }
 
     if (!!error.response && !!error.response.data && error.response.data.Detail) {
+        //console.log('error.response.data.Detail', error.response.data.Detail);
         const { Detail } = error.response.data;
         
         return {
@@ -43,7 +44,7 @@ export const getError = (error) => {
 
     if (!!error.response && !!error.response.data) {
         const { errors } = error.response.data;
-        // console.log(errors);
+        //console.log(errors);
         if (!!errors) { // errores del BusinesException
             // console.log(errors);
 

@@ -13,8 +13,10 @@ import {
     faCalendar,
     faCommentsDollar,
     faGlobe,
+    faHourglass,
     faLaptopCode,
     faListCheck,
+    faMagnifyingGlass,
     faNewspaper,
     faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons';
@@ -32,6 +34,7 @@ import DashboardToolbar from './components/DashboardToolbar';
 import auditStatusProps from '../audits/helpers/auditStatusProps';
 import AuditModalEditItem from '../audits/components/AuditModalEditItem';
 import auditStepProps from '../audits/helpers/auditStepProps';
+import consoleLog from '../../helpers/consoleLog';
 
 
 const locales = {
@@ -56,6 +59,7 @@ export const Dashboard = () => {
 
     const {
         AuditOrderType,
+        DefaultStatusType,
     } = enums();
 
     // CUSTOM HOOKS
@@ -78,13 +82,17 @@ export const Dashboard = () => {
     const [lastview, setLastview] = useState(localStorage.getItem(CALENDAR_LASTVIEW) || 'month');
     const [auditID, setAuditID] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    //const [defaultDate, setDefaultDate] = useState(null); //! Aun no funciona el mantener el mismo mes si se refresca el navegador :/
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [statAudits, setStatAudits] = useState({
+        total: 0,
+        title: '-'
+    });
 
     useEffect(() => {
         const { start, end } = getInitialRange();        
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const newSearch = {
-            //defaultDate: defaultDate ?? new Date(),
+            currentDate: currentDate,
             startDate: start, // : firstMonthDay,
             endDate: end, // lastMonthDay,
             pageSize: 0, // savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
@@ -92,46 +100,63 @@ export const Dashboard = () => {
             order: savedSearch?.order ? savedSearch.order : AuditOrderType.date,
         };
         const search = !!savedSearch ? savedSearch : newSearch;
-        // setDefaultDate(search.defaultDate);        
         
+        if (!!search.currentDate) setCurrentDate(new Date(search.currentDate));
+
+// consoleLog('useEffect[]: search', search);
         auditsAsync(search);
         localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
         setNavbarTitle(despatch, null);
     }, []);
 
     useEffect(() => {
-        setEventsList(audits.map(item => {
 
-            // console.log(item.StartDate, item.EndDate);
-            // console.log(new Date(item.StartDate), new Date(item.EndDate));
+        if (!!audits) {
 
-            const endDate = new Date(item.EndDate);
-            endDate.setHours(23, 59, 59, 999);
+            setEventsList(audits.map(item => {
+                const endDate = new Date(item.EndDate);
+                endDate.setHours(23, 59, 59, 999);
 
-            const toolTip = item.Description + '\n' 
-                + item.OrganizationName + '\n' 
-                + item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
-                + item.Standards.map(i => {
-                    let s = i.StandardName;
-                    s += ' - ' + auditStepProps[i.Step].abbreviation.toUpperCase();
-                    return s;
-                }).join(', ');
+                const auditors = item.Auditors
+                    .filter(i => i.Status == DefaultStatusType.active)
+                    .map(i => i.AuditorName).join(', ');
+    
+                const toolTip = item.Description + '\n' 
+                    + item.OrganizationName + '\n' 
+                    + auditors //item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
+                    + item.Standards.map(i => {
+                        let s = i.StandardName;
+                        s += ' - ' + auditStepProps[i.Step].abbreviation.toUpperCase();
+                        return s;
+                    }).join(', ');
+    
+                return {
+                    title: toolTip,
+                    notes: item.OrganizationName,
+                    start: new Date(item.StartDate),
+                    end: endDate, // new Date(item.EndDate),
+                    bgColor: item.Status == 1 ? '#347CF7' : '#82d616',
+                    audit: item,
+                    //allDay: true,
+                    allDayAccessor: true,
+                    // user: {
+                    //     id: item.AuditorID,
+                    //     name: item.AuditorName
+                    // }
+                }
+            }));
 
-            return {
-                title: toolTip,
-                notes: item.OrganizationName,
-                start: new Date(item.StartDate),
-                end: endDate, // new Date(item.EndDate),
-                bgColor: item.Status == 1 ? '#347CF7' : '#82d616',
-                audit: item,
-                //allDay: true,
-                allDayAccessor: true,
-                // user: {
-                //     id: item.AuditorID,
-                //     name: item.AuditorName
-                // }
-            }
-        }));
+            setStatAudits({
+                total: audits.length,
+                title: lastview
+            });
+        } else {
+            setEventsList([]);
+            setStatAudits({
+                total: 0,
+                title: '-'
+            });
+        }
 
         // console.log('audits', audits);
     }, [audits]);
@@ -169,6 +194,8 @@ export const Dashboard = () => {
         if (!!start) start.setHours(0, 0, 0, 0);
         if (!!end) end.setHours(23, 59, 59, 999);
 
+        // consoleLog('getInitialRange', start, end);
+
         return { start, end };
     }; // getInitialRange
 
@@ -199,7 +226,7 @@ export const Dashboard = () => {
     }; // onDoubleClick
 
     const onSelect = (event) => {
-        //console.log('onSelect', event);
+        // consoleLog('onSelect', event);
     }; // onSelect
 
     const onViewChanged = (event) => {
@@ -209,21 +236,22 @@ export const Dashboard = () => {
         setLastview(event);
     }; // onViewChanged
 
+    /// Se ejecuta cuando cambia el rango de fechas por cualquier motivo
     const onRangeChange = (range) => {
         // El formato de range depende de la vista actual
         // Para 'month' view: range es un array con un solo objeto {start, end}
         // Para 'week' o 'day' view: range es un objeto {start, end}
         // Para 'agenda' view: range es un array de fechas
         
-        //console.log('onRangeChange', range);
+        //consoleLog('Dashboard.onRangeChange(range)', range);
 
         let startDate, endDate;
 
-        if (Array.isArray(range)) {
+        if (Array.isArray(range)) { // Creo que el valor de range ya es un array siempre
             if (range.length === 1) {
                 // Vista mensual
-                startDate = range[0].start;
-                endDate = range[0].end;
+                startDate = range[0];
+                endDate = range[0];
             } else {
                 // Vista agenda
                 startDate = range[0];
@@ -235,11 +263,12 @@ export const Dashboard = () => {
             endDate = range.end;
         }
 
-        // Actualizamos la consulta de auditorias
+        //consoleLog('Dashboard.onRangeChange(startDate, endDate)', startDate, endDate);
+
+        // Actualizamos la consulta de auditorias con el rango de fechas a consultar
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const search = {
             ...savedSearch,
-            //defaultDate: defaultDate,
             startDate: startDate,
             endDate: endDate,
         };        
@@ -248,18 +277,17 @@ export const Dashboard = () => {
     }; // onRangeChange
 
     const onNavigate = (date) => {
-        console.log('onNavigate', date);
-        // setDefaultDate(date);
+        // consoleLog('onNavigate', date);
 
-        // // Actualizamos la consulta de auditorias
-        // const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
-        // const search = {
-        //     ...savedSearch,
-        //     defaultDate: date,
-        // };
+        setCurrentDate(date);
 
-        // auditsAsync(search);
-        // localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
+        // Actualizamos la consulta de auditorias con la fecha base a mostrarse
+        const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
+        const search = {
+            ...savedSearch,
+            currentDate: date,
+        };
+        localStorage.setItem(DASHBOARD_OPTIONS, JSON.stringify(search));
     };
 
     const onCloseModal = () => {
@@ -279,9 +307,9 @@ export const Dashboard = () => {
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
                         <MiniStatisticsCard
                             title="Audits"
-                            count="4"
-                            percentage={{ text: 'in august', color: 'info' }}
-                            icon={{ icon: faGlobe, bgColor: 'info' }}
+                            count={statAudits.total}
+                            percentage={{ text: 'in the view', color: 'info' }}
+                            icon={{ icon: faMagnifyingGlass, bgColor: 'info' }}
                         />
                     </Col>
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
@@ -317,14 +345,16 @@ export const Dashboard = () => {
                             </Card.Header>
                             <Card.Body className="pt-0">
                                 <Calendar
-                                    // date={defaultDate}
-                                    // defaultDate={defaultDate}
+                                    date={currentDate}
                                     defaultView={lastview}
                                     localizer={localizer}
                                     events={eventsList}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: 'calc(100vh - 100px)' }}
+                                    style={{ 
+                                        minHeight: '800px',
+                                        height: 'calc(100vh - 100px)' 
+                                    }}
                                     eventPropGetter={eventPropGetter}
                                     components={{
                                         event: CalendarEvent

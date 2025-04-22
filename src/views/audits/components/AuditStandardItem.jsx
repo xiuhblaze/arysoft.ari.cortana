@@ -9,7 +9,7 @@ import AuditStandardEditItem from "./AuditStandardEditItem";
 const AuditStandardItem = ({ item, readOnly = false, ...props }) => {
     const { DefaultStatusType } = enums();
 
-    const itemStyle = `border-0 d-flex justify-content-between align-items-center bg-transparent px-0${item.Status == DefaultStatusType.inactive ? ' opacity-6' : ''}`;
+    const itemStyle = `border-0 d-flex justify-content-between align-items-center bg-transparent px-0${item.Status == DefaultStatusType.inactive || item.StandardStatus == DefaultStatusType.inactive ? ' opacity-6' : ''}`;
 
     return (
         <ListGroupItem {...props} className={itemStyle} >

@@ -223,7 +223,7 @@ export const useAuditAuditorsStore = () => {
             const resp = await cortanaApi.post(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, toAdd);
             const { Data } = await resp.data;
 
-            console.log('auditStandardAddAsync.Data', Data);
+            // console.log('auditStandardAddAsync.Data', Data);
 
             return Data;
         } catch (error) {
@@ -250,7 +250,7 @@ export const useAuditAuditorsStore = () => {
             const resp = await cortanaApi.delete(`${AUDITAUDITOR_URL}/${auditAuditor.ID}/audit-standard`, { data: toRemove });
             const { Data } = await resp.data;
 
-            console.log('auditStandardDelAsync.Data', Data);
+            //console.log('auditStandardDelAsync.Data', Data);
 
             return Data;
         } catch (error) {
