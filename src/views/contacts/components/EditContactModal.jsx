@@ -5,7 +5,7 @@ import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
-import { formatDistanceToNow, parseISO } from 'date-fns';
+// import { formatDistanceToNow, parseISO } from 'date-fns';
 
 import { AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { useContactsStore } from "../../../hooks/useContactStore";
@@ -15,7 +15,7 @@ import envVariables from "../../../helpers/envVariables";
 import { ViewLoading } from "../../../components/Loaders";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 
-import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
+// import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
 const EditContactModal = ({ id, ...props}) => {
     const { 
@@ -96,7 +96,7 @@ const EditContactModal = ({ id, ...props}) => {
     const {
         isContactLoading,
         isContactCreating,
-        contactCreatedOk,
+        // contactCreatedOk,
         isContactSaving,
         contactSavedOk,
         contact,
@@ -114,9 +114,8 @@ const EditContactModal = ({ id, ...props}) => {
     const [showModal, setShowModal] = useState(false);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [newPhoto, setNewPhoto] = useState(false);
-    const [initialValues, setInitialValues] = useState(formDefaultValues);
-    const [activeAccount, setActiveAccount] = useState(false);
-    const [isMainContactCheck, setIsMainContactCheck] = useState(false);
+    const [initialValues, setInitialValues] = useState(formDefaultValues);    
+    // const [isMainContactCheck, setIsMainContactCheck] = useState(false);
 
     useEffect(() => {
         if (!!contact) {
@@ -137,8 +136,7 @@ const EditContactModal = ({ id, ...props}) => {
                 statusCheck: contact?.Status === DefaultStatusType.active,
             });
 
-            setActiveAccount(contact?.Status === DefaultStatusType.active);
-            setIsMainContactCheck(contact?.IsMainContact ?? false);
+            // setIsMainContactCheck(contact?.IsMainContact ?? false);
             setNewPhoto(!contact.PhotoFilename);
         }
     }, [contact]);
@@ -403,7 +401,7 @@ const EditContactModal = ({ id, ...props}) => {
                                         </Row>
                                         <Row>
                                             <Col xs="12" sm="4">
-                                                <div className="form-check form-switch">
+                                                {/* <div className="form-check form-switch">
                                                     <input id="isMainContactCheck" name="isMainContactCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
@@ -422,6 +420,18 @@ const EditContactModal = ({ id, ...props}) => {
                                                             isMainContactCheck ? 'Is main contact' : 'Is alternative contact'
                                                         }
                                                     </label>
+                                                </div> */}
+                                                <div className="form-check form-switch">
+                                                    <input id="isMainContactCheck" name="isMainContactCheck"
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                    />
+                                                    <label
+                                                        className="form-check-label text-secondary mb-0"
+                                                        htmlFor="isMainContactCheck"
+                                                    >
+                                                        Is main contact
+                                                    </label>
                                                 </div>
                                             </Col>
                                             <Col xs="12" sm="4">
@@ -429,21 +439,12 @@ const EditContactModal = ({ id, ...props}) => {
                                                     <input id="statusCheck" name="statusCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
-                                                        // onChange={ formik.handleChange }
-                                                        onChange= { (e) => {
-                                                            const isChecked = e.target.checked;
-                                                            formik.setFieldValue('statusCheck', isChecked);
-                                                            setActiveAccount(isChecked);
-                                                        }} 
-                                                        checked={ formik.values.statusCheck }
                                                     />
                                                     <label 
                                                         className="form-check-label text-secondary mb-0"
                                                         htmlFor="statusCheck"
                                                     >
-                                                        { 
-                                                            activeAccount ? 'Active account' : 'Inactive account'
-                                                        }
+                                                        Active
                                                     </label>
                                                 </div>
                                             </Col>

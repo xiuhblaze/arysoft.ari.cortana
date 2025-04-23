@@ -17,7 +17,7 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
     return (
         <tr {...props} className={className}>
             <td>
-                <div className="d-flex justify-content-center align-items-center mx-1">
+                <div className="d-flex justify-content-center align-items-center">
                     {
                         !!onEditClick ?  
                         <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
@@ -101,6 +101,16 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                             <FontAwesomeIcon icon={ faStickyNote } className="text-secondary me-1" title="no extra info" />
                         )
 
+                    }
+                </div>
+            </td>
+            <td>
+                <div className="d-flex justify-content-center align-items-center mx-1">
+                    {
+                        !!onEditClick ?  
+                        <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
+                            <FontAwesomeIcon icon={faEdit} />
+                        </a> : null
                     }
                 </div>
             </td>

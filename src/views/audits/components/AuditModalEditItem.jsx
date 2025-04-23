@@ -477,7 +477,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     }}
                                                                     helpText={ audit.Status == AuditStatusType.confirmed 
                                                                         || audit.Status == AuditStatusType.inProcess 
-                                                                        || audit.Status == AuditStatusType.finished || audit.Status == AuditStatusType.completed || audit.Status == AuditStatusType.closed ? 'Add a note for the status change' : '' }
+                                                                        || audit.Status == AuditStatusType.finished 
+                                                                        || audit.Status == AuditStatusType.completed 
+                                                                        || audit.Status == AuditStatusType.closed 
+                                                                            ? 'Add a note for the status change' 
+                                                                            : '' 
+                                                                    }
                                                                 >
                                                                     {
                                                                         !!statusOptions && statusOptions.map(item =>

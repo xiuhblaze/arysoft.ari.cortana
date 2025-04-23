@@ -35,7 +35,7 @@ const OrganizationsTableItem = ({ item, className, applicantsOnly = false, onSho
     return (
         <tr {...props} className={myClassName}>
             <td>
-                <div className="d-flex justify-content-center mx-1 gap-2">
+                <div className="d-flex justify-content-center aling-items-center">
                     <Link to={`${item.ID}`} title="Edit" className="text-dark">
                         <FontAwesomeIcon icon={faEdit} />
                     </Link>
@@ -43,7 +43,7 @@ const OrganizationsTableItem = ({ item, className, applicantsOnly = false, onSho
             </td>
             <td>
                 <div className="d-flex align-items-center me-2">
-                    <div className="avatar m-3" style={{ minWidth: '48px'}}>
+                    <div className="avatar me-3" style={{ minWidth: '48px'}}>
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">

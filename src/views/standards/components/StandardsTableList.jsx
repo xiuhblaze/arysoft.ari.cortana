@@ -50,6 +50,7 @@ const StandardsTableList = ({ onOrder }) => {
                     <table className="table align-items-center mb-0">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>
                                     <div className="d-flex justify-content-start align-items-center gap-1">
                                         <div className="d-flex flex-row">
@@ -97,28 +98,7 @@ const StandardsTableList = ({ onOrder }) => {
                                         </div>
                                     </div>
                                 </th>
-                                {/* <th>
-                                    <div className="d-flex justify-content-start align-items-center gap-1">
-                                        <div className="d-flex flex-row">
-                                            <AryTableSortIcon
-                                                icon={faCaretUp}
-                                                isActive={currentOrder === StandardOrderType.update}
-                                                title="Asc"
-                                                onClick={() => { onOrder(StandardOrderType.update) }}
-                                            />
-                                            <AryTableSortIcon
-                                                icon={faCaretDown}
-                                                isActive={currentOrder === StandardOrderType.updateDesc}
-                                                title="Desc"
-                                                onClick={() => { onOrder(StandardOrderType.updateDesc) }}
-                                            />
-                                        </div>
-                                        <div className={headStyle}>
-                                            Info
-                                        </div>
-                                    </div>
-                                </th> */}
-                                <th className={`${headStyle} text-center`}>Action</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>

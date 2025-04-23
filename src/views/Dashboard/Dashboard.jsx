@@ -18,7 +18,8 @@ import {
     faListCheck,
     faMagnifyingGlass,
     faNewspaper,
-    faWandMagicSparkles
+    faWandMagicSparkles,
+    faHourglassStart
 } from '@fortawesome/free-solid-svg-icons';
 
 import { setNavbarTitle, useArysoftUIController } from "../../context/context";
@@ -123,10 +124,11 @@ export const Dashboard = () => {
     
                 const toolTip = item.Description + '\n' 
                     + item.OrganizationName + '\n' 
-                    + auditors //item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
+                    + auditors + '\n' //item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
                     + item.Standards.map(i => {
                         let s = i.StandardName;
-                        s += ' - ' + auditStepProps[i.Step].abbreviation.toUpperCase();
+                        s += ' - ' + auditStepProps[i.Step].
+                        abbreviation.toUpperCase();
                         return s;
                     }).join(', ');
     
@@ -314,13 +316,30 @@ export const Dashboard = () => {
                     </Col>
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
                         <MiniStatisticsCard
-                            title="Pending payments"
-                            count="2"
-                            percentage={{ text: 'for audits', color: 'danger' }}
-                            icon={{ icon: faCommentsDollar, bgColor: 'warning' }}
+                            title="Lorem ipsum"
+                            count="0"
+                            percentage={{ text: 'dolor sit amet', color: 'light' }}
+                            // icon={{ icon: faCommentsDollar, bgColor: 'warning' }}
+                            icon={{ icon: faHourglassStart, bgColor: 'secondary' }}
                         />
                     </Col>
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
+                        <MiniStatisticsCard
+                            title="Consectetur"
+                            count="0"
+                            percentage={{ text: 'adipiscing elit', color: 'light' }}
+                            icon={{ icon: faHourglassStart, bgColor: 'secondary' }}
+                        />
+                    </Col>
+                    <Col sm="6" xl="3" className="mb-xl-0 mb-4">
+                        <MiniStatisticsCard
+                            title="Sed id elit"
+                            count="0"
+                            percentage={{ text: 'sed gravida', color: 'light' }}
+                            icon={{ icon: faHourglassStart, bgColor: 'secondary' }}
+                        />
+                    </Col>
+                    {/* <Col sm="6" xl="3" className="mb-xl-0 mb-4">
                         <MiniStatisticsCard
                             title="Dolor sit amet"
                             count="34.0"
@@ -335,7 +354,7 @@ export const Dashboard = () => {
                             percentage={{ text: '+13', color: 'dark' }}
                             icon={{ icon: faNewspaper, bgColor: 'primary' }}
                         />
-                    </Col>
+                    </Col> */}
                 </Row>
                 <Row className="mt-4">
                     <Col md="12">

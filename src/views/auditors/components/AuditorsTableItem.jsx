@@ -21,9 +21,19 @@ const AuditorsTableItem = ({ item, className, onShowModal, hideActions = false, 
 
     return (
         <tr { ...props }>
+            {
+                !hideActions && 
+                <td>
+                    <div className="d-flex justify-content-center gap-2">
+                        <Link to={ item.ID } title="Edit">
+                            <FontAwesomeIcon icon={ faEdit } />
+                        </Link>
+                    </div>
+                </td>
+            }
             <td>
                 <div className="d-flex align-items-center me-2">
-                    <div className="avatar m-3" style={{ minWidth: '48px' }}>
+                    <div className="avatar m-3 ms-0" style={{ minWidth: '48px' }}>
                         <img className="border-radius-md shadow" src={ pathPhotoFilename } />
                     </div>
                     <div className="d-flex align-items-start flex-column justify-content-center">

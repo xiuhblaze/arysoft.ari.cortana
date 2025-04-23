@@ -89,7 +89,7 @@ export const DashboardNavbar = () => {
                 </span> } 
               id="userMenu"
             >
-              <NavDropdown.Item onClick={ onProfileClick }>
+              {/* <NavDropdown.Item onClick={ onProfileClick }>
                 <FontAwesomeIcon icon={ faUserGear } className="me-2" />
                 Profile
               </NavDropdown.Item>
@@ -97,7 +97,7 @@ export const DashboardNavbar = () => {
                 <FontAwesomeIcon icon={ faLock } className="me-2" />
                 Change password
               </NavDropdown.Item>
-              <NavDropdown.Divider />
+              <NavDropdown.Divider /> */}
               <NavDropdown.Item onClick={ onLogout }>
                 <FontAwesomeIcon icon={ faArrowRightFromBracket } className="me-2" />
                 Logout
@@ -113,7 +113,7 @@ export const DashboardNavbar = () => {
                 <FontAwesomeIcon icon={ faGear } />
               </a>
             </li>
-            <NavDropdown
+            {/* <NavDropdown
               id="notificationsMenu"
               title={ <span className="text-body"><FontAwesomeIcon icon={ faBell } /></span> }
             >
@@ -155,7 +155,7 @@ export const DashboardNavbar = () => {
                   </div>
                 </div>
               </NavDropdown.Item>
-            </NavDropdown>
+            </NavDropdown> */}
           </ul>
         </div>
       </div>

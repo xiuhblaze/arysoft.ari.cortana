@@ -465,7 +465,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         </Row>
                                     </div>
                                     <Row className="mt-4">
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12" sm="5">
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <Row>
@@ -617,7 +617,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 </Card.Body>
                                             </Card>
                                         </Col>
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12" sm="7">
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <AppFormPreview formik={formik} />
