@@ -7,7 +7,7 @@ import { Col, Container, Nav, NavDropdown, Navbar, Row } from "react-bootstrap";
 import { useAuthStore } from "../../hooks/useAuthStore";
 
 import lgoARINavbar from '../../assets/img/lgoARINavbar.png';
-import lgoLictus from '../../assets/img/lgoLictus.png';
+//import lgoLictus from '../../assets/img/lgoLictus.png';
 
 export const DefaultNavbar = () => {
 

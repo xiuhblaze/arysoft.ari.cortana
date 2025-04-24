@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Card, Col, Container, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay, startOfMonth, startOfDay, endOfDay, endOfMonth, endOfWeek } from "date-fns";
+import { format, parse, startOfWeek, getDay, startOfMonth, startOfDay, endOfDay, endOfMonth, endOfWeek, isSameMonth } from "date-fns";
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { addDays, addHours } from 'date-fns'; // xBLAZE: Puede que sean temporales
+import { addDays, addHours, isWeekend } from 'date-fns'; // xBLAZE: Puede que sean temporales
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -36,6 +36,7 @@ import auditStatusProps from '../audits/helpers/auditStatusProps';
 import AuditModalEditItem from '../audits/components/AuditModalEditItem';
 import auditStepProps from '../audits/helpers/auditStepProps';
 import consoleLog from '../../helpers/consoleLog';
+import { ViewLoading } from '../../components/Loaders';
 
 
 const locales = {
@@ -220,6 +221,26 @@ export const Dashboard = () => {
         }
     }; // eventPropGetter
 
+    // Se ejecuta cada que se renderiza un día del calendario
+    const dayPropGetter = (date) => {        
+        let myClassName = '';
+
+        if (isWeekend(date)) {
+            myClassName += 'bg-gray-100';            
+        }
+
+        if (!isSameMonth(date, currentDate)) {
+            myClassName += 'bg-gray-200';
+            if (isWeekend(date)) {
+                myClassName += ' bg-gray-300';
+            }
+        }
+
+        return {
+            className: myClassName,
+        };
+    };
+
     const onDoubleClick = (event) => {
         // console.log('onDoubleClick', event);
 
@@ -295,9 +316,6 @@ export const Dashboard = () => {
     const onCloseModal = () => {
         setShowModal(false);
 
-        //console.log('onCloseModal');
-        //! Actualizar listado o lo que se ocupe ne el Dashboard - YA!
-
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         auditsAsync(savedSearch);
     }; // onCloseModal
@@ -319,7 +337,6 @@ export const Dashboard = () => {
                             title="Lorem ipsum"
                             count="0"
                             percentage={{ text: 'dolor sit amet', color: 'light' }}
-                            // icon={{ icon: faCommentsDollar, bgColor: 'warning' }}
                             icon={{ icon: faHourglassStart, bgColor: 'secondary' }}
                         />
                     </Col>
@@ -363,27 +380,32 @@ export const Dashboard = () => {
                                 <DashboardToolbar />
                             </Card.Header>
                             <Card.Body className="pt-0">
-                                <Calendar
-                                    date={currentDate}
-                                    defaultView={lastview}
-                                    localizer={localizer}
-                                    events={eventsList}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    style={{ 
-                                        minHeight: '800px',
-                                        height: 'calc(100vh - 100px)' 
-                                    }}
-                                    eventPropGetter={eventPropGetter}
-                                    components={{
-                                        event: CalendarEvent
-                                    }}
-                                    onDoubleClickEvent={onDoubleClick}
-                                    onSelectEvent={onSelect}
-                                    onView={onViewChanged}
-                                    onRangeChange={onRangeChange}
-                                    onNavigate={onNavigate}
-                                />
+                                {
+                                    isAuditsLoading ? (
+                                        <ViewLoading />
+                                    ) : ( <Calendar
+                                        date={currentDate}
+                                        defaultView={lastview}
+                                        localizer={localizer}
+                                        events={eventsList}
+                                        startAccessor="start"
+                                        endAccessor="end"
+                                        style={{ 
+                                            minHeight: '800px',
+                                            height: 'calc(100vh - 100px)' 
+                                        }}
+                                        dayPropGetter={dayPropGetter}
+                                        eventPropGetter={eventPropGetter}                                        
+                                        components={{
+                                            event: CalendarEvent
+                                        }}
+                                        onDoubleClickEvent={onDoubleClick}
+                                        onSelectEvent={onSelect}
+                                        onView={onViewChanged}
+                                        onRangeChange={onRangeChange}
+                                        onNavigate={onNavigate}
+                                    />)
+                                }
                             </Card.Body>
                         </Card>
                     </Col>

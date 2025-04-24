@@ -6,10 +6,11 @@ import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { useContactsStore } from '../../../hooks/useContactStore';
 import enums from '../../../helpers/enums';
-import { faEnvelope, faPhone, faSpinner, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faPhone, faSpinner, faStickyNote, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import isString from '../../../helpers/isString';
 import { setContactsList, useAppFormController } from '../context/appFormContext';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
 const AppFormEditContacts = ({ ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -119,7 +120,7 @@ const AppFormEditContacts = ({ ...props }) => {
                         contactsList
                             //.sort((a, b) => a.FullName.localeCompare(b.FullName))
                             .map(item => 
-                                <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
+                                <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 px-0 text-xs">
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div className="d-flex justify-content-start align-items-center">
                                             <FontAwesomeIcon icon={ faUser } className="me-2" size="lg" />
@@ -155,19 +156,30 @@ const AppFormEditContacts = ({ ...props }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button
-                                            type="button"
-                                            className="btn btn-link p-0 mb-0 text-secondary"
-                                            onClick={() => onClickRemove(item.ID)}
-                                            title="Delete"
-                                            disabled={isDeleting == item.ID}
-                                        >   
+                                        <div className="d-flex justify-content-end align-items-center">
                                             {
-                                                isDeleting == item.ID 
-                                                    ? <FontAwesomeIcon icon={ faSpinner } spin size="lg" />
-                                                    : <FontAwesomeIcon icon={ faTrashCan } size="lg" />
+                                                isNullOrEmpty(item.ExtraInfo) ? null :
+                                                <FontAwesomeIcon 
+                                                    icon={ faStickyNote } 
+                                                    size="lg" 
+                                                    title={ item.ExtraInfo }
+                                                    className="me-2"
+                                                />
                                             }
-                                        </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                onClick={() => onClickRemove(item.ID)}
+                                                title="Delete"
+                                                disabled={isDeleting == item.ID}
+                                            >   
+                                                {
+                                                    isDeleting == item.ID 
+                                                        ? <FontAwesomeIcon icon={ faSpinner } spin size="lg" />
+                                                        : <FontAwesomeIcon icon={ faTrashCan } size="lg" />
+                                                }
+                                            </button>
+                                        </div>
                                     </div>
                                 </ListGroup.Item>
                             )

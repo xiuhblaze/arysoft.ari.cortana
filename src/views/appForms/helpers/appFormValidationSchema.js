@@ -56,8 +56,23 @@ const appFormValidationSchema = (currentStatus) => {
                 then: schema => schema.required('Critical complaint comments are required'),
                 otherwise: schema => schema.notRequired(),
             }),
-        automationLevelInput: Yup.string()
-            .max(1000, 'Automation level must be less than 1000 characters'),
+        automationLevelPercentInput: Yup.number()
+            .typeError('Automation level percentage must be a number')
+            .integer('Automation level percentage must be an integer number')
+            .min(0, 'Automation level percentage must be greater than 0')
+            .max(100, 'Automation level percentage must be less than 100')
+            .when('standardSelect', {
+                is: (standardSelect) => standardSelect == StandardBaseType.iso9k,
+                then: schema => schema.required('The percentage of the automation level is required.'),
+                otherwise: schema => schema.notRequired(),
+            }),
+        automationLevelJustificationInput: Yup.string()
+            .max(1000, 'Automation level must be less than 1000 characters')
+            .when('standardSelect', {
+                is: (standardSelect) => standardSelect == StandardBaseType.iso9k,
+                then: schema => schema.required('Justification of the level of automation is required'),
+                otherwise: schema => schema.notRequired(),
+            }),
         isDesignResponsibilityCheck: Yup.bool(),
         designResponsibilityJustificationInput: Yup.string()
             .max(1000, 'Design responsibility justification must be less than 1000 characters')
