@@ -150,7 +150,13 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
             let standardsActiveCount = !!audit.Standards 
                 ? audit.Standards.filter(i => 
-                    i.Status == DefaultStatusType.active && i.StandardStatus == DefaultStatusType.active)
+                    i.Status == DefaultStatusType.active 
+                    && i.StandardStatus == DefaultStatusType.active)
+                    .length
+                : 0;
+            const auditorsActiveCount = !!audit.Auditors
+                ? audit.Auditors.filter(i => 
+                    i.Status == DefaultStatusType.active)
                     .length
                 : 0;
 
@@ -165,7 +171,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                 hasWitnessCheck: audit.HasWitness ?? false,
                 noteInput: '',
                 standardsCountHidden: standardsActiveCount, //audit.Standards?.length ?? 0,
-                auditorsCountHidden: audit.Auditors?.length ?? 0,
+                auditorsCountHidden: auditorsActiveCount //audit.Auditors?.length ?? 0,
             });
 
             switch (audit.Status) {
@@ -244,14 +250,19 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     useEffect(() => {
         if (!!auditStandards && show && !!formikRef?.current) {
             const standardsActive = auditStandards.filter(item => 
-                item.Status == DefaultStatusType.active && item.StandardStatus == DefaultStatusType.active);
+                item.Status == DefaultStatusType.active 
+                && item.StandardStatus == DefaultStatusType.active);
             formikRef.current.setFieldValue('standardsCountHidden', standardsActive.length);
         }
     }, [auditStandards]);
 
     useEffect(() => {
         if (!!auditAuditors && show && !!formikRef?.current) {
-            formikRef.current.setFieldValue('auditorsCountHidden', auditAuditors.length);
+            formikRef.current.setFieldValue(
+                'auditorsCountHidden', 
+                auditAuditors.filter(aa => 
+                    aa.Status == DefaultStatusType.active)
+                    .length);
         }
     }, [auditAuditors]);
 

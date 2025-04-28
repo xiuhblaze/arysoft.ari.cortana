@@ -102,6 +102,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             if (cycleTypeSelect == AuditCycleType.initial) {
                 setAuditCycleStepList([
                     { label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 },
+                    { label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 }, // Puede que inicie en ST2 y no se aplique ST1
                 ]);
             } else if (cycleTypeSelect == AuditCycleType.recertification) {
                 setAuditCycleStepList([
@@ -111,7 +112,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                 setAuditCycleStepList([
                     { label: auditStepProps[AuditStepType.recertification].label, value: AuditStepType.recertification},
                     { label: auditStepProps[AuditStepType.surveillance1].label, value: AuditStepType.surveillance1},
-                    { label: auditStepProps[AuditStepType.surveillance1].label, value: AuditStepType.surveillance2},
+                    { label: auditStepProps[AuditStepType.surveillance2].label, value: AuditStepType.surveillance2},
                 ]);
             } else {
                 setAuditCycleStepList([]);

@@ -1,21 +1,21 @@
+import { useEffect, useRef } from "react";
+
 import { Col, Container, Row } from "react-bootstrap";
+import { useReactToPrint } from "react-to-print";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGlobeAmericas, faPrint } from "@fortawesome/free-solid-svg-icons";
 
 import { useAppFormController } from "../context/appFormContext";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import AppFormPreviewStandardLoading from "./AppFormPreviewStandardLoading";
 import enums from "../../../helpers/enums";
-import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import standardBaseProps from "../../standards/helpers/standardBaseProps";
-import { useEffect, useRef } from "react";
+import getCode from "../helpers/getCode";
 import getSmallHour from "../../../helpers/getSmallHour";
-//import ReactToPrint from 'react-to-print';
-import { useReactToPrint } from "react-to-print";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import languagesProps from "../../../helpers/languagesProps";
+import standardBaseProps from "../../standards/helpers/standardBaseProps";
 
 import logoARI from "../../../assets/img/lgoARI.png";
-import { faCircleCheck, faGlobe, faGlobeAmericas, faPrint } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import getCode from "../helpers/getCode";
-import languagesProps from "../../../helpers/languagesProps";
 
 const shiftText = [
     '',

@@ -489,7 +489,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                     Active
                                                 </label>
                                             </div>
-                                        </Col>
+                                        </Col>                                        
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>
