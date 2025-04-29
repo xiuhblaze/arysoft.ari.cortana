@@ -84,18 +84,18 @@ const ListView = () => {
         <Container fluid className="py-4 px-0 px-sm-4">
             <Row>
                 <Col>
-                    <Card className="mb-4">
+                    <Card>
                         <Card.Header className="pb-0">
                             <OrganizationsToolbar />
                         </Card.Header>
                         <Card.Body className="px-0 pt-0 pb-2">
-                            {!!organizationsMeta && (
+                            {/* {!!organizationsMeta && (
                                 <AryPagination
                                     currentPage={organizationsMeta.CurrentPage}
                                     totalPages={organizationsMeta.TotalPages}
                                     onClickGoPage={onClickGoPage}
                                 />
-                            )}
+                            )} */}
                             <OrganizationsTableList />
                             {!!organizationsMeta && (
                                 <>

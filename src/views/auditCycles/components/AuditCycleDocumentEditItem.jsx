@@ -123,16 +123,14 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,
             });
-            auditCycleDocumentClear();
-            setShowModal(false);
+            onCloseModal();
         }
     }, [auditCycleDocumentSavedOk]);
 
     useEffect(() => {
         if (!!auditCycleDocumentsErrorMessage && showModal) {
             Swal.fire('Document', auditCycleDocumentsErrorMessage, 'error');
-            auditCycleDocumentClear();
-            onCloseModal();
+            // onCloseModal();
         }
     }, [auditCycleDocumentsErrorMessage]);
     
@@ -153,8 +151,10 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
 
     const onCloseModal = () => {
 
-        auditCycleDocumentClear();
-        setShowModal(false);
+        if (!isAuditCycleDocumentSaving) {
+            auditCycleDocumentClear();
+            setShowModal(false);
+        }
     }; // onCloseModal
 
     const onFormSubmit = (values) => {

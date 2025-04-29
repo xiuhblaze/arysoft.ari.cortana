@@ -155,8 +155,6 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                 auditID: audit.ID,
                 pageSize: 0,
             });
-            // auditDocumentClear();
-            // setShowModal(false);
             onCloseModal();
         }
     }, [auditDocumentSavedOk]);
@@ -164,15 +162,8 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     useEffect(() => {
         if (!!auditDocumentsErrorMessage && showModal) {
             Swal.fire('Document', auditDocumentsErrorMessage, 'error');
-            // auditDocumentClear();
-            //onCloseModal();
         }
     }, [auditDocumentsErrorMessage]);
-
-    // useEffect(() => {
-    //     console.log('standardsCount', standardsCount);
-    // }, [standardsCount])
-    
 
     // METHODS
 
@@ -190,26 +181,25 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
     };
     
     const onCloseModal = () => {
-        auditDocumentClear();
-        setShowModal(false);
-    };
+
+        if (!isAuditDocumentSaving) {
+            auditDocumentClear();
+            setShowModal(false);
+        }
+    }; // onCloseModal
 
     const onFormSubmit = (values) => {
-        //console.log('onFormSubmit', values);
 
         addStandardSelected(); // por si hay algun standard seleccionado
 
         const toSave = {
             ID: auditDocument.ID,
-            // StandardID: values.standardSelect, // id ? auditDocument.StandardID : values.standardSelect,
             DocumentType: documentType,
             Comments: values.commentsInput,
             OtherDescription: values.otherDescriptionInput,
             isWitnessIncluded: !!values.isWitnessIncludedCheck ?? false,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
-
-        //console.log(toSave);
         auditDocumentSaveAsync(toSave, values.fileInput);
     }; // onFormSubmit
 
@@ -217,27 +207,52 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
 
     const addStandardSelected = () => {
 
-        if (!isNullOrEmpty(standardSelect)) {
+        if (standardSelect == 'all') {
+            const tmpStandardsList = [];
 
-            auditStandardAddAsync(standardSelect)
-                .then(data => {
-                    if (!!data) {
-                        //setIsForUpdateStandard(true); // Para que no actualice los initialValues
-                        setStandardSelect(''); // reiniciar el select
-                        const currentStandard = audit.Standards.find(i => i.ID == standardSelect);
-                        setStandardsList([
-                            ...standardsList,
-                            {
-                                ID: currentStandard.ID,
-                                StandardName: currentStandard.StandardName,
-                            }
-                        ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
-                        formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + 1);
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                });
+            audit.Standards.forEach(auditStandard => {
+                const item = standardsList.find(i => i.ID == auditStandard.ID);
+                if (!item) { // Si no existe lo agregamos
+
+                    tmpStandardsList.push({ // Estoy confiando en que la asignación va a ser correcta
+                        ID: auditStandard.ID,
+                        StandardName: auditStandard.StandardName,
+                    });
+
+                    auditStandardAddAsync(auditStandard.ID);
+                } 
+            });
+
+            if (tmpStandardsList.length > 0) {
+                setStandardSelect('');
+                setStandardsList([
+                    ...standardsList,
+                    ...tmpStandardsList,
+                ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
+                formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + tmpStandardsList.length);
+            }
+        } else if (!isNullOrEmpty(standardSelect)) {
+            const item = standardsList.find(i => i.ID == standardSelect);
+
+            if (!item) {
+                auditStandardAddAsync(standardSelect)
+                    .then(data => {
+                        if (!!data) {
+                            const currentStandard = audit.Standards.find(i => i.ID == standardSelect);
+                            setStandardSelect(''); // reiniciar el select
+                            setStandardsList([
+                                ...standardsList,
+                                {
+                                    ID: currentStandard.ID,
+                                    StandardName: currentStandard.StandardName,
+                                }
+                            ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
+                            formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + 1);
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    });
+            }
         }
     }; // addStandardSelected
 
@@ -336,6 +351,7 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                                                     </option>
                                                                 ))
                                                             }
+                                                            <option value="all">All</option>
                                                         </select>
                                                     </div>
                                                 </Col>
@@ -344,8 +360,9 @@ const AuditDocumentEditItem = ({ id, documentType, ...props }) => {
                                                         <label className="form-label">&nbsp;</label>
                                                         <button 
                                                             type='button' 
-                                                            className="btn bg-gradient-secondary text-white"
+                                                            className="btn btn-link text-dark"
                                                             onClick={addStandardSelected}
+                                                            title="This action will add the selected standard to the list and leave the select field empty to select another standard"
                                                         >
                                                             Add another
                                                         </button>

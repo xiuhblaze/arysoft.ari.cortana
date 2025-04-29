@@ -15,6 +15,7 @@ import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Fo
 import auditStepProps from "../helpers/auditStepProps";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 import Swal from "sweetalert2";
+import { setAuditStandards } from "../../../store/slices/auditStandardsSlice";
 
 const AuditStandardEditItem = ({ id, ...props }) => {
 
@@ -55,6 +56,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
         isAuditStandardSaving,
         auditStandardSavedOk,
         auditStandard,
+        auditStandards,
         auditStandardsErrorMessage,
 
         auditStandardsAsync,
@@ -98,43 +100,48 @@ const AuditStandardEditItem = ({ id, ...props }) => {
     }, [auditStandard]);
 
     useEffect(() => {
-        if (!!standardSelect && standardSelect != DefaultStatusType.nothing) {
-            var auditCycleStandard = auditCycleStandards.find(i => i.StandardID == standardSelect);
 
-            if (!!auditCycleStandard) {
-                if (auditCycleStandard.InitialStep == AuditStepType.stage1) {
-                    setAuditStepList([
-                        { label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 },
-                        { label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 },
-                        { label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 },
-                        { label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 },
-                        { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
-                    ]);
-                } else if (auditCycleStandard.InitialStep == AuditStepType.stage2) {
-                    setAuditStepList([
-                        { label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 },
-                        { label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 },
-                        { label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 },
-                        { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
-                    ]);
-                } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance1) {
-                    setAuditStepList([
-                        { label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 },
-                        { label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 },
-                        { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
-                    ]);
-                } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance2) {
-                    setAuditStepList([
-                        { label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 },
-                        { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
-                    ]);
-                } else if (auditCycleStandard.InitialStep == AuditStepType.recertification) {
-                    setAuditStepList([
-                        { label: auditStepProps[AuditStepType.recertification].label , value: AuditStepType.recertification },
-                        { label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 },
-                        { label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 },
-                        { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
-                    ]);
+        if (showModal) {
+            const firstStandardActive = auditStandards.find(standard => standard.Status == DefaultStatusType.active);
+
+            if (!!firstStandardActive && firstStandardActive.Step == AuditStepType.special) {
+                setAuditStepList([
+                    { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
+                ]);
+            } else if (!!standardSelect && standardSelect != DefaultStatusType.nothing) {
+                var auditCycleStandard = auditCycleStandards.find(i => i.StandardID == standardSelect);
+
+                if (!!auditCycleStandard) {
+                    const auditStandardsTmp = [];
+                    if (auditCycleStandard.InitialStep == AuditStepType.stage1) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.stage2) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance1) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance2) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.recertification) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.recertification].label , value: AuditStepType.recertification });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });                    
+                    }
+
+                    if (!!auditStandards && auditStandards.length == 0) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special });
+                    }
+
+                    setAuditStepList(auditStandardsTmp);
                 }
             }
         }
@@ -303,7 +310,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                             </div>
                                         </Col>
                                         {
-                                            !!id && !!auditStandard && auditStandard.StandardStatus != DefaultStatusType.active ?
+                                            !!id && !!auditStandard && auditStandard.Status != DefaultStatusType.active ?
                                             <Col xs="12">
                                                 <Alert variant="warning">
                                                     <FontAwesomeIcon icon={ faExclamationTriangle } className="text-white me-2" size="lg" />

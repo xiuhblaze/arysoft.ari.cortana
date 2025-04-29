@@ -30,6 +30,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
     const {
         AuditStatusType,
+        AuditStepType,
         DefaultStatusType,
     } = enums();
     const formDefaultValues = {
@@ -43,6 +44,14 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         standardsCountHidden: 0,
         auditorsCountHidden: 0,
     }; // formDefaultValues
+
+    const {
+        auditStandards
+    } = useAuditStandardsStore();
+
+
+
+
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
             .max(1000, 'Audit description must be at most 1000 characters'),
@@ -69,7 +78,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             }),
         auditorsCountHidden: Yup.number()
             .when('statusSelect', {
-                is: (statusSelect) => statusSelect > AuditStatusType.scheduled && statusSelect < AuditStatusType.canceled,
+                is: (statusSelect) => statusSelect > AuditStatusType.scheduled 
+                    && statusSelect < AuditStatusType.canceled
+                    && (!!auditStandards && auditStandards.length > 0 && auditStandards[0].Step != AuditStepType.special),
                 then: schema => schema.min(1, 'For this status change, there must be at least one active auditor assigned')
             }),
     }); 
@@ -89,10 +100,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     } = useAuditCyclesStore();
 
     const {
-        auditStandards
-    } = useAuditStandardsStore();
-
-    const {
         auditAuditors
     } = useAuditAuditorsStore();
 
@@ -104,7 +111,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         audit,
         auditsErrorMessage,
 
-        auditsAsync,
         auditAsync,
         auditCreateAsync,
         auditSaveAsync,
@@ -133,8 +139,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             if (!!id) {
                 auditAsync(id);
             } else if (!!auditCycle) {
-                //* Crear nuevo audit
-                auditCreateAsync({
+                auditCreateAsync({ // Crear nuevo audit
                     AuditCycleID: auditCycle.ID,
                 });
             } else {

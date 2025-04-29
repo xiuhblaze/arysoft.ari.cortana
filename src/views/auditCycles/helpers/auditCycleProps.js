@@ -1,19 +1,23 @@
 const auditCycleProps = [
     { 
         label: "-",
-        variant: "light" 
+        variant: "light", 
+        abreviation: "-"
     },
     { 
         label: "Initial",
-        variant: "dark" 
+        variant: "dark", 
+        abreviation: "I" 
     },
     { 
         label: "Recertification",
-        variant: "info" 
+        variant: "info", 
+        abreviation: "RR" 
     },
     { 
         label: "Transfer",
-        variant: "warning" 
+        variant: "warning", 
+        abreviation: "T"
     },
 ];
 
