@@ -3,8 +3,13 @@ import { useAuditsStore } from '../../../hooks/useAuditsStore';
 import { ViewLoading } from '../../../components/Loaders';
 import AuditItem from './AuditItem';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import enums from '../../../helpers/enums';
 
-const AuditList = ({ readOnly = false, ...props }) => {
+const AuditList = ({ readOnly = false, showAllFiles = false, ...props }) => {
+
+    const {
+        AuditStatusType,
+    } = enums();
 
     // CUSTOM HOOKS
 
@@ -36,7 +41,10 @@ const AuditList = ({ readOnly = false, ...props }) => {
                 isAuditsLoading ? (
                     <ViewLoading />
                 ) : !!audits && audits.length > 0 ? (
-                    audits.map(item => <AuditItem key={item.ID} item={item} />) 
+                    audits
+                        .filter(item => showAllFiles 
+                            || item.Status >= AuditStatusType.scheduled && item.Status <= AuditStatusType.closed)
+                        .map(item => <AuditItem key={item.ID} item={item} />) 
                 ) : <p className="text-center text-secondary text-xs">
                      (no audits created)
                 </p>

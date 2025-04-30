@@ -37,9 +37,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         descriptionInput: '',
         startDateInput: '',
         endDateInput: '',
+        isMultisiteCheck: false,
+        daysInput: '',
+        includeSaturdayCheck: false,
+        includeSundayCheck: false,
         extraInfoInput: '',
         statusSelect: AuditStatusType.scheduled,
-        hasWitnessCheck: false,
         noteInput: '',
         standardsCountHidden: 0,
         auditorsCountHidden: 0,
@@ -48,9 +51,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     const {
         auditStandards
     } = useAuditStandardsStore();
-
-
-
 
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
@@ -63,11 +63,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         endDateInput: Yup.date()
             .typeError('End date has an invalid format')
             .required('Must specify end date'),
+        daysInput: Yup.number()
+            .typeError('Days must be a number'),
         statusSelect: Yup.string()
-            // .oneOf(Object.values(AuditStatusType)
-            //         .filter(ast => ast != AuditStatusType.nothing)
-            //         .map(ast => ast + ''), 
-            //    'Select a valid option')
             .required('Must select a status'),
         noteInput: Yup.string()
             .max(1000, 'The note must be at most 1000 characters'),
@@ -169,11 +167,14 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                 descriptionInput: audit.Description ?? '',
                 startDateInput: !!audit.StartDate ? getISODate(audit.StartDate) : '',
                 endDateInput: !!audit.EndDate ? getISODate(audit.EndDate) : '',
+                isMultisiteCheck: audit.IsMultisite ?? false,
+                daysInput: audit.Days ?? '',
+                includeSaturdayCheck: audit.IncludeSaturday ?? false,
+                includeSundayCheck: audit.IncludeSunday ?? false,
                 extraInfoInput: audit.ExtraInfo ?? '',
                 statusSelect: !!audit.Status && audit.Status != AuditStatusType.nothing
                     ? audit.Status
                     : AuditStatusType.scheduled,
-                hasWitnessCheck: audit.HasWitness ?? false,
                 noteInput: '',
                 standardsCountHidden: standardsActiveCount, //audit.Standards?.length ?? 0,
                 auditorsCountHidden: auditorsActiveCount //audit.Auditors?.length ?? 0,
@@ -272,16 +273,16 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     }, [auditAuditors]);
 
     useEffect(() => {
-            if (!!auditSavedOk && show) {
-                if (!isNullOrEmpty(saveNote)) {
-                    noteCreateAsync({ OwnerID: audit.ID, Text: saveNote });
-                    setSaveNote('');
-                }
-                Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
-                auditAsync(audit.ID); // Refrescar los datos de la audit
-                // onCloseModal(); // Probando el evitar cerrar la modal al guardar
+        if (!!auditSavedOk && show) {
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({ OwnerID: audit.ID, Text: saveNote });
+                setSaveNote('');
             }
-        }, [auditSavedOk]);
+            Swal.fire('Audit', `Audit ${!id ? 'created' : 'updated'} successfully`, 'success');
+            auditAsync(audit.ID); // Refrescar los datos de la audit
+            // onCloseModal(); // Probando el evitar cerrar la modal al guardar
+        }
+    }, [auditSavedOk]);
         
     useEffect(() => {
         if (!!auditsErrorMessage && show) {
@@ -310,9 +311,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             Description: values.descriptionInput,
             StartDate: values.startDateInput,
             EndDate: values.endDateInput,
+            IsMultisite: values.isMultisiteCheck,
+            Days: values.daysInput,
+            IncludeSaturday: values.includeSaturdayCheck,
+            IncludeSunday: values.includeSundayCheck,
             ExtraInfo: values.extraInfoInput,
             Status: values.statusSelect,
-            HasWitness: values.hasWitnessCheck,
         };
 
         // console.log('AuditModalEditItem.onFormSubmit: toSave', toSave);
@@ -433,24 +437,80 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 }
                                                             </Col>
                                                             <Col xs="12">
-                                                                <AryFormikTextInput
+                                                                <AryFormikTextArea
                                                                     name="descriptionInput"
                                                                     label="Audit description"
                                                                 />
                                                             </Col>
-                                                            <Col xs="12" sm="6">
+                                                            <hr className="horizontal dark my-1" />
+                                                            <Col xs="12" sm="5">
                                                                 <AryFormikTextInput
                                                                     name="startDateInput"
                                                                     type="date"
                                                                     label="Start date"
                                                                 />
                                                             </Col>
-                                                            <Col xs="12" sm="6">
+                                                            <Col xs="12" sm="5">
                                                                 <AryFormikTextInput
                                                                     name="endDateInput"
                                                                     type="date"
                                                                     label="End date"
                                                                 />
+                                                            </Col>
+                                                            <Col xs="12" sm="2">
+                                                                <AryFormikTextInput
+                                                                    name="daysInput"
+                                                                    label="Days"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <div className="form-check form-switch mb-3">
+                                                                    <input id="includeSaturdayCheck" name="includeSaturdayCheck"
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        onChange={ formik.handleChange }
+                                                                        checked={ formik.values.includeSaturdayCheck }
+                                                                    />
+                                                                    <label 
+                                                                        className="form-check-label text-secondary mb-0" 
+                                                                        htmlFor="includeSaturdayCheck"
+                                                                    >
+                                                                        Include Saturday
+                                                                    </label>
+                                                                </div>
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <div className="form-check form-switch mb-3">
+                                                                    <input id="includeSundayCheck" name="includeSundayCheck"
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        onChange={ formik.handleChange }
+                                                                        checked={ formik.values.includeSundayCheck }
+                                                                    />
+                                                                    <label 
+                                                                        className="form-check-label text-secondary mb-0" 
+                                                                        htmlFor="includeSundayCheck"
+                                                                    >
+                                                                        Include Sunday
+                                                                    </label>
+                                                                </div>
+                                                            </Col>
+                                                            <hr className="horizontal dark my-1" />
+                                                            <Col xs="12" sm="6">
+                                                                <div className="form-check form-switch mb-3">
+                                                                    <input id="isMultisiteCheck" name="isMultisiteCheck"
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        onChange={ formik.handleChange }
+                                                                        checked={ formik.values.isMultisiteCheck }
+                                                                    />
+                                                                    <label 
+                                                                        className="form-check-label text-secondary mb-0" 
+                                                                        htmlFor="isMultisiteCheck"
+                                                                    >
+                                                                        Is Multisite
+                                                                    </label>
+                                                                </div>
                                                             </Col>
                                                             <Col xs="12">
                                                                 <AryFormikTextArea
@@ -458,22 +518,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     label="Extra info"
                                                                     helpText="Add any extra info for the audit"
                                                                 />
-                                                            </Col>
-                                                            <Col xs="12" sm="6">
-                                                                <div className="form-check form-switch mb-3">
-                                                                    <input id="hasWitnessCheck" name="hasWitnessCheck"
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        onChange={ formik.handleChange }
-                                                                        checked={ formik.values.hasWitnessCheck }
-                                                                    />
-                                                                    <label 
-                                                                        className="form-check-label text-secondary mb-0" 
-                                                                        htmlFor="hasWitnessCheck"
-                                                                    >
-                                                                        Has witness
-                                                                    </label>
-                                                                </div>
                                                             </Col>
                                                             {
                                                                 !!audit.Notes && audit.Notes.length > 0 &&
