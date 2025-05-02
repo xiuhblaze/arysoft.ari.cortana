@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
 import { useStandardsStore } from '../../../hooks/useStandardsStore';
 
-const DashboardToolbar = ({ ...props }) => {
+const CalendarToolbar = ({ ...props }) => {
     const {
         DASHBOARD_OPTIONS,
     } = envVariables();
@@ -313,4 +313,4 @@ const DashboardToolbar = ({ ...props }) => {
     )
 }
 
-export default DashboardToolbar
+export default CalendarToolbar
