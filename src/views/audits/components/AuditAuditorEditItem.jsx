@@ -241,7 +241,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                     ...standardsList,
                     ...tmpStandardsList,
                 ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
-                formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + tmpStandardsList.length);
+                formikRef?.current?.setFieldValue('standardsCountHidden', standardsList.length + tmpStandardsList.length); 
             }
         } else if (!isNullOrEmpty(standardSelect)) {
             const item = standardsList.find(i => i.ID == standardSelect);
@@ -259,7 +259,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                     StandardName: currentStandard.StandardName,
                                 }
                             ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
-                            formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + 1);
+                            formikRef?.current?.setFieldValue('standardsCountHidden', standardsList.length + 1);
                         }
                     }).catch(err => {
                         console.log(err);

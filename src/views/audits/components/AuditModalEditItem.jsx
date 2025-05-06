@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Card, Col, Modal, Row } from "react-bootstrap";
-import { faExclamationTriangle, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { Alert, Card, Col, ListGroup, Modal, Row } from "react-bootstrap";
+import { faBuilding, faExclamationTriangle, faPlus, faSave, faSpinner, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Yup from "yup";
@@ -46,6 +46,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         noteInput: '',
         standardsCountHidden: 0,
         auditorsCountHidden: 0,
+        sitesCountHidden: 0,
     }; // formDefaultValues
 
     const {
@@ -81,6 +82,8 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     && (!!auditStandards && auditStandards.length > 0 && auditStandards[0].Step != AuditStepType.special),
                 then: schema => schema.min(1, 'For this status change, there must be at least one active auditor assigned')
             }),
+        sitesCountHidden: Yup.number()
+            .min(1, 'There must be at least one site assigned'),
     }); 
 
     // CUSTOM HOOKS
@@ -113,6 +116,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         auditCreateAsync,
         auditSaveAsync,
         auditClear,
+
+        auditSiteAddAsync,
+        auditSiteDeleteAsync,
     } = useAuditsStore();
 
     const {
@@ -127,6 +133,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [showAllFiles, setShowAllFiles] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
+
+    const [sitesList, setSitesList] = useState([]);
+    // const [showSites, setShowSites] = useState(false);
+    const [disabledMultisiteCheck, setDisabledMultisiteCheck] = useState(false);
+    const [siteSelect, setSiteSelect] = useState('');
+
     const [statusOptions, setStatusOptions] = useState(false);
     const [showAddNote, setShowAddNote] = useState(false);
     const [saveNote, setSaveNote] = useState(''); 
@@ -162,6 +174,11 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     i.Status == DefaultStatusType.active)
                     .length
                 : 0;
+            const sitesActiveCount = !!audit.Sites
+                ? audit.Sites.filter(i => 
+                    i.Status == DefaultStatusType.active)
+                    .length
+                : 0;
 
             setInitialValues({
                 descriptionInput: audit.Description ?? '',
@@ -176,8 +193,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     ? audit.Status
                     : AuditStatusType.scheduled,
                 noteInput: '',
-                standardsCountHidden: standardsActiveCount, //audit.Standards?.length ?? 0,
-                auditorsCountHidden: auditorsActiveCount //audit.Auditors?.length ?? 0,
+                standardsCountHidden: standardsActiveCount,
+                auditorsCountHidden: auditorsActiveCount,
+                sitesCountHidden: sitesActiveCount, 
             });
 
             switch (audit.Status) {
@@ -242,16 +260,35 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             
             if (!organization || (!!audit.AuditCycle && organization.ID != audit.AuditCycle?.OrganizationID)) {
                 organizationAsync(audit.AuditCycle.OrganizationID);
+            } else {
+                // Validar antes si ya paso la auditoria y tiene sites, los muestre aunque hayan sido dados de baja
+                setMultisite();
             }
             
             if (!auditCycle || (!!audit.AuditCycle && auditCycle.ID != audit.AuditCycle.ID)) {
                 auditCycleAsync(audit.AuditCycle.ID);
             }
+
+            if (!!audit.Sites) {
+                setSitesList(audit.Sites.map(i => ({
+                    ID: i.ID,
+                    Description: i.Description,
+                })));
+            } else {
+                setSitesList([]);
+            }
             
+            // setShowSites(audit.IsMultisite ?? false);
             setShowModal(show);            
         }
 
     }, [audit]);
+
+    useEffect(() => {
+
+        if (!!organization && show) setMultisite();
+
+    }, [organization]);
     
     useEffect(() => {
         if (!!auditStandards && show && !!formikRef?.current) {
@@ -292,6 +329,36 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
     }, [auditsErrorMessage]);
 
     // METHODS
+
+    const setMultisite = () => {
+        
+        if (!!organization && !!audit) {
+
+            if (audit.Status >= AuditStatusType.inProcess) { // Ya pasó, como haya quedado
+                const isMultisite = audit.isMultisite ?? false;
+                const hasSites = audit.Sites.length > 0;
+
+                setDisabledMultisiteCheck(true);
+                setShowSites(isMultisite && hasSites);
+                formikRef?.current?.setFieldValue('isMultisiteCheck', isMultisite);
+            } else { // No ha pasado, se puede modificar
+
+                // - que tenga más de un site activo, si no tiene más de un site activo, deshabilitar multisite
+                // - que este marcado como multisite
+                const multisite = organization.Sites
+                    .filter(site => site.Status == DefaultStatusType.active)
+                    .length > 1;
+                const hasSites = !!audit.Sites && audit.Sites.length > 0; 
+
+                //setCanBeMultisite(multisite || hasSites);
+
+                if (!multisite) {
+                    setShowSites(false);
+                    formikRef?.current?.setFieldValue('isMultisiteCheck', false);
+                }
+            }
+        }
+    }; // setIsMultisite
 
     const onFormSubmit = (values) => {
 
@@ -350,6 +417,64 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             if (!!onHide) onHide(); // Desde el exterior se decide que limpiar los regristros Redux o no
         }
     };  // onCloseModal
+
+    const onSiteSelectChange = (e) => {
+        setSiteSelect(e.target.value);
+
+        // const sitesCount = formikRef.current.values.sitesCountHidden;
+
+        // // Para contar el numero de sites o si al menos esta uno seleccionado
+        // if (!isNullOrEmpty(e.target.value)) {
+        //     //setSitesCount(sitesCount + 1);
+        //     formikRef.current.setFieldValue('sitesCountHidden', sitesCount + 1);
+        //     //console.log('onSiteSelectChange', sitesCount + 1);
+        // } else {
+        //     //setSitesCount(sitesCount - 1);
+        //     formikRef.current.setFieldValue('sitesCountHidden', sitesCount - 1 < 0 ? 0 : sitesCount - 1);
+        //     //console.log('onSiteSelectChange', sitesCount - 1);
+        // }
+    };
+
+    const onAddSite = () => {
+
+        auditSiteAddAsync(siteSelect)
+            .then(data => {
+                if (!!data) {
+                    const currentSite = organization.Sites.find(i => i.ID == siteSelect);
+                    setSiteSelect(''); // Reiniciar el select
+                    setSitesList([
+                        ...sitesList,
+                        {
+                            ID: currentSite.ID,
+                            Description: currentSite.Description,
+                        }
+                    ].sort((a, b) => a.Description.localeCompare(b.Description)));
+                    formikRef.current.setFieldValue('sitesCountHidden', sitesList.length + 1);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
+    const onDeleteSite = (siteID) => {
+
+        if (!siteID) {
+            setError('You must specify the site ID');
+            return;
+        }
+
+        auditSiteDeleteAsync(siteID)
+            .then(data => {
+                if (!!data) {
+                    setSitesList(sitesList.filter(i => i.ID != siteID));
+                    formikRef.current.setFieldValue('sitesCountHidden', audit.Sites.length - 1);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
 
     return (
         <Modal {...props} show={showModal} onHide={ onCloseModal } 
@@ -496,21 +621,103 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 </div>
                                                             </Col>
                                                             <hr className="horizontal dark my-1" />
-                                                            <Col xs="12" sm="6">
-                                                                <div className="form-check form-switch mb-3">
-                                                                    <input id="isMultisiteCheck" name="isMultisiteCheck"
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        onChange={ formik.handleChange }
-                                                                        checked={ formik.values.isMultisiteCheck }
-                                                                    />
-                                                                    <label 
-                                                                        className="form-check-label text-secondary mb-0" 
-                                                                        htmlFor="isMultisiteCheck"
-                                                                    >
-                                                                        Is Multisite
-                                                                    </label>
-                                                                </div>
+                                                            <Col xs="12">
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <div className="form-check form-switch mb-3">
+                                                                            <input id="isMultisiteCheck" name="isMultisiteCheck"
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                onChange={ (e) => {
+                                                                                    const isChecked = e.target.checked;
+                                                                                    formik.setFieldValue('isMultisiteCheck', isChecked);
+                                                                                    setShowSites(isChecked);
+                                                                                }}
+                                                                                checked={ formik.values.isMultisiteCheck }
+                                                                                disabled={ disabledMultisiteCheck }
+                                                                            />
+                                                                            <label 
+                                                                                className="form-check-label text-secondary mb-0" 
+                                                                                htmlFor="isMultisiteCheck"
+                                                                            >
+                                                                                Is Multisite
+                                                                            </label>
+                                                                        </div>
+                                                                    </Col>
+                                                                </Row>                                                              
+                                                                <Row>
+                                                                    <Col xs="10">
+                                                                        <label className="form-label">Sites</label>
+                                                                        <select
+                                                                            className="form-select"
+                                                                            value={siteSelect}
+                                                                            onChange={onSiteSelectChange}
+                                                                        >
+                                                                            <option value="">(select site)</option>
+                                                                            {
+                                                                                !!organization && organization.Sites && organization.Sites.length > 0 &&
+                                                                                organization.Sites.map(site =>
+                                                                                    <option
+                                                                                        key={site.ID}
+                                                                                        value={site.ID}
+                                                                                        className="text-capitalize"
+                                                                                        disabled={site.Status != DefaultStatusType.active}
+                                                                                    >
+                                                                                        {site.Description}
+                                                                                    </option>
+                                                                                )
+                                                                            }
+                                                                        </select>
+                                                                    </Col>
+                                                                    <Col xs="2">
+                                                                        <div className="d-grid gap-1">
+                                                                        <label className="form-label">&nbsp;</label>
+                                                                        <button
+                                                                            type='button'
+                                                                            className="btn btn-link text-dark px-1"
+                                                                            onClick={ onAddSite }
+                                                                            title="Add selected site"
+                                                                        >
+                                                                            Add
+                                                                        </button>
+                                                                        </div>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <div className="bg-gray-100 rounded-3 p-2 mb-3">
+                                                                            <ListGroup variant="flush">
+                                                                                {
+                                                                                    sitesList.map(item => 
+                                                                                        <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
+                                                                                            <div className='d-flex justify-content-between align-items-center'>
+                                                                                                <span>
+                                                                                                    <FontAwesomeIcon icon={ faBuilding } className="me-2" />
+                                                                                                    <span className="font-weight-bold">
+                                                                                                        {item.Description}
+                                                                                                    </span>
+                                                                                                </span>
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    className="btn btn-link p-0 mb-0 text-secondary"
+                                                                                                    onClick={() => onDeleteSite(item.ID)}
+                                                                                                    title="Delete site"
+                                                                                                >
+                                                                                                    <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </ListGroup.Item>
+                                                                                    )
+                                                                                }
+                                                                            </ListGroup>
+                                                                        </div>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Field name="sitesCountHidden" type="hidden" value={ formik.values.sitesCountHidden } />                                                                
+                                                                {
+                                                                    formik.touched.sitesCountHidden && formik.errors.sitesCountHidden &&
+                                                                    <span className="text-danger text-xs">{formik.errors.sitesCountHidden}</span>
+                                                                }
                                                             </Col>
                                                             <Col xs="12">
                                                                 <AryFormikTextArea

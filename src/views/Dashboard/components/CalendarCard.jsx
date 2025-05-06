@@ -96,77 +96,7 @@ const CalendarCard = () => {
         if (!!audits) {
             setIsEventsLoading(true);
 
-            const events = []; 
-            audits.forEach((item, i) => {
-                const intervalDates = eachDayOfInterval({
-                    start: new Date(item.StartDate),
-                    end: new Date(item.EndDate)
-                });
-                
-                const hasSaturday = intervalDates.find(date => isSaturday(date)) ?? null; 
-                const hasSunday = intervalDates.find(date => isSunday(date)) ?? null;
-                
-                if (!!hasSaturday && item.IncludeSaturday && !!hasSunday && item.IncludeSunday) {
-                    events.push(item);
-                    return;
-                }
-
-                if (!!hasSaturday || !!hasSunday) { // ver si se tiene que dividir el evento para mostrarse en el calendario
-                    // console.log('hasSaturday', hasSaturday);
-                    // console.log('hasSunday', hasSunday);
-
-                    // crear un nuevo endate para item y duplicar item con un nuevo startDate omitiendo saturday y sunday
-                    let newEndDate = new Date(item.EndDate);
-                    if (!!hasSunday && !item.IncludeSunday) {
-                        newEndDate = addDays(new Date(hasSunday), -1)
-                    }
-                    if (!!hasSaturday && !item.IncludeSaturday) {
-                        newEndDate = addDays(new Date(hasSaturday), -1);
-                    }
-
-                    let newStartDate = new Date(item.StartDate);
-                    if (!!hasSaturday && !item.IncludeSaturday) {
-                        newStartDate = addDays(new Date(hasSaturday), 1);
-                    }
-                    if (!!hasSunday && !item.IncludeSunday) {
-                        newStartDate = addDays(new Date(hasSunday), 1);
-                    }
-
-                    //console.log('newEndDate', newEndDate);
-
-                    if (!isEqual(parseISO(newEndDate.toISOString()), parseISO(item.EndDate)) 
-                        && (isAfter(parseISO(newEndDate.toISOString()), parseISO(item.StartDate)) 
-                        || isEqual(parseISO(newEndDate.toISOString()), parseISO(item.StartDate))
-                    )) {
-                        const newItem = {
-                            ...item,
-                            EndDate: newEndDate,
-                        };
-                        events.push(newItem);
-                    }
-
-                    //console.log('newStartDate', newStartDate);
-
-                    if (!isEqual(parseISO(newStartDate.toISOString()), parseISO(item.StartDate))
-                        && (isBefore(parseISO(newStartDate.toISOString()), parseISO(item.EndDate))
-                        || isEqual(parseISO(newStartDate.toISOString()), parseISO(item.EndDate))
-                    )) {  
-                        const newItem = {
-                            ...item,
-                            StartDate: newStartDate,
-                        };
-                        events.push(newItem);
-                    }
-
-                    if (isEqual(parseISO(newEndDate.toISOString()), parseISO(item.EndDate))
-                        && isEqual(parseISO(newStartDate.toISOString()), parseISO(item.StartDate))) {
-                        events.push(item);    
-                    }
-                } else { // pasa normal
-                    events.push(item);
-                }
-            });
-
+            const events = getEvents(audits);
 
             setEventsList(events.map(item => {
                 const endDate = new Date(item.EndDate);
@@ -207,9 +137,78 @@ const CalendarCard = () => {
             setEventsList([]);
         }
     }, [audits]);
-    
 
     // METHODS
+
+    const getEvents = (auditList) => {
+        const events = []; 
+
+        auditList.forEach((item, i) => {
+            const intervalDates = eachDayOfInterval({
+                start: new Date(item.StartDate),
+                end: new Date(item.EndDate)
+            });
+            
+            const hasSaturday = intervalDates.find(date => isSaturday(date)) ?? null; 
+            const hasSunday = intervalDates.find(date => isSunday(date)) ?? null;
+            
+            if (!!hasSaturday && item.IncludeSaturday && !!hasSunday && item.IncludeSunday) {
+                events.push(item);
+                return;
+            }
+
+            if (!!hasSaturday || !!hasSunday) { // ver si se tiene que dividir el evento para mostrarse en el calendario
+                
+                // crear un nuevo endDate para item y duplicar item con un nuevo startDate omitiendo saturday y sunday
+                let newEndDate = new Date(item.EndDate);
+                if (!!hasSunday && !item.IncludeSunday) {
+                    newEndDate = addDays(new Date(hasSunday), -1)
+                }
+                if (!!hasSaturday && !item.IncludeSaturday) {
+                    newEndDate = addDays(new Date(hasSaturday), -1);
+                }
+
+                let newStartDate = new Date(item.StartDate);
+                if (!!hasSaturday && !item.IncludeSaturday) {
+                    newStartDate = addDays(new Date(hasSaturday), 1);
+                }
+                if (!!hasSunday && !item.IncludeSunday) {
+                    newStartDate = addDays(new Date(hasSunday), 1);
+                }
+
+                if (!isEqual(parseISO(newEndDate.toISOString()), parseISO(item.EndDate)) 
+                    && (isAfter(parseISO(newEndDate.toISOString()), parseISO(item.StartDate)) 
+                    || isEqual(parseISO(newEndDate.toISOString()), parseISO(item.StartDate))
+                )) {
+                    const newItem = {
+                        ...item,
+                        EndDate: newEndDate,
+                    };
+                    events.push(newItem);
+                }
+
+                if (!isEqual(parseISO(newStartDate.toISOString()), parseISO(item.StartDate))
+                    && (isBefore(parseISO(newStartDate.toISOString()), parseISO(item.EndDate))
+                    || isEqual(parseISO(newStartDate.toISOString()), parseISO(item.EndDate))
+                )) {  
+                    const newItem = {
+                        ...item,
+                        StartDate: newStartDate,
+                    };
+                    events.push(newItem);
+                }
+
+                if (isEqual(parseISO(newEndDate.toISOString()), parseISO(item.EndDate))
+                    && isEqual(parseISO(newStartDate.toISOString()), parseISO(item.StartDate))) {
+                    events.push(item);    
+                }
+            } else { // pasa normal
+                events.push(item);
+            }
+        });
+
+        return events;
+    }; // getEvents
 
     const getInitialRange = () => {
         // Por defecto, calculamos el rango basado en la fecha actual y la vista predeterminada
@@ -295,7 +294,7 @@ const CalendarCard = () => {
 
         let startDate, endDate;
 
-        if (Array.isArray(range)) { // Creo que el valor de range ya es un array siempre
+        if (Array.isArray(range)) {
             if (range.length === 1) {
                 // Vista mensual
                 startDate = range[0];
