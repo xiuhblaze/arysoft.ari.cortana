@@ -82,8 +82,8 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                     && (!!auditStandards && auditStandards.length > 0 && auditStandards[0].Step != AuditStepType.special),
                 then: schema => schema.min(1, 'For this status change, there must be at least one active auditor assigned')
             }),
-        sitesCountHidden: Yup.number()
-            .min(1, 'There must be at least one site assigned'),
+        // sitesCountHidden: Yup.number()
+        //     .min(1, 'There must be at least one site assigned'),
     }); 
 
     // CUSTOM HOOKS
@@ -109,12 +109,16 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
         isAuditCreating,
         isAuditSaving,
         auditSavedOk,
+        isAuditDeleting,
+        auditDeletedOk,
         audit,
+
         auditsErrorMessage,
 
         auditAsync,
         auditCreateAsync,
         auditSaveAsync,
+        auditDeleteAsync,
         auditClear,
 
         auditSiteAddAsync,
@@ -339,7 +343,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                 const hasSites = audit.Sites.length > 0;
 
                 setDisabledMultisiteCheck(true);
-                setShowSites(isMultisite && hasSites);
+                // setShowSites(isMultisite && hasSites);
                 formikRef?.current?.setFieldValue('isMultisiteCheck', isMultisite);
             } else { // No ha pasado, se puede modificar
 
@@ -353,7 +357,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                 //setCanBeMultisite(multisite || hasSites);
 
                 if (!multisite) {
-                    setShowSites(false);
+                    //setShowSites(false);
                     formikRef?.current?.setFieldValue('isMultisiteCheck', false);
                 }
             }
@@ -388,6 +392,12 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
         // console.log('AuditModalEditItem.onFormSubmit: toSave', toSave);
         auditSaveAsync(toSave);
+    };
+
+    const onDeleteAudit = () => {
+
+        console.log('AuditModalEditItem.onDeleteAudit', audit.ID);
+        //auditDeleteAsync(audit.ID);
     };
 
     const onCloseModal = () => {
@@ -450,12 +460,18 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                         }
                     ].sort((a, b) => a.Description.localeCompare(b.Description)));
                     formikRef.current.setFieldValue('sitesCountHidden', sitesList.length + 1);
+
+                    if (sitesList.length + 1 > 1) {
+                        formikRef.current.setFieldValue('isMultisiteCheck', true);
+                    } else {
+                        formikRef.current.setFieldValue('isMultisiteCheck', false);
+                    }
                 }
             })
             .catch(err => {
                 console.log(err);
             });
-    };
+    }; // onAddSite
 
     const onDeleteSite = (siteID) => {
 
@@ -474,7 +490,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             .catch(err => {
                 console.log(err);
             });
-    };
+    }; // onDeleteSite
 
     return (
         <Modal {...props} show={showModal} onHide={ onCloseModal } 
@@ -567,7 +583,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     label="Audit description"
                                                                 />
                                                             </Col>
-                                                            <hr className="horizontal dark my-1" />
+                                                            <hr className="horizontal dark mb-3" />
                                                             <Col xs="12" sm="5">
                                                                 <AryFormikTextInput
                                                                     name="startDateInput"
@@ -620,7 +636,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                     </label>
                                                                 </div>
                                                             </Col>
-                                                            <hr className="horizontal dark my-1" />
+                                                            <hr className="horizontal dark mb-3" />
                                                             <Col xs="12">
                                                                 <Row>
                                                                     <Col xs="12">
@@ -683,36 +699,43 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                         </div>
                                                                     </Col>
                                                                 </Row>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <div className="bg-gray-100 rounded-3 p-2 mb-3">
-                                                                            <ListGroup variant="flush">
-                                                                                {
-                                                                                    sitesList.map(item => 
-                                                                                        <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
-                                                                                            <div className='d-flex justify-content-between align-items-center'>
-                                                                                                <span>
-                                                                                                    <FontAwesomeIcon icon={ faBuilding } className="me-2" />
-                                                                                                    <span className="font-weight-bold">
-                                                                                                        {item.Description}
+                                                                    <Row>
+                                                                        <Col xs="12">
+                                                                            <div className="bg-gray-100 rounded-3 p-2 mb-3">
+                                                                            {
+                                                                                !!sitesList && sitesList.length > 0 ?
+                                                                                <ListGroup variant="flush">
+                                                                                    {
+                                                                                        sitesList.map(item => 
+                                                                                            <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
+                                                                                                <div className='d-flex justify-content-between align-items-center'>
+                                                                                                    <span>
+                                                                                                        <FontAwesomeIcon icon={ faBuilding } className="me-2" />
+                                                                                                        <span className="font-weight-bold">
+                                                                                                            {item.Description}
+                                                                                                        </span>
                                                                                                     </span>
-                                                                                                </span>
-                                                                                                <button
-                                                                                                    type="button"
-                                                                                                    className="btn btn-link p-0 mb-0 text-secondary"
-                                                                                                    onClick={() => onDeleteSite(item.ID)}
-                                                                                                    title="Delete site"
-                                                                                                >
-                                                                                                    <FontAwesomeIcon icon={faTrashCan} size="lg" />
-                                                                                                </button>
-                                                                                            </div>
-                                                                                        </ListGroup.Item>
-                                                                                    )
-                                                                                }
-                                                                            </ListGroup>
-                                                                        </div>
-                                                                    </Col>
-                                                                </Row>
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        className="btn btn-link p-0 mb-0 text-secondary"
+                                                                                                        onClick={() => onDeleteSite(item.ID)}
+                                                                                                        title="Delete site"
+                                                                                                    >
+                                                                                                        <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </ListGroup.Item>
+                                                                                        )
+                                                                                    }
+                                                                                </ListGroup>
+                                                                                :
+                                                                                <p className="text-center text-secondary text-xs mb-0">
+                                                                                    (no sites assigned, select a site and press the <span className="text-dark font-weight-bold">ADD</span> button to assign more than one)
+                                                                                </p>
+                                                                            }
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
                                                                 <Field name="sitesCountHidden" type="hidden" value={ formik.values.sitesCountHidden } />                                                                
                                                                 {
                                                                     formik.touched.sitesCountHidden && formik.errors.sitesCountHidden &&
@@ -728,7 +751,7 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                             </Col>
                                                             {
                                                                 !!audit.Notes && audit.Notes.length > 0 &&
-                                                                <Col xs="12" sm="6" className="text-end">
+                                                                <Col xs="12" className="text-end">
                                                                     <NotesListModal notes={audit.Notes} buttonLabel="View notes" />
                                                                 </Col>
                                                             }
@@ -775,18 +798,34 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                             }
                                                         </Row>
                                                         <Row>
-                                                            <Col xs="12" className="d-flex justify-content-end">
-                                                                <button type="submit"
-                                                                    className="btn bg-gradient-dark mb-0"
-                                                                    disabled={ isAuditSaving || !hasChanges }
-                                                                >
+                                                            <Col xs="12" className="d-flex justify-content-between align-items-center">
+                                                                <div>
                                                                     {
-                                                                        isAuditSaving 
-                                                                            ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
-                                                                            : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                                        audit.Status >= AuditStatusType.canceled ?
+                                                                        <button type="button"
+                                                                            className="btn btn-link text-danger mb-0"
+                                                                            onClick={ () => console.log('delete') }
+                                                                            title="Delete audit"
+                                                                        >
+                                                                            <FontAwesomeIcon icon={ faTrashCan } className="me-1" size="lg" />
+                                                                            Delete
+                                                                        </button>
+                                                                        : null
                                                                     }
-                                                                    Save
-                                                                </button>
+                                                                </div>
+                                                                <div>
+                                                                    <button type="submit"
+                                                                        className="btn bg-gradient-dark mb-0"
+                                                                        disabled={ isAuditSaving || !hasChanges }
+                                                                    >
+                                                                        {
+                                                                            isAuditSaving 
+                                                                                ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                                                : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                                        }
+                                                                        Save
+                                                                    </button>
+                                                                </div>
                                                             </Col>
                                                         </Row>
                                                     </Card.Body>

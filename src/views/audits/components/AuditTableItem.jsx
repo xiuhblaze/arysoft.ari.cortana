@@ -42,7 +42,7 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                     <div className="d-flex flex-column align-items-start">
                         <h6 className="mb-0 text-sm text-wrap">{item.Description}</h6>
                         <p className="text-xs text-secondary mb-0">
-                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') } / { getDateDifferenceInUpperDays(item.StartDate, item.EndDate) + 1 } Days
+                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') } / { item.Days ?? getDateDifferenceInUpperDays(item.StartDate, item.EndDate) + 1 } Days
                         </p>
                     </div>
                 </div>

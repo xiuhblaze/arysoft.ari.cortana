@@ -56,6 +56,7 @@ const AuditItem = ({ item, ...props }) => {
                 <p className="text-secondary text-xs mb-0">
                     Auditors: <span className={`badge text-bg-${ !!item.AuditorsCount && item.AuditorsCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.AuditorsCount ?? 0 }</span>
                     Documents: <span className={`badge text-bg-${ !!item.DocumentsCount && item.DocumentsCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.DocumentsCount ?? 0 }</span>  
+                    Sites: <span className={`badge text-bg-${ !!item.SitesCount && item.SitesCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.SitesCount ?? 0 }</span>
                     { item.HasWitness ? <span className="text-secondary me-2">
                         <FontAwesomeIcon icon={ faEye } className="me-1" />Has Witness
                     </span> : null }

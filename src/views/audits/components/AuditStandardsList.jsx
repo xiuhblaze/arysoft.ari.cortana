@@ -58,7 +58,7 @@ const AuditStandardsList = ({ readOnly = false, ...props }) => {
                             </ListGroup>
                         </div>
                     ) : <p className="text-center text-secondary text-xs">
-                        (no standards assigned, press de <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one)
+                        (no standards assigned, press the <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one)
                     </p>
                 }
             </Col>

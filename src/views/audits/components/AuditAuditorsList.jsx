@@ -60,7 +60,7 @@ const AuditAuditorsList = ({ readOnly = false, ...props }) => {
                             </ListGroup>
                         </div>
                     ) : <p className="text-center text-secondary text-xs">
-                        (no auditors assigned, press de <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one
+                        (no auditors assigned, press the <FontAwesomeIcon icon={ faPlus } className="text-dark" /> button to assign one
                     </p>    
                 }
             </Col>
