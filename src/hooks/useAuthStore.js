@@ -38,13 +38,13 @@ export const useAuthStore = () => {
     }; // setError
 
     const setUserInfo = (token) => {
-        const userInfo = jwtDecode(token);
+        const userInfo = jwtDecode(token);        
         const user = {
-            id: userInfo.userid,
-            username: userInfo.username,
-            givename: userInfo.username,
-            useremail: userInfo.useremail,
-            role: 'admin',
+            id: userInfo.nameid,
+            username: userInfo.unique_name,
+            givename: userInfo.unique_name,
+            useremail: userInfo.email,
+            role: userInfo.role,
             exp: new Date(userInfo.exp * 1000).getTime(),
         };
 

@@ -198,6 +198,7 @@ export const useAuditsStore = () => {
 
         try {
             const resp = await cortanaApi.delete(`${AUDIT_URL}/${id}`, { data: toDelete });
+            console.log('useAuditsStore.auditDeleteAsync', resp);
             dispatch(isAuditDeleted());
         } catch (error) {
             const message = getError(error);
