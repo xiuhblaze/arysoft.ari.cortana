@@ -55,7 +55,7 @@ const ChangePwdModal = React.memo(({ show, onHide, ...props }) => {
 
         validatePasswordAsync(values.currentPasswordInput)
             .then(data => {
-                console.log('validatePasswordAsync', data);
+                
                 if (!!data) {
                     onChangePassword(values.currentPasswordInput, values.passwordInput);                    
                 } else {
@@ -80,7 +80,7 @@ const ChangePwdModal = React.memo(({ show, onHide, ...props }) => {
             OldPassword: oldPwd,
             NewPassword: newPwd,
         };
-console.log('onChangePassword', toChangePwd);
+
         changePasswordAsync(toChangePwd)
             .then(data => {
                 if (!!data) {
@@ -98,7 +98,7 @@ console.log('onChangePassword', toChangePwd);
         <Modal {...props} show={showModal} onHide={onCloseModal}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    <FontAwesomeIcon icon={faLock} className="me-2" />
+                    <FontAwesomeIcon icon={faLock} className="me-3" />
                     Change password
                 </Modal.Title>
             </Modal.Header>
@@ -112,7 +112,7 @@ console.log('onChangePassword', toChangePwd);
                         <Form>
                             <Modal.Body>
                                 <Alert variant="info" className="text-white">
-                                    Change password for: <strong>{user.username}</strong>
+                                    Change password for <strong>{user.username}</strong>
                                 </Alert>
                                 <Row>
                                     <Col xs="12">

@@ -27,7 +27,6 @@ import { useNotesStore } from "../../../hooks/useNotesStore";
 import NotesListModal from "../../notes/components/NotesListModal";
 
 const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
-
     const {
         AuditStatusType,
         AuditStepType,

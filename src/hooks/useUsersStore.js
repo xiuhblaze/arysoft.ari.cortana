@@ -36,6 +36,7 @@ const getSearchQuery = (options = {}) => {
 
     query += options?.ownerID ? `&ownerid=${options.ownerID}` : '';
     query += options?.text ? `&text=${options.text}` : '';
+    query += options?.type ? `&type=${options.type}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 

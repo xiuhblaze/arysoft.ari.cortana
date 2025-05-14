@@ -9,6 +9,7 @@ const envVariables = () => {
     const NACECODES_OPTIONS = 'arysoft-ari-nacecodesOptions';
     const ORGANIZATIONS_OPTIONS = 'arysoft-ari-organizationsOptions';
     const STANDARDS_OPTIONS = 'arysoft-ari-standardsOptions';
+    const USERS_OPTIONS = 'arysoft-ari-usersOptions';
 
     const COID_REGEX = /[A-Z]{3}-\d-[0-9]{4}-[0-9]{6}/;//  /^[A-Z]{3}-\d-\d{4}-\d{6}$/;
     const HOUR24_REGEX =  /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -44,6 +45,7 @@ const envVariables = () => {
         NACECODES_OPTIONS,
         ORGANIZATIONS_OPTIONS,
         STANDARDS_OPTIONS,
+        USERS_OPTIONS,
 
         COMMENTS_SMALL_MAX_LENGTH,
     }

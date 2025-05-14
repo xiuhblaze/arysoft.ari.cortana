@@ -425,6 +425,8 @@ const EditContactModal = ({ id, ...props}) => {
                                                     <input id="isMainContactCheck" name="isMainContactCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
+                                                        onChange={formik.handleChange}
+                                                        checked={formik.values.isMainContactCheck}
                                                     />
                                                     <label
                                                         className="form-check-label text-secondary mb-0"
@@ -439,6 +441,8 @@ const EditContactModal = ({ id, ...props}) => {
                                                     <input id="statusCheck" name="statusCheck"
                                                         className="form-check-input"
                                                         type="checkbox"
+                                                        onChange={formik.handleChange}
+                                                        checked={formik.values.statusCheck}
                                                     />
                                                     <label 
                                                         className="form-check-label text-secondary mb-0"

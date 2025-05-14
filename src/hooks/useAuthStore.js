@@ -114,7 +114,7 @@ export const useAuthStore = () => {
             ...values,
             ID: user.id,
         }
-console.log(toChangePwd);
+
         try {
             const resp = await cortanaApi.put(`${AUTH_URL}/change-password`, toChangePwd);
             const { Data } = await resp.data;
