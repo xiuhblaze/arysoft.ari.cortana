@@ -52,6 +52,7 @@ const CalendarCard = () => {
     } = envVariables();
 
     const {
+        AuditStatusType,
         AuditOrderType,
         DefaultStatusType
     } = enums();
@@ -144,6 +145,10 @@ const CalendarCard = () => {
         const events = []; 
 
         auditList.forEach((item, i) => {
+
+            // Ocultar si es nothing, canceled o deleted
+            if (item.Status == AuditStatusType.nothing || item.Status >= AuditStatusType.canceled) return;
+
             const intervalDates = eachDayOfInterval({
                 start: new Date(item.StartDate),
                 end: new Date(item.EndDate)

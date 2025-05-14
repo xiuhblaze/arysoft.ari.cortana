@@ -210,6 +210,8 @@ export const useAuditsStore = () => {
         dispatch(clearAudit());
     }
 
+    // SITES
+
     const auditSiteAddAsync = async (siteID) => {
 
         if (!audit) {

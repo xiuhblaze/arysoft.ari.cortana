@@ -7,7 +7,7 @@ import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
 import isString from "../helpers/isString";
 
-
+const AUTH_URL = '/auth';
 const { VITE_TOKEN } = envVariables();
 
 export const useAuthStore = () => {
@@ -85,7 +85,7 @@ export const useAuthStore = () => {
         dispatch(onChecking());
 
         try {
-            const result = await cortanaApi.post('/auth', values);
+            const result = await cortanaApi.post(AUTH_URL, values);
             const token = result.data.Data;
             const user = setUserInfo(token);
             localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
@@ -103,6 +103,56 @@ export const useAuthStore = () => {
         dispatch(onLogout());
     };
 
+    const changePasswordAsync = async (values) => {
+
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toChangePwd = {
+            ...values,
+            ID: user.id,
+        }
+console.log(toChangePwd);
+        try {
+            const resp = await cortanaApi.put(`${AUTH_URL}/change-password`, toChangePwd);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // changePasswordAsync
+
+    const validatePasswordAsync = async (password) => {
+
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toValidate = {
+            ID: user.id,
+            Password: password,
+        }
+
+        try {
+            const resp = await cortanaApi.post(`${AUTH_URL}/${user.id}/validate`, toValidate);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // validatePasswordAsync
+
     return {
         status,
         user,
@@ -111,5 +161,7 @@ export const useAuthStore = () => {
         checkAuthToken,
         loginASync,
         logout,
+        changePasswordAsync,
+        validatePasswordAsync,
     }
 };
