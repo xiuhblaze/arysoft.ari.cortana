@@ -6,11 +6,20 @@ import { jwtDecode } from "jwt-decode";
 import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
 import isString from "../helpers/isString";
+import isNullOrEmpty from "../helpers/isNullOrEmpty";
 
-
+const AUTH_URL = '/auth';
 const { VITE_TOKEN } = envVariables();
 
 export const useAuthStore = () => {
+
+    const ROLES = Object.freeze({
+        admin: 'admin',
+        editor: 'editor',
+        auditor: 'auditor',
+        readonly: 'readonly',
+        sales: 'sales',
+    });
 
     // HOOKS 
 
@@ -38,13 +47,13 @@ export const useAuthStore = () => {
     }; // setError
 
     const setUserInfo = (token) => {
-        const userInfo = jwtDecode(token);
+        const userInfo = jwtDecode(token);        
         const user = {
-            id: userInfo.userid,
-            username: userInfo.username,
-            givename: userInfo.username,
-            useremail: userInfo.useremail,
-            role: 'admin',
+            id: userInfo.nameid,
+            username: userInfo.unique_name,
+            givename: userInfo.given_name,
+            useremail: userInfo.email,
+            roles: userInfo.role,
             exp: new Date(userInfo.exp * 1000).getTime(),
         };
 
@@ -85,7 +94,7 @@ export const useAuthStore = () => {
         dispatch(onChecking());
 
         try {
-            const result = await cortanaApi.post('/auth', values);
+            const result = await cortanaApi.post(AUTH_URL, values);
             const token = result.data.Data;
             const user = setUserInfo(token);
             localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
@@ -103,13 +112,88 @@ export const useAuthStore = () => {
         dispatch(onLogout());
     };
 
+    const changePasswordAsync = async (values) => {
+
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toChangePwd = {
+            ...values,
+            ID: user.id,
+        }
+
+        try {
+            const resp = await cortanaApi.put(`${AUTH_URL}/change-password`, toChangePwd);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // changePasswordAsync
+
+    const validatePasswordAsync = async (password) => {
+
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toValidate = {
+            ID: user.id,
+            Password: password,
+        }
+
+        try {
+            const resp = await cortanaApi.post(`${AUTH_URL}/${user.id}/validate`, toValidate);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // validatePasswordAsync
+
+    /**
+     * Si existe un usuario con el rol especificado
+     * @param {string} role
+     * @returns true if the user has the specified role
+     */
+    const hasRole = (role) => {
+
+        if (!user) return false;
+
+        if (user.roles != null) {
+            if (Array.isArray(user.roles)) {
+                return user.roles.some(r => r.toLowerCase() == role.toLowerCase());
+            } else if (!isNullOrEmpty(user.roles)) {
+                return user.roles.toLowerCase() == role.toLowerCase();
+            } 
+        }
+
+        return false;
+    }; // hasRole
+
     return {
+        ROLES,
+        
         status,
         user,
         userErrorMessage,
 
+        changePasswordAsync,
         checkAuthToken,
+        hasRole,
         loginASync,
         logout,
+        validatePasswordAsync,
     }
 };

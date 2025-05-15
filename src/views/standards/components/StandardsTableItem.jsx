@@ -13,6 +13,18 @@ const StandardsTableItem = ({ item, className, onShowModal, hideActions = false,
     
     return (
         <tr { ...props }>
+            {
+                !hideActions &&
+                <td>
+                    <div className="d-flex justify-content-center gap-2">
+                        { item.Status !== DefaultStatusType.deleted && (
+                            <Link to={`${item.ID}`} title="Edit">
+                                <FontAwesomeIcon icon={faEdit} />
+                            </Link>
+                        )}
+                    </div>
+                </td>
+            }
             <td>
                 <div className="d-flex align-items-center me-2">
                     <div>

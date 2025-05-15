@@ -192,12 +192,13 @@ export const useAuditsStore = () => {
         dispatch(onAuditDeleting());
 
         const toDelete = {
-            AuditID: id,
+            ID: id,
             UpdatedUser: user.username,
         }
 
         try {
             const resp = await cortanaApi.delete(`${AUDIT_URL}/${id}`, { data: toDelete });
+            console.log('useAuditsStore.auditDeleteAsync', resp);
             dispatch(isAuditDeleted());
         } catch (error) {
             const message = getError(error);
@@ -208,6 +209,58 @@ export const useAuditsStore = () => {
     const auditClear = () => {
         dispatch(clearAudit());
     }
+
+    // SITES
+
+    const auditSiteAddAsync = async (siteID) => {
+
+        if (!audit) {
+            setError('The audit must be loaded first');
+            return;
+        }
+
+        const toAdd = {
+            AuditID: audit.ID,
+            SiteID: siteID,
+        };
+
+        try {
+            const resp = await cortanaApi.post(`${AUDIT_URL}/${audit.ID}/site`, toAdd);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditSiteAddAsync
+
+    const auditSiteDeleteAsync = async (siteID) => {
+        
+        if (!audit) {
+            setError('The audit must be loaded first');
+            return;
+        }
+
+        const toDelete = {
+            AuditID: audit.ID,
+            SiteID: siteID,
+        }
+
+        try {
+            const resp = await cortanaApi.delete(`${AUDIT_URL}/${audit.ID}/site`, { data: toDelete });
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // auditSiteDeleteAsync
 
     return {
         // properties
@@ -235,5 +288,8 @@ export const useAuditsStore = () => {
         auditSaveAsync,
         auditDeleteAsync,
         auditClear,
+
+        auditSiteAddAsync,
+        auditSiteDeleteAsync,
     }
 };

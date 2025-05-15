@@ -1,12 +1,13 @@
 import React from 'react'
 import { Col, Row } from 'react-bootstrap';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import languagesProps from '../../../helpers/languagesProps';
 
-const auditLanguageOptions = [
-    { value: '', label: '(select a language)' },
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Spanish' },
-];
+// const auditLanguageOptions = [
+//     { value: '', label: '(select a language)' },
+//     { value: 'en', label: 'English' },
+//     { value: 'es', label: 'Spanish' },
+// ];
 
 const AppFormStepGeneral = ({ formik, ...props }) => {
 
@@ -18,9 +19,11 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                         name="auditLanguageSelect"
                         label="Audit language"
                     >
-                        {auditLanguageOptions.map((option) => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
+                        {
+                            languagesProps.map((option) => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                            ))
+                        }
                     </AryFormikSelectInput>
                 </Col>
             </Row>

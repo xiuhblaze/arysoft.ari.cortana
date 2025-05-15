@@ -93,6 +93,7 @@ const AuditTableList = () => {
                                     <th className={headStyle}>Auditors</th>
                                     <th className={headStyle}>Standards</th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>

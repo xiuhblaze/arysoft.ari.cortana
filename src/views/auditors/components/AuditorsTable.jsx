@@ -44,6 +44,7 @@ const AuditorsTable = () => {
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th className={headStyle}>
                                         Auditor
                                     </th>

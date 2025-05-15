@@ -104,12 +104,26 @@ const AppFormISO9K = ({ formik, ...props }) => {
                     </div>
                 </Col>
                 <Col xs="12">
-                    <AryFormikTextInput
-                        name="automationLevelInput"
-                        label="Process automation level"
-                        placeholder="Justification"
-                        helpText="Degree of implementation of processes in which labor is little involved"
-                    />
+                    <Row>
+                        <Col xs="12">
+                            <label className="form-label">Process automation level</label>
+                        </Col>
+                        <Col xs="12" sm="3">
+                            <AryFormikTextInput
+                                name="automationLevelPercentInput"
+                                placeholder="0%"
+                                className="text-end"
+                                helpText="Percentage (%)"
+                            />
+                        </Col>
+                        <Col xs="12" sm="9">
+                            <AryFormikTextArea
+                                name="automationLevelJustificationInput"
+                                placeholder="Justification"
+                                helpText="Degree of implementation of processes in which labor is little involved"
+                            />
+                        </Col>
+                    </Row>
                 </Col>
                 <Col xs="12">
                     <div className="bg-light border-radius-md p-3 pb-0 mb-3">

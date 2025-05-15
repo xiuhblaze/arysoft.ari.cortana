@@ -36,6 +36,7 @@ const getSearchQuery = (options = {}) => {
 
     query += options?.ownerID ? `&ownerid=${options.ownerID}` : '';
     query += options?.text ? `&text=${options.text}` : '';
+    query += options?.type ? `&type=${options.type}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
 
@@ -202,6 +203,58 @@ export const useUsersStore = () => {
         dispatch(clearUser());
     } // userClear
 
+    // ROLES
+
+    const userRoleAddAsync = async (roleID) => {
+        
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toAdd = {
+            ID: user.ID,
+            RoleID: roleID,
+        };
+
+        try {
+            const resp = await cortanaApi.post(`${USER_URL}/${user.ID}/role`, toAdd);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // userRoleAddAsync
+
+    const userRoleDeleteAsync = async (roleID) => {
+        
+        if (!user) {
+            setError('The user must be loaded first');
+            return;
+        }
+
+        const toDelete = {
+            ID: user.ID,
+            RoleID: roleID,
+        }
+
+        try {
+            const resp = await cortanaApi.delete(`${USER_URL}/${user.ID}/role`, { data: toDelete });
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    };
+        
     return {
         // properties
         isUsersLoading,
@@ -228,5 +281,8 @@ export const useUsersStore = () => {
         userSaveAsync,
         userDeleteAsync,
         userClear,
+        // - roles
+        userRoleAddAsync,
+        userRoleDeleteAsync,
     }
 };

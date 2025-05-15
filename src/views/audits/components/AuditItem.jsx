@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faFile, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faCity, faClone, faEdit, faEye, faFile, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import auditStepProps from '../helpers/auditStepProps';
 import enums from '../../../helpers/enums';
 import auditStatusProps from '../helpers/auditStatusProps';
@@ -25,15 +25,15 @@ const AuditItem = ({ item, ...props }) => {
     const itemStatusStyle = item.Status == AuditStatusType.canceled ? 'opacity-6' : ''; 
 
     return (
-        <div {...props} className={`d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-2 ${itemStatusStyle}`}>
+        <div {...props} className={`d-flex justify-content-start align-items-top bg-gray-100 rounded-2 p-2 me-2 mb-2 gap-2 ${itemStatusStyle}`}>
             <div>
                 <FontAwesomeIcon 
                     icon={ auditStatusProps[item.Status].icon }
-                    className={`text-${ auditStatusProps[item.Status].variant} mx-2`} 
+                    className={`text-${ auditStatusProps[item.Status].variant}`} 
                     title={ auditStatusProps[item.Status].label }
                 />
             </div>
-            <div className="ms-2">
+            <div>
                 <h6 className="text-dark text-sm font-weight-bold mb-0">
                     {item.Description}
                 </h6>
@@ -54,9 +54,16 @@ const AuditItem = ({ item, ...props }) => {
                     }
                 </div>
                 <p className="text-secondary text-xs mb-0">
-                    Auditors: <span className={`badge bg-gradient-${ !!item.AuditorsCount && item.AuditorsCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.AuditorsCount ?? 0 }</span>
-                    Documents: <span className={`badge bg-gradient-${ !!item.DocumentsCount && item.DocumentsCount > 0 ? 'secondary' : 'light'} me-2`}>{ item.DocumentsCount ?? 0 }</span>  
-                    Has witness: <span className={`badge bg-gradient-${!!item.HasWitness ? 'secondary' : 'light'}`}>{ !!item.HasWitness ? 'yes':'no'}</span>
+                    Auditors: <span className={`badge text-bg-${ !!item.AuditorsCount && item.AuditorsCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.AuditorsCount ?? 0 }</span>
+                    Documents: <span className={`badge text-bg-${ !!item.DocumentsCount && item.DocumentsCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.DocumentsCount ?? 0 }</span>  
+                    Sites: <span className={`badge text-bg-${ !!item.SitesCount && item.SitesCount > 0 ? 'secondary text-white' : 'light'} me-2`}>{ item.SitesCount ?? 0 }</span>
+                    { item.HasWitness ? <span className="text-secondary me-2">
+                        <FontAwesomeIcon icon={ faEye } className="me-1" />Has Witness
+                    </span> : null }
+                    { item.IsMultisite ? <span className="text-dark me-2">
+                        <FontAwesomeIcon icon={ faCity } className="me-1" />
+                        Is Multisite
+                    </span> : null }
                 </p>
             </div>
             <div>

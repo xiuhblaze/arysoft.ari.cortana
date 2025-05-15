@@ -13,6 +13,7 @@ import AuditCycleEditItem from './AuditCycleEditItem';
 import AuditCyclesCardItem from './AuditCyclesCardItem';
 import auditStepProps from '../../audits/helpers/auditStepProps';
 import enums from '../../../helpers/enums';
+import auditCycleProps from '../helpers/auditCycleProps';
 //import envVariables from '../../../helpers/envVariables';
 
 const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props }) => {
@@ -154,22 +155,22 @@ const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props
                                     <div>
                                         <div className="d-flex justify-content-between align-items-center bg-gray-100 rounded-3 p-2 gap-2 mb-3">
                                             <div>
-                                                <h6 className="text-dark text-sm font-weight-bold mb-0">
+                                                <h6 className="text-dark font-weight-bold mb-0">
                                                     {auditCycle.Name}
                                                 </h6>
                                                 { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
                                                     <div className="d-flex justify-content-start align-items-start flex-wrap my-1 gap-2">
                                                         {
                                                             auditCycle.AuditCycleStandards.map(item => (
-                                                                <span key={item.ID}
-                                                                    className={`badge bg-gradient-${ item.Status == DefaultStatusType.active && item.StandardStatus == DefaultStatusType.active ? 'secondary' : 'light' } text-xs`}
-                                                                    title={ item.Status == DefaultStatusType.active ? 'Active' : 'Inactive' }
-                                                                >
+                                                                <div key={item.ID} className="d-flex justify-content-start align-items-center px-2 py-1 bg-gray-200 rounded-1 mb-1">
                                                                     <FontAwesomeIcon icon={ faLandmark } className="me-1" />
-                                                                    <span className="text-xs">
-                                                                        { item.StandardName } - { auditStepProps[item.InitialStep].abbreviation }
-                                                                    </span>
-                                                                </span>
+                                                                    <div>
+                                                                        <h6 className="text-xs mb-0">{ item.StandardName }</h6>
+                                                                        <p className="text-xs text-secondary mb-0">
+                                                                            <span title="Cycle type">{ auditCycleProps[item.CycleType].label }</span> | <span title="Initial step">{ auditStepProps[item.InitialStep].abbreviation.toUpperCase() }</span>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
                                                             ))
                                                         }
                                                     </div>
