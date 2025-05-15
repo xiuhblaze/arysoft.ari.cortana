@@ -33,10 +33,10 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
             .required('Must select a standard'),
-        initialStepSelect: Yup.string()
-            .required('Must select the initial step'),
         cycleTypeSelect: Yup.string()
             .required('Must select the cycle type'),
+        initialStepSelect: Yup.string()
+            .required('Must select the initial step'),
     });
 
     // CUSTOM HOOKS
@@ -70,6 +70,8 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [cycleTypeSelect, setCycleTypeSelect] = useState(null);
+    const [auditCycleStepList, setAuditCycleStepList] = useState([]);
 
     useEffect(() => {
         if (!!auditCycleStandard && showModal) {
@@ -89,8 +91,36 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                     order: StandardOrderType.name,
                 });
             }
+
+            setCycleTypeSelect(auditCycleStandard.CycleType);
         }
     }, [auditCycleStandard]);
+
+    useEffect(() => {
+        if (!!cycleTypeSelect && cycleTypeSelect != AuditCycleType.nothing) {
+            
+            if (cycleTypeSelect == AuditCycleType.initial) {
+                setAuditCycleStepList([
+                    { label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 },
+                    { label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 }, // Puede que inicie en ST2 y no se aplique ST1
+                ]);
+            } else if (cycleTypeSelect == AuditCycleType.recertification) {
+                setAuditCycleStepList([
+                    { label: auditStepProps[AuditStepType.recertification].label, value: AuditStepType.recertification},
+                ]);
+            } else if (cycleTypeSelect == AuditCycleType.transfer) {
+                setAuditCycleStepList([
+                    { label: auditStepProps[AuditStepType.recertification].label, value: AuditStepType.recertification},
+                    { label: auditStepProps[AuditStepType.surveillance1].label, value: AuditStepType.surveillance1},
+                    { label: auditStepProps[AuditStepType.surveillance2].label, value: AuditStepType.surveillance2},
+                ]);
+            } else {
+                setAuditCycleStepList([]);
+            }            
+        } else {
+            setAuditCycleStepList([]);
+        }
+    }, [cycleTypeSelect]);
 
     useEffect(() => {
         if (!!auditCycleStandardSavedOk && showModal) {
@@ -109,12 +139,6 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             onCloseModal();
         }        
     }, [auditCycleStandardsErrorMessage]);
-
-
-    // useEffect(() => {
-    //   console.log(organizationStandards);
-    // }, [organizationStandards]);
-    
     
     // METHODS
 
@@ -194,7 +218,6 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                                 { !id && <option value="">(select)</option> }
                                                 {
                                                     organizationStandards
-                                                        // .filter(item => (item.Status === DefaultStatusType.active))
                                                         .map(item =>
                                                             <option
                                                                 key={item.StandardID}
@@ -213,6 +236,10 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                             <AryFormikSelectInput
                                                 name="cycleTypeSelect"
                                                 label="Cycle type"
+                                                onChange={ e => {
+                                                    setCycleTypeSelect(e.target.value);
+                                                    formik.setFieldValue('cycleTypeSelect', e.target.value);
+                                                }}
                                             >
                                                 {
                                                     Object.keys(AuditCycleType).map(key =>
@@ -232,14 +259,15 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                                 name="initialStepSelect"
                                                 label="Initial step"
                                             >
+                                                <option value="">(select)</option>
                                                 {
-                                                    auditStepProps.map(item =>
+                                                    auditCycleStepList.map(item =>
                                                         <option
-                                                            key={item.id}
-                                                            value={item.id}
+                                                            key={item.value}
+                                                            value={item.value}
                                                             className="text-capitalize"
                                                         >
-                                                            {item.label === '-' ? '(select)' : item.label}
+                                                            {item.label}
                                                         </option>
                                                     )
                                                 }

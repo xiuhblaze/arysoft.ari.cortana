@@ -41,7 +41,9 @@ const AuditDocumentsList = ({ showAllFiles = false, readOnly = false, ...props }
 
             if (!!audit.Standards && audit.Standards.length > 0) {
                 const fsscStandard = audit.Standards.some(i => 
-                    i.StandardName.includes('FSSC') && i.Status == DefaultStatusType.active
+                    i.StandardName.includes('FSSC') 
+                    && i.Status == DefaultStatusType.active
+                    && i.StandardStatus == DefaultStatusType.active
                 );
 
                 setAboutFSSC({

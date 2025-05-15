@@ -13,6 +13,7 @@ import getSelectSearchOptions from '../../../helpers/getSelectSearchOptions';
 import getSelectSearchOptionSelected from '../../../helpers/getSelectSearchOptionSelected';
 import nacecodeAccreditedStatusProps from '../../nacecodes/helpers/nacecodeAccreditedStatusProps';
 import useNacecodesStore from '../../../hooks/useNaceCodesStore';
+import getCode from '../helpers/getCode';
 
 const AppFormEditNaceCodes = ({ ...props }) => {
 
@@ -120,12 +121,12 @@ const AppFormEditNaceCodes = ({ ...props }) => {
             });
     }; // onClickRemove
 
-    const getCode = (item) => {
-        return `${item.Sector.toString().padStart(2, '0')}.`
-            + `${item.Division != null && item.Division != undefined ? item.Division.toString().padStart(2, '0') + '.' : ''}`
-            + `${item.Group != null && item.Group != undefined ? item.Group.toString().padStart(2, '0') + '.' : ''}`
-            + `${item.Class != null && item.Class != undefined ? item.Class.toString().padStart(2, '0') + '.' : ''}`;
-    };
+    // const getCode = (item) => {
+    //     return `${item.Sector.toString().padStart(2, '0')}.`
+    //         + `${item.Division != null && item.Division != undefined ? item.Division.toString().padStart(2, '0') + '.' : ''}`
+    //         + `${item.Group != null && item.Group != undefined ? item.Group.toString().padStart(2, '0') + '.' : ''}`
+    //         + `${item.Class != null && item.Class != undefined ? item.Class.toString().padStart(2, '0') + '.' : ''}`;
+    // };
 
     const getNacecodeDescription = (item, isSector = true) => {
         const accretiditation = item.AccreditedStatus == NaceCodeAccreditedType.accredited 

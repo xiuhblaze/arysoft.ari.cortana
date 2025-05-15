@@ -58,15 +58,25 @@ export const NaceTableList = memo(() => {
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th className={`${headStyle} text-start`}>Code</th>
                                     <th className={headStyle}>NACE Description</th>
                                     <th className={`${headStyle} text-center`}>Status</th>
-                                    <th className={`${headStyle} text-center`}>Action</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {nacecodes.map(item => (
                                     <tr key={item.ID} className={item.Status === DefaultStatusType.deleted ? 'opacity-6' : ''}>
+                                        <td>
+                                            <div className="d-flex justify-content-center">
+                                                { item.Status !== DefaultStatusType.deleted && (
+                                                    <Link to={`${item.ID}`} title="Edit">
+                                                        <FontAwesomeIcon icon={faEdit} />
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td>
                                             <div className="d-flex justify-content-start align-items-center">
                                                 <div 

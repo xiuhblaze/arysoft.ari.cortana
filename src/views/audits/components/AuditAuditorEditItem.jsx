@@ -218,42 +218,53 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
     // AUDIT STANDARDS
 
     const addStandardSelected = () => {
-        // console.log('addStandardSelected', standardSelect);
 
-        if (!isNullOrEmpty(standardSelect)) {
-            
-            // // validar que el standard seleccionado no sea una que ya este asignado
-            // if (!!auditAuditor?.AuditStandards && auditAuditor.AuditStandards.length > 0) {
-            //     const existStandard = auditAuditor.AuditStandards.find(i => i.ID == standardSelect);
-            //     //console.log('existStandard', existStandard);
-            //     if (!!existStandard) {
-            //         // Swal.fire('Error', 'The standard is already assigned', 'error');
-            //         // console.log('El standard seleccionado ya está asignado');
-            //         return;
-            //     }
-            // }
+        if (standardSelect == 'all') {
+            const tmpStandardsList = [];
 
-            auditStandardAddAsync(standardSelect)
-                .then(data => {
-                    console.log('data', data);
-                    if (!!data) {
-                        //auditAuditorAsync(auditAuditor.ID); // Refrescar la lista de standards
-                        //setIsForUpdateStandard(true); // Para que no actualice los initialValues
-                        setStandardSelect(''); // reiniciar el select
-                        const currentStandard = auditStandards.find(i => i.ID == standardSelect); // audit.Standards.find(i => i.ID == standardSelect);
-                        setStandardsList([
-                            ...standardsList,
-                            {
-                                ID: currentStandard.ID,
-                                StandardName: currentStandard.StandardName,
-                            }
-                        ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
-                        formikRef.current.setFieldValue('standardsCountHidden', standardsList.length + 1);
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                });
+            auditStandards.forEach(auditStandard => {
+                const item = standardsList.find(i => i.ID == auditStandard.ID);
+                if (!item) { // Si no existe lo agregamos
+
+                    tmpStandardsList.push({ // Estoy confiando en que la asignación va a ser correcta
+                        ID: auditStandard.ID,
+                        StandardName: auditStandard.StandardName,
+                    });
+
+                    auditStandardAddAsync(auditStandard.ID);
+                } 
+            });
+
+            if (tmpStandardsList.length > 0) {
+                setStandardSelect('');
+                setStandardsList([
+                    ...standardsList,
+                    ...tmpStandardsList,
+                ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
+                formikRef?.current?.setFieldValue('standardsCountHidden', standardsList.length + tmpStandardsList.length); 
+            }
+        } else if (!isNullOrEmpty(standardSelect)) {
+            const item = standardsList.find(i => i.ID == standardSelect);
+
+            if (!item) {
+                auditStandardAddAsync(standardSelect)
+                    .then(data => {
+                        if (!!data) {
+                            const currentStandard = auditStandards.find(i => i.ID == standardSelect);
+                            setStandardSelect(''); // reiniciar el select
+                            setStandardsList([
+                                ...standardsList,
+                                {
+                                    ID: currentStandard.ID,
+                                    StandardName: currentStandard.StandardName,
+                                }
+                            ].sort((a, b) => a.StandardName.localeCompare(b.StandardName)));
+                            formikRef?.current?.setFieldValue('standardsCountHidden', standardsList.length + 1);
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    });
+            }
         }
     }; // addStandardSelected
 
@@ -375,6 +386,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                                     </option>
                                                                 ))
                                                             }
+                                                            <option value="all">All</option>
                                                         </select>
                                                     </div>
                                                 </Col>
@@ -383,10 +395,11 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                         <label className="form-label">&nbsp;</label>
                                                         <button 
                                                             type='button' 
-                                                            className="btn bg-gradient-secondary text-white"
+                                                            className="btn btn-link text-dark"
                                                             onClick={addStandardSelected}
+                                                            title="This action will add the selected standard to the list and leave the select field empty to select another standard"
                                                         >
-                                                            Add another
+                                                            Add Another
                                                         </button>
                                                     </div>
                                                 </Col>
@@ -489,7 +502,7 @@ const AuditAuditorEditItem = ({ id, ...props }) => {
                                                     Active
                                                 </label>
                                             </div>
-                                        </Col>
+                                        </Col>                                        
                                     </Row>
                                 </Modal.Body>
                                 <Modal.Footer>

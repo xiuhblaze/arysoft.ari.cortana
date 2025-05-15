@@ -41,6 +41,7 @@ const CatAuditorDocumentsTable = () => {
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th className={ headStyle }>Document</th>
                                     <th className={ headStyle }>Info</th>
                                     <th className={ headStyle }>Warning</th>

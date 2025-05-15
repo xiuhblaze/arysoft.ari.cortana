@@ -1,6 +1,6 @@
 import enums from "../../../helpers/enums";
 
-const appFormStatusOptions = (appFormCurrentStatus) => {
+const appFormStatusOptions = (appFormCurrentStatus) => { //! Optimizar esto, con appformstatustype o optionsprops, estoy duplicando el codigo Jajaja
     
     const { AppFormStatusType } = enums();
 
@@ -64,15 +64,15 @@ const appFormStatusOptions = (appFormCurrentStatus) => {
         case AppFormStatusType.active:
             return [
                 currentOption,
-                { value: AppFormStatusType.inactive, label: 'Inactive' },
+                { value: AppFormStatusType.inactive, label: 'Inactive' }, // Mostrar advertencia que no se va a poder editar
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
             break;
         case AppFormStatusType.inactive:
             return [
                 currentOption,
-                { value: AppFormStatusType.active, label: 'Active' },
-                { value: AppFormStatusType.cancel, label: 'Cancel' },
+                // { value: AppFormStatusType.active, label: 'Active' },
+                // { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
             break;
         case AppFormStatusType.cancel:

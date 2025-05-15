@@ -334,6 +334,16 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    // Roles
+
+    const RoleOrderType = Object.freeze({
+        nothing: 0,
+        name: 1,
+        updated: 2,
+        nameDesc: 3,
+        updatedDesc: 4,
+    });
+
     // Shifts
 
     const ShiftOrderType = Object.freeze({
@@ -397,13 +407,22 @@ const enums = () => {
 
     // Users
 
+    const UserOrderType = Object.freeze({
+        nothing: 0,
+        username: 1,
+        email: 2,
+        updated: 3,
+        usernameDesc: 4,
+        emailDesc: 5,
+        updatedDesc: 6,
+    });
+
     const UserType = Object.freeze({
         nothing: 0,
-        admin: 1,
-        auditor: 2,
-        organization: 3,
-        sales: 4,
-        superAdmin: 5,
+        superAdmin: 1,
+        admin: 2,
+        auditor: 3,
+        organization: 4,
     });
 
     return {
@@ -442,11 +461,13 @@ const enums = () => {
         OrganizationOrderType,
         OrganizationStatusType,
         OrganizationStandardOrderType,
+        RoleOrderType,
         ShiftOrderType,
         ShiftType,
         SiteOrderType,
         StandardOrderType,
         StandardBaseType,
+        UserOrderType,
         UserType,
     }
 };

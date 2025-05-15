@@ -155,7 +155,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                 title={!!id ? 'Edit current audit cycle' : 'Add new audit cycle'}
                 onClick={onShowModal}
             >
-                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} size="lg" className="text-dark" />
+                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} size="xl" className="text-dark" />
             </button>
             <Modal show={showModal} onHide={onCloseModal}>
                 <Modal.Header closeButton>

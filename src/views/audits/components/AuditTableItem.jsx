@@ -17,7 +17,7 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
     return (
         <tr {...props} className={className}>
             <td>
-                <div className="d-flex justify-content-center align-items-center mx-1">
+                <div className="d-flex justify-content-center align-items-center">
                     {
                         !!onEditClick ?  
                         <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
@@ -42,7 +42,7 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                     <div className="d-flex flex-column align-items-start">
                         <h6 className="mb-0 text-sm text-wrap">{item.Description}</h6>
                         <p className="text-xs text-secondary mb-0">
-                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') } / { getDateDifferenceInUpperDays(item.StartDate, item.EndDate) + 1 } Days
+                            { format(new Date(item.StartDate), 'dd/MM/yyyy') } - { format(new Date(item.EndDate), 'dd/MM/yyyy') } / { item.Days ?? getDateDifferenceInUpperDays(item.StartDate, item.EndDate) + 1 } Days
                         </p>
                     </div>
                 </div>
@@ -101,6 +101,16 @@ const AuditTableItem = ({ item, className, onEditClick, ...props }) => {
                             <FontAwesomeIcon icon={ faStickyNote } className="text-secondary me-1" title="no extra info" />
                         )
 
+                    }
+                </div>
+            </td>
+            <td>
+                <div className="d-flex justify-content-center align-items-center mx-1">
+                    {
+                        !!onEditClick ?  
+                        <a href="#" onClick={() => onEditClick(item.ID)} title="Edit">
+                            <FontAwesomeIcon icon={faEdit} />
+                        </a> : null
                     }
                 </div>
             </td>

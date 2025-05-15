@@ -89,7 +89,10 @@ const OrganizationsTableList = ({ applicantsOnly = false, ...props }) => {
                 isOrganizationsLoading ? (
                     <ViewLoading />
                 ) : !!organizations ? (
-                    <div className="table-responsive p-0">
+                    <div className="table-responsive p-0" style={{
+                        maxHeight: '65vh',
+                        overflowY: 'auto'
+                    }}>
                         <table className="table align-items-center mb-0">
                             <thead>
                                 <tr>

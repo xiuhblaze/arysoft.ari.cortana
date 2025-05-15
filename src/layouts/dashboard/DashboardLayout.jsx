@@ -31,7 +31,7 @@ export const DashboardLayout = ({ help = null, children }) => {
       <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
         <DashboardNavbar />
         { children }
-        <DashboardFooter />
+        {/* <DashboardFooter /> */}
       </main>
       <Configurator help={ help } />
     </>

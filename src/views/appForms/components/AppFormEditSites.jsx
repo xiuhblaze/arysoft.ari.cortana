@@ -119,9 +119,9 @@ const AppFormEditSites = ({ ...props }) => {
                             sitesList
                                 //.sort((a, b) => a.Description.localeCompare(b.Description))
                                 .map(item => 
-                                    <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 ps-0 text-xs">
+                                    <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 px-0 text-xs">
                                         <div className='d-flex justify-content-between align-items-center'>
-                                            <span>
+                                            <span className="d-flex flex-row flex-wrap align-items-center">
                                                 <span className="text-dark font-weight-bold">
                                                     {item.Description}
                                                 </span>
@@ -131,12 +131,12 @@ const AppFormEditSites = ({ ...props }) => {
                                                 </span>
                                                 <span className="text-secondary ms-2">
                                                     <FontAwesomeIcon icon={ faUsers } className="me-1" />
-                                                    {item.EmployeesCount}
+                                                    Employees {item.EmployeesCount}
                                                 </span>
                                             </span>
                                             <button
                                                 type="button"
-                                                className="btn btn-link p-0 mb-0 text-secondary"
+                                                className="btn btn-link px-1 py-0 mb-0 text-secondary"
                                                 onClick={() => onClickRemove(item.ID)}
                                                 title="Delete"
                                                 disabled={isDeleting == item.ID}

@@ -156,7 +156,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                 </div>
                                             </div>
                                             <div className="d-flex justify-content-start gap-3 mt-1 mb-0">
-                                                <AuditList />
+                                                <AuditList showAllFiles={ showAllFiles } />
                                             </div>
                                         </div>
                                     </div>

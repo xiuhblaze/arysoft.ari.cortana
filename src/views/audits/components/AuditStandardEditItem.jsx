@@ -15,10 +15,12 @@ import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Fo
 import auditStepProps from "../helpers/auditStepProps";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 import Swal from "sweetalert2";
+import { setAuditStandards } from "../../../store/slices/auditStandardsSlice";
 
 const AuditStandardEditItem = ({ id, ...props }) => {
 
     const {
+        AuditStepType,
         DefaultStatusType
     } = enums();
 
@@ -54,6 +56,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
         isAuditStandardSaving,
         auditStandardSavedOk,
         auditStandard,
+        auditStandards,
         auditStandardsErrorMessage,
 
         auditStandardsAsync,
@@ -74,6 +77,9 @@ const AuditStandardEditItem = ({ id, ...props }) => {
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
+    const [standardSelect, setStandardSelect] = useState(null);
+    const [auditStepList, setAuditStepList] = useState([]);
+
     useEffect(() => {
         if (!!auditStandard && showModal) {
             setInitialValues({
@@ -88,8 +94,59 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                 auditCycleID: audit.AuditCycleID,
                 pageSize: 0,
             });
+
+            setStandardSelect(auditStandard.StandardID);
         }
     }, [auditStandard]);
+
+    useEffect(() => {
+
+        if (showModal) {
+            const firstStandardActive = auditStandards.find(standard => standard.Status == DefaultStatusType.active);
+
+            if (!!firstStandardActive && firstStandardActive.Step == AuditStepType.special) {
+                setAuditStepList([
+                    { label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special },
+                ]);
+            } else if (!!standardSelect && standardSelect != DefaultStatusType.nothing) {
+                var auditCycleStandard = auditCycleStandards.find(i => i.StandardID == standardSelect);
+
+                if (!!auditCycleStandard) {
+                    const auditStandardsTmp = [];
+                    if (auditCycleStandard.InitialStep == AuditStepType.stage1) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.stage2) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance1) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.surveillance2) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });
+
+                    } else if (auditCycleStandard.InitialStep == AuditStepType.recertification) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.recertification].label , value: AuditStepType.recertification });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance1].label , value: AuditStepType.surveillance1 });
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.surveillance2].label , value: AuditStepType.surveillance2 });                    
+                    }
+
+                    if (!!auditStandards && auditStandards.length == 0) {
+                        auditStandardsTmp.push({label: auditStepProps[AuditStepType.special].label , value: AuditStepType.special });
+                    }
+
+                    setAuditStepList(auditStandardsTmp);
+                }
+            }
+        }
+    }, [standardSelect]);
+    
     
     useEffect(() => {
         if (!!auditStandardSavedOk && showModal) {
@@ -179,6 +236,10 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                 name="standardSelect"
                                                 label="Standard"
                                                 disabled={!!id}
+                                                onChange={ (e) => {
+                                                    setStandardSelect(e.target.value);
+                                                    formik.setFieldValue('standardSelect', e.target.value);
+                                                }}
                                             >
                                                 { !id && <option value="">(select)</option> }
                                                 {
@@ -190,6 +251,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                                 value={item.StandardID}
                                                                 className="text-capitalize"
                                                                 disabled={item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active}
+                                                                title={item.Status != DefaultStatusType.active || item.StandardStatus != DefaultStatusType.active ? 'Inactive' : 'Select'}
                                                             >
                                                                 {item.StandardName}
                                                             </option>
@@ -202,7 +264,17 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                 name="stepSelect"
                                                 label="Step"
                                             >
-                                                {
+                                                <option value="">(select)</option>
+                                                { auditStepList.map(item =>
+                                                    <option
+                                                        key={item.value}
+                                                        value={item.value}
+                                                        className="text-capitalize"
+                                                    >
+                                                        {item.label}
+                                                    </option>
+                                                )}
+                                                {/* {
                                                     auditStepProps.map(item =>
                                                         <option
                                                             key={item.id}
@@ -212,7 +284,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                                             {item.label === '-' ? '(select)' : item.label}
                                                         </option>
                                                     )
-                                                }
+                                                } */}
                                             </AryFormikSelectInput>
                                         </Col>
                                         <Col xs="12">
@@ -238,7 +310,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                                             </div>
                                         </Col>
                                         {
-                                            !!id && !!auditStandard && auditStandard.StandardStatus != DefaultStatusType.active ?
+                                            !!id && !!auditStandard && auditStandard.Status != DefaultStatusType.active ?
                                             <Col xs="12">
                                                 <Alert variant="warning">
                                                     <FontAwesomeIcon icon={ faExclamationTriangle } className="text-white me-2" size="lg" />

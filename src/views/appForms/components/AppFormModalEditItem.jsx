@@ -62,7 +62,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         legalRequirementsInput: '',
         anyCriticalComplaintCheck: false,
         criticalComplaintCommentsInput: '',
-        automationLevelInput: '',
+        automationLevelPercentInput: '',
+        automationLevelJustificationInput: '',
         isDesignResponsibilityCheck: false,
         designResponsibilityJustificationInput: '',
         // General
@@ -186,7 +187,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 legalRequirementsInput: appForm.LegalRequirements ?? '',
                 anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
                 criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
-                automationLevelInput: appForm.AutomationLevel ?? '',
+                automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
+                automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
                 isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
                 designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
                 // General
@@ -336,7 +338,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             LegalRequirements: values.legalRequirementsInput,
             AnyCriticalComplaint: values.anyCriticalComplaintCheck,
             CriticalComplaintComments: values.criticalComplaintCommentsInput,
-            AutomationLevel: values.automationLevelInput,
+            AutomationLevelPercent: values.automationLevelPercentInput,
+            AutomationLevelJustification: values.automationLevelJustificationInput,
             IsDesignResponsibility: values.isDesignResponsibilityCheck,
             DesignResponsibilityJustify: values.designResponsibilityJustificationInput, // Corregir
             // General
@@ -465,7 +468,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         </Row>
                                     </div>
                                     <Row className="mt-4">
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12" sm="5">
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <Row>
@@ -617,7 +620,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 </Card.Body>
                                             </Card>
                                         </Col>
-                                        <Col xs="12" sm="6">
+                                        <Col xs="12" sm="7">
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <AppFormPreview formik={formik} />
