@@ -323,6 +323,13 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
             // onCloseModal(); // Probando el evitar cerrar la modal al guardar
         }
     }, [auditSavedOk]);
+
+    useEffect(() => {
+        if (!!auditDeletedOk && show) {
+            Swal.fire('Audit', `Audit deleted successfully`, 'success');            
+            onCloseModal();
+        }
+    }, [auditDeletedOk]);
         
     useEffect(() => {
         if (!!auditsErrorMessage && show) {
@@ -395,8 +402,20 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
     const onDeleteAudit = () => {
 
-        console.log('AuditModalEditItem.onDeleteAudit', audit.ID);
-        //auditDeleteAsync(audit.ID);
+        Swal.fire({
+            title: 'Deleted audit',
+            text:  'The audit has already been deleted',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                auditDeleteAsync(audit.ID);
+                onCloseModal();
+            }
+        });
     };
 
     const onCloseModal = () => {
@@ -803,8 +822,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                         audit.Status >= AuditStatusType.canceled ?
                                                                         <button type="button"
                                                                             className="btn btn-link text-danger mb-0"
-                                                                            onClick={ () => console.log('delete') }
+                                                                            onClick={ onDeleteAudit }
                                                                             title="Delete audit"
+                                                                            disabled={ isAuditDeleting }
                                                                         >
                                                                             <FontAwesomeIcon icon={ faTrashCan } className="me-1" size="lg" />
                                                                             Delete
@@ -815,7 +835,9 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
                                                                 <div>
                                                                     <button type="submit"
                                                                         className="btn bg-gradient-dark mb-0"
-                                                                        disabled={ isAuditSaving || !hasChanges }
+                                                                        disabled={ isAuditSaving 
+                                                                            || !hasChanges 
+                                                                            || isAuditDeleting }
                                                                     >
                                                                         {
                                                                             isAuditSaving 

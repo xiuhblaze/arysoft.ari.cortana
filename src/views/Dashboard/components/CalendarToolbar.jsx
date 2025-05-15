@@ -11,6 +11,7 @@ import envVariables from '../../../helpers/envVariables';
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
 import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import { useAuthStore } from '../../../hooks/useAuthStore';
 
 const CalendarToolbar = ({ ...props }) => {
     const {
@@ -47,6 +48,8 @@ const CalendarToolbar = ({ ...props }) => {
     };
 
     // CUSTOM HOOKS
+
+    const { ROLES, hasRole } = useAuthStore();
 
     const {
         isAuditsLoading,
@@ -269,21 +272,24 @@ const CalendarToolbar = ({ ...props }) => {
                                                 )}
                                             </AryFormikSelectInput>
                                         </div>
-                                        <div className="col-12 col-sm-auto">
-                                            <div className="p-2 bg-gray-100 border-radius-md mb-3">
-                                                <div className="form-check form-switch">
-                                                    <input id="includeDeletedCheck" name="includeDeletedCheck"
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        onChange={formik.handleChange}
-                                                        checked={formik.values.includeDeletedCheck}
-                                                    />
-                                                    <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
-                                                        <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {
+                                            hasRole(ROLES.admin) ?
+                                                <div className="col-12 col-sm-auto">
+                                                    <div className="p-2 bg-gray-100 border-radius-md mb-3">
+                                                        <div className="form-check form-switch">
+                                                            <input id="includeDeletedCheck" name="includeDeletedCheck"
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                onChange={formik.handleChange}
+                                                                checked={formik.values.includeDeletedCheck}
+                                                            />
+                                                            <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
+                                                                <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div> : null
+                                        }
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">

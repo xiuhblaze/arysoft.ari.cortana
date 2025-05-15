@@ -6,11 +6,20 @@ import { jwtDecode } from "jwt-decode";
 import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
 import isString from "../helpers/isString";
+import isNullOrEmpty from "../helpers/isNullOrEmpty";
 
 const AUTH_URL = '/auth';
 const { VITE_TOKEN } = envVariables();
 
 export const useAuthStore = () => {
+
+    const ROLES = Object.freeze({
+        admin: 'admin',
+        editor: 'editor',
+        auditor: 'auditor',
+        readonly: 'readonly',
+        sales: 'sales',
+    });
 
     // HOOKS 
 
@@ -42,9 +51,9 @@ export const useAuthStore = () => {
         const user = {
             id: userInfo.nameid,
             username: userInfo.unique_name,
-            givename: userInfo.unique_name,
+            givename: userInfo.given_name,
             useremail: userInfo.email,
-            role: userInfo.role,
+            roles: userInfo.role,
             exp: new Date(userInfo.exp * 1000).getTime(),
         };
 
@@ -153,15 +162,38 @@ export const useAuthStore = () => {
         return null;
     }; // validatePasswordAsync
 
+    /**
+     * Si existe un usuario con el rol especificado
+     * @param {string} role
+     * @returns true if the user has the specified role
+     */
+    const hasRole = (role) => {
+
+        if (!user) return false;
+
+        if (user.roles != null) {
+            if (Array.isArray(user.roles)) {
+                return user.roles.some(r => r.toLowerCase() == role.toLowerCase());
+            } else if (!isNullOrEmpty(user.roles)) {
+                return user.roles.toLowerCase() == role.toLowerCase();
+            } 
+        }
+
+        return false;
+    }; // hasRole
+
     return {
+        ROLES,
+        
         status,
         user,
         userErrorMessage,
 
+        changePasswordAsync,
         checkAuthToken,
+        hasRole,
         loginASync,
         logout,
-        changePasswordAsync,
         validatePasswordAsync,
     }
 };

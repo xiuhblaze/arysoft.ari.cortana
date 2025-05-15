@@ -192,7 +192,7 @@ export const useAuditsStore = () => {
         dispatch(onAuditDeleting());
 
         const toDelete = {
-            AuditID: id,
+            ID: id,
             UpdatedUser: user.username,
         }
 

@@ -9,6 +9,7 @@ import { Form, Formik } from 'formik';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
 import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import { useAuthStore } from '../../../hooks/useAuthStore';
 
 const CatAuditorDocumentsToolbar = () => {
     const formDefaultData = {
@@ -37,6 +38,8 @@ const CatAuditorDocumentsToolbar = () => {
     } = defaultCSSClasses();
 
     // CUSTOM HOOKS
+
+    const { ROLES, hasRole } = useAuthStore();
 
     const {
         isCatAuditorDocumentCreating,
@@ -211,21 +214,24 @@ const CatAuditorDocumentsToolbar = () => {
                                                 )}
                                             </AryFormikSelectInput>
                                         </div>
-                                        <div className="col-auto ps-sm-0">
-                                            <div className="p-2 bg-gray-100 border-radius-md mb-3">
-                                                <div className="form-check form-switch">
-                                                    <input id="includeDeletedCheck" name="includeDeletedCheck"
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        onChange={formik.handleChange}
-                                                        checked={formik.values.includeDeletedCheck}
-                                                    />
-                                                    <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
-                                                        <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {
+                                            hasRole(ROLES.admin) ?
+                                                <div className="col-auto ps-sm-0">
+                                                    <div className="p-2 bg-gray-100 border-radius-md mb-3">
+                                                        <div className="form-check form-switch">
+                                                            <input id="includeDeletedCheck" name="includeDeletedCheck"
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                onChange={formik.handleChange}
+                                                                checked={formik.values.includeDeletedCheck}
+                                                            />
+                                                            <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
+                                                                <FontAwesomeIcon icon={ faTrash } size="lg" title="Show deleted records" />
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div> : null
+                                        }
                                     </div> {/* row */}
                                 </div>
                                 <div className="d-flex justify-content-between gap-2 mb-3">

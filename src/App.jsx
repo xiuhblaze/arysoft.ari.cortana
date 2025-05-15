@@ -5,7 +5,7 @@ import { useAuthStore } from './hooks/useAuthStore';
 
 import Loading from './views/loading';
 
-import publicRoute from './routes/publicRoutes';
+//import publicRoute from './routes/publicRoutes';
 import privateRoute from './routes/privateRoutes';
 
 import './app.css';
@@ -50,7 +50,7 @@ function App() {
                 status === 'authenticated' ? (
                     <>
                         {renderRoutes(privateRoute)}
-                        {renderRoutes(publicRoute)}
+                        {/* {renderRoutes(publicRoute)} */}
                         <Route path="/profile" element={ <Profile /> } />
                         <Route path="/users/*" element={ <LazyUsers /> } />
                         <Route path="/*" element={<Navigate to={privateRoute[0].path} />} />

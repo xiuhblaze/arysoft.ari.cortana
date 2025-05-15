@@ -10,6 +10,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
 const UserRolesAdmin = () => {
     const { RoleOrderType } = enums();
+    
     // CUSTOM HOOKS
 
     const {
@@ -57,7 +58,6 @@ const UserRolesAdmin = () => {
 
         if (isNullOrEmpty(roleSelect)) return;
 
-        console.log('onRoleAddClick: roleSelect', roleSelect);
         userRoleAddAsync(roleSelect)
             .then(data => {
                 if (!!data) {
