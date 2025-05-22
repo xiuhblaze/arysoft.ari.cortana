@@ -1,7 +1,8 @@
+import React from "react";
 import { useField } from "formik";
 
 // Basado en: https://codesandbox.io/s/formik-v2-tutorial-added-textarea-ujz18
-export const AryFormikTextInput = ({ label, classNameDiv, startLabel, endLabel, helpText, innerRef, ...props }) => {
+export const AryFormikTextInput = React.memo(({ label, classNameDiv, startLabel, endLabel, helpText, innerRef, ...props }) => {
     const [field, meta] = useField(props);
     const { className, ...baseProps } = props;
 
@@ -34,6 +35,6 @@ export const AryFormikTextInput = ({ label, classNameDiv, startLabel, endLabel, 
             }
         </div>
     );
-};
+});
 
 export default AryFormikTextInput;
