@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Card, Col, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faChevronLeft, faChevronRight, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -10,11 +10,18 @@ import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 
-import { clearAppFormController, setContactsList, setNacecodesList, setSitesList, setStandardData, useAppFormController } from "../context/appFormContext";
+import { 
+    clearAppFormController, 
+    setContactsList,
+    setNacecodesList, 
+    setOrganizationData, 
+    setSitesList, 
+    setStandardData, 
+    useAppFormController 
+} from "../context/appFormContext";
 
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import { ViewLoading } from "../../../components/Loaders";
-import AppFormEditNaceCodes from "./AppFormEditNaceCodes";
 import AppFormStepOrganization from "./AppFormStepOrganization";
 import AppFormPreview from "./AppFormPreview";
 import appFormStatusOptions from "../helpers/appFormStatusOptions";
@@ -25,7 +32,8 @@ import enums from "../../../helpers/enums";
 import FormLoading from "../../../components/Loaders/FormLoading";
 import standardBaseProps from "../../standards/helpers/standardBaseProps";
 
-import AryFormDebug from "../../../components/Forms/AryFormDebug";
+// import AryFormDebug from "../../../components/Forms/AryFormDebug";
+
 import AppFormStepStandard from "./AppFormStepStandard";
 import AppFormStepGeneral from "./AppFormStepGeneral";
 import navOptions from "../helpers/appFormNavOptions";
@@ -37,9 +45,9 @@ import NotesListModal from "../../notes/components/NotesListModal";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 
 const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
-    // console.log('AppFormModalEditItem');
     const [ controller, dispatch ] = useAppFormController();
     const { 
+        organiationData,
         standardData,
         contactsList,
         nacecodesList,
@@ -141,8 +149,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         return appFormValidationSchema(appForm?.Status ?? AppFormStatusType.nothing);
     }, [appForm?.Status ?? AppFormStatusType.nothing]);
 
-    
-
     useEffect(() => {
 
         if (!!show) {
@@ -178,40 +184,52 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
 
         if (!!appForm && !!show) { //* Aquí se debe de iniciar todo del context 
-            setInitialValues({
-                standardSelect: appForm.Standard?.StandardBase ?? '',
-                // 9K
-                activitiesScopeInput: appForm.ActivitiesScope ?? '',
-                processServicesCountInput: appForm.ProcessServicesCount ?? '',
-                processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
-                legalRequirementsInput: appForm.LegalRequirements ?? '',
-                anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
-                criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
-                automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
-                automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
-                isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
-                designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
-                // General
-                auditLanguageSelect: appForm.AuditLanguage ?? 'es',
-                currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
-                currentStandardsInput: appForm.CurrentStandards ?? '',
-                currentCertificationsByInput: appForm.CurrentCertificationsBy ?? '',
-                outsourcedProcessInput: appForm.OutsourcedProcess ?? '',
-                anyConsultancyCheck: appForm.AnyConsultancy ?? false,
-                anyConsultancyByInput: appForm.AnyConsultancyBy ?? '',
-                statusSelect: !!appForm?.Status && appForm.Status != AppFormStatusType.nothing
-                    ? appForm.Status
-                    : AppFormStatusType.new,
-                // Validations
-                commentsInput: '',
-                // salesCommentsInput: appForm.SalesComments ?? '',
-                // reviewJustificationInput: appForm.ReviewJustification ?? '',
-                // reviewCommentsInput: appForm.ReviewComments ?? '',
-                // Hidden
-                contactsCountHidden: !!appForm.Contacts ? appForm.Contacts.length : 0,
-                nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
-                sitesCountHidden: !!appForm.Sites ? appForm.Sites.length : 0,
-            });
+
+            if (appForm.Status >= AppFormStatusType.inactive) {
+                if (!!appForm.HistoricalDataJSON) {
+                    loadFromHistoricalData();
+                } else {
+                    Swal.fire('App Form', 'The historical data is not available, contact the system administrator', 'warning');
+                    onCloseModal();
+                }
+            } else {
+                loadFromRealData();
+            }
+
+            // setInitialValues({
+            //     standardSelect: appForm.Standard?.StandardBase ?? '',
+            //     // 9K
+            //     activitiesScopeInput: appForm.ActivitiesScope ?? '',
+            //     processServicesCountInput: appForm.ProcessServicesCount ?? '',
+            //     processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
+            //     legalRequirementsInput: appForm.LegalRequirements ?? '',
+            //     anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
+            //     criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
+            //     automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
+            //     automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
+            //     isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
+            //     designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
+            //     // General
+            //     auditLanguageSelect: appForm.AuditLanguage ?? 'es',
+            //     currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
+            //     currentStandardsInput: appForm.CurrentStandards ?? '',
+            //     currentCertificationsByInput: appForm.CurrentCertificationsBy ?? '',
+            //     outsourcedProcessInput: appForm.OutsourcedProcess ?? '',
+            //     anyConsultancyCheck: appForm.AnyConsultancy ?? false,
+            //     anyConsultancyByInput: appForm.AnyConsultancyBy ?? '',
+            //     statusSelect: !!appForm?.Status && appForm.Status != AppFormStatusType.nothing
+            //         ? appForm.Status
+            //         : AppFormStatusType.new,
+            //     // Validations
+            //     commentsInput: '',
+            //     // salesCommentsInput: appForm.SalesComments ?? '',
+            //     // reviewJustificationInput: appForm.ReviewJustification ?? '',
+            //     // reviewCommentsInput: appForm.ReviewComments ?? '',
+            //     // Hidden
+            //     contactsCountHidden: !!appForm.Contacts ? appForm.Contacts.length : 0,
+            //     nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
+            //     sitesCountHidden: !!appForm.Sites ? appForm.Sites.length : 0,
+            // });
 
             if (!organization || organization.ID != appForm.OrganizationID) {
                 organizationAsync(appForm.OrganizationID);
@@ -221,17 +239,17 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 auditCycleAsync(appForm.AuditCycleID);
             }
 
-            if (!!appForm.Contacts && appForm.Contacts.length > 0) {
-                setContactsList(dispatch, appForm.Contacts);
-            }
+            // if (!!appForm.Contacts && appForm.Contacts.length > 0) {
+            //     setContactsList(dispatch, appForm.Contacts);
+            // }
 
-            if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
-                setNacecodesList(dispatch, appForm.Nacecodes);
-            }
+            // if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
+            //     setNacecodesList(dispatch, appForm.Nacecodes);
+            // }
 
-            if (!!appForm.Sites && appForm.Sites.length > 0) {
-                setSitesList(dispatch, appForm.Sites);
-            }
+            // if (!!appForm.Sites && appForm.Sites.length > 0) {
+            //     setSitesList(dispatch, appForm.Sites);
+            // }
 
             setStandardData(dispatch, {
                 ...standardData,
@@ -272,7 +290,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {        
         if (!!contactsList && formikRef?.current != null) {
-            formikRef.current.setFieldValue('contactsCountHidden', contactsList.length);
+            formikRef.current.setFieldValue('contactsCountHidden', 
+                contactsList.filter(cl => cl.Status == DefaultStatusType.active).length);
         }
     }, [contactsList]);
 
@@ -284,11 +303,133 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         if (!!sitesList && formikRef?.current != null) {
-            formikRef.current.setFieldValue('sitesCountHidden', sitesList.length);
+            formikRef.current.setFieldValue('sitesCountHidden', 
+                sitesList.filter(sl => sl.Status == DefaultStatusType.active).length);
         }
     }, [sitesList]);
     
     // METHODS 
+
+    const loadFromHistoricalData = () => {
+        const historicalData = JSON.parse(appForm.HistoricalDataJSON);
+        // console.log('loadFromHistoricalData', historicalData);
+
+        setInitialValues({
+            standardSelect: appForm.Standard?.StandardBase ?? '',
+            // 9K
+            activitiesScopeInput: appForm.ActivitiesScope ?? '',
+            processServicesCountInput: appForm.ProcessServicesCount ?? '',
+            processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
+            legalRequirementsInput: appForm.LegalRequirements ?? '',
+            anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
+            criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
+            automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
+            automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
+            isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
+            designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
+            // General
+            auditLanguageSelect: appForm.AuditLanguage ?? 'es',
+            currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
+            currentStandardsInput: appForm.CurrentStandards ?? '',
+            currentCertificationsByInput: appForm.CurrentCertificationsBy ?? '',
+            outsourcedProcessInput: appForm.OutsourcedProcess ?? '',
+            anyConsultancyCheck: appForm.AnyConsultancy ?? false,
+            anyConsultancyByInput: appForm.AnyConsultancyBy ?? '',
+            statusSelect: appForm.Status,
+            // Internal
+            commentsInput: '',
+            // Hidden
+            contactsCountHidden: !!historicalData.Contacts ? historicalData.Contacts.length : 0,
+            nacecodesCountHidden: !!historicalData.Nacecodes ? historicalData.Nacecodes.length : 0,
+            sitesCountHidden: !!historicalData.Sites ? historicalData.Sites.length : 0,
+        });
+
+        if (!!historicalData.Sites && historicalData.Sites.length > 0) {
+            setSitesList(dispatch, historicalData.Sites);
+        }
+
+        if (!!historicalData.Contacts && historicalData.Contacts.length > 0) {
+            setContactsList(dispatch, historicalData.Contacts);
+        }
+
+        if (!!historicalData.NaceCodes && historicalData.NaceCodes.length > 0) {  
+            setNacecodesList(dispatch, historicalData.NaceCodes);
+        }
+
+        setOrganizationData(dispatch, {
+            OrganizationName: historicalData.OrganizationName,
+            AuditCycleName: historicalData.AuditCycleName,
+            Website: historicalData.Website,
+            Phone: historicalData.Phone,
+            Companies: historicalData.Companies,
+        })
+
+    }; // loadFromHistoricalData
+
+    const loadFromRealData = () => {
+        
+        // console.log('loadFromRealData', appForm);
+
+        setInitialValues({
+            standardSelect: appForm.Standard?.StandardBase ?? '',
+            // 9K
+            activitiesScopeInput: appForm.ActivitiesScope ?? '',
+            processServicesCountInput: appForm.ProcessServicesCount ?? '',
+            processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
+            legalRequirementsInput: appForm.LegalRequirements ?? '',
+            anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
+            criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
+            automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
+            automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
+            isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
+            designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
+            // General
+            auditLanguageSelect: appForm.AuditLanguage ?? 'es',
+            currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
+            currentStandardsInput: appForm.CurrentStandards ?? '',
+            currentCertificationsByInput: appForm.CurrentCertificationsBy ?? '',
+            outsourcedProcessInput: appForm.OutsourcedProcess ?? '',
+            anyConsultancyCheck: appForm.AnyConsultancy ?? false,
+            anyConsultancyByInput: appForm.AnyConsultancyBy ?? '',
+            statusSelect: !!appForm?.Status && appForm.Status != AppFormStatusType.nothing
+                ? appForm.Status
+                : AppFormStatusType.new,
+            // Internal
+            commentsInput: '',
+            // salesCommentsInput: appForm.SalesComments ?? '',
+            // reviewJustificationInput: appForm.ReviewJustification ?? '',
+            // reviewCommentsInput: appForm.ReviewComments ?? '',
+            // Hidden
+            contactsCountHidden: !!appForm.Contacts 
+                ? appForm.Contacts.filter(c => c.Status == DefaultStatusType.active).length
+                : 0,
+            nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
+            sitesCountHidden: !!appForm.Sites 
+                ? appForm.Sites.filter(s => s.Status == DefaultStatusType.active).length
+                : 0,
+        });
+
+        if (!!appForm.Contacts && appForm.Contacts.length > 0) {
+            setContactsList(dispatch, appForm.Contacts);
+        }
+
+        if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
+            setNacecodesList(dispatch, appForm.Nacecodes);
+        }
+
+        if (!!appForm.Sites && appForm.Sites.length > 0) {
+            setSitesList(dispatch, appForm.Sites);
+        }
+
+        setOrganizationData(dispatch, {
+            OrganizationName: appForm.Organization.Name,
+            AuditCycleName: appForm.AuditCycle.Name,
+            Website: appForm.Organization.Website,
+            Phone: appForm.Organization.Phone,
+            Companies: appForm.Organization.Companies
+                .filter(company => company.Status == DefaultStatusType.active),
+        })
+    }; // loadFromRealData
 
     const onStandardSelectChange = (e) => {
         const selectedValue = e.target.value;
@@ -300,13 +441,18 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     };
 
     const onFormSubmit = (values) => {
+
+        if (!!appForm.Status && appForm.Status >= AppFormStatusType.inactive) {
+            Swal.fire('App Form', 'You cannot change the data of an inactive application form', 'warning');
+            return;
+        }
+
         let salesComments = appForm.SalesComments;
         let applicantComments = appForm.ReviewComments;
         let newStatus = appForm.Status == AppFormStatusType.nothing
             ? AppFormStatusType.new
             : values.statusSelect;
 
-        //console.log('appForm.Status != newStatus', appForm.Status, newStatus); 
         if (appForm.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + appFormStatusProps[newStatus].label.toUpperCase();
 
@@ -321,9 +467,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             if (newStatus == AppFormStatusType.applicantRejected || newStatus == AppFormStatusType.active) {
                 applicantComments = values.commentsInput;
             } 
-            
-            // console.log('salesComments', salesComments);
-            // console.log('applicantComments', applicantComments);
         } 
 
         const standard = auditCycle.AuditCycleStandards.find(acs => acs.StandardBase == values.standardSelect);
@@ -525,15 +668,15 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             />
                                                             {
                                                                 navOption == navOptions.organization &&
-                                                                <AppFormStepOrganization formik={ formik } />
+                                                                <AppFormStepOrganization formik={ formik } readonly={ appForm.Status >= AppFormStatusType.inactive } />
                                                             }
                                                             { 
                                                                 navOption == navOptions.standard &&
-                                                                <AppFormStepStandard formik={ formik } />
+                                                                <AppFormStepStandard formik={ formik } readonly={ appForm.Status >= AppFormStatusType.inactive } />
                                                             }
                                                             {
                                                                 navOption == navOptions.general &&
-                                                                <AppFormStepGeneral formik={ formik } />
+                                                                <AppFormStepGeneral formik={ formik } readonly={ appForm.Status >= AppFormStatusType.inactive } />
                                                             }
                                                             <AppFormNavPrevNext 
                                                                 navOption={navOption} 
@@ -664,7 +807,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <button 
                                                 type="submit"
                                                 className="btn bg-gradient-dark mb-0"
-                                                disabled={ isAppFormSaving || !hasChanges }
+                                                disabled={ isAppFormSaving || !hasChanges || appForm.Status >= AppFormStatusType.inactive }
                                             >
                                                 {
                                                     isAppFormSaving 

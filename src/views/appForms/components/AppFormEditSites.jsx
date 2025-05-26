@@ -1,16 +1,16 @@
+import { useState } from "react";
+
 import { Col, ListGroup, Row } from "react-bootstrap"
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
-import { useEffect, useState } from "react";
-import { AryFormikSelectInput } from "../../../components/Forms";
-import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
-import enums from "../../../helpers/enums";
+import { faBuilding, faSpinner, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faPlus, faSpinner, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { useAppFormsStore } from "../../../hooks/useAppFormsStore";
 import Swal from "sweetalert2";
+
 import { setSitesList, useAppFormController } from "../context/appFormContext";
 import { useSitesStore } from "../../../hooks/useSiteStore";
+import enums from "../../../helpers/enums";
 
-const AppFormEditSites = ({ ...props }) => {
+const AppFormEditSites = ({ readonly = false, ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
     const { sitesList } = controller;
     const { DefaultStatusType} = enums();
@@ -36,6 +36,9 @@ const AppFormEditSites = ({ ...props }) => {
     };
 
     const onClickAdd = () => {
+
+        if (readonly) { return; }
+
         setIsAddging(true);
         siteAddAsync(siteSelected)
             .then(data => {
@@ -60,6 +63,9 @@ const AppFormEditSites = ({ ...props }) => {
     }; // onClickAdd
 
     const onClickRemove = (id) => {
+
+        if (readonly) { return; }
+
         setIsDeleting(id);
         siteDelAsync(id)
             .then(data => {
@@ -77,49 +83,60 @@ const AppFormEditSites = ({ ...props }) => {
 
     return (
         <Row {...props}>
-            <Col xs="8" sm="10">
-                <label className="form-label">Sites</label>
-                <select 
-                    className="form-select" 
-                    value={siteSelected ?? ''} 
-                    onChange={onSiteSelected}
-                    disabled={ isAdding || isDeleting }
-                >
-                    <option value="">(select a site)</option>
-                    {
-                        !!sites && sites.length > 0 && sites.map(site => ( 
-                            <option 
-                                key={site.ID} 
-                                value={site.ID}
-                                disabled={ site.Status != DefaultStatusType.active }
+            {
+                readonly ? (
+                    <Col xs="8" sm="10">
+                        <label className="form-label">Sites</label>
+                    </Col>
+                ) : (
+                <>
+                    <Col xs="8" sm="10">
+                        <label className="form-label">Sites</label>
+                        <select 
+                            className="form-select" 
+                            value={siteSelected ?? ''} 
+                            onChange={onSiteSelected}
+                            disabled={ isAdding || isDeleting || readonly }
+                        >
+                            <option value="">(select a site)</option>
+                            {
+                                !!sites && sites.length > 0 && sites.map(site => ( 
+                                    <option 
+                                        key={site.ID} 
+                                        value={site.ID}
+                                        disabled={ site.Status != DefaultStatusType.active }
+                                    >
+                                        {site.Description}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </Col>
+                    <Col xs="4" sm="2">
+                        <div className="d-grid gap-1 align-items-end">
+                            <label className="form-label">&nbsp;</label>
+                            <button type="button"
+                                className="btn btn-link text-dark px-2"
+                                onClick={onClickAdd}
+                                disabled={isAdding || readonly}
                             >
-                                {site.Description}
-                            </option>
-                        ))
-                    }
-                </select>
-            </Col>
-            <Col xs="4" sm="2">
-                <div className="d-grid gap-1 align-items-end">
-                    <label className="form-label">&nbsp;</label>
-                    <button type="button"
-                        className="btn btn-link text-dark px-2"
-                        onClick={onClickAdd}
-                        disabled={isAdding}
-                    >
-                        { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
-                    </button>
-                </div>
-            </Col>
+                                { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
+                            </button>
+                        </div>
+                    </Col>
+                </>
+            )}
             <Col xs="12">
                 {
                     !!sitesList && sitesList.length > 0 && 
                     <ListGroup variant="flush" className="mb-3">
                         {
                             sitesList
-                                //.sort((a, b) => a.Description.localeCompare(b.Description))
                                 .map(item => 
-                                    <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 px-0 text-xs">
+                                    <ListGroup.Item key={item.ID} 
+                                        className={`bg-transparent border-0 py-1 px-0 text-xs${ item.Status != DefaultStatusType.active ? ' opacity-6' : ''}`}
+                                        title={ item.Status != DefaultStatusType.active ? 'Inactive' : '' }
+                                    >
                                         <div className='d-flex justify-content-between align-items-center'>
                                             <span className="d-flex flex-row flex-wrap align-items-center">
                                                 <span className="text-dark font-weight-bold">
@@ -139,7 +156,7 @@ const AppFormEditSites = ({ ...props }) => {
                                                 className="btn btn-link px-1 py-0 mb-0 text-secondary"
                                                 onClick={() => onClickRemove(item.ID)}
                                                 title="Delete"
-                                                disabled={isDeleting == item.ID}
+                                                disabled={isDeleting == item.ID || readonly}
                                             >
                                                 {
                                                     isDeleting == item.ID 

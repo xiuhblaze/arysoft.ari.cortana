@@ -4,7 +4,7 @@ import { Col, Row } from "react-bootstrap";
 import AppFormEditSites from "./AppFormEditSites";
 import AppFormEditContacts from "./AppFormEditContacts";
 
-const AppFormStepOrganization = ({ formik, ...props }) => {
+const AppFormStepOrganization = ({ formik, readonly = false, ...props }) => {
     return (
         <Row {...props}>
             <Col xs="12">
@@ -12,7 +12,7 @@ const AppFormStepOrganization = ({ formik, ...props }) => {
                     <Col xs="12">
                         <div className="mb-3">
                             <div className="bg-light border-radius-md p-3 pb-0">
-                                <AppFormEditSites />
+                                <AppFormEditSites readonly={readonly} />
                             </div>
                             <Field name="sitesCountHidden" type="hidden" value={formik.values.sitesCountHidden} />
                             {
@@ -24,7 +24,7 @@ const AppFormStepOrganization = ({ formik, ...props }) => {
                     <Col xs="12">
                         <div className="mb-3">
                             <div className="bg-light border-radius-md p-3 pb-0">
-                                <AppFormEditContacts />
+                                <AppFormEditContacts readonly={readonly} />
                             </div>
                             <Field name="contactsCountHidden" type="hidden" value={formik.values.contactsCountHidden} />
                             {

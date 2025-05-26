@@ -5,6 +5,7 @@ const AppFormContext = createContext(null);
 const AppFormControllerProvider = ({ children }) => {
 
     const initialState = {
+        organizationData: null,
         standardData: null,
         contactsList: [],        
         nacecodesList: [],
@@ -15,6 +16,9 @@ const AppFormControllerProvider = ({ children }) => {
 
     const reducer = (state, action) => {
         switch (action.type) {
+            case 'SET_ORGANIZATION_DATA': {
+                return { ...state, organizationData: action.value };
+            }
             case 'SET_STANDARD_DATA': {
                 return { ...state, standardData: action.value };
             }
@@ -53,6 +57,7 @@ const useAppFormController = () => {
     return context;
 }; // useAppFormController
 
+const setOrganizationData = (dispatch, value) => dispatch({ type: "SET_ORGANIZATION_DATA", value });
 const setStandardData = (dispatch, value) => dispatch({ type: "SET_STANDARD_DATA", value });
 const setContactsList = (dispatch, value) => dispatch({ type: "SET_CONTACTS_LIST", value });
 const setNacecodesList = (dispatch, value) => dispatch({ type: "SET_NACECODES_LIST", value });
@@ -62,6 +67,7 @@ const clearAppFormController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER"
 export { 
     AppFormControllerProvider, 
     useAppFormController,
+    setOrganizationData,
     setStandardData,
     setContactsList,
     setNacecodesList,

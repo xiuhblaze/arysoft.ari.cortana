@@ -5,7 +5,7 @@ import { Field } from 'formik'
 import AppFormEditNaceCodes from './AppFormEditNaceCodes'
 import { AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms'
 
-const AppFormISO9K = ({ formik, ...props }) => {
+const AppFormISO9K = ({ formik, readonly = false, ...props }) => {
 
     // HOOKS
 
@@ -19,7 +19,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                 <Col xs="12">
                     <div className="mb-3">
                         <div className="bg-light border-radius-md p-3 pb-0">
-                            <AppFormEditNaceCodes />
+                            <AppFormEditNaceCodes readonly={readonly} />
                         </div>
                         <Field name="nacecodesCountHidden" type="hidden" value={formik.values.nacecodesCountHidden} />
                         {
@@ -32,6 +32,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                     <AryFormikTextInput
                         name="activitiesScopeInput"
                         label="Process activities/scope"
+                        disabled={readonly}
                     />
                 </Col>
                 <Col xs="12">
@@ -45,12 +46,14 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                 placeholder="0"
                                 className="text-end"
                                 helpText="Number of process/services"
+                                disabled={readonly}
                             />
                         </Col>
                         <Col xs="12" sm="9">
                             <AryFormikTextArea
                                 name="processServicesDescriptionInput"
                                 helpText="Description of process/services"
+                                disabled={readonly}
                             />
                         </Col>
                     </Row>
@@ -59,6 +62,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                     <AryFormikTextInput
                         name="legalRequirementsInput"
                         label="Legal requirements associated with product/service"
+                        disabled={readonly}
                     />
                 </Col>
                 <Col xs="12">
@@ -75,6 +79,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                             setShowAnyCriticalComplaintComments(isChecked);
                                         }}
                                         checked={formik.values.anyCriticalComplaintCheck}
+                                        disabled={readonly}
                                     />
                                     <label
                                         className="form-check-label"
@@ -98,6 +103,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                 <AryFormikTextArea
                                     name="criticalComplaintCommentsInput"
                                     label="Comments"
+                                    disabled={readonly}
                                 />
                             </Col>
                         </Row>
@@ -114,6 +120,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                 placeholder="0%"
                                 className="text-end"
                                 helpText="Percentage (%)"
+                                disabled={readonly}
                             />
                         </Col>
                         <Col xs="12" sm="9">
@@ -121,6 +128,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                 name="automationLevelJustificationInput"
                                 placeholder="Justification"
                                 helpText="Degree of implementation of processes in which labor is little involved"
+                                disabled={readonly}
                             />
                         </Col>
                     </Row>
@@ -138,6 +146,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                             formik.setFieldValue('isDesignResponsibilityCheck', isChecked);
                                         }}
                                         checked={formik.values.isDesignResponsibilityCheck}
+                                        disabled={readonly}
                                     />
                                     <label
                                         className="form-check-label"
@@ -154,6 +163,7 @@ const AppFormISO9K = ({ formik, ...props }) => {
                                     name="designResponsibilityJustificationInput"
                                     label="Justification"
                                     helpText="If you're NOT responsible for design, explain why and who is in charge of this process"
+                                    disabled={readonly}
                                 />
                             </Col>
                         </Row>

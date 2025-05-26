@@ -1,21 +1,21 @@
-import { Col, ListGroup, Modal, Row } from 'react-bootstrap';
-import { faBars, faLandmark, faPlus, faSpinner, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Col, ListGroup, Modal, Row } from 'react-bootstrap';
+import { faBars, faLandmark, faSpinner, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Select from 'react-select';
 import Swal from 'sweetalert2';
 
 import { setNacecodesList, useAppFormController } from '../context/appFormContext';
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
-import consoleLog from '../../../helpers/consoleLog';
 import enums from '../../../helpers/enums'
+import getCode from '../helpers/getCode';
 import getSelectSearchOptions from '../../../helpers/getSelectSearchOptions';
 import getSelectSearchOptionSelected from '../../../helpers/getSelectSearchOptionSelected';
 import nacecodeAccreditedStatusProps from '../../nacecodes/helpers/nacecodeAccreditedStatusProps';
 import useNacecodesStore from '../../../hooks/useNaceCodesStore';
-import getCode from '../helpers/getCode';
 
-const AppFormEditNaceCodes = ({ ...props }) => {
+const AppFormEditNaceCodes = ({ readonly = false, ...props }) => {
 
     const [ controller, dispatch ] = useAppFormController();
     const { nacecodesList } = controller;
@@ -56,12 +56,16 @@ const AppFormEditNaceCodes = ({ ...props }) => {
 
     useEffect(() => {
         // Cargar lista de nacecodes para seleccionar
-        nacecodesAsync({
-            // onlyOption: NaceCodeOnlyOptionType.sectors,
-            pageSize: 0,
-            includeDeleted: false,
-            order: NacecodeOrderType.sector,
-        });
+        //console.log('nacecodesList', nacecodesList);
+
+        if (!readonly) {
+            nacecodesAsync({
+                // onlyOption: NaceCodeOnlyOptionType.sectors,
+                pageSize: 0,
+                includeDeleted: false,
+                order: NacecodeOrderType.sector,
+            });
+        }
         
     }, []);
 
@@ -78,7 +82,9 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     // METHODS
 
     const onClickAdd = (itemSelected, isSector = true) => {
-        // consoleLog('AppFormEditNaceCodes.onClickAdd[]: itemSelected', itemSelected, isSector);
+        
+        if (readonly) { return; }
+
         setIsAddging(true);
         naceCodeAddAsync(itemSelected)
             .then(data => {
@@ -107,6 +113,9 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     }; // onClickAdd
 
     const onClickRemove = (id) => {
+
+        if (readonly) { return; }
+
         setIsDeleting(id);
         naceCodeDelAsync(id)
             .then(data => {
@@ -121,19 +130,12 @@ const AppFormEditNaceCodes = ({ ...props }) => {
             });
     }; // onClickRemove
 
-    // const getCode = (item) => {
-    //     return `${item.Sector.toString().padStart(2, '0')}.`
-    //         + `${item.Division != null && item.Division != undefined ? item.Division.toString().padStart(2, '0') + '.' : ''}`
-    //         + `${item.Group != null && item.Group != undefined ? item.Group.toString().padStart(2, '0') + '.' : ''}`
-    //         + `${item.Class != null && item.Class != undefined ? item.Class.toString().padStart(2, '0') + '.' : ''}`;
-    // };
-
     const getNacecodeDescription = (item, isSector = true) => {
         const accretiditation = item.AccreditedStatus == NaceCodeAccreditedType.accredited 
             ? ' (accredited)' 
             : item.AccreditedStatus == NaceCodeAccreditedType.mustAccredited 
                 ? ' (must accredited)'
-                : '';
+                : ' (not accredited)';
 
         return `${getCode(item)} ${ item.Description }${ accretiditation }`;
     };
@@ -151,6 +153,9 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     // MODAL
 
     const onShowModal = (item) => {
+
+        if (readonly) { return; }
+
         setShowModal(true);
         setNacecodesSubtreeList(
             nacecodes.filter(nc => nc.Sector == item.Sector)
@@ -174,49 +179,75 @@ const AppFormEditNaceCodes = ({ ...props }) => {
     
     return (
         <Row {...props}>
-            <Col xs="8" sm="10">
-                <label className="form-label">Sector</label>
-                <Select name="nacecodesSelect"
-                    options={ getSelectSearchOptions(getNacecodeList, 'ID', 'Description') }
-                    value={ getSelectSearchOptionSelected(getNacecodeList, 'ID', 'Description', nacecodeSelected) }
-                    onChange={item => setNacecodeSelected(item.value)}
-                    placeholder={ isNacecodeLoading ? 'Loading...' : 'select' }
-                />
-            </Col>
-            <Col xs="4" sm="2">
-                <div className="d-grid gap-1 align-items-end">
-                    <label className="form-label">&nbsp;</label>
-                    <button type="button" 
-                        className="btn btn-link text-dark px-2"
-                        onClick={() => onClickAdd(nacecodeSelected)}
-                        disabled={isAdding}
-                    >
-                        { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
-                    </button>
-                </div>
-            </Col>
+            {
+                readonly ? (
+                    <Col xs="8" sm="10">
+                        <label className="form-label">Sector</label>
+                    </Col>
+                ) : (
+                    <>
+                        <Col xs="8" sm="10">
+                            <label className="form-label">Sector</label>
+                            <Select name="nacecodesSelect"
+                                options={ getSelectSearchOptions(getNacecodeList, 'ID', 'Description') }
+                                value={ getSelectSearchOptionSelected(getNacecodeList, 'ID', 'Description', nacecodeSelected) }
+                                onChange={item => setNacecodeSelected(item.value)}
+                                placeholder={ isNacecodeLoading ? 'Loading...' : 'select' }
+                            />
+                        </Col>
+                        <Col xs="4" sm="2">
+                            <div className="d-grid gap-1 align-items-end">
+                                <label className="form-label">&nbsp;</label>
+                                <button type="button" 
+                                    className="btn btn-link text-dark px-2"
+                                    onClick={() => onClickAdd(nacecodeSelected)}
+                                    disabled={isAdding}
+                                >
+                                    { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
+                                </button>
+                            </div>
+                        </Col>
+                    </>
+                )
+            }
             <Col xs="12">
                 {
                     !!nacecodesList && nacecodesList.length > 0 && 
                     <ListGroup variant="flush" className="mb-3">
                         {
                             nacecodesList
-                                //.sort((a, b) => a.Description.localeCompare(b.Description))
                                 .map(item => 
                                     <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 px-0 text-xs">
                                         <div className='d-flex justify-content-between align-items-center'>
-                                            <span>
-                                                <FontAwesomeIcon icon={ faLandmark } className="me-2" />
-                                                <span className="text-dark font-weight-bold">
-                                                    {getCode(item)} {item.Description}
-                                                </span>
-                                            </span>
+                                            <div className="d-flex justify-content-start align-items-center">
+                                                <FontAwesomeIcon icon={ faLandmark } className="me-2" size="lg" />
+                                                <div className="d-flex flex-column">
+                                                    <div className="text-dark font-weight-bold">
+                                                        {getCode(item)} {item.Description}
+                                                    </div>
+                                                    <div className={`text-${item.AccreditedStatus == NaceCodeAccreditedType.accredited 
+                                                        ? 'success'
+                                                        : item.AccreditedStatus == NaceCodeAccreditedType.mustAccredited 
+                                                            ? 'warning'
+                                                            : 'secondary'
+                                                    }`}>
+                                                        { !!item.AccreditedStatus ? ( 
+                                                            item.AccreditedStatus == NaceCodeAccreditedType.accredited 
+                                                            ? '(accredited)'
+                                                            : item.AccreditedStatus == NaceCodeAccreditedType.mustAccredited 
+                                                                ? '(must accredited)'
+                                                                : '(not accredited)'
+                                                        ) : null }
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div className="d-flex justify-content-end gap-2">
                                                 <button
                                                     type="button"
                                                     className="btn btn-link p-1 mb-0 text-secondary"
                                                     onClick={() => onShowModal(item)}
                                                     title="Edit"
+                                                    disabled={readonly}
                                                 >
                                                     <FontAwesomeIcon icon={ faBars } />
                                                 </button>
@@ -225,7 +256,7 @@ const AppFormEditNaceCodes = ({ ...props }) => {
                                                     className="btn btn-link p-1 mb-0 text-secondary"
                                                     onClick={() => onClickRemove(item.ID)}
                                                     title="Delete"
-                                                    disabled={isDeleting == item.ID}
+                                                    disabled={isDeleting == item.ID || readonly}
                                                 >
                                                     {
                                                         isDeleting == item.ID 
