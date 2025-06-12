@@ -1,5 +1,6 @@
-import { configureStore, isImmutableDefault } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 
+import adcsSlice from "./slices/adcsSlice";
 import appFormsSlice from "./slices/appFormsSlice";
 import auditAuditorsSlice from "./slices/auditAuditorsSlice";
 import auditCycleDocumentsSlice from "./slices/auditCycleDocumentsSlice";
@@ -28,6 +29,7 @@ import usersSlice from "./slices/usersSlice";
 
 export const store = configureStore({
     reducer: {
+        adcs: adcsSlice.reducer,
         appForms: appFormsSlice.reducer,
         auditAuditors: auditAuditorsSlice.reducer,
         auditCycleDocuments: auditCycleDocumentsSlice.reducer,

@@ -390,9 +390,10 @@ const enums = () => {
         iso27K: 4,
         iso37K: 5,
         iso45K: 6,
-        fssc22K: 7,
-        haccp: 8,
-        gMarkets: 9,
+        fssc22K: 7,     // Food Safety System Certification 22000
+        haccp: 8,       // Hazard Analysis and Critical Control Points
+        gMarkets: 9,    // Global Markets
+        sqf: 10,        // Safe Quality Food
     });
 
     const StandardOrderType = Object.freeze({

@@ -196,41 +196,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 loadFromRealData();
             }
 
-            // setInitialValues({
-            //     standardSelect: appForm.Standard?.StandardBase ?? '',
-            //     // 9K
-            //     activitiesScopeInput: appForm.ActivitiesScope ?? '',
-            //     processServicesCountInput: appForm.ProcessServicesCount ?? '',
-            //     processServicesDescriptionInput: appForm.ProcessServicesDescription ?? '',
-            //     legalRequirementsInput: appForm.LegalRequirements ?? '',
-            //     anyCriticalComplaintCheck: appForm.AnyCriticalComplaint ?? false,
-            //     criticalComplaintCommentsInput: appForm.CriticalComplaintComments ?? '',
-            //     automationLevelPercentInput: appForm.AutomationLevelPercent ?? '',
-            //     automationLevelJustificationInput: appForm.AutomationLevelJustification ?? '',
-            //     isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
-            //     designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
-            //     // General
-            //     auditLanguageSelect: appForm.AuditLanguage ?? 'es',
-            //     currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
-            //     currentStandardsInput: appForm.CurrentStandards ?? '',
-            //     currentCertificationsByInput: appForm.CurrentCertificationsBy ?? '',
-            //     outsourcedProcessInput: appForm.OutsourcedProcess ?? '',
-            //     anyConsultancyCheck: appForm.AnyConsultancy ?? false,
-            //     anyConsultancyByInput: appForm.AnyConsultancyBy ?? '',
-            //     statusSelect: !!appForm?.Status && appForm.Status != AppFormStatusType.nothing
-            //         ? appForm.Status
-            //         : AppFormStatusType.new,
-            //     // Validations
-            //     commentsInput: '',
-            //     // salesCommentsInput: appForm.SalesComments ?? '',
-            //     // reviewJustificationInput: appForm.ReviewJustification ?? '',
-            //     // reviewCommentsInput: appForm.ReviewComments ?? '',
-            //     // Hidden
-            //     contactsCountHidden: !!appForm.Contacts ? appForm.Contacts.length : 0,
-            //     nacecodesCountHidden: !!appForm.Nacecodes ? appForm.Nacecodes.length : 0,
-            //     sitesCountHidden: !!appForm.Sites ? appForm.Sites.length : 0,
-            // });
-
             if (!organization || organization.ID != appForm.OrganizationID) {
                 organizationAsync(appForm.OrganizationID);
             }
@@ -238,18 +203,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             if (!auditCycle || auditCycle.ID != appForm.AuditCycleID) {
                 auditCycleAsync(appForm.AuditCycleID);
             }
-
-            // if (!!appForm.Contacts && appForm.Contacts.length > 0) {
-            //     setContactsList(dispatch, appForm.Contacts);
-            // }
-
-            // if (!!appForm.Nacecodes && appForm.Nacecodes.length > 0) {
-            //     setNacecodesList(dispatch, appForm.Nacecodes);
-            // }
-
-            // if (!!appForm.Sites && appForm.Sites.length > 0) {
-            //     setSitesList(dispatch, appForm.Sites);
-            // }
 
             setStandardData(dispatch, {
                 ...standardData,
@@ -421,14 +374,16 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setSitesList(dispatch, appForm.Sites);
         }
 
-        setOrganizationData(dispatch, {
-            OrganizationName: appForm.Organization.Name,
-            AuditCycleName: appForm.AuditCycle.Name,
-            Website: appForm.Organization.Website,
-            Phone: appForm.Organization.Phone,
-            Companies: appForm.Organization.Companies
-                .filter(company => company.Status == DefaultStatusType.active),
-        })
+        if (organization != null && auditCycle != null) {
+            setOrganizationData(dispatch, {
+                OrganizationName: organization.Name,
+                AuditCycleName: auditCycle.Name,
+                Website: organization.Website,
+                Phone: organization.Phone,
+                Companies: organization.Companies
+                    .filter(company => company.Status == DefaultStatusType.active),
+            })
+        }
     }; // loadFromRealData
 
     const onStandardSelectChange = (e) => {
@@ -690,7 +645,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             <Col xs="12">
                                                                 <Alert className="text-sm text-white list-group-item-warning">
                                                                     <h6 className="text-sm text-white font-weight-bold">
-                                                                        Sales comments
+                                                                        Comments for review
                                                                     </h6>
                                                                     <p className="text-xs text-white mb-0">
                                                                         {appForm.SalesComments}
@@ -708,7 +663,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             <Col xs="12">
                                                                 <Alert className="text-sm text-white list-group-item-warning">
                                                                     <h6 className="text-sm text-white font-weight-bold">
-                                                                        Review comments
+                                                                        Reviewer comments
                                                                     </h6>
                                                                     <p className="text-xs text-white mb-0">
                                                                         {appForm.ReviewComments}
@@ -760,6 +715,32 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             </Col>
                                                         </Row>  
                                                     }
+                                                    <Row>
+                                                        <Col xs="12" className="text-center">
+                                                        {
+                                                            appForm.Status == AppFormStatusType.active ? ( // ! Aqui voy... Revisar bien este código.
+                                                                !!appForm?.ADCs && appForm.ADCs.filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-info text-white mb-0"
+                                                                        onClick={ () => console.log('Generate Audit Day Calculation Form...') }    
+                                                                    >
+                                                                        Generate Audit Day Calculation Form
+                                                                    </button>
+                                                                ) : (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-secondary text-white mb-0"
+                                                                        onClick={ () => console.log('onClick') }
+                                                                        disabled
+                                                                    >
+                                                                        Generate Audit Day Calculation Form
+                                                                    </button>
+                                                                )
+                                                            ) : null
+                                                        }
+                                                        </Col>
+                                                    </Row>
                                                 </Card.Body>
                                             </Card>
                                         </Col>
