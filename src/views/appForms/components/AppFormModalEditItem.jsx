@@ -486,6 +486,10 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         appFormClear();
         setShowModal(false);
+    }; // actionsForCloseModal
+
+    const onGenerateADC = () => {
+        console.log('onGenerateADC');
     };
 
     return (
@@ -718,25 +722,24 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                     <Row>
                                                         <Col xs="12" className="text-center">
                                                         {
-                                                            appForm.Status == AppFormStatusType.active ? ( // ! Aqui voy... Revisar bien este código.
+                                                            appForm.Status < AppFormStatusType.active ? (
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn bg-secondary text-white mb-0"
+                                                                    disabled
+                                                                >
+                                                                    Generate Audit Day Calculation Form
+                                                                </button>
+                                                            ) : appForm.Status == AppFormStatusType.active ? ( // ! Aqui voy... Revisar bien este código.
                                                                 !!appForm?.ADCs && appForm.ADCs.filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
                                                                     <button
                                                                         type="button"
                                                                         className="btn bg-info text-white mb-0"
-                                                                        onClick={ () => console.log('Generate Audit Day Calculation Form...') }    
+                                                                        onClick={ onGenerateADC }
                                                                     >
                                                                         Generate Audit Day Calculation Form
                                                                     </button>
-                                                                ) : (
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn bg-secondary text-white mb-0"
-                                                                        onClick={ () => console.log('onClick') }
-                                                                        disabled
-                                                                    >
-                                                                        Generate Audit Day Calculation Form
-                                                                    </button>
-                                                                )
+                                                                ) : null
                                                             ) : null
                                                         }
                                                         </Col>

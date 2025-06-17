@@ -1,5 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import adcConceptsSlice from "./slices/adcConceptsSlice";
+import adcConceptValuesSlice from "./slices/adcConceptValuesSlice";
+import adcSitesSlice from "./slices/adcSitesSlice";
 import adcsSlice from "./slices/adcsSlice";
 import appFormsSlice from "./slices/appFormsSlice";
 import auditAuditorsSlice from "./slices/auditAuditorsSlice";
@@ -17,6 +20,7 @@ import catAuditorDocumentsSlice from "./slices/catAuditorDocumentsSlice";
 import certificatesSlice from "./slices/certificatesSlice";
 import companiesSlice from "./slices/companiesSlice";
 import contactsSlice from "./slices/contactsSlice";
+import md5sSlice from "./slices/md5sSlice";
 import nacecodesSlice from "./slices/nacecodesSlice";
 import notesSlice from "./slices/notesSlice";
 import organizationsSlice from "./slices/organizationsSlice";
@@ -29,7 +33,10 @@ import usersSlice from "./slices/usersSlice";
 
 export const store = configureStore({
     reducer: {
+        adcConcepts: adcConceptsSlice.reducer,
+        adcConceptValues: adcConceptValuesSlice.reducer,
         adcs: adcsSlice.reducer,
+        adcSites: adcSitesSlice.reducer,
         appForms: appFormsSlice.reducer,
         auditAuditors: auditAuditorsSlice.reducer,
         auditCycleDocuments: auditCycleDocumentsSlice.reducer,
@@ -46,6 +53,7 @@ export const store = configureStore({
         certificates: certificatesSlice.reducer,
         companies: companiesSlice.reducer,
         contacts: contactsSlice.reducer,
+        md5s: md5sSlice.reducer,
         nacecodes: nacecodesSlice.reducer,
         notes: notesSlice.reducer,
         organizations: organizationsSlice.reducer,

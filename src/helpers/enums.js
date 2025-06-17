@@ -15,6 +15,32 @@ const enums = () => {
         danger: 3,
     });
 
+    // ADC
+
+    const ADCConceptOrderType = Object.freeze({
+        nothing: 0,
+        indexSort: 1,
+        description: 2,
+        indexSortDesc: 3,
+        descriptionDesc: 4,
+    });
+
+    const ADCConceptUnitType = Object.freeze({
+        nothing: 0,     // No se ha definido unidad
+        percentage: 1,  // Porcentaje
+        days: 2,        // Días
+    });
+
+    // ADC Sites
+
+    const ADCSiteOrderType = Object.freeze({
+        nothing: 0,
+        siteDescription: 1,
+        isMainSite: 2,
+        siteDescriptionDesc: 3,
+        isMainSiteDesc: 4,
+    });
+
     // Application Forms
 
     const AppFormOrderType = Object.freeze({
@@ -430,6 +456,9 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
+        ADCConceptOrderType,
+        ADCConceptUnitType,
+        ADCSiteOrderType,
         AppFormOrderType,
         AppFormStatusType,
         AuditCycleStandardsOrderType,
