@@ -21,8 +21,10 @@ const enums = () => {
         nothing: 0,
         indexSort: 1,
         description: 2,
-        indexSortDesc: 3,
-        descriptionDesc: 4,
+        standard: 3,
+        indexSortDesc: 4,
+        descriptionDesc: 5,
+        standardDesc: 6,
     });
 
     const ADCConceptUnitType = Object.freeze({

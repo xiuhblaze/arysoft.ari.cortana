@@ -43,6 +43,7 @@ import { useNotesStore } from "../../../hooks/useNotesStore";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import NotesListModal from "../../notes/components/NotesListModal";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
+import { useADCsStore } from "../../../hooks/useADCsStore";
 
 const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -130,6 +131,14 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         noteCreateAsync,
     } = useNotesStore();
+
+    const {
+        isADCCreating,
+        adcCreatedOk,
+        adcsErrorMessage,
+        
+        adcCreateAsync,
+    } = useADCsStore();
 
     // HOOKS
 
@@ -260,6 +269,20 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 sitesList.filter(sl => sl.Status == DefaultStatusType.active).length);
         }
     }, [sitesList]);
+
+    useEffect(() => {
+        if (!!adcCreatedOk) {
+            Swal.fire('ADC', 
+                'ADC created successfully, please close this modal, and you will be see the new ADC in the ADCs list',
+                'success');
+        }
+    }, [adcCreatedOk]);
+    
+    useEffect(() => {
+        if (!!adcsErrorMessage) {
+            Swal.fire('App Form, creating ADC', adcsErrorMessage, 'error');
+        }
+    }, [adcsErrorMessage]);
     
     // METHODS 
 
@@ -489,7 +512,13 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }; // actionsForCloseModal
 
     const onGenerateADC = () => {
-        console.log('onGenerateADC');
+        console.log('onGenerateADC, appForm', appForm.ID);
+
+        if (!!appForm) {
+            adcCreateAsync({
+                AppFormID: appForm.ID,
+            });
+        }
     };
 
     return (

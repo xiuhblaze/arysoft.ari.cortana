@@ -34,7 +34,7 @@ const getSearchQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
-    query += options?.StandardID ? `&standardid=${options.StandardID}` : '';
+    query += options?.standardID ? `&standardid=${options.standardID}` : '';
     query += options?.text ? `&text=${options.text}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';
@@ -134,14 +134,12 @@ export const useADCConceptsStore = () => {
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
-     * @param {OrganizationID} identificador de la organizacion asociada a la compañia
      */
-    const adcConceptCreateAsync = async (item) => {
+    const adcConceptCreateAsync = async () => {
         dispatch(onADCConceptCreating());
 
         try {
             const params = {
-                ...item,
                 UpdatedUser: user.username,
             };
             const resp = await cortanaApi.post(ADC_CONCEPT_URL, params);
