@@ -14,8 +14,10 @@ import { faPuzzlePiece, faSave } from "@fortawesome/free-solid-svg-icons";
 import AryLastUpdatedInfo from "../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../components/Forms";
 import { useStandardsStore } from "../../hooks/useStandardsStore";
+import Swal from "sweetalert2";
 
 const ADCConceptEditView = () => {
+    const GUID_EMPTY = '00000000-0000-0000-0000-000000000000';
     const { id } = useParams();
     const navigate = useNavigate();
     const [controller, dispatch] = useArysoftUIController();
@@ -38,35 +40,46 @@ const ADCConceptEditView = () => {
     };
     const validationSchema = Yup.object({
         standardSelect: Yup.string()
-            .required('Standard is required'),
+            .required('Standard is required')
+            .test('required-even-guid-empty', 'Standard is required', function (value) {
+                return !!value && value != GUID_EMPTY;
+            }),
         indexSortInput: Yup.number()
             .typeError('Index sort must be a number')
             .positive('Index sort must be a positive number'),
         descriptionInput: Yup.string()
+            .required('Description is required')
             .max(500, 'Description must be at most 500 characters'),
         increaseInput: Yup.number()
             .typeError('Increase must be a number')
-            .when('increaseUnitSelect', {
-                is: ADCConceptUnitType.percentage,
-                then: schema => schema.min(0, 'Percentage increase must be a positive number')
-                    .max(100, 'Percentage increase must be a number between 0 and 100'),
-                otherwise: schema => schema.min(0, 'Increase must be a positive number'),
+            .test('required-when-unit-selected', 'Increase is required', function (value) {
+                const { increaseUnitSelect } = this.parent;
+                if (!!increaseUnitSelect && increaseUnitSelect != ADCConceptUnitType.nothing) {
+                    return !!value; // new Yup.ValidationError('Increase is required', null, 'increaseInput');
+                }
+                return true;
             }),
         decreaseInput: Yup.number()
             .typeError('Decrease must be a number')
-            .when('decreaseUnitSelect', {
-                is: ADCConceptUnitType.percentage,
-                then: schema => schema.min(0, 'Percentage decrease must be a positive number')
-                    .max(100, 'Percentage decrease must be a number between 0 and 100'),
-                otherwise: schema => schema.min(0, 'Decrease must be a positive number'),
+            .test('required-when-unit-selected', 'Decrease is required', function (value) {
+                const { decreaseUnitSelect } = this.parent;                
+                if (!!decreaseUnitSelect && decreaseUnitSelect != ADCConceptUnitType.nothing) { 
+                    return !!value;
+                }
+                return true;
             }),
-        increaseUnitSelect: Yup.string()
-            .required('Increase unit is required'),
-        decreaseUnitSelect: Yup.string()
-            .required('Decrease unit is required'),
+        increaseUnitSelect: Yup.string(),
+        decreaseUnitSelect: Yup.string(),
         extraInfoInput: Yup.string()
             .max(500, 'Extra info must be at most 500 characters'),
         statusCheck: Yup.boolean(),
+    }).test('at-least-one-unit', null, (values) => {
+        const increaseUnitSelected = !!values.increaseUnitSelect && values.increaseUnitSelect != ADCConceptUnitType.nothing;
+        const decreaseUnitSelected = !!values.decreaseUnitSelect && values.decreaseUnitSelect != ADCConceptUnitType.nothing;
+        if (!increaseUnitSelected && !decreaseUnitSelected) {
+            return new Yup.ValidationError('At least one unit must be selected', null, 'increaseUnitSelect');
+        }
+        return increaseUnitSelected || decreaseUnitSelected;
     });
 
     // CUSTOM HOOKS
@@ -92,6 +105,7 @@ const ADCConceptEditView = () => {
     // HOOKS
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [whenTrueActive, setWhenTrueActive] = useState(false);
 
     useEffect(() => {
         standardsAsync({
@@ -109,8 +123,10 @@ const ADCConceptEditView = () => {
     useEffect(() => {
         if (!!adcConcept) {
             setInitialValues({
-                standardSelect: adcConcept.StandardID ?? '',
-                indexSortInput: adcConcept.IndexSort ?? 0,
+                standardSelect: adcConcept.StandardID ?? GUID_EMPTY,
+                indexSortInput: !!adcConcept.IndexSort && adcConcept.IndexSort != 1000 
+                    ? adcConcept.IndexSort 
+                    : '',
                 descriptionInput: adcConcept.Description ?? '',
                 whenTrueCheck: adcConcept.WhenTrue ?? false,
                 increaseInput: adcConcept.Increase ?? '',
@@ -123,13 +139,14 @@ const ADCConceptEditView = () => {
             });
 
             setNavbarTitle(dispatch, adcConcept.Description);
+            setWhenTrueActive(adcConcept.WhenTrue ?? false);
         }
     }, [adcConcept]);
 
     useEffect(() => {
             if (adcConceptSavedOk) {
-                Swal.fire('ADC Concept', `The changes were made successfully`, 'success');
-                userClear();
+                Swal.fire('ADC Concept', `The changes were made successfully`, 'success');                
+                adcConceptClear();
                 navigate('/adc-concepts/');
             }
         }, [adcConceptSavedOk]);
@@ -205,7 +222,9 @@ const ADCConceptEditView = () => {
                                                                     }}
                                                                     disabled={ adcConcept.Status >= DefaultStatusType.active }
                                                                 >
-                                                                    <option value="">(all standards)</option>
+                                                                    <option value={GUID_EMPTY}>
+                                                                        { isStandardsLoading ? 'Loading...' : '(all standards)' }
+                                                                    </option>
                                                                     {
                                                                         !!standards && standards.length > 0 && standards.map(item =>
                                                                             <option
@@ -226,7 +245,144 @@ const ADCConceptEditView = () => {
                                                                     type="text"
                                                                 />
                                                             </Col>
+                                                            <Col xs="2">
+                                                                <AryFormikTextInput
+                                                                    name="indexSortInput"
+                                                                    label="Index sort"
+                                                                    type="number"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="10">
+                                                                <AryFormikTextInput
+                                                                    name="extraInfoInput"
+                                                                    label="Extra info"
+                                                                    type="text"
+                                                                />
+                                                            </Col>
+                                                            <Col xs="12">
+                                                                <div className="bg-light border-radius-md p-3 pb-0 mb-3">
+                                                                    <Row>
+                                                                        <Col xs="12">
+                                                                            <div className="form-check form-switch">
+                                                                                <input id="whenTrueCheck" name="whenTrueCheck"
+                                                                                    className="form-check-input"
+                                                                                    type="checkbox"
+                                                                                    onChange={(e) => {
+                                                                                        const isChecked = e.target.checked;
+                                                                                        formik.setFieldValue('whenTrueCheck', isChecked);
+                                                                                        setWhenTrueActive(isChecked);
+                                                                                    }}
+                                                                                    checked={formik.values.whenTrueCheck}
+                                                                                />
+                                                                                <label className="form-check-label text-secondary mb-0" htmlFor="includeDeletedCheck">
+                                                                                    When the condition is positive: {whenTrueActive 
+                                                                                        ? <span className="text-dark font-weight-bold">increase</span>
+                                                                                        : <span className="text-dark font-weight-bold">decrease</span>}
+                                                                                </label>
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
+                                                                    <Row>
+                                                                        <Col xs="2">
+                                                                            <label className="form-label">&nbsp;</label>
+                                                                            <div className="d-flex justify-content-end align-items-center mt-2">
+                                                                            { whenTrueActive 
+                                                                                ? <div className="badge bg-gradient-success text-white">Yes</div>
+                                                                                : <div className="badge bg-gradient-primary text-white">No</div>
+                                                                            } 
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col xs="6">
+                                                                            <AryFormikTextInput
+                                                                                name="increaseInput"
+                                                                                label="Increase"
+                                                                                type="number"
+                                                                            />
+                                                                        </Col>
+                                                                        <Col xs="4">
+                                                                            <AryFormikSelectInput
+                                                                                name="increaseUnitSelect"
+                                                                                label="Unit"
+                                                                            >
+                                                                                { !!ADCConceptUnitType &&  Object.keys(ADCConceptUnitType)
+                                                                                    .filter(key => key != 'deleted')
+                                                                                    .map(key =>
+                                                                                    <option
+                                                                                        key={key}
+                                                                                        value={ADCConceptUnitType[key]}
+                                                                                        className="text-capitalize"
+                                                                                    >
+                                                                                        {key === 'nothing' ? '(select unit)' : key}
+                                                                                    </option>
+                                                                                )}
+                                                                            </AryFormikSelectInput>
+                                                                        </Col>
+                                                                    </Row>
+                                                                    <Row>
+                                                                        <Col xs="2">
+                                                                            <label className="form-label">&nbsp;</label>
+                                                                            <div className="d-flex justify-content-end align-items-center mt-2">
+                                                                                { !whenTrueActive 
+                                                                                    ? <div className="badge bg-gradient-success text-white">Yes</div>
+                                                                                    : <div className="badge bg-gradient-primary text-white">No</div>
+                                                                                }
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col xs="6">
+                                                                            <AryFormikTextInput
+                                                                                name="decreaseInput"
+                                                                                label="Decrease"
+                                                                                type="number"
+                                                                            />
+                                                                        </Col>
+                                                                        <Col xs="4">
+                                                                            <AryFormikSelectInput
+                                                                                name="decreaseUnitSelect"
+                                                                                label="Unit"
+                                                                            >
+                                                                                { !!ADCConceptUnitType &&  Object.keys(ADCConceptUnitType)
+                                                                                    .filter(key => key != 'deleted')
+                                                                                    .map(key =>
+                                                                                    <option
+                                                                                        key={key}
+                                                                                        value={ADCConceptUnitType[key]}
+                                                                                        className="text-capitalize"
+                                                                                    >
+                                                                                        {key === 'nothing' ? '(select unit)' : key}
+                                                                                    </option>
+                                                                                )}
+                                                                            </AryFormikSelectInput>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </div>
+                                                            </Col>
+                                                            <Col xs="12" sm="6">
+                                                                <div className="form-check form-switch mb-3">
+                                                                    <input id="statusCheck" name="statusCheck"
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        onChange={formik.handleChange}
+                                                                        checked={formik.values.statusCheck}
+                                                                    />
+                                                                    <label 
+                                                                        className="form-check-label text-secondary mb-0"
+                                                                        htmlFor="statusCheck"
+                                                                    >
+                                                                        Active
+                                                                    </label>
+                                                                </div>
+                                                            </Col>
                                                         </Row>
+                                                    </Col>
+                                                    <Col xs="12" sm="4">
+                                                        <h6>Index sort</h6>
+                                                        <p className="text-secondary text-sm">
+                                                            The index sort is used to sort the ADC concepts in the list
+                                                            when the ADC concepts are displayed in the ADC form.<br />
+                                                            <strong>Note:</strong> The index sort re-order when others 
+                                                            ADC concepts at the same standard are modified.
+                                                        </p>
+                                                        
                                                     </Col>
                                                 </Row>
                                             </Card.Body>
