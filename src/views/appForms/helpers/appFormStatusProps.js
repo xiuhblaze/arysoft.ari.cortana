@@ -16,26 +16,26 @@ const appFormStatusProps = [
         description: 'New recorded application form'
     },
     {
-        value: AppFormStatusType.salesReview,
+        value: AppFormStatusType.salesReview,   //! Not used for now
         label: 'Sales review', 
         variant: 'warning',
         description: 'Sales review and approval'
     },
     { 
-        value: AppFormStatusType.salesRejected,
+        value: AppFormStatusType.salesRejected, //! Not used for now
         label: 'Sales rejected', 
         variant: 'danger',
         description: 'Rejected by sales, check the comments'
     },
     { 
         value: AppFormStatusType.applicantReview,
-        label: 'Applicant review', 
+        label: 'In review', // Applicant review
         variant: 'warning',
         description: 'Applicant review and approval'
     },
     {
         value: AppFormStatusType.applicantRejected,
-        label: 'Applicant rejected', 
+        label: 'Rejected', // Applicant rejected
         variant: 'danger',
         description: 'Rejected by reviewer, check the comments'
     },

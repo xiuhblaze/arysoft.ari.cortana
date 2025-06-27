@@ -15,6 +15,34 @@ const enums = () => {
         danger: 3,
     });
 
+    // ADC
+
+    const ADCConceptOrderType = Object.freeze({
+        nothing: 0,
+        indexSort: 1,
+        description: 2,
+        standard: 3,
+        indexSortDesc: 4,
+        descriptionDesc: 5,
+        standardDesc: 6,
+    });
+
+    const ADCConceptUnitType = Object.freeze({
+        nothing: 0,     // No se ha definido unidad
+        percentage: 1,  // Porcentaje
+        days: 2,        // Días
+    });
+
+    // ADC Sites
+
+    const ADCSiteOrderType = Object.freeze({
+        nothing: 0,
+        siteDescription: 1,
+        isMainSite: 2,
+        siteDescriptionDesc: 3,
+        isMainSiteDesc: 4,
+    });
+
     // Application Forms
 
     const AppFormOrderType = Object.freeze({
@@ -390,9 +418,10 @@ const enums = () => {
         iso27K: 4,
         iso37K: 5,
         iso45K: 6,
-        fssc22K: 7,
-        haccp: 8,
-        gMarkets: 9,
+        fssc22K: 7,     // Food Safety System Certification 22000
+        haccp: 8,       // Hazard Analysis and Critical Control Points
+        gMarkets: 9,    // Global Markets
+        sqf: 10,        // Safe Quality Food
     });
 
     const StandardOrderType = Object.freeze({
@@ -429,6 +458,9 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
+        ADCConceptOrderType,
+        ADCConceptUnitType,
+        ADCSiteOrderType,
         AppFormOrderType,
         AppFormStatusType,
         AuditCycleStandardsOrderType,

@@ -1,15 +1,9 @@
-import React from 'react'
 import { Col, Row } from 'react-bootstrap';
+
 import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
 import languagesProps from '../../../helpers/languagesProps';
 
-// const auditLanguageOptions = [
-//     { value: '', label: '(select a language)' },
-//     { value: 'en', label: 'English' },
-//     { value: 'es', label: 'Spanish' },
-// ];
-
-const AppFormStepGeneral = ({ formik, ...props }) => {
+const AppFormStepGeneral = ({ formik, readonly = false, ...props }) => {
 
     return (
         <div {...props}>
@@ -18,6 +12,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                     <AryFormikSelectInput
                         name="auditLanguageSelect"
                         label="Audit language"
+                        disabled={readonly}
                     >
                         {
                             languagesProps.map((option) => (
@@ -39,18 +34,24 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                         <AryFormikTextInput
                             name="currentStandardsInput"
                             label="Current standards"
+                            placeholder="ISO 9001, ISO 14001, ..."
+                            disabled={readonly}
                         />
                     </Col>
                     <Col xs="12">
                         <AryFormikTextInput
                             name="currentCertificationsByInput"
                             label="Certified by"
+                            placeholder="Company name, company name 2, ..."
+                            disabled={readonly}
                         />
                     </Col>
                     <Col xs="12">
                         <AryFormikTextInput
                             name="currentCertificationsExpirationInput"
                             label="Expiration date"
+                            placeholder="dd/mm/yyyy, dd/mm/yyyy, ..."
+                            disabled={readonly}
                         />
                     </Col>
                 </Row>
@@ -61,6 +62,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                         name="outsourcedProcessInput"
                         label="Outsourced process related with product/service"
                         helpText="It refers to those that are part of the main process of the company and are subcontracted by a supplier as an extension of the company"
+                        disabled={readonly}
                     />
                 </Col>
             </Row>
@@ -78,6 +80,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                                             formik.setFieldValue('anyConsultancyCheck', isChecked);
                                         }}
                                         checked={ formik.values.anyConsultancyCheck }
+                                        disabled={readonly}
                                     />
                                     <label 
                                         className="form-check-label"
@@ -93,6 +96,7 @@ const AppFormStepGeneral = ({ formik, ...props }) => {
                                 <AryFormikTextInput
                                     name="anyConsultancyByInput"
                                     label="By"
+                                    disabled={readonly}
                                 />
                             </Col>
                         </Row>

@@ -1,8 +1,9 @@
 const envVariables = () => {
+    const ADCCONCEPTS_OPTIONS = 'arysoft-ari-adcConceptsOptions';
     const APPLICANTS_OPTIONS = 'arysoft-ari-applicantsOptions';
     const APPLICATION_FORM_OPTIONS = 'arysoft-ari-applicationFormOptions';
-    const AUDITS_OPTIONS = 'arysoft-ari-auditsOptions';
     const AUDITORS_OPTIONS = 'arysoft-ari-auditorsOptions';
+    const AUDITS_OPTIONS = 'arysoft-ari-auditsOptions';
     const CATAUDITORDOCUMENTS_OPTIONS = 'arysoft-ari-catAuditorDocumentsOptions';
     const CONTACTS_OPTIONS = 'arysoft-ari-contactsOptions';
     const DASHBOARD_OPTIONS = 'arysoft-ari-dashboardOptions';
@@ -35,15 +36,16 @@ const envVariables = () => {
         HOUR24_REGEX,
         PHONE_REGEX,
 
+        ADCCONCEPTS_OPTIONS,
         APPLICANTS_OPTIONS,
         APPLICATION_FORM_OPTIONS,
-        AUDITS_OPTIONS,
         AUDITORS_OPTIONS,
+        AUDITS_OPTIONS,
         CATAUDITORDOCUMENTS_OPTIONS,
         CONTACTS_OPTIONS,
         DASHBOARD_OPTIONS,
         NACECODES_OPTIONS,
-        ORGANIZATIONS_OPTIONS,
+        ORGANIZATIONS_OPTIONS,        
         STANDARDS_OPTIONS,
         USERS_OPTIONS,
 

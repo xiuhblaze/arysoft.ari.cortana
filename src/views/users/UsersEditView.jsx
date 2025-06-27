@@ -1,21 +1,24 @@
+import { useEffect, useState } from 'react';
+
+import { Card, Col, Container, ListGroup, Row } from 'react-bootstrap';
+import { faSave, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Form, Formik } from 'formik';
+import { format } from 'date-fns';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from "yup";
-import { Card, Col, Container, Row } from 'react-bootstrap';
-
-import enums from '../../helpers/enums';
-import { useUsersStore } from '../../hooks/useUsersStore';
-import { useEffect, useState } from 'react';
-import { ViewLoading } from '../../components/Loaders';
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
-import AryDefaultStatusBadge from '../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextInput } from '../../components/Forms';
-import userTypeProps from './helpers/userTypeProps';
-import AryLastUpdatedInfo from '../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUser } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
+
+import { AryFormikSelectInput, AryFormikTextInput } from '../../components/Forms';
+import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { useUsersStore } from '../../hooks/useUsersStore';
+import { ViewLoading } from '../../components/Loaders';
+import AryDefaultStatusBadge from '../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
+import AryLastUpdatedInfo from '../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import enums from '../../helpers/enums';
 import UserRolesAdmin from './components/UserRolesAdmin';
+import userTypeProps from './helpers/userTypeProps';
+import aryDateTools from '../../helpers/aryDateTools';
 
 const UsersEditView = () => {
     const { id } = useParams();
@@ -26,6 +29,11 @@ const UsersEditView = () => {
         DefaultStatusType,
         UserType,
     } = enums();
+
+    const {
+        getFriendlyDate,
+        getLocalDate,
+    } = aryDateTools();
 
     const formDefaultValues = {
         usernameInput: '',
@@ -238,7 +246,7 @@ const UsersEditView = () => {
                                                                 </AryFormikSelectInput>
                                                             </Col>
                                                             <Col xs="12" sm="4">
-                                                                <div className="form-check form-switch">
+                                                                <div className="form-check form-switch mb-3">
                                                                     <input id="statusCheck" name="statusCheck"
                                                                         className="form-check-input"
                                                                         type="checkbox"
@@ -252,6 +260,24 @@ const UsersEditView = () => {
                                                                         Active
                                                                     </label>
                                                                 </div>
+                                                            </Col>
+                                                            <Col xs="12">
+                                                                <ListGroup>
+                                                                    <ListGroup.Item
+                                                                        className="border-0 py-0 ps-0 text-xs"
+                                                                        title={ user.LastAccess ? format(getLocalDate(user.LastAccess), "dd/MM/yyyy HH:mm:ss") : null }
+                                                                    >
+                                                                        <strong>Last access: </strong> 
+                                                                        { !!user.LastAccess ? getFriendlyDate(new Date(user.LastAccess), true) : '(never)' }
+                                                                    </ListGroup.Item>
+                                                                    <ListGroup.Item
+                                                                        className="border-0 py-0 ps-0 text-xs"
+                                                                        title={ user.LastPasswordChange ? format(getLocalDate(user.LastPasswordChange), "dd/MM/yyyy HH:mm:ss") : null }
+                                                                    >
+                                                                        <strong>Last password change: </strong> 
+                                                                        { !!user.LastPasswordChange ? getFriendlyDate(new Date(user.LastPasswordChange), true) : '(never)' }
+                                                                    </ListGroup.Item>
+                                                                </ListGroup>
                                                             </Col>
                                                         </Row>
                                                     </Col>

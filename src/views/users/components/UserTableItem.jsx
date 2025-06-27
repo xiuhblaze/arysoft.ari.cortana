@@ -4,9 +4,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import defaultStatusProps from '../../../helpers/defaultStatusProps';
 import { Link } from 'react-router-dom';
 import userTypeProps from '../helpers/userTypeProps';
-import getFriendlyDate from '../../../helpers/getFriendlyDate';
+//import getFriendlyDate from '../../../helpers/getFriendlyDate';
+import { format } from 'date-fns';
+import aryDateTools from '../../../helpers/aryDateTools';
 
 const UserTableItem = ({ item, className, ...props }) => {
+
+    const {
+        getFriendlyDate,
+        getLocalDate,
+    } = aryDateTools();
 
     return (
         <tr {...props} className={className}>
@@ -59,8 +66,17 @@ const UserTableItem = ({ item, className, ...props }) => {
                 </div>
             </td>
             <td>
-                <p className="text-xs text-wrap mb-0">
-                    { getFriendlyDate(item.LastAccess) }
+                <p 
+                    className="text-xs text-wrap mb-0"
+                    title={ item.LastAccess ? format(getLocalDate(item.LastAccess), "dd/MM/yyyy HH:mm:ss") : null }
+                >
+                    <strong>Access:</strong> { !!item.LastAccess ? getFriendlyDate(new Date(item.LastAccess), true) : '(never)' } 
+                </p>
+                <p 
+                    className="text-xs text-wrap mb-0"
+                    title={ item.LastPasswordChange ? format(getLocalDate(item.LastPasswordChange), "dd/MM/yyyy HH:mm:ss") : null }
+                >
+                    <strong>Password change:</strong> { !!item.LastPasswordChange ? getFriendlyDate(new Date(item.LastPasswordChange), true) : '(never)' }
                 </p>
             </td>
             <td className="text-end">

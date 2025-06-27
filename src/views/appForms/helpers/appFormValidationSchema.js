@@ -12,10 +12,10 @@ const appFormValidationSchema = (currentStatus) => {
         standardSelect: Yup.string()
             .required('Standard is required'),
         sitesCountHidden: Yup.number()
-            .positive('Must be at least one site associated')
+            .positive('Must be at least one site active associated')
             .required('Must add at least one site'),
         contactsCountHidden: Yup.number()
-            .positive('Must be at least one contact associated')
+            .positive('Must be at least one contact active associated')
             .required('Must add at least one contact'),
         // ISO 9K
         activitiesScopeInput: Yup.string()
@@ -110,7 +110,7 @@ const appFormValidationSchema = (currentStatus) => {
                 otherwise: schema => schema.notRequired(),
             }),
         statusSelect: Yup.string()
-            .required('Standard is required'),
+            .required('Status is required'),
         commentsInput: Yup.string()
             .max(1000, 'Comments must be less than 1000 characters')
             .when('statusSelect', {

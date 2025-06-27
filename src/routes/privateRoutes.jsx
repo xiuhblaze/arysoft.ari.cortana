@@ -6,6 +6,7 @@ import {
     faHome,
     faLandmark,
     faMagnifyingGlass,
+    faPuzzlePiece,
     faUsers
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,6 +18,7 @@ const lazyApplicants = lazy(() => import('../views/applicants'));
 const lazyAuditors = lazy(() => import('../views/auditors'));
 const lazyOrganizations = lazy(() => import('../views/organizations'));
 
+const lazyADCConcepts = lazy(() => import('../views/adcConcepts'));
 const lazyCatAuditorDocuments = lazy(() => import('../views/catAuditorDocuments'));
 const lazyNacecodes = lazy(() => import('../views/nacecodes'));
 const lazyStandards = lazy(() => import('../views/standards'));
@@ -66,6 +68,14 @@ const privateRoute = [
         type: 'title',
         title: 'Catalogs',
         key: 'catalogs',
+    },
+    {
+        type: 'collapse',
+        title: 'ADC Concepts',
+        key: 'adcConcepts',
+        path: '/adc-concepts/*',
+        icon: faPuzzlePiece,
+        element: lazyADCConcepts
     },
     {
         type: 'collapse',
