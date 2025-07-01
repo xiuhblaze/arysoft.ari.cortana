@@ -210,6 +210,39 @@ export const useAuditsStore = () => {
         dispatch(clearAudit());
     }
 
+    const getNextAuditAsync = async (ownerID, initialDate, ownerType) => {
+
+        if (!ownerID) {
+            setError('You must specify the owner ID');
+            return;
+        }
+
+        const toSend = {
+            OwnerID: ownerID,
+            InitialDate: initialDate,
+            Owner: ownerType,
+        }
+        
+        try {
+            const resp = await cortanaApi.get(
+                `${AUDIT_URL}/next-audit`, 
+                { 
+                    params: toSend, 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    } 
+                });
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // getNextAuditAsync
+
     // SITES
 
     const auditSiteAddAsync = async (siteID) => {
@@ -288,6 +321,8 @@ export const useAuditsStore = () => {
         auditSaveAsync,
         auditDeleteAsync,
         auditClear,
+
+        getNextAuditAsync,
 
         auditSiteAddAsync,
         auditSiteDeleteAsync,

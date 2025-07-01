@@ -12,6 +12,7 @@ import { DashboardLayout } from "../../layouts/dashboard";
 import { MiniStatisticsCard } from "../../components/Cards";
 
 import CalendarCard from './components/CalendarCard';
+import MiniNextAuditCard from './components/MiniNextAuditCard';
 
 export const Dashboard = () => {
     
@@ -36,12 +37,7 @@ export const Dashboard = () => {
             <Container fluid className="py-4">
                 <Row>
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
-                        <MiniStatisticsCard
-                            title="Audits"
-                            count={statAudits.total}
-                            percentage={{ text: 'in the view', color: 'info' }}
-                            icon={{ icon: faMagnifyingGlass, bgColor: 'info' }}
-                        />
+                        <MiniNextAuditCard />
                     </Col>
                     <Col sm="6" xl="3" className="mb-xl-0 mb-4">
                         <MiniStatisticsCard

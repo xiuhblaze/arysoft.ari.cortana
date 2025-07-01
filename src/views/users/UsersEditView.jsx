@@ -12,6 +12,8 @@ import Swal from 'sweetalert2';
 import { AryFormikSelectInput, AryFormikTextInput } from '../../components/Forms';
 import { setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useUsersStore } from '../../hooks/useUsersStore';
+import { useOrganizationsStore } from '../../hooks/useOrganizationsStore';
+import { useAuditorsStore } from '../../hooks/useAuditorsStore';
 import { ViewLoading } from '../../components/Loaders';
 import AryDefaultStatusBadge from '../../components/AryDefaultStatusBadge/AryDefaultStatusBadge';
 import AryLastUpdatedInfo from '../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -19,6 +21,7 @@ import enums from '../../helpers/enums';
 import UserRolesAdmin from './components/UserRolesAdmin';
 import userTypeProps from './helpers/userTypeProps';
 import aryDateTools from '../../helpers/aryDateTools';
+import { setUser } from '../../store/slices/usersSlice';
 
 const UsersEditView = () => {
     const { id } = useParams();
@@ -27,6 +30,8 @@ const UsersEditView = () => {
 
     const {
         DefaultStatusType,
+        AuditorOrderType,
+        OrganizationStatusType,
         UserType,
     } = enums();
 
@@ -43,6 +48,7 @@ const UsersEditView = () => {
         firstNameInput: '',
         lastNameInput: '',
         typeSelect: '',
+        ownerSelect: '',
         statusCheck: false,
     };
     const validationSchema = Yup.object({
@@ -85,9 +91,25 @@ const UsersEditView = () => {
         userClear,
     } = useUsersStore();
 
+    const {
+        isOrganizationsLoading,
+        organizations,
+        organizationsAsync,
+        organizationsErrorMessage,
+    } = useOrganizationsStore();
+
+    const {
+        isAuditorsLoading,
+        auditors,
+        auditorsAsync,
+        auditorsErrorMessage,
+    } = useAuditorsStore();
+
     // HOOKS
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [userType, setUserType] = useState(null);
+    const [ownersList, setOwnersList] = useState([]);
 
     useEffect(() => {
         if (!!id) userAsync(id);
@@ -103,10 +125,14 @@ const UsersEditView = () => {
                 firstNameInput: user.FirstName ?? '',
                 lastNameInput: user.LastName ?? '',
                 typeSelect: user.Type ?? UserType.nothing,
+                ownerSelect: user.OwnerID ?? '',
                 statusCheck: user.Status == DefaultStatusType.active
                     || user.Status == DefaultStatusType.nothing,
             });
 
+            setUserType(Number(user.Type ?? UserType.nothing));
+            loadOwners(Number(user.Type));
+            
             setNavbarTitle(dispatch, user.Username);
         }
     }, [user]);
@@ -118,19 +144,93 @@ const UsersEditView = () => {
             navigate('/users/');
         }
     }, [userSavedOk]);
+
+    useEffect(() => {
+        if (!!auditors) {
+            setOwnersList(auditors.map(i => ({
+                Value: i.ID,
+                Label: i.FullName,
+            })));
+        }
+    }, [auditors]);
+
+    useEffect(() => {
+        if (!!organizations) {
+            setOwnersList(organizations.map(i => ({
+                Value: i.ID,
+                Label: i.Name,
+            })));
+        }
+    }, [organizations]);
     
     useEffect(() => {
         if (!!usersErrorMessage) {
             Swal.fire('User', usersErrorMessage, 'error');
         }
     }, [usersErrorMessage]);
+
+    useEffect(() => {
+        if (!!auditorsErrorMessage) {
+            Swal.fire('Loading auditors', auditorsErrorMessage, 'error');
+        }
+    }, [auditorsErrorMessage]);
+    
+    useEffect(() => {
+        if (!!organizationsErrorMessage) {
+            Swal.fire('Loading organizations', organizationsErrorMessage, 'error');
+        }
+    }, [organizationsErrorMessage]);
     
     // METHODS
 
-    const onFormSubmit = (values) => {
+    const loadOwners = async (userType) => {
 
+        if (!!userType) {
+            
+            switch (userType) {
+                case UserType.organization:
+                    if (!!organizations && organizations.length > 0) {
+                        setOwnersList(organizations.map(i => ({
+                            Value: i.ID,
+                            Label: i.Name,
+                        })));
+                    } else {
+                        setOwnersList([]);
+                        organizationsAsync({
+                            status: OrganizationStatusType.active,
+                            pageSize: 0,
+                        });
+                    }
+                    break;
+                case UserType.superAdmin:
+                case UserType.admin:
+                case UserType.auditor:
+                    if (!!auditors && auditors.length > 0) {
+                        setOwnersList(auditors.map(i => ({
+                            Value: i.ID,
+                            Label: i.FullName,
+                        })));
+                    } else {
+                        setOwnersList([]);
+                        auditorsAsync({
+                            status: DefaultStatusType.active,
+                            pageSize: 0,
+                        });     
+                    }               
+                    break;
+                default:
+                    setOwnersList([]);
+                    break;
+            }           
+        } else {
+            setOwnersList([]);
+        }
+    }; // loadOwners
+
+    const onFormSubmit = (values) => {
         const toSave = {
             ID: user.ID,
+            OwnerID: values.ownerSelect == '' ? null : values.ownerSelect,
             Username: values.usernameInput,
             Password:  values.passwordInput,
             Email: values.emailInput,
@@ -146,7 +246,7 @@ const UsersEditView = () => {
     const onCancelButton = () => {
         userClear();
         navigate('/users/');
-    };
+    }; // onCancelButton
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
@@ -237,14 +337,45 @@ const UsersEditView = () => {
                                                                 <AryFormikSelectInput
                                                                     name="typeSelect"
                                                                     label="Type"
+                                                                    onChange={ (e) => {
+                                                                        const selectedValue = e.target.value;
+                                                                        formik.setFieldValue('typeSelect', selectedValue);
+                                                                        setUserType(Number(selectedValue));
+                                                                        loadOwners(Number(selectedValue));
+                                                                    }}
                                                                 >
                                                                     {
                                                                         userTypeProps.map((option) => (
-                                                                            <option key={option.id} value={option.id}>{option.label}</option>
+                                                                            <option key={option.id} value={option.id}>{ option.label == '-' ? '(select type)' : option.label }</option> 
                                                                         ))
                                                                     }
                                                                 </AryFormikSelectInput>
                                                             </Col>
+                                                            {
+                                                                !!userType && userType != UserType.nothing ? (
+                                                                    <Col xs="12">
+                                                                        <AryFormikSelectInput
+                                                                            name="ownerSelect"
+                                                                            label="Owner"
+                                                                        >
+                                                                            <option value="">{ isAuditorsLoading || isOrganizationsLoading ? '(loading...)' : '(select owner)' }</option>
+                                                                            {
+                                                                                !!ownersList && ownersList.length > 0 ?
+                                                                                    ownersList.map(item =>
+                                                                                        <option
+                                                                                            key={item.Value}
+                                                                                            value={item.Value}
+                                                                                            className="text-capitalize"
+                                                                                        >
+                                                                                            {item.Label}
+                                                                                        </option>
+                                                                                    )
+                                                                                    : null
+                                                                            }
+                                                                        </AryFormikSelectInput>
+                                                                    </Col>
+                                                                ) : null
+                                                            }
                                                             <Col xs="12" sm="4">
                                                                 <div className="form-check form-switch mb-3">
                                                                     <input id="statusCheck" name="statusCheck"
