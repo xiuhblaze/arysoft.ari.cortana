@@ -202,6 +202,8 @@ const UsersEditView = () => {
                         });
                     }
                     break;
+                case UserType.superAdmin:
+                case UserType.admin:
                 case UserType.auditor:
                     if (!!auditors && auditors.length > 0) {
                         setOwnersList(auditors.map(i => ({
@@ -350,7 +352,7 @@ const UsersEditView = () => {
                                                                 </AryFormikSelectInput>
                                                             </Col>
                                                             {
-                                                                !!userType && (userType == UserType.auditor || userType == UserType.organization) ? (
+                                                                !!userType && userType != UserType.nothing ? (
                                                                     <Col xs="12">
                                                                         <AryFormikSelectInput
                                                                             name="ownerSelect"

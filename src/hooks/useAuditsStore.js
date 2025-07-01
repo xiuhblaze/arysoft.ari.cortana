@@ -222,8 +222,7 @@ export const useAuditsStore = () => {
             InitialDate: initialDate,
             Owner: ownerType,
         }
-        console.log('AuditsStore.getNextAuditAsync', { params: toSend });
-
+        
         try {
             const resp = await cortanaApi.get(
                 `${AUDIT_URL}/next-audit`, 
