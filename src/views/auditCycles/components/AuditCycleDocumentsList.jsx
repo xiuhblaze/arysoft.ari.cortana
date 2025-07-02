@@ -18,6 +18,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 // import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
 import AppFormButtonNewItem from '../../appForms/components/AppFormButtonNewItem';
 import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleList';
+import ADCAuditCycleList from '../../adcs/components/ADCAuditCycleList';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     // console.log('AuditCycleDocumentsList');
@@ -104,7 +105,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                     </div> : null
                                 }
                                 {
-                                    item.id != AuditCycleDocumentType.appForm && // TODOS LOS DEMAS
+                                    item.id == AuditCycleDocumentType.adc ?
                                     <div  className="timeline-block mb-3">
                                         <div className="timeline-step">
                                             <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
@@ -116,7 +117,6 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     <p className="text-xs text-secondary mb-0">{item.helpText}</p>
                                                 </div>
                                                 <div className="d-flex align-items-center gap-3">
-                                                    { item.id == AuditCycleDocumentType.appForm && <AppFormButtonNewItem /> }
                                                     <div className="text-dark text-sm font-weight-bold">
                                                         <AuditCycleDocumentEditItem 
                                                             documentType={ item.id }
@@ -129,8 +129,39 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
+                                            <ADCAuditCycleList />
                                         </div>
-                                    </div>
+                                    </div> : null
+                                }
+                                { // EL RESTO DE PASOS
+                                    item.id != AuditCycleDocumentType.appForm 
+                                    && item.id != AuditCycleDocumentType.adc ? (
+                                        <div  className="timeline-block mb-3">
+                                            <div className="timeline-step">
+                                                <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
+                                            </div>
+                                            <div className="timeline-content" style={{ maxWidth: 'none' }}>
+                                                <div className='d-flex justify-content-between align-items-center me-1 mb-0'>
+                                                    <div>
+                                                        <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
+                                                        <p className="text-xs text-secondary mb-0">{item.helpText}</p>
+                                                    </div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <div className="text-dark text-sm font-weight-bold">
+                                                            <AuditCycleDocumentEditItem 
+                                                                documentType={ item.id }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
+                                                    {
+                                                        documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : null
                                 }
                                 {
                                     item.id == AuditCycleDocumentType.auditProgramme &&

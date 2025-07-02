@@ -19,7 +19,7 @@ const auditCycleDocumentTypeProps = [
         variant: 'primary',
     },
     {
-        id: AuditCycleDocumentType.acd,
+        id: AuditCycleDocumentType.adc,
         icon: faClock,
         label: 'ADC - Audit day calculation',
         helpText: 'A document for each standard',

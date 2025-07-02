@@ -34,6 +34,8 @@ const getSearchQuery = (options = {}) => {
     query = `?pagesize=${options?.pageSize ?? VITE_PAGE_SIZE}`;
     query += options?.pageNumber ? `&pagenumber=${options.pageNumber}` : '&pagenumber=1';
 
+    query += options?.organizationID ? `&organizationid=${options.organizationID}` : '';
+    query += options?.auditCycleID ? `&auditcycleid=${options.auditCycleID}` : '';
     query += options?.appFormID ? `&appformid=${options.appFormID}` : '';
     query += options?.status ? `&status=${options.status}` : '';
     query += options?.includeDeleted ? `&includeDeleted=${options.includeDeleted}` : '';

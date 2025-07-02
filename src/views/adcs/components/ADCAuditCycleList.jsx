@@ -1,0 +1,114 @@
+import { useEffect, useState } from "react";
+import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
+import { useADCsStore } from "../../../hooks/useADCsStore";
+import { Spinner } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBuilding, faCalendarDay, faEdit, faFileLines, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import ADCModalEditItem from "./ADCModalEditItem";
+
+const ADCAuditCycleList = () => {
+
+    const { auditCycle } = useAuditCyclesStore();
+
+    const {
+        isADCsLoading,
+        adcs,
+        adcsAsync,
+        adcsErrorMessage,
+    } = useADCsStore();
+
+    // HOOKS
+
+    const [showModal, setShowModal] = useState(false);
+    const [adcID, setADCID] = useState(null);
+
+    useEffect(() => {
+
+        if (!!auditCycle) {
+            adcsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+        }
+    }, [auditCycle]);
+
+    useEffect(() => {
+        if (!!adcsErrorMessage) {
+            console.log(`ADCAuditCycleList(error): ${ adcsErrorMessage }`);
+        }
+    }, [adcsErrorMessage]);
+
+    // METHODS
+    
+    const onShowModal = (id) => {
+        setADCID(id);
+        setShowModal(true);
+    };
+
+    const onCloseModal = () => {
+        adcsAsync({
+            auditCycleID: auditCycle.ID,
+            pageSize: 0,
+        });
+        setShowModal(false);
+    };
+        
+    return (
+        <>
+            <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
+                {
+                    isADCsLoading ? (
+                        <div className="ms-3 my-3">
+                            <Spinner animation="border" variant="secondary" role="status" size="sm">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>
+                    ) : !!adcs && adcs.length > 0 ? adcs.map(adc => {
+                        const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action gap-2 px-2 py-1`;
+
+                        return (
+                            <div key={adc.ID} className={itemStyle}>
+                                <div className="text-sm">
+                                    <FontAwesomeIcon icon={ faWindowMaximize } size="lg" className={`text-dark text-gradient`} />
+                                </div>
+                                <div>
+                                    <h6 className="text-xs text-dark text-gradient mb-0">
+                                        {adc.AppFormStandardName}
+                                    </h6>
+                                    <div className="d-flex justify-content-start align-items-center text-xs text-secondary gap-1">
+                                        <FontAwesomeIcon icon={ faFileLines } 
+                                            className={`text-${ isNullOrEmpty(adc.Description) ? 'secondary' : 'info' }`}
+                                            title={ isNullOrEmpty(adc.Description) ? 'No description' : adc.Description }
+                                        /> | 
+                                        <span title="Sites">
+                                            <FontAwesomeIcon icon={ faBuilding } />: { adc.ADCSitesCount ?? '0' }
+                                        </span> | 
+                                        <span title="Total initial (days)">
+                                            <FontAwesomeIcon icon={ faCalendarDay } />: {adc.TotalInitial ?? '0'}
+                                        </span> |
+                                        <span title="Total employees">
+                                            <FontAwesomeIcon icon={ faUsers } />: { adc.TotalEmployees ?? '0' }
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="text-end">
+                                    <button type="button" 
+                                        className="btn btn-link text-dark text-gradient p-0 mb-0"
+                                        onClick={ () => { onShowModal(adc.ID) } } 
+                                        title="Edit ADC"
+                                    >
+                                        <FontAwesomeIcon icon={ faEdit } size="lg" />
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    }) : null
+                }
+            </div>
+            <ADCModalEditItem show={ showModal } onHide={ onCloseModal } id={ adcID } />
+        </>
+    )
+}
+
+export default ADCAuditCycleList

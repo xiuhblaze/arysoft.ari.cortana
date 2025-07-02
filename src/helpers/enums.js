@@ -17,6 +17,24 @@ const enums = () => {
 
     // ADC
 
+    const ADCStatusType = Object.freeze({
+        nothing: 0,    // Nuevo registro - temporal sino se guarda, se elimina
+        new: 1,        // Nuevo registro almacenado con la información mínima
+        review: 2,     // Registro enviado a revisión
+        rejected: 3,   // Registro rechazado por el revisor, no se puede modificar
+        active: 4,     // Registro aprobado y activo
+        inactive: 5,   // Registro inactivo, ya no está en uso, no modificable
+        cancel: 6,     // En algún momento el registro fué cancelado
+        deleted: 7,     // Eliminación lógica 
+    });
+    const ADCOrderType = Object.freeze({
+        nothing: 0,        // No ordenar
+        description: 1,    // Ordenar por descripción
+        created: 2,        // Ordenar por fecha de creación
+        descriptionDesc: 3,
+        createdDesc: 4,
+    });
+
     const ADCConceptOrderType = Object.freeze({
         nothing: 0,
         indexSort: 1,
@@ -84,7 +102,7 @@ const enums = () => {
     const AuditCycleDocumentType = Object.freeze({
         nothing: 0,
         appForm: 1,        // Application form
-        acd: 2,            // Audit day calculation
+        adc: 2,            // Audit day calculation
         proposal: 3,
         contract: 4,
         auditProgramme: 5, // Confirmation letter
@@ -458,6 +476,8 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
+        ADCStatusType,
+        ADCOrderType,
         ADCConceptOrderType,
         ADCConceptUnitType,
         ADCSiteOrderType,
