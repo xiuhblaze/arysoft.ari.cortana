@@ -53,6 +53,28 @@ option {
   padding: .25rem .25rem !important;
 }
 
+.ari-table-col {
+  width: 1.5rem;
+}
+
+.ari-truncate {
+  white-space: nowrap;      /* No permite saltos de línea */
+  overflow: hidden;         /* Oculta el contenido que se desborda */
+  text-overflow: ellipsis;  /* Muestra los puntos suspensivos */
+}
+
+/* ARI Inputs
+******************************************************************************/
+
+.ari-form-control-with-end {
+  padding-right: 7px !important;
+  margin-right: -5px;
+}
+
+.ari-input-group-text-end {
+  position: relative !important;  
+}
+
 /* ARI Color
 ******************************************************************************/
 

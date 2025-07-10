@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Col, Modal, Row } from 'react-bootstrap';
+import { Card, Col, Modal, Row } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -12,16 +12,28 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import { ViewLoading } from '../../../components/Loaders';
 import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
-import { faClock, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faMinus, faPercent, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import enums from '../../../helpers/enums';
+import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
+import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
+import ADCConceptValueInput from './ADCConceptValueInput';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
+    const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
+    const subHeadStyle = 'text-secondary text-xxs text-wrap';
+    const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
+    const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
+    const pStyle = 'text-xs font-weight-bold text-wrap mb-0';
 
     const {
+        DefaultStatusType,
         ADCStatusType,
+        ADCConceptUnitType,
+        ADCConceptOrderType
     } = enums();
 
     const formDefaultValues = {
@@ -33,8 +45,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             .max(500, 'Description must be less than 500 characters')
             .required('Description is required'),
     });
-
-    
 
     // CUSTOM HOOKS
 
@@ -63,6 +73,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcSaveAsync,
         adcClear,
     } = useADCsStore();
+
+    const {
+        isADCConceptsLoading,
+        adcConcepts,
+        adcConceptsAsync,
+        adcConceptsErrorMessage,
+    } = useADCConceptsStore();
 
     // HOOKS
 
@@ -99,10 +116,16 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             if (!auditCycle || auditCycle.ID != adc.AppForm.AuditCycleID) {
                 auditCycleAsync(adc.AppForm.AuditCycleID);
             }
+
+            adcConceptsAsync({
+                standardID: adc.AppForm.StandardID,
+                status: DefaultStatusType.active,
+                pageSize: 0,
+                order: ADCConceptOrderType.indexSort,
+            });
         }
     }, [adc]);
     
-
     // METHODS
 
     const onFormSubmit = (values) => {
@@ -215,34 +238,255 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             </Row>
                                         </div>
                                         <Row className="mt-4">
-                                            <Col xs="12">
-                                                <AryFormikTextInput
-                                                    name="descriptionInput"
-                                                    label="Description"
-                                                    type="text"
-                                                />
+                                            <Col xs="12" sm="12">
+                                                <Card>
+                                                    <Card.Body className="p-3">
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <AryFormikTextInput
+                                                                    name="descriptionInput"
+                                                                    label="Description"
+                                                                    type="text"
+                                                                />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <table>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th></th>
+                                                                            <th></th>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <th className={headStyle}>Loading...</th>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <th key={adcSite.ID} className={headStyle}>
+                                                                                        { adcSite.SiteDescription }
+                                                                                    </th>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <th>
+                                                                                <h6 className={h6Style}>
+                                                                                    Employees
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.Employees }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    Initial MD5
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.InitialMD5 }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        {
+                                                                            isADCConceptsLoading ? (
+                                                                                <tr>
+                                                                                    <th>
+                                                                                        <h6 className={`${h6Style} text-secondary`}>
+                                                                                            Loading...
+                                                                                        </h6>
+                                                                                    </th>
+                                                                                </tr>
+                                                                            ) : !!adcConcepts && adcConcepts.length > 0 ? (
+                                                                                adcConcepts.map(adcConcept => 
+                                                                                <tr key={ adcConcept.ID }>
+                                                                                    <th>
+                                                                                        <h6 className={h6Style}>{adcConcept.Description}</h6>
+                                                                                        <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                            { adcConcept.ExtraInfo }
+                                                                                        </p>
+                                                                                    </th>
+                                                                                    <td>
+                                                                                        <ADCConceptYesNoInfo item={adcConcept} />
+                                                                                    </td>
+                                                                                    {
+                                                                                        !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                            adc.ADCSites.map(adcSite =>  
+                                                                                            <td key={adcSite.ID}>
+                                                                                                { adcSite.ADCConceptValues
+                                                                                                    .filter(acv => acv.ADCConceptID == adcConcept.ID)
+                                                                                                    .map(acv => 
+                                                                                                        <ADCConceptValueInput key={acv.ID} adcConcept={adcConcept} adcConceptValue={acv} />
+                                                                                                )}
+                                                                                            </td>
+                                                                                            )
+                                                                                        ) : null
+                                                                                    }
+                                                                                </tr>
+                                                                            )) : null
+                                                                        }
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    Total Initial
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.TotalInitial ?? 0 }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    MD11
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    Surveillance
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.Surveillance ?? 0 }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    Recertification (RR)
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.RR ?? 0 }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th className={firstColStyle}>
+                                                                                <h6 className={h6Style}>
+                                                                                    Extra Info
+                                                                                </h6>
+                                                                            </th>
+                                                                            <td></td>
+                                                                            {
+                                                                                isADCLoading ? (
+                                                                                    <td>
+                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    </td>
+                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                    adc.ADCSites.map(adcSite =>  
+                                                                                    <td key={adcSite.ID}>
+                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p>
+                                                                                    </td>
+                                                                                    )
+                                                                                ) : null
+                                                                            }
+                                                                        </tr>
+                                                                    </tbody>                                                                    
+                                                                </table>
+                                                            </Col>
+                                                        </Row>
+                                                    </Card.Body>
+                                                </Card>
                                             </Col>
-                                            <Col xs="2">
-                                                <div className="input-group mb-3">
-                                                    <div className="input-group-text">
-                                                        <input type="checkbox" className="form-check-input mt-0" aria-label="Checkbox for following text input" />
-                                                    </div>
-                                                    <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />                                                        
-                                                </div>
-                                            </Col>
-                                            <Col xs="2">
-                                                <div className="input-group mb-3">
-                                                    <div className="input-group-text py-1">
-                                                        <div className="form-check form-switch">
-                                                            <input type="checkbox" className="form-check-input" 
-                                                                aria-label="Checkbox for following text input" 
-                                                                style={{ height: '20px' }}
-                                                            />
+                                            <Col xs="12" sm="4" className="d-none">
+                                                <Row>
+                                                    <Col xs="6">
+                                                        <div className="input-group mb-3">
+                                                            <div className="input-group-text">
+                                                                <input type="checkbox" className="form-check-input mt-0" aria-label="Checkbox for following text input" />
+                                                            </div>
+                                                            <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />                                                        
                                                         </div>
-                                                    </div>
-                                                    <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />
-                                                    Days
-                                                </div>
+                                                    </Col>
+                                                    <Col xs="6">
+                                                        <div className="input-group mb-3">
+                                                            <div className="input-group-text py-1">
+                                                                <div className="form-check form-switch">
+                                                                    <input type="checkbox" className="form-check-input" 
+                                                                        aria-label="Checkbox for following text input" 
+                                                                        style={{ height: '20px' }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />
+                                                            Days
+                                                        </div>
+                                                    </Col>
+                                                </Row>
                                             </Col>
                                         </Row>
 

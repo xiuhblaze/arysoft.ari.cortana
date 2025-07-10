@@ -11,7 +11,7 @@ const getRandomBackgroundImage = async () => {
     ];
 
     try {
-        const module = await import(`../assets/img/${backgroundImages[Math.floor(Math.random() * backgroundImages.length)]}`);
+        const module = await import(/* @vite-ignore */`../assets/img/${backgroundImages[Math.floor(Math.random() * backgroundImages.length)]}`);
         return module.default;
     } catch (error) {
         console.error('getRandomBackgroundImage', error);

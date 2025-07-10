@@ -278,11 +278,12 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
     }, [adcCreatedOk]);
     
-    useEffect(() => {
-        if (!!adcsErrorMessage) {
-            Swal.fire('App Form, creating ADC', adcsErrorMessage, 'error');
-        }
-    }, [adcsErrorMessage]);
+    // useEffect(() => {
+    //     if (!!adcsErrorMessage) {
+    //         //Swal.fire('App Form, creating ADC', adcsErrorMessage, 'error');
+    //         console.log(`AppForm, creating ADC(error): ${ adcsErrorMessage }`);
+    //     }
+    // }, [adcsErrorMessage]);
     
     // METHODS 
 

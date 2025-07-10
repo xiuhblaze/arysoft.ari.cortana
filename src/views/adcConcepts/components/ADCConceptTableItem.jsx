@@ -4,6 +4,7 @@ import { faEdit, faPuzzlePiece } from "@fortawesome/free-solid-svg-icons";
 import defaultStatusProps from "../../../helpers/defaultStatusProps";
 import enums from "../../../helpers/enums";
 import { Link } from "react-router-dom";
+import ADCConceptYesNoInfo from "./ADCConceptYesNoInfo";
 
 const ADCConceptTableItem = ({ item, className, ...props }) => {
     const { ADCConceptUnitType } = enums();
@@ -43,38 +44,7 @@ const ADCConceptTableItem = ({ item, className, ...props }) => {
                 </p>
             </td>
             <td>
-                {
-                    !!item.Increase ? (
-                        <p className="text-xs font-weight-bold mb-1">
-                            { item.WhenTrue ? (
-                                <span className="me-1">
-                                    <span className="badge bg-gradient-success text-white">Yes</span> Increase:
-                                </span>
-                            ) : ( 
-                                <span className="me-1">
-                                    <span className="badge bg-gradient-primary text-white">No</span> Increase:
-                                </span>
-                            )}
-                            { item.Increase } { item.IncreaseUnit == ADCConceptUnitType.days ? 'Days' : '%' }
-                        </p>
-                    ) : null
-                }
-                {
-                    !!item.Decrease ? (
-                        <p className="text-xs font-weight-bold mb-0">
-                            { !item.WhenTrue ? (
-                                <span className="me-1">
-                                    <span className="badge bg-gradient-success text-white">Yes</span> Decrease:
-                                </span>
-                            ) : (
-                                <span className="me-1">
-                                    <span className="badge bg-gradient-primary text-white">No</span> Decrease:
-                                </span>
-                            ) }
-                            {item.Decrease} { item.DecreaseUnit == ADCConceptUnitType.days ? 'Days' : '%' }
-                        </p>
-                    ) : null
-                }
+                <ADCConceptYesNoInfo item={item} />
             </td>
             <td>
                 <div className="d-flex justify-content-center align-items-center mx-1">
