@@ -38,6 +38,15 @@ option {
   background-color: #e9ecef !important;
 }
 
+.ari-pe-2 {
+  padding-right: 2rem !important;
+}
+
+.ari-btn-outline-light-2 {
+  color: #d2d6da !important;
+  border-color: #d2d6da !important;
+}
+
 /* ARI Tables
 ******************************************************************************/
 

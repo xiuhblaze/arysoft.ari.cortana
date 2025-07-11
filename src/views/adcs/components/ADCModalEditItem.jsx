@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Card, Col, Modal, Row } from 'react-bootstrap';
+import { Card, Col, Container, Modal, Row } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -12,7 +12,7 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import { ViewLoading } from '../../../components/Loaders';
 import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
-import { faCalendarDay, faClock, faMinus, faPercent, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -21,13 +21,13 @@ import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
+import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
-    const subHeadStyle = 'text-secondary text-xxs text-wrap';
     const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
     const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
-    const pStyle = 'text-xs font-weight-bold text-wrap mb-0';
+    const pStyle = 'text-sm text-wrap pe-0 pe-sm-5 mb-0';
 
     const {
         DefaultStatusType,
@@ -252,211 +252,328 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         </Row>
                                                         <Row>
                                                             <Col xs="12">
-                                                                <table>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th></th>
-                                                                            <th></th>
+                                                                <div className='table-responsive'>
+                                                                    <table>
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <th className={headStyle}>Loading...</th>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <th key={adcSite.ID} className={headStyle}>
+                                                                                            { adcSite.SiteDescription }
+                                                                                        </th>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Employees
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.Employees } 
+                                                                                                <span className="px-2" title="Employees">
+                                                                                                    <FontAwesomeIcon icon={ faUsers } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Initial MD5
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.InitialMD5 }
+                                                                                                <span className="px-2" title="Days">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
                                                                             {
-                                                                                isADCLoading ? (
-                                                                                    <th className={headStyle}>Loading...</th>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <th key={adcSite.ID} className={headStyle}>
-                                                                                        { adcSite.SiteDescription }
-                                                                                    </th>
-                                                                                    )
-                                                                                ) : null
+                                                                                isADCConceptsLoading ? (
+                                                                                    <tr>
+                                                                                        <th>
+                                                                                            <h6 className={`${h6Style} text-secondary`}>
+                                                                                                Loading...
+                                                                                            </h6>
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                ) : !!adcConcepts && adcConcepts.length > 0 ? (
+                                                                                    adcConcepts.map(adcConcept => 
+                                                                                    <tr key={ adcConcept.ID }>
+                                                                                        <th>
+                                                                                            <h6 className={h6Style}>{adcConcept.Description}</h6>
+                                                                                            <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                                { adcConcept.ExtraInfo }
+                                                                                            </p>
+                                                                                        </th>
+                                                                                        <td>
+                                                                                            <ADCConceptYesNoInfo item={adcConcept} />
+                                                                                        </td>
+                                                                                        {
+                                                                                            !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                                adc.ADCSites.map(adcSite =>  
+                                                                                                <td key={adcSite.ID}>
+                                                                                                    { adcSite.ADCConceptValues
+                                                                                                        .filter(acv => acv.ADCConceptID == adcConcept.ID)
+                                                                                                        .map(acv => 
+                                                                                                            <ADCConceptValueInput key={acv.ID} adcConcept={adcConcept} adcConceptValue={acv} />
+                                                                                                    )}
+                                                                                                </td>
+                                                                                                )
+                                                                                            ) : null
+                                                                                        }
+                                                                                    </tr>
+                                                                                )) : null
                                                                             }
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <th>
-                                                                                <h6 className={h6Style}>
-                                                                                    Employees
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.Employees }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    Initial MD5
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.InitialMD5 }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        {
-                                                                            isADCConceptsLoading ? (
-                                                                                <tr>
-                                                                                    <th>
-                                                                                        <h6 className={`${h6Style} text-secondary`}>
-                                                                                            Loading...
-                                                                                        </h6>
-                                                                                    </th>
-                                                                                </tr>
-                                                                            ) : !!adcConcepts && adcConcepts.length > 0 ? (
-                                                                                adcConcepts.map(adcConcept => 
-                                                                                <tr key={ adcConcept.ID }>
-                                                                                    <th>
-                                                                                        <h6 className={h6Style}>{adcConcept.Description}</h6>
-                                                                                        <p className="text-xs text-secondary text-wrap mb-0">
-                                                                                            { adcConcept.ExtraInfo }
-                                                                                        </p>
-                                                                                    </th>
-                                                                                    <td>
-                                                                                        <ADCConceptYesNoInfo item={adcConcept} />
-                                                                                    </td>
-                                                                                    {
-                                                                                        !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                            adc.ADCSites.map(adcSite =>  
-                                                                                            <td key={adcSite.ID}>
-                                                                                                { adcSite.ADCConceptValues
-                                                                                                    .filter(acv => acv.ADCConceptID == adcConcept.ID)
-                                                                                                    .map(acv => 
-                                                                                                        <ADCConceptValueInput key={acv.ID} adcConcept={adcConcept} adcConceptValue={acv} />
-                                                                                                )}
-                                                                                            </td>
-                                                                                            )
-                                                                                        ) : null
-                                                                                    }
-                                                                                </tr>
-                                                                            )) : null
-                                                                        }
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    Total Initial
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.TotalInitial ?? 0 }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    MD11
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    Surveillance
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.Surveillance ?? 0 }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    Recertification (RR)
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.RR ?? 0 }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th className={firstColStyle}>
-                                                                                <h6 className={h6Style}>
-                                                                                    Extra Info
-                                                                                </h6>
-                                                                            </th>
-                                                                            <td></td>
-                                                                            {
-                                                                                isADCLoading ? (
-                                                                                    <td>
-                                                                                        <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                    </td>
-                                                                                ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    adc.ADCSites.map(adcSite =>  
-                                                                                    <td key={adcSite.ID}>
-                                                                                        <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p>
-                                                                                    </td>
-                                                                                    )
-                                                                                ) : null
-                                                                            }
-                                                                        </tr>
-                                                                    </tbody>                                                                    
-                                                                </table>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Total Initial
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.TotalInitial ?? 0 }
+                                                                                                <span className="px-2" title="Days">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        MD11
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <div className="input-group mb-3">
+                                                                                                <input type="text" 
+                                                                                                    className="form-control ari-form-control-with-end text-end" 
+                                                                                                    placeholder="0" 
+                                                                                                    defaultValue={ adcSite.MD11 ?? 0 }
+                                                                                                    onChange={(e) => {
+                                                                                                        const value = e.target.value;
+                                                                                                        console.log('onChange', value);
+                                                                                                        //formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
+                                                                                                    }}
+                                                                                                />
+                                                                                                <span className="input-group-text ari-input-group-text-end text-sm">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } title="Days" />
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            {/* <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p> */}
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Surveillance
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.Surveillance ?? 0 }
+                                                                                                <span className="px-2" title="Days">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Recertification (RR)
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.RR ?? 0 }
+                                                                                                <span className="px-2" title="Days">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className={firstColStyle}>
+                                                                                    <h6 className={h6Style}>
+                                                                                        Extra Info
+                                                                                    </h6>
+                                                                                </th>
+                                                                                <td></td>
+                                                                                {
+                                                                                    isADCLoading ? (
+                                                                                        <td>
+                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                        </td>
+                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
+                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p>
+                                                                                        </td>
+                                                                                        )
+                                                                                    ) : null
+                                                                                }
+                                                                            </tr>
+                                                                        </tbody>                                                                    
+                                                                    </table>
+                                                                    <hr className="horizontal dark my-3" />
+                                                                    <Container fluid className="px-3">
+                                                                        <Row>
+                                                                            <Col>
+                                                                                <MiniStatisticsCard
+                                                                                    title="Employees"
+                                                                                    count="94"
+                                                                                    percentage={{
+                                                                                        color: 'info',
+                                                                                        text: 'persons',
+                                                                                    }}
+                                                                                    icon={{
+                                                                                        icon: faUsers,
+                                                                                        bgColor: 'info',
+                                                                                    }}
+                                                                                />
+                                                                            </Col>
+                                                                            <Col>
+                                                                                <MiniStatisticsCard
+                                                                                    title="Total Initial"
+                                                                                    count="5"
+                                                                                    percentage={{
+                                                                                        color: 'info',
+                                                                                        text: 'days',
+                                                                                    }}
+                                                                                    icon={{
+                                                                                        icon: faCalendarDay,
+                                                                                        bgColor: 'info',
+                                                                                    }}
+                                                                                />
+                                                                            </Col>
+                                                                            <Col>
+                                                                                <MiniStatisticsCard
+                                                                                    title="Total MD11"
+                                                                                    count="5"
+                                                                                    percentage={{
+                                                                                        color: 'dark',
+                                                                                        text: 'days',
+                                                                                    }}
+                                                                                    icon={{
+                                                                                        icon: faCalendarDay,
+                                                                                        bgColor: 'dark',
+                                                                                    }}
+                                                                                />
+                                                                            </Col>
+                                                                            <Col>
+                                                                                <MiniStatisticsCard
+                                                                                    title="Surveillance"
+                                                                                    count="2"
+                                                                                    percentage={{
+                                                                                        color: 'secondary',
+                                                                                        text: 'days',
+                                                                                    }}
+                                                                                    icon={{
+                                                                                        icon: faCalendarDay,
+                                                                                        bgColor: 'secondary',
+                                                                                    }}
+                                                                                />
+                                                                            </Col>
+                                                                            <Col>
+                                                                                <MiniStatisticsCard
+                                                                                    title="RR"
+                                                                                    count="2.5"
+                                                                                    percentage={{
+                                                                                        color: 'dark',
+                                                                                        text: 'days',
+                                                                                    }}
+                                                                                    icon={{
+                                                                                        icon: faCalendarDay,
+                                                                                        bgColor: 'dark',
+                                                                                    }}
+                                                                                />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </Container>
+                                                                </div>
                                                             </Col>
                                                         </Row>
                                                     </Card.Body>
