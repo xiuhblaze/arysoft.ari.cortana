@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBuilding, faCalendarDay, faEdit, faFileLines, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ADCModalEditItem from "./ADCModalEditItem";
+import { ADCControllerProvider } from "../context/ADCContext";
 
 const ADCAuditCycleList = () => {
 
@@ -106,7 +107,9 @@ const ADCAuditCycleList = () => {
                     }) : null
                 }
             </div>
-            <ADCModalEditItem show={ showModal } onHide={ onCloseModal } id={ adcID } />
+            <ADCControllerProvider>
+                <ADCModalEditItem show={ showModal } onHide={ onCloseModal } id={ adcID } />
+            </ADCControllerProvider>
         </>
     )
 }

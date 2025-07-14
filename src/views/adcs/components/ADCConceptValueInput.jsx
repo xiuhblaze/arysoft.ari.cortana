@@ -2,11 +2,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAlignLeft, faCalendarDay, faMinus, faPercent } from '@fortawesome/free-solid-svg-icons';
 import enums from '../../../helpers/enums';
 import { useEffect, useState } from 'react';
+import { useADCController } from '../context/ADCContext';
 
 const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props }) => {
     const {
         ADCConceptUnitType,
     } = enums();
+    useADCController();
 
     const decreaseList = [
         { value: 0, label: '0' },
@@ -60,6 +62,17 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         }
 
     }, [checkValue]);
+
+    // useEffect(() => {
+
+    //     if (!!adcConcept && !!adcConceptValue) {
+    //         console.log('useEffect', adcConcept, adcConceptValue);
+    //     }
+    // }, [adcConcept, adcConceptValue]);
+
+    const onChangeValue = (id, value) => {
+        console.log('onChangeValue: set values at ADCCotext', id, value);
+    };
     
 
     return (
@@ -79,13 +92,12 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                 </div>
             </div>
             {
-                // !!adcConcept.Decrease 
-                // && !!adcConcept.DecreaseUnit == ADCConceptUnitType.percentage 
-                isDecrease
-                ? (
+                isDecrease ? (
                     <select 
-                        onSelect={(e) => {
+                        onChange={(e) => {
                             const value = e.target.value;
+                            onChangeValue(adcConceptValue.ID, value);
+                            
                             // formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
                         }}
                         className="form-select text-end ari-pe-2"
@@ -102,10 +114,14 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                         aria-label="Text input with checkbox"
                         // value={adcConceptValue.Value}
                         defaultValue={adcConceptValue.Value}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            console.log('onChange', value);
-                            // formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
+                        // onChange={(e) => {
+                        //     const value = e.target.value;
+                        //     //console.log('onChange', value);
+                        //     // formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
+                        // }}
+                        onBlur={(e) => {
+                            //console.log('onBlur', adcConceptValue.ID, e.target.value);
+                            onChangeValue(adcConceptValue.ID, e.target.value);
                         }}
                     />
                 )

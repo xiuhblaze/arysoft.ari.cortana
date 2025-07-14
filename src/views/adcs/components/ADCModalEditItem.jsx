@@ -22,12 +22,19 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
+import { setADCData, setADCSitesList, useADCController } from '../context/ADCContext';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
     const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
     const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
     const pStyle = 'text-sm text-wrap pe-0 pe-sm-5 mb-0';
+    const [ controller, dispatch ] = useADCController();
+    const {
+        adcData,
+        adcSitesList,
+        adcConceptValuesList,
+    } = controller;
 
     const {
         DefaultStatusType,
@@ -123,10 +130,53 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 pageSize: 0,
                 order: ADCConceptOrderType.indexSort,
             });
+
+            loadData();
+            calculateData();
         }
     }, [adc]);
     
     // METHODS
+
+    const loadData = () => {
+        
+        if (!!adc) {
+            setADCData(dispatch, adc);
+            setADCSitesList(dispatch, adc.ADCSites);            
+        }
+    }; // loadData
+
+    const calculateData = () => {
+
+        if (!!adcData && !!adcSitesList && adcSitesList.length > 0) {            
+            const totalEmployees = adcSitesList
+                .filter(i => i.Status == DefaultStatusType.active)
+                .reduce((acc, i) => acc + i.Employees, 0);
+            const totalInitial = adcSitesList
+                .filter(i => i.Status == DefaultStatusType.active)
+                .reduce((acc, i) => acc + i.InitialMD5, 0);
+            const totalMD11 = adcSitesList
+                .filter(i => i.Status == DefaultStatusType.active)
+                .reduce((acc, i) => acc + i.MD11, 0);
+            const totalSurveillance = adcSitesList
+                .filter(i => i.Status == DefaultStatusType.active)
+                .reduce((acc, i) => acc + i.Surveillance, 0);
+            const totalRR = adcSitesList
+                .filter(i => i.Status == DefaultStatusType.active)
+                .reduce((acc, i) => acc + i.RR, 0);
+
+            setADCData(dispatch, 
+                {
+                    ...adcData,
+                    TotalEmployees: totalEmployees,
+                    TotalInitial: totalInitial,
+                    TotalMD11: totalMD11,
+                    TotalSurveillance: totalSurveillance,
+                    TotalRR: totalRR,
+                }
+            );
+        }
+    }; // calculateData
 
     const onFormSubmit = (values) => {
         console.log('onFormSubmit', values);
@@ -237,7 +287,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 </Col>
                                             </Row>
                                         </div>
-                                        <Row className="mt-4">
+                                        <Row className="mt-4 mb-3">
                                             <Col xs="12" sm="12">
                                                 <Card>
                                                     <Card.Body className="p-3">
@@ -499,114 +549,86 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                         </tbody>                                                                    
                                                                     </table>
                                                                     <hr className="horizontal dark my-3" />
-                                                                    <Container fluid className="px-3">
-                                                                        <Row>
-                                                                            <Col>
-                                                                                <MiniStatisticsCard
-                                                                                    title="Employees"
-                                                                                    count="94"
-                                                                                    percentage={{
-                                                                                        color: 'info',
-                                                                                        text: 'persons',
-                                                                                    }}
-                                                                                    icon={{
-                                                                                        icon: faUsers,
-                                                                                        bgColor: 'info',
-                                                                                    }}
-                                                                                />
-                                                                            </Col>
-                                                                            <Col>
-                                                                                <MiniStatisticsCard
-                                                                                    title="Total Initial"
-                                                                                    count="5"
-                                                                                    percentage={{
-                                                                                        color: 'info',
-                                                                                        text: 'days',
-                                                                                    }}
-                                                                                    icon={{
-                                                                                        icon: faCalendarDay,
-                                                                                        bgColor: 'info',
-                                                                                    }}
-                                                                                />
-                                                                            </Col>
-                                                                            <Col>
-                                                                                <MiniStatisticsCard
-                                                                                    title="Total MD11"
-                                                                                    count="5"
-                                                                                    percentage={{
-                                                                                        color: 'dark',
-                                                                                        text: 'days',
-                                                                                    }}
-                                                                                    icon={{
-                                                                                        icon: faCalendarDay,
-                                                                                        bgColor: 'dark',
-                                                                                    }}
-                                                                                />
-                                                                            </Col>
-                                                                            <Col>
-                                                                                <MiniStatisticsCard
-                                                                                    title="Surveillance"
-                                                                                    count="2"
-                                                                                    percentage={{
-                                                                                        color: 'secondary',
-                                                                                        text: 'days',
-                                                                                    }}
-                                                                                    icon={{
-                                                                                        icon: faCalendarDay,
-                                                                                        bgColor: 'secondary',
-                                                                                    }}
-                                                                                />
-                                                                            </Col>
-                                                                            <Col>
-                                                                                <MiniStatisticsCard
-                                                                                    title="RR"
-                                                                                    count="2.5"
-                                                                                    percentage={{
-                                                                                        color: 'dark',
-                                                                                        text: 'days',
-                                                                                    }}
-                                                                                    icon={{
-                                                                                        icon: faCalendarDay,
-                                                                                        bgColor: 'dark',
-                                                                                    }}
-                                                                                />
-                                                                            </Col>
-                                                                        </Row>
-                                                                    </Container>
+                                                                    
                                                                 </div>
                                                             </Col>
                                                         </Row>
                                                     </Card.Body>
                                                 </Card>
                                             </Col>
-                                            <Col xs="12" sm="4" className="d-none">
-                                                <Row>
-                                                    <Col xs="6">
-                                                        <div className="input-group mb-3">
-                                                            <div className="input-group-text">
-                                                                <input type="checkbox" className="form-check-input mt-0" aria-label="Checkbox for following text input" />
-                                                            </div>
-                                                            <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />                                                        
-                                                        </div>
-                                                    </Col>
-                                                    <Col xs="6">
-                                                        <div className="input-group mb-3">
-                                                            <div className="input-group-text py-1">
-                                                                <div className="form-check form-switch">
-                                                                    <input type="checkbox" className="form-check-input" 
-                                                                        aria-label="Checkbox for following text input" 
-                                                                        style={{ height: '20px' }}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <input type="text" className="form-control text-end" placeholder="0" aria-label="Text input with checkbox" />
-                                                            Days
-                                                        </div>
-                                                    </Col>
-                                                </Row>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="Employees"
+                                                    count={ adcData?.TotalEmployees ?? 0 }
+                                                    percentage={{
+                                                        color: 'primary',
+                                                        text: 'persons',
+                                                    }}
+                                                    icon={{
+                                                        icon: faUsers,
+                                                        bgColor: 'primary',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="Total Initial"
+                                                    count={ adcData?.TotalInitial ?? 0 }
+                                                    percentage={{
+                                                        color: 'info',
+                                                        text: 'days',
+                                                    }}
+                                                    icon={{
+                                                        icon: faCalendarDay,
+                                                        bgColor: 'info',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="Total MD11"
+                                                    count={ adcData?.TotalMD11 ?? 0 }
+                                                    percentage={{
+                                                        color: 'secondary',
+                                                        text: 'days',
+                                                    }}
+                                                    icon={{
+                                                        icon: faCalendarDay,
+                                                        bgColor: 'secondary',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="Surveillance"
+                                                    count={ adcData?.TotalSurveillance ?? 0 }
+                                                    percentage={{
+                                                        color: 'dark',
+                                                        text: 'days',
+                                                    }}
+                                                    icon={{
+                                                        icon: faCalendarDay,
+                                                        bgColor: 'dark',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="RR"
+                                                    count={ adcData?.TotalRR ?? 0 }
+                                                    percentage={{
+                                                        color: 'dark',
+                                                        text: 'days',
+                                                    }}
+                                                    icon={{
+                                                        icon: faCalendarDay,
+                                                        bgColor: 'dark',
+                                                    }}
+                                                />
                                             </Col>
                                         </Row>
-
                                     </Modal.Body>
                                     <Modal.Footer>
                                     <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
