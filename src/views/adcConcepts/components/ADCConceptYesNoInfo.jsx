@@ -17,7 +17,8 @@ const ADCConceptYesNoInfo = ({ item, ...props }) => {
                                 <span className="badge bg-gradient-primary text-white">No</span> Increase:
                             </span>
                         )}
-                        {item.Increase} {item.IncreaseUnit == ADCConceptUnitType.days ? 'Days' : '%'}
+                        {item.Increase}
+                        {item.IncreaseUnit == ADCConceptUnitType.days ? ' days' : ' %'}
                     </p>
                 ) : null
             }
@@ -33,7 +34,8 @@ const ADCConceptYesNoInfo = ({ item, ...props }) => {
                                 <span className="badge bg-gradient-primary text-white">No</span> Decrease:
                             </span>
                         )}
-                        {item.Decrease} {item.DecreaseUnit == ADCConceptUnitType.days ? 'Days' : '%'}
+                        {item.Decrease} 
+                        {item.DecreaseUnit == ADCConceptUnitType.days ? ' days' : ' %'}
                     </p>
                 ) : null
             }

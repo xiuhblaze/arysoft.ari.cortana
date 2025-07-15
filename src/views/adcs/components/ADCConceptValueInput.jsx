@@ -2,13 +2,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAlignLeft, faCalendarDay, faMinus, faPercent } from '@fortawesome/free-solid-svg-icons';
 import enums from '../../../helpers/enums';
 import { useEffect, useState } from 'react';
-import { useADCController } from '../context/ADCContext';
+import { setADCSitesList, updateADCConceptValue, useADCController } from '../context/ADCContext';
+import { useField } from 'formik';
 
-const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props }) => {
+const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
+    const [field, meta] = useField(props);
+
     const {
         ADCConceptUnitType,
     } = enums();
-    useADCController();
+    const [controller, dispatch]= useADCController();
+    const { 
+        adcData,
+        adcSitesList,
+        adcConceptValuesList,
+    } = controller;
 
     const decreaseList = [
         { value: 0, label: '0' },
@@ -20,9 +28,13 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
 
     // HOOKS
 
-    const [checkValue, setCheckValue] = useState(adcConceptValue.CheckValue);
-    const [iconUnit, setIconUnit] = useState({ icon: faMinus, label: '-' });
+    const [checkValue, setCheckValue] = useState(adcConceptValue.CheckValue);    
     const [isDecrease, setIsDecrease] = useState(false);
+    const [myProps, setMyProps] = useState({ 
+        icon: faMinus, 
+        label: '-',
+        disabled: true,
+    });
 
     useEffect(() => {
         // let unitType = ADCConceptUnitType.nothing;
@@ -53,30 +65,69 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         );
 
         if (unit != ADCConceptUnitType.nothing) {
-            setIconUnit(unit == ADCConceptUnitType.percentage 
-                ? { icon: faPercent, label: 'percent' } 
-                : { icon: faCalendarDay, label: 'days' }
+            setMyProps(unit == ADCConceptUnitType.percentage 
+                ? { icon: faPercent, label: 'percent', disabled: false } 
+                : { icon: faCalendarDay, label: 'days', disabled: false }
             );
         } else {
-            setIconUnit({ icon: faMinus, label: '-' });
+            setMyProps({ icon: faMinus, label: '-', disabled: true });
         }
 
     }, [checkValue]);
 
-    // useEffect(() => {
-
-    //     if (!!adcConcept && !!adcConceptValue) {
-    //         console.log('useEffect', adcConcept, adcConceptValue);
-    //     }
-    // }, [adcConcept, adcConceptValue]);
-
     const onChangeValue = (id, value) => {
-        console.log('onChangeValue: set values at ADCCotext', id, value);
-    };
+        // console.log('onChangeValue: set values at ADCContext', id, value);
+
+        // console.log('adcConcept', adcConcept);
+        // console.log('adcConceptValue', adcConceptValue);
+
+        console.log('onChangeValue', {
+            adcConceptValueID: adcConceptValue.ID,
+            checkValue: checkValue,
+            newValue: Number(value),
+        });
+
+        updateADCConceptValue(dispatch, {
+            adcConceptValueID: adcConceptValue.ID,
+            checkValue: checkValue,
+            newValue: Number(value),
+        });
+
+        // const newADCSitesList = adcSitesList.map(adcSite => {
+        //     if (adcSite.ID == adcConceptValue.ADCSiteID) {
+        //         const newADCConceptValuesList = adcSite.ADCConceptValues.map(adccvItem => {
+        //             if (adccvItem.ID == adcConceptValue.ID) {
+        //                 return {
+        //                     ...adccvItem,
+        //                     CheckValue: checkValue,
+        //                     Value: Number(value),
+        //                 };
+        //             }
+        //             return adccvItem
+        //         });
+
+        //         return {
+        //             ...adcSite,
+        //             ADCConceptValues: newADCConceptValuesList,
+        //         };
+        //     }
+        //     return adcSite;
+        // });
+
+        // setADCSitesList(dispatch, newADCSitesList);
+
+        //console.log('newADCSitesList', adcSitesList);
+
+        // Verificar que sea un valor valido
+        // Actualizar el valor en el ADCContext
+        // Enviar a formik el valor
+        // Recalcular todos los totales del ADC
+
+    }; // onChangeValue
     
 
     return (
-        <div className="input-group mb-3" {...props}>
+        <div className="input-group mb-3">
             <div className="input-group-text py-1">
                 <div className="form-check form-switch">
                     <input type="checkbox" className="form-check-input"
@@ -94,6 +145,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             {
                 isDecrease ? (
                     <select 
+                        {...field}                        
                         onChange={(e) => {
                             const value = e.target.value;
                             onChangeValue(adcConceptValue.ID, value);
@@ -102,13 +154,16 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                         }}
                         className="form-select text-end ari-pe-2"
                         defaultValue={adcConceptValue.Value}
+                        disabled={ myProps.disabled }
                     >
-                        {decreaseList.map((item, index) => (
+                        { decreaseList.map((item, index) => (
                             <option key={index} value={item.value} className="text-end">{item.label}</option>
                         ))}
                     </select>
                 ) : (
-                    <input type="text"
+                    <input 
+                        {...field}
+                        type="text"
                         className="form-control ari-form-control-with-end text-end"
                         placeholder="0"
                         aria-label="Text input with checkbox"
@@ -123,11 +178,12 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                             //console.log('onBlur', adcConceptValue.ID, e.target.value);
                             onChangeValue(adcConceptValue.ID, e.target.value);
                         }}
+                        disabled={ myProps.disabled }
                     />
                 )
             }
             <span className="input-group-text ari-input-group-text-end text-sm">
-                <FontAwesomeIcon icon={ iconUnit.icon } title={ iconUnit.label } />
+                <FontAwesomeIcon icon={ myProps.icon } title={ myProps.label } />
             </span>
             <button 
                 className="btn btn-outline-light ari-btn-outline-light-2 px-3 mb-0" 
