@@ -1,8 +1,9 @@
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAlignLeft, faCalendarDay, faMinus, faPercent } from '@fortawesome/free-solid-svg-icons';
 import enums from '../../../helpers/enums';
 import { useEffect, useState } from 'react';
-import { setADCSitesList, updateADCConceptValue, useADCController } from '../context/ADCContext';
+import { setADCSiteList, updateADCConceptValue, updateTotals, useADCController } from '../context/ADCContext';
 import { useField } from 'formik';
 
 const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
@@ -14,8 +15,8 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
     const [controller, dispatch]= useADCController();
     const { 
         adcData,
-        adcSitesList,
-        adcConceptValuesList,
+        adcSiteList,
+        adcConceptList,
     } = controller;
 
     const decreaseList = [
@@ -34,6 +35,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
         icon: faMinus, 
         label: '-',
         disabled: true,
+        unit: ADCConceptUnitType.nothing,
     });
 
     useEffect(() => {
@@ -66,11 +68,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
 
         if (unit != ADCConceptUnitType.nothing) {
             setMyProps(unit == ADCConceptUnitType.percentage 
-                ? { icon: faPercent, label: 'percent', disabled: false } 
-                : { icon: faCalendarDay, label: 'days', disabled: false }
+                ? { icon: faPercent, label: 'percent', disabled: false, unit: ADCConceptUnitType.percentage } 
+                : { icon: faCalendarDay, label: 'days', disabled: false, unit: ADCConceptUnitType.days }
             );
         } else {
-            setMyProps({ icon: faMinus, label: '-', disabled: true });
+            setMyProps({ icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
         }
 
     }, [checkValue]);
@@ -78,50 +80,24 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
     const onChangeValue = (id, value) => {
         // console.log('onChangeValue: set values at ADCContext', id, value);
 
-        // console.log('adcConcept', adcConcept);
-        // console.log('adcConceptValue', adcConceptValue);
-
-        console.log('onChangeValue', {
-            adcConceptValueID: adcConceptValue.ID,
-            checkValue: checkValue,
-            newValue: Number(value),
-        });
+        // console.log('onChangeValue', {
+        //     adcConceptValueID: adcConceptValue.ID,
+        //     checkValue: checkValue,
+        //     newValue: Number(value),
+        // });
 
         updateADCConceptValue(dispatch, {
             adcConceptValueID: adcConceptValue.ID,
             checkValue: checkValue,
             newValue: Number(value),
+            unit: myProps.unit,
         });
 
-        // const newADCSitesList = adcSitesList.map(adcSite => {
-        //     if (adcSite.ID == adcConceptValue.ADCSiteID) {
-        //         const newADCConceptValuesList = adcSite.ADCConceptValues.map(adccvItem => {
-        //             if (adccvItem.ID == adcConceptValue.ID) {
-        //                 return {
-        //                     ...adccvItem,
-        //                     CheckValue: checkValue,
-        //                     Value: Number(value),
-        //                 };
-        //             }
-        //             return adccvItem
-        //         });
-
-        //         return {
-        //             ...adcSite,
-        //             ADCConceptValues: newADCConceptValuesList,
-        //         };
-        //     }
-        //     return adcSite;
-        // });
-
-        // setADCSitesList(dispatch, newADCSitesList);
-
-        //console.log('newADCSitesList', adcSitesList);
-
         // Verificar que sea un valor valido
-        // Actualizar el valor en el ADCContext
+        // Actualizar el valor en el ADCContext - Ya con updateADCConceptValue
         // Enviar a formik el valor
-        // Recalcular todos los totales del ADC
+        
+        updateTotals(dispatch);
 
     }; // onChangeValue
     
@@ -153,7 +129,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
                             // formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
                         }}
                         className="form-select text-end ari-pe-2"
-                        defaultValue={adcConceptValue.Value}
+                        defaultValue={adcConceptValue.Value ?? 0}
                         disabled={ myProps.disabled }
                     >
                         { decreaseList.map((item, index) => (
@@ -168,7 +144,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
                         placeholder="0"
                         aria-label="Text input with checkbox"
                         // value={adcConceptValue.Value}
-                        defaultValue={adcConceptValue.Value}
+                        defaultValue={adcConceptValue.Value ?? '0'}
                         // onChange={(e) => {
                         //     const value = e.target.value;
                         //     //console.log('onChange', value);

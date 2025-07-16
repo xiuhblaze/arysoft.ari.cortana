@@ -22,7 +22,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { setADCData, setADCSitesList, useADCController } from '../context/ADCContext';
+import { setADCConceptList, setADCData, setADCSiteList, useADCController } from '../context/ADCContext';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -32,8 +32,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [ controller, dispatch ] = useADCController();
     const {
         adcData,
-        adcSitesList,
-        adcConceptValuesList,
+        adcSiteList,
+        adcConceptList,
     } = controller;
 
     const {
@@ -45,6 +45,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     const formDefaultValues = {
         descriptionInput: '',
+        extraInfoInput: '',
+        statusSelect: '',
+        reviewCommentsInput: '',
     };
 
     const validationSchema = Yup.object({
@@ -124,6 +127,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 auditCycleAsync(adc.AppForm.AuditCycleID);
             }
 
+            setInitialValues({
+                descriptionInput: adc.Description ?? '',
+                extraInfoInput: adc.ExtraInfo ?? '',
+                statusSelect: adc.Status,
+                reviewCommentsInput: adc.ReviewComments ?? '',
+            });
+
             adcConceptsAsync({
                 standardID: adc.AppForm.StandardID,
                 status: DefaultStatusType.active,
@@ -138,9 +148,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         console.log('adcData', adcData);
-        console.log('adcSitesList', adcSitesList);
-    }, [adcData, adcSitesList]);
+        console.log('adcSiteList', adcSiteList);
+    }, [adcData, adcSiteList]);
     
+    useEffect(() => {
+        if (!!adcConcepts) {
+            setADCConceptList(dispatch, adcConcepts);
+        }
+    }, [adcConcepts]);
     
     // METHODS
 
@@ -148,26 +163,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         // console.log('loadData', adc);
         if (!!adc) {
             setADCData(dispatch, adc);
-            setADCSitesList(dispatch, adc.ADCSites);
+            setADCSiteList(dispatch, adc.ADCSites);
         }
     }; // loadData
 
     const calculateData = () => {
         // console.log('calculateData', adcData, adcSitesList);
-        if (!!adcData && !!adcSitesList && adcSitesList.length > 0) {            
-            const totalEmployees = adcSitesList
+        if (!!adcData && !!adcSiteList && adcSiteList.length > 0) {            
+            const totalEmployees = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.Employees, 0);
-            const totalInitial = adcSitesList
+            const totalInitial = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.InitialMD5, 0);
-            const totalMD11 = adcSitesList
+            const totalMD11 = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.MD11, 0);
-            const totalSurveillance = adcSitesList
+            const totalSurveillance = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.Surveillance, 0);
-            const totalRR = adcSitesList
+            const totalRR = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.RR, 0);
 
@@ -317,8 +332,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 {
                                                                                     isADCLoading ? (
                                                                                         <th className={headStyle}>Loading...</th>
-                                                                                    ) : adcSitesList.length > 0 ? (  //!!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? ( 
-                                                                                        adcSitesList.map(adcSite =>  
+                                                                                    ) : adcSiteList.length > 0 ? (  //!!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? ( 
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <th key={adcSite.ID} className={headStyle}>
                                                                                             { adcSite.SiteDescription }
                                                                                         </th>
@@ -341,7 +356,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
                                                                                     ) : (
-                                                                                        adcSitesList.map(adcSite =>  
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                             <td key={adcSite.ID}>
                                                                                                 <p className={`${pStyle} text-end`}>
                                                                                                     { adcSite.Employees } 
@@ -378,8 +393,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.InitialMD5 }
@@ -389,7 +404,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </p>
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                             {
@@ -401,8 +416,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </h6>
                                                                                         </th>
                                                                                     </tr>
-                                                                                ) : !!adcConcepts && adcConcepts.length > 0 ? (
-                                                                                    adcConcepts.map(adcConcept => 
+                                                                                ) : (
+                                                                                    adcConceptList.map(adcConcept => 
                                                                                     <tr key={ adcConcept.ID }>
                                                                                         <th>
                                                                                             <h6 className={h6Style}>{adcConcept.Description}</h6>
@@ -414,25 +429,23 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             <ADCConceptYesNoInfo item={adcConcept} />
                                                                                         </td>
                                                                                         {
-                                                                                            !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                                adc.ADCSites.map(adcSite =>  
-                                                                                                <td key={adcSite.ID}>
-                                                                                                    { adcSite.ADCConceptValues
-                                                                                                        .filter(acv => acv.ADCConceptID == adcConcept.ID)
-                                                                                                        .map(acv => 
-                                                                                                            <ADCConceptValueInput 
-                                                                                                                key={acv.ID} 
-                                                                                                                name={`ADCConceptValue.${acv.ID}`}
-                                                                                                                adcConcept={adcConcept} 
-                                                                                                                adcConceptValue={acv} 
-                                                                                                            />
-                                                                                                    )}
-                                                                                                </td>
-                                                                                                )
-                                                                                            ) : null
+                                                                                            adcSiteList.map(adcSite =>  
+                                                                                            <td key={adcSite.ID}>
+                                                                                                { adcSite.ADCConceptValues
+                                                                                                    .filter(acv => acv.ADCConceptID == adcConcept.ID)
+                                                                                                    .map(acv => 
+                                                                                                        <ADCConceptValueInput 
+                                                                                                            key={acv.ID} 
+                                                                                                            name={`ADCConceptValue.${acv.ID}`}
+                                                                                                            adcConcept={adcConcept} 
+                                                                                                            adcConceptValue={acv} 
+                                                                                                        />
+                                                                                                )}
+                                                                                            </td>
+                                                                                            )
                                                                                         }
                                                                                     </tr>
-                                                                                )) : null
+                                                                                ))
                                                                             }
                                                                             <tr>
                                                                                 <th className={firstColStyle}>
@@ -446,8 +459,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.TotalInitial ?? 0 }
@@ -457,7 +470,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </p>
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    ) 
                                                                                 }
                                                                             </tr>
                                                                             <tr>
@@ -472,8 +485,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <div className="input-group mb-3">
                                                                                                 <input type="text" 
@@ -493,7 +506,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             {/* <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p> */}
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
@@ -508,8 +521,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.Surveillance ?? 0 }
@@ -519,7 +532,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </p>
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
@@ -534,8 +547,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.RR ?? 0 }
@@ -545,7 +558,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </p>
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
@@ -560,13 +573,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
-                                                                                    ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                        adc.ADCSites.map(adcSite =>  
+                                                                                    ) : (
+                                                                                        adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p>
                                                                                         </td>
                                                                                         )
-                                                                                    ) : null
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                         </tbody>                                                                    
