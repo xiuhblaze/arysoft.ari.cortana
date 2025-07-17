@@ -110,13 +110,13 @@ const ADCControllerProvider = ({ children }) => {
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
             
             // Recertification
-            const rr = Math.floor((totalInitial / 3) * 10) / 10; //! Esta formula no está bien. No se puede reducir menos del 50% del totalInicial
+            const rr = (totalInitial / 3) * 10; //! Esta formula no está bien. No se puede reducir menos del 50% del totalInicial 
             totalRR += rr;
 
             return {
                 ...adcSite,
-                TotalInitial: totalDays,
-                Surveillance: surveillance,
+                TotalInitial: round(totalDays, 2),
+                Surveillance: round(surveillance, 2)
             };
         }); // newADCSiteList
 
