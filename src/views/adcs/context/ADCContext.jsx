@@ -10,7 +10,7 @@ const ADCControllerProvider = ({ children }) => {
         ADCConceptUnitType
     } = enums();
 
-    const { round } = aryMathTools();
+    const { round, roundDays } = aryMathTools();
 
     const initialState = {
         adcData: null,
@@ -55,6 +55,9 @@ const ADCControllerProvider = ({ children }) => {
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
         console.log('updateTotals()');
+        const TOTAL_INITIAL_MIN_DAYS = 2;
+        const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
+        const RR_PERCENT_BASE = 33; // 33% de TotalInitial del site
 
         const { acdData, adcSiteList } = state;
         let totalInitial = 0;       // equivalente a ST1 y ST2
@@ -97,36 +100,49 @@ const ADCControllerProvider = ({ children }) => {
                     }
                 }
             }); 
+
+            //* Validaciones
+
+            // If the total initial is greater than the maximum allowed, it will be reduced to the maximum allowed
+            const maxRedution = adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100));
+            const exceedsReduction = totalDays < maxRedution;
             
             // Totales por sitio
             totalInitial += totalDays;
             totalEmployees += adcSite.Employees;
+            totalMD11 += adcSite.MD11;
             
             // Surveillance
             const survPercentBase = 30; // 30% de TotalInitial del site
-            const survResult = totalInitial * (survPercentBase / 100);
-            //const surveillance = Math.floor((totalInitial * (survPercent / 100)) * 10) / 10; // Redondea a un digito
-            const surveillance = Math.round(survResult * 10) / 10; // Redondea a un digito
+            const surveillance = totalDays * (survPercentBase / 100);
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
             
             // Recertification
-            const rr = (totalInitial / 3) * 10; //! Esta formula no está bien. No se puede reducir menos del 50% del totalInicial 
+            
+            const rr = totalDays * ((100 - RR_PERCENT_BASE) / 100);
             totalRR += rr;
 
             return {
                 ...adcSite,
                 TotalInitial: round(totalDays, 2),
-                Surveillance: round(surveillance, 2)
+                Surveillance: round(surveillance, 2),
+                //MD11: round(totalMD11, 2),
+                RR: round(rr, 2),
+                ExceedsMaximumReduction: exceedsReduction,
             };
         }); // newADCSiteList
 
+        // None initial certification shall be less than 2 audit days
+        if (totalInitial < TOTAL_INITIAL_MIN_DAYS) totalInitial = TOTAL_INITIAL_MIN_DAYS;
+
         const newADCData = {
             ...acdData,
-            TotalInitial: round(totalInitial, 2, 'up'),
-            TotalEmployees: round(totalEmployees, 2, 'up'),
-            TotalMD11: round(totalMD11, 2, 'up'),
-            TotalSurveillance: round(totalSurveillance, 2, 'up'),
-            TotalRR: round(totalRR, 2, 'up'),
+            TotalInitial: roundDays(totalInitial, 2, 'up'),
+            TotalEmployees: totalEmployees, 
+            TotalMD11: roundDays(totalMD11, 2, 'up'),
+            TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
+            TotalRR: roundDays(totalRR, 2, 'up'),
+            //ExceedsMaximumReduction: totalInitial > (totalInitial * TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100),
         }
 
         return {

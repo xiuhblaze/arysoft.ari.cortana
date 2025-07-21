@@ -126,11 +126,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
 
     const onBlur = (e) => { // Cuando se deja el input de Value
         const { name, value } = e.target;
-        console.log('onBlur', name, value);
+        // console.log('onBlur', name, value);
 
         if (name === 'value') {
             //! validar que sea un numero
-            console.log('onChange, update value', value);
+            // console.log('onChange, update value', value);
             updateConceptValues(value ?? 0, formData.justification);
         }
     };
@@ -152,7 +152,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
     }; // updateConceptValues
 
     const onSaveJustification = () => {
-        console.log('onSaveJustification, update justification', formData.justification);
+        //console.log('onSaveJustification, update justification', formData.justification);
         updateConceptValues(formData.value);
         setCurrentJustification(formData.justification);
 
@@ -181,7 +181,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
 
     return (
         <>
-            <div className="mb-3">
+            <div {...props}>
                 <div className="input-group">
                     <div className="input-group-text py-1">
                         <div className="form-check form-switch">

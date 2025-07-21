@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Card, Col, Container, Modal, Row } from 'react-bootstrap';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
@@ -12,7 +12,7 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import { ViewLoading } from '../../../components/Loaders';
 import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
-import { faCalendarDay, faClock, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faExclamationTriangle, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -48,6 +48,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         extraInfoInput: '',
         statusSelect: '',
         reviewCommentsInput: '',
+        items: [], 
     };
 
     const validationSchema = Yup.object({
@@ -127,11 +128,20 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 auditCycleAsync(adc.AppForm.AuditCycleID);
             }
 
+            const itemsInputs = adc.ADCSites.map(adcSite => {
+                return {
+                    ID: adcSite.ID,
+                    MD11: adcSite.MD11 ?? '0',
+                    extraInfo: adcSite.ExtraInfo ?? '',
+                }
+            });
+
             setInitialValues({
                 descriptionInput: adc.Description ?? '',
                 extraInfoInput: adc.ExtraInfo ?? '',
                 statusSelect: adc.Status,
                 reviewCommentsInput: adc.ReviewComments ?? '',
+                items: itemsInputs,
             });
 
             adcConceptsAsync({
@@ -146,10 +156,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
     }, [adc]);
 
-    useEffect(() => {
-        console.log('adcData', adcData);
-        console.log('adcSiteList', adcSiteList);
-    }, [adcData, adcSiteList]);
+    // useEffect(() => {
+    //     console.log('adcData', adcData);
+    //     console.log('adcSiteList', adcSiteList);
+    // }, [adcData, adcSiteList]);
     
     useEffect(() => {
         if (!!adcConcepts) {
@@ -261,6 +271,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                         innerRef={formikRef}
                     >
                         {(formik) => {
+                            // console.log('formik', formik.values);
                             useEffect(() => {
                                 setHasChanges(formik.dirty);
                             }, [formik.dirty])
@@ -324,77 +335,48 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         <Row>
                                                             <Col xs="12">
                                                                 <div className='table-responsive'>
-                                                                    <table>
+                                                                    <table className='table align-items-center table-borderless'>
                                                                         <thead>
                                                                             <tr>
                                                                                 <th></th>
                                                                                 <th></th>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <th className={headStyle}>Loading...</th>
-                                                                                    ) : adcSiteList.length > 0 ? (  //!!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? ( 
-                                                                                        adcSiteList.map(adcSite =>  
-                                                                                        <th key={adcSite.ID} className={headStyle}>
-                                                                                            { adcSite.SiteDescription }
-                                                                                        </th>
-                                                                                        )
-                                                                                    ) : null
+                                                                                    adcSiteList.map(adcSite =>  
+                                                                                    <th key={adcSite.ID} className={headStyle}>
+                                                                                        { adcSite.SiteDescription }
+                                                                                    </th>
+                                                                                    )
                                                                                 }
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
                                                                             <tr>
-                                                                                <th>
+                                                                                <th className='text-end' colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Employees
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
+                                                                                    adcSiteList.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.Employees } 
+                                                                                                <span className="px-2" title="Employees">
+                                                                                                    <FontAwesomeIcon icon={ faUsers } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
                                                                                         </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
-                                                                                            <td key={adcSite.ID}>
-                                                                                                <p className={`${pStyle} text-end`}>
-                                                                                                    { adcSite.Employees } 
-                                                                                                    <span className="px-2" title="Employees">
-                                                                                                        <FontAwesomeIcon icon={ faUsers } fixedWidth />
-                                                                                                    </span>
-                                                                                                </p>
-                                                                                            </td>
-                                                                                        )
                                                                                     )
-                                                                                    // ) : !!adc && !!adc.ADCSites && adc.ADCSites.length > 0 ? (
-                                                                                    //     adc.ADCSites.map(adcSite =>  
-                                                                                    //     <td key={adcSite.ID}>
-                                                                                    //         <p className={`${pStyle} text-end`}>
-                                                                                    //             { adcSite.Employees } 
-                                                                                    //             <span className="px-2" title="Employees">
-                                                                                    //                 <FontAwesomeIcon icon={ faUsers } fixedWidth />
-                                                                                    //             </span>
-                                                                                    //         </p>
-                                                                                    //     </td>
-                                                                                    //     )
-                                                                                    // ) : null
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Initial MD5
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
+                                                                                    adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.InitialMD5 }
@@ -403,7 +385,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 </span>
                                                                                             </p>
                                                                                         </td>
-                                                                                        )
                                                                                     )
                                                                                 }
                                                                             </tr>
@@ -448,56 +429,45 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 ))
                                                                             }
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Total Initial
                                                                                     </h6>
-                                                                                </th>
-                                                                                <td></td>
+                                                                                </th>                                                                                
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
+                                                                                    adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                            <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
                                                                                                 { adcSite.TotalInitial ?? 0 }
                                                                                                 <span className="px-2" title="Days">
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
                                                                                                 </span>
                                                                                             </p>
+                                                                                            {
+                                                                                                !!adcSite.ExceedsMaximumReduction ? (
+                                                                                                    <span className="text-xs text-danger">
+                                                                                                        <FontAwesomeIcon icon={ faExclamationTriangle } className="me-1" size="sm" />
+                                                                                                        Exceeds maximum reduction
+                                                                                                    </span>
+                                                                                                ) : null
+                                                                                            }
                                                                                         </td>
-                                                                                        )
                                                                                     ) 
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         MD11
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
-                                                                                        <td key={adcSite.ID}>
-                                                                                            <div className="input-group mb-3">
-                                                                                                <input type="text" 
-                                                                                                    className="form-control ari-form-control-with-end text-end" 
-                                                                                                    placeholder="0" 
-                                                                                                    defaultValue={ adcSite.MD11 ?? 0 }
-                                                                                                    onChange={(e) => {
-                                                                                                        const value = e.target.value;
-                                                                                                        console.log('onChange', value);
-                                                                                                        //formik.setFieldValue(`ADCConceptValues.${adcConceptValue.ID}.Value`, value);
-                                                                                                    }}
+                                                                                    formik.values.items.map((item, index) =>  
+                                                                                        <td key={item.ID}>
+                                                                                            <div className="input-group">
+                                                                                                <Field
+                                                                                                    name={ `items[${index}].MD11` }
+                                                                                                    className="form-control ari-form-control-with-end text-end"
                                                                                                 />
                                                                                                 <span className="input-group-text ari-input-group-text-end text-sm">
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } title="Days" />
@@ -505,17 +475,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </div>
                                                                                             {/* <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p> */}
                                                                                         </td>
-                                                                                        )
                                                                                     )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Surveillance
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
                                                                                     isADCLoading ? (
                                                                                         <td>
@@ -536,12 +504,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Recertification (RR)
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
                                                                                     isADCLoading ? (
                                                                                         <td>
@@ -562,21 +529,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className={firstColStyle}>
+                                                                                <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Extra Info
                                                                                     </h6>
                                                                                 </th>
-                                                                                <td></td>
                                                                                 {
                                                                                     isADCLoading ? (
                                                                                         <td>
                                                                                             <FontAwesomeIcon icon={ faSpinner } spin />
                                                                                         </td>
                                                                                     ) : (
-                                                                                        adcSiteList.map(adcSite =>  
-                                                                                        <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p>
+                                                                                        formik.values.items.map((item, index) =>   
+                                                                                        <td key={item.ID}>
+                                                                                            {/* <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p> */}
+                                                                                            <Field
+                                                                                                name={ `items[${index}].extraInfo` }
+                                                                                                className="form-control"
+                                                                                                as="textarea"
+                                                                                                rows={ 3 }
+                                                                                            />
                                                                                         </td>
                                                                                         )
                                                                                     )
@@ -584,8 +556,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             </tr>
                                                                         </tbody>                                                                    
                                                                     </table>
-                                                                    <hr className="horizontal dark my-3" />
-                                                                    
+                                                                    {/* <hr className="horizontal dark my-3" /> */}
                                                                 </div>
                                                             </Col>
                                                         </Row>
