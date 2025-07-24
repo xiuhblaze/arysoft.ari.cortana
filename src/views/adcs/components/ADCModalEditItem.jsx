@@ -49,7 +49,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         statusSelect: '',
         reviewCommentsInput: '',
         items: [],
-        conceptValueHidden: false,
+        conceptValueHidden: 0,
     };
 
     const validationSchema = Yup.object({
@@ -57,7 +57,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             .max(500, 'Description must be less than 500 characters')
             .required('Description is required'),
         extraInfoInput: Yup.string()
-            .max(500, 'Extra info must be less than 500 characters')
+            .max(500, 'Extra info must be less than 500 characters'),
+        conceptValueHidden: Yup.number()
+            .max(0, 'At last a concept value is not valid')
     });
 
     // CUSTOM HOOKS
@@ -145,7 +147,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 statusSelect: adc.Status,
                 reviewCommentsInput: adc.ReviewComments ?? '',
                 items: itemsInputs,
-                conceptValueHidden: false,
+                conceptValueHidden: 0,
             });
 
             adcConceptsAsync({
@@ -215,10 +217,52 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     const onFormSubmit = (values) => {
 
-        console.log('onFormSubmit');
+        console.log('onFormSubmit()');
         console.log(values);
         console.log('adcData', adcData);
         console.log('adcSiteList', adcSiteList);
+
+        const toSave = {
+            ID: adc.ID,
+            Description: values.descriptionInput,
+            TotalInitial: adcData.TotalInitial,
+            TotalMD11: adcData.TotalMD11,
+            TotalSurveillance: adcData.TotalSurveillance,
+            TotalRR: adcData.TotalRR,
+            ReviewComments: '', // de este falta ver cuando se genera
+            ExtraInfo: values.extraInfoInput,
+            Status: values.statusSelect,
+        };
+
+        console.log('toSave', toSave);
+        console.log('----- Sites -----');
+
+        adcSiteList.forEach(adcSite => {
+            const localADCSite = values.items.find(item => item.ID == adcSite.ID);
+
+            const toADCSiteSave = {
+                ID: adcSite.ID,
+                SiteID: adcSite.SiteID,
+                TotalInitial: adcSite.TotalInitial,
+                MD11: localADCSite?.MD11 ?? 0,
+                Surveillance: adcSite.Surveillance,
+                RR: adcSite.RR,
+                ExtraInfo: localADCSite?.extraInfo ?? '',
+                Status: adcSite.Status,
+            };
+            console.log('toADCSiteSave', toADCSiteSave);
+            console.log('----- Concept Values -----');
+            adcSite.ADCConceptValues.forEach(adccvItem => {
+                console.log('adccvItem', adccvItem);
+                const toADCCVSave = {
+                    ID: adccvItem.ID,
+                    CheckValue: adccvItem.CheckValue,
+                    Value: adccvItem.Value,
+                    Justification:
+                    Status:
+                };
+            });
+        });
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -663,7 +707,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         <div className="text-secondary mb-3 mb-sm-0">
                                             <AryLastUpdatedInfo item={ adc } />
                                         </div>
-                                        {/* {
+                                        {
                                             !!formik.errors && !!formik.touched && Object.keys(formik.errors).length > 0 ?
                                             <div className="m-0">
                                                 <Alert variant="danger" className="text-sm text-white mb-0">
@@ -683,7 +727,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                     </ListGroup>
                                                 </Alert>
                                             </div> : null
-                                        } */}
+                                        }
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <button 
                                                 type="submit"

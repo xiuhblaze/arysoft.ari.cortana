@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 
 import { setIn, useField } from 'formik';
 import { Button, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAlignLeft, faCalendarDay, faCheckToSlot, faJ, faMinus, faPercent, faStickyNote } from '@fortawesome/free-solid-svg-icons';
+import { faAlignLeft, faCalendarDay, faCheckToSlot, faExclamationTriangle, faJ, faMinus, faPercent, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 
 import enums from '../../../helpers/enums';
 import { setADCSiteList, updateADCConceptValue, updateTotals, useADCController } from '../context/ADCContext';
@@ -38,9 +37,10 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         checkValue: adcConceptValue.CheckValue ?? false,
         value: adcConceptValue.Value ?? 0,
         justification: adcConceptValue.Justification ?? '',
-    })
+        error: null,
+    });
     const [currentJustification, setCurrentJustification] = useState(adcConceptValue.Justification ?? '');  
-
+    
     //const [checkValue, setCheckValue] = useState(adcConceptValue.CheckValue);    
     const [isDecrease, setIsDecrease] = useState(false);
     const [myProps, setMyProps] = useState({ 
@@ -90,7 +90,18 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         setFormData({
             ...formData,
             value: 0,
+            error: '',
         });
+
+        if (!!formik && !isNullOrEmpty(formData.error)) {
+            //console.log(formik.values.conceptValueHidden, 'aqui se debe restar');
+            formik.setFieldValue(
+                'conceptValueHidden', 
+                formik.values.conceptValueHidden == 0 
+                    ? 0 
+                    : formik.values.conceptValueHidden - 1
+            );
+        }
         // console.log('useEffect, update value,', 0);
         updateConceptValues(0);
 
@@ -98,46 +109,75 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
 
     // METHODS
 
-    const onChange = (e) => {
+    const isValidDays = (value) => {
+        const regex = /^-?\d*\.?\d*$/;
         let isValid = true;
-        const { name, value, type, checked } = e.target;
 
-        // Validations
+        if (regex.test(value) || value === '') { // Validar que sea un numero
 
-        if (name==='value' && type === 'text') { // Validar que sea un numero
-            const regex = /^-?\d*\.?\d*$/;
-            isValid = regex.test(value) || value === '';
-        }
+            // Validar que esté dentro del rango permitido - si es incremento
+            if ((formData.checkValue && adcConcept.WhenTrue && !!adcConcept.Increase)
+                || (!formData.checkValue && !adcConcept.WhenTrue && !!adcConcept.Increase)) {
 
-        if (isValid) {
-// console.log('onChange.isValid', name, value);
+                if (Number(value) > adcConcept.Increase || Number(value) < 0) {
+                    isValid = false;
+                    setFormData({
+                        ...formData,
+                        error: 'The increase value must be positive and less than the maximum allowed',
+                    });
+                    if (!!formik && isNullOrEmpty(formData.error)) {
+                        //formik.setFieldError('conceptValueHidden', 'At last a concept value is not valid');
+                        //console.log(formik.values.conceptValueHidden, 'aqui se debe sumar');
+                        formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden + 1);
+                    }
+                } else {
+                    setFormData({
+                        ...formData,
+                        error: ''
+                    });
+                    if (!!formik && !isNullOrEmpty(formData.error)) {
+                        //formik.setFieldError('conceptValueHidden', '');
+                        //console.log(formik.values.conceptValueHidden, 'aqui se debe restar');
+                        formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden == 0 ? 0 : formik.values.conceptValueHidden - 1);
+                    }
+                }
+            } 
+        } else {
+            isValid = false;
             setFormData({
                 ...formData,
-                [name]: type === 'checkbox' ? checked : value,
+                error: 'The value must be a number',
             });
-
-            if (type === 'select-one') { // Cuando se cambia el select
-                if (!!formik) {
-                    formik.setFieldTouched('conceptValueHidden', true);
-                    formik.setFieldValue('conceptValueHidden', true);
-                }
-                updateConceptValues(value, formData.justification);
-            }
         }
 
-        // console.log('onChange', value);
+        return isValid;
+    }; // isValidDays
+
+    const onChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value,
+        });
+
+        if (type === 'select-one') { // Cuando se cambia el select
+            if (!!formik) {
+                formik.setFieldTouched('conceptValueHidden', true);
+                //formik.setFieldValue('conceptValueHidden', true);
+            }
+            updateConceptValues(value, formData.justification);
+        }
     }; // onChange
 
     const onBlur = (e) => { // Cuando se deja el input de Value
         const { name, value } = e.target;
-        // console.log('onBlur', name, value);
-
-        if (name === 'value') {
-            //! validar que sea un numero
-            // console.log('onChange, update value', value);
+        
+        if (name === 'value' && isValidDays(value)) {
+            
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                formik.setFieldValue('conceptValueHidden', true);
+                //formik.setFieldValue('conceptValueHidden', true);
             }
             
             updateConceptValues(value ?? 0, formData.justification);
@@ -172,7 +212,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
 
         if (!!formik) {
             formik.setFieldTouched('conceptValueHidden', true);
-            formik.setFieldValue('conceptValueHidden', true);
+            //formik.setFieldValue('conceptValueHidden', true);
         }
 
         setShowModal(false);
@@ -259,9 +299,17 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                 </div>
                 {
                     !isNullOrEmpty(currentJustification) ? (
-                        <div className="text-xs text-secondary mt-1">
+                        <div className="text-xs text-secondary text-wrap mt-1">
                             <FontAwesomeIcon icon={ faStickyNote } fixedWidth className="text-warning me-1" />
                             {currentJustification}
+                        </div>
+                    ) : null
+                }
+                {
+                    !isNullOrEmpty(formData.error) ? ( 
+                        <div className="text-xs text-danger text-wrap mt-1">
+                            <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
+                            { formData.error }
                         </div>
                     ) : null
                 }
