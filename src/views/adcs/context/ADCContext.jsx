@@ -54,7 +54,7 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
-        console.log('updateTotals()');
+        //console.log('updateTotals()');
         const TOTAL_INITIAL_MIN_DAYS = 2;
         const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
         const RR_PERCENT_BASE = 33; // 33% de TotalInitial del site

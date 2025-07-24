@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Card, Col, Container, Modal, Row } from 'react-bootstrap';
+import { Alert, Card, Col, Container, ListGroup, Modal, Row } from 'react-bootstrap';
 import { Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -12,7 +12,7 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import { ViewLoading } from '../../../components/Loaders';
 import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
-import { faCalendarDay, faClock, faExclamationTriangle, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -48,13 +48,16 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         extraInfoInput: '',
         statusSelect: '',
         reviewCommentsInput: '',
-        items: [], 
+        items: [],
+        conceptValueHidden: false,
     };
 
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
             .max(500, 'Description must be less than 500 characters')
             .required('Description is required'),
+        extraInfoInput: Yup.string()
+            .max(500, 'Extra info must be less than 500 characters')
     });
 
     // CUSTOM HOOKS
@@ -142,6 +145,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 statusSelect: adc.Status,
                 reviewCommentsInput: adc.ReviewComments ?? '',
                 items: itemsInputs,
+                conceptValueHidden: false,
             });
 
             adcConceptsAsync({
@@ -210,7 +214,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }; // calculateData
 
     const onFormSubmit = (values) => {
-        console.log('onFormSubmit', values);
+
+        console.log('onFormSubmit');
+        console.log(values);
+        console.log('adcData', adcData);
+        console.log('adcSiteList', adcSiteList);
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -323,6 +331,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <Col xs="12" sm="12">
                                                 <Card>
                                                     <Card.Body className="p-3">
+                                                        {/* <Row>
+                                                            <Col xs="12">
+                                                                <Alert variant="danger" className="text-white">
+                                                                    <FontAwesomeIcon icon={ faExclamationTriangle } className="me-3" />
+                                                                    The sites employees has changed, review the values and save the ADC
+                                                                </Alert>
+                                                            </Col>
+                                                        </Row> */}
                                                         <Row>
                                                             <Col xs="12">
                                                                 <AryFormikTextInput
@@ -330,6 +346,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     label="Description"
                                                                     type="text"
                                                                 />
+                                                                <input type="hidden" name="conceptValueHidden" />
                                                             </Col>
                                                         </Row>
                                                         <Row>
@@ -420,6 +437,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                             name={`ADCConceptValue.${acv.ID}`}
                                                                                                             adcConcept={adcConcept} 
                                                                                                             adcConceptValue={acv} 
+                                                                                                            formik={formik}
                                                                                                         />
                                                                                                 )}
                                                                                             </td>
@@ -469,7 +487,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                     name={ `items[${index}].MD11` }
                                                                                                     className="form-control ari-form-control-with-end text-end"
                                                                                                 />
-                                                                                                <span className="input-group-text ari-input-group-text-end text-sm">
+                                                                                                <span 
+                                                                                                    className="input-group-text ari-input-group-text-end text-sm"
+                                                                                                    style={{ paddingRight: '58px' }}
+                                                                                                >
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } title="Days" />
                                                                                                 </span>
                                                                                             </div>
@@ -642,6 +663,27 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         <div className="text-secondary mb-3 mb-sm-0">
                                             <AryLastUpdatedInfo item={ adc } />
                                         </div>
+                                        {/* {
+                                            !!formik.errors && !!formik.touched && Object.keys(formik.errors).length > 0 ?
+                                            <div className="m-0">
+                                                <Alert variant="danger" className="text-sm text-white mb-0">
+                                                    <h6 className="text-sm text-white font-weight-bold"> 
+                                                        There are some errors in the form
+                                                    </h6>
+                                                    <ListGroup variant="flush" size="sm">
+                                                        { Object.keys(formik.errors).map(key => 
+                                                            <ListGroup.Item 
+                                                                key={key} 
+                                                                className="text-xs bg-transparent p-1 border-0"
+                                                            >
+                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                                                {formik.errors[key]}
+                                                            </ListGroup.Item>
+                                                        )} 
+                                                    </ListGroup>
+                                                </Alert>
+                                            </div> : null
+                                        } */}
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <button 
                                                 type="submit"

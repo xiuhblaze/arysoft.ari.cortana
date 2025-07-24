@@ -10,7 +10,7 @@ import enums from '../../../helpers/enums';
 import { setADCSiteList, updateADCConceptValue, updateTotals, useADCController } from '../context/ADCContext';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
-const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
+const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props }) => {
     // const [field, meta] = useField(props);
 
     const {
@@ -91,7 +91,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
             ...formData,
             value: 0,
         });
-        console.log('useEffect, update value,', 0);
+        // console.log('useEffect, update value,', 0);
         updateConceptValues(0);
 
     }, [formData.checkValue]);
@@ -117,6 +117,10 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
             });
 
             if (type === 'select-one') { // Cuando se cambia el select
+                if (!!formik) {
+                    formik.setFieldTouched('conceptValueHidden', true);
+                    formik.setFieldValue('conceptValueHidden', true);
+                }
                 updateConceptValues(value, formData.justification);
             }
         }
@@ -131,9 +135,14 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
         if (name === 'value') {
             //! validar que sea un numero
             // console.log('onChange, update value', value);
+            if (!!formik) {
+                formik.setFieldTouched('conceptValueHidden', true);
+                formik.setFieldValue('conceptValueHidden', true);
+            }
+            
             updateConceptValues(value ?? 0, formData.justification);
         }
-    };
+    }; // onBlur
 
     const updateConceptValues = (value, justification = '') => {
         
@@ -147,6 +156,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
 
         // Verificar que sea un valor valido
         // Actualizar el valor en el ADCContext - Ya con updateADCConceptValue
+        
+        // if (!!formik) {
+        //     formik.setFieldTouched('conceptValueHidden', true);
+        //     formik.setFieldValue('conceptValueHidden', true);
+        // }
                 
         updateTotals(dispatch);
     }; // updateConceptValues
@@ -155,6 +169,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, ...props }) => {
         //console.log('onSaveJustification, update justification', formData.justification);
         updateConceptValues(formData.value);
         setCurrentJustification(formData.justification);
+
+        if (!!formik) {
+            formik.setFieldTouched('conceptValueHidden', true);
+            formik.setFieldValue('conceptValueHidden', true);
+        }
 
         setShowModal(false);
     }; // onSaveJustification
