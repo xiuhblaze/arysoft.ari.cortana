@@ -18,6 +18,22 @@ const ADCControllerProvider = ({ children }) => {
         adcConceptList: [],
     } // initialState
 
+    const updateADCSite = (state, value) => { //! Todavia no jala
+        //const { ID, TotalInitial, MD11, Surveillance, RR, ExtraInfo, Status } = value;
+
+        const newADCSiteList = state.adcSiteList.map(adcSite => {
+            if (adcSite.ID == value.ID) {
+                return {
+                    ...adcSite,
+                    ...value,
+                };
+            }
+            return adcSite;
+        }); // newADCSiteList
+
+        return newADCSiteList;
+    };
+
     const updateADCConceptValue = (state, value) => {
         const {adcConceptValueID, checkValue, newValue, unit, justification } = value;
 
@@ -165,6 +181,13 @@ const ADCControllerProvider = ({ children }) => {
             case 'SET_ADC_CONCEPTS': {
                 return { ...state, adcConceptList: action.value };
             }
+            case 'UPDATE_ADC_SITE': {
+                const newState = updateTotals({
+                    ...state, 
+                    adcSiteList: updateADCSite(state, action.value)
+                })
+                return { ...newState };
+            }
             case 'UPDATE_ADC_CONCEPT_VALUE': {
                 const newState = updateTotals({
                     ...state, 
@@ -205,6 +228,7 @@ const useADCController = () => {
 const setADCData = (dispatch, value) => dispatch({ type: "SET_ADC_DATA", value });
 const setADCSiteList = (dispatch, value) => dispatch({ type: "SET_ADC_SITES_LIST", value });
 const setADCConceptList = (dispatch, value) => dispatch({ type: "SET_ADC_CONCEPTS", value });
+const updateADCSite = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SITE", value });
 const updateADCConceptValue = (dispatch, value) => dispatch({ type: "UPDATE_ADC_CONCEPT_VALUE", value });
 const updateTotals = (dispatch) => dispatch({ type: "UPDATE_TOTALS" });
 const clearADCController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
@@ -217,6 +241,7 @@ export {
     setADCSiteList,
     setADCConceptList,
     
+    updateADCSite,
     updateADCConceptValue,
     updateTotals,
 

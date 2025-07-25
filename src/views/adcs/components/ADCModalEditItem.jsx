@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Card, Col, Container, ListGroup, Modal, Row } from 'react-bootstrap';
-import { Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
@@ -22,7 +22,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { setADCConceptList, setADCData, setADCSiteList, useADCController } from '../context/ADCContext';
+import { setADCConceptList, setADCData, setADCSiteList, updateADCSite, useADCController } from '../context/ADCContext';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -58,6 +58,17 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             .required('Description is required'),
         extraInfoInput: Yup.string()
             .max(500, 'Extra info must be less than 500 characters'),
+        items: Yup.array().of(
+            Yup.object({
+                ID: Yup.string().required('ID is required'),
+                MD11: Yup.number()
+                    .typeError('MD11 must be a number')
+                    .min(0, 'MD11 must be greater than 0')
+                    .max(99, 'At last a concept value is not valid'),
+                extraInfo: Yup.string()
+                    .max(500, 'Extra info must be less than 500 characters'),
+            })
+        ),
         conceptValueHidden: Yup.number()
             .max(0, 'At last a concept value is not valid')
     });
@@ -218,7 +229,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const onFormSubmit = (values) => {
 
         console.log('onFormSubmit()');
-        console.log(values);
+        console.log('values', values);
         console.log('adcData', adcData);
         console.log('adcSiteList', adcSiteList);
 
@@ -239,7 +250,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         adcSiteList.forEach(adcSite => {
             const localADCSite = values.items.find(item => item.ID == adcSite.ID);
-
+            //console.log('localADCSite', localADCSite);
             const toADCSiteSave = {
                 ID: adcSite.ID,
                 SiteID: adcSite.SiteID,
@@ -253,14 +264,17 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             console.log('toADCSiteSave', toADCSiteSave);
             console.log('----- Concept Values -----');
             adcSite.ADCConceptValues.forEach(adccvItem => {
-                console.log('adccvItem', adccvItem);
+                
+                //console.log('adccvItem', adccvItem);
                 const toADCCVSave = {
                     ID: adccvItem.ID,
                     CheckValue: adccvItem.CheckValue,
                     Value: adccvItem.Value,
-                    Justification:
-                    Status:
+                    Justification: adccvItem.Justification,
+                    ValueUnit: adccvItem.ValueUnit,
+                    Status: adccvItem.Status,
                 };
+                console.log('toADCCVSave', toADCCVSave);
             });
         });
     }; // onFormSubmit
@@ -326,7 +340,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                             // console.log('formik', formik.values);
                             useEffect(() => {
                                 setHasChanges(formik.dirty);
-                            }, [formik.dirty])
+                            }, [formik.dirty]);
+
                             return (
                                 <Form>
                                     <Modal.Body>
@@ -530,7 +545,25 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 <Field
                                                                                                     name={ `items[${index}].MD11` }
                                                                                                     className="form-control ari-form-control-with-end text-end"
-                                                                                                />
+                                                                                                >
+                                                                                                    {({field, form, meta}) => ( //! AUN HAY UN ERROR CON LA VALIDACION
+                                                                                                        <input 
+                                                                                                            {...field}                                                                                                                
+                                                                                                            // className={`form-control ari-form-control-with-end text-end${meta.touched && meta.error ? ' is-invalid' : ''}`}
+                                                                                                            className="form-control ari-form-control-with-end text-end"
+                                                                                                            onBlur={(e) => {
+                                                                                                                const value = e.target.value;
+                                                                                                                // form.setFieldValue(`items[${index}].MD11`, value);
+                                                                                                                // console.log('onBlur - Actualizando MD11', value);
+                                                                                                                field.onBlur(e);
+                                                                                                                updateADCSite(dispatch, {
+                                                                                                                    ID: item.ID,
+                                                                                                                    MD11: Number(value),
+                                                                                                                })
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    )}
+                                                                                                </Field>
                                                                                                 <span 
                                                                                                     className="input-group-text ari-input-group-text-end text-sm"
                                                                                                     style={{ paddingRight: '58px' }}
@@ -538,7 +571,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } title="Days" />
                                                                                                 </span>
                                                                                             </div>
-                                                                                            {/* <p className={`${pStyle} text-center`}>{ adcSite.MD11 ?? 0 }</p> */}
+                                                                                            <ErrorMessage
+                                                                                                name={`items[${index}].MD11`}
+                                                                                                component="div"
+                                                                                                className="text-danger"
+                                                                                            />
                                                                                         </td>
                                                                                     )
                                                                                 }
@@ -550,12 +587,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     </h6>
                                                                                 </th>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
+                                                                                    adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.Surveillance ?? 0 }
@@ -564,7 +596,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 </span>
                                                                                             </p>
                                                                                         </td>
-                                                                                        )
                                                                                     )
                                                                                 }
                                                                             </tr>
@@ -575,12 +606,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     </h6>
                                                                                 </th>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        adcSiteList.map(adcSite =>  
+                                                                                    adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.RR ?? 0 }
@@ -589,7 +615,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 </span>
                                                                                             </p>
                                                                                         </td>
-                                                                                        )
                                                                                     )
                                                                                 }
                                                                             </tr>
@@ -600,12 +625,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     </h6>
                                                                                 </th>
                                                                                 {
-                                                                                    isADCLoading ? (
-                                                                                        <td>
-                                                                                            <FontAwesomeIcon icon={ faSpinner } spin />
-                                                                                        </td>
-                                                                                    ) : (
-                                                                                        formik.values.items.map((item, index) =>   
+                                                                                    formik.values.items.map((item, index) =>   
                                                                                         <td key={item.ID}>
                                                                                             {/* <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p> */}
                                                                                             <Field
@@ -615,7 +635,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 rows={ 3 }
                                                                                             />
                                                                                         </td>
-                                                                                        )
                                                                                     )
                                                                                 }
                                                                             </tr>
