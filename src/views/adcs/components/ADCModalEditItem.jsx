@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Card, Col, Container, ListGroup, Modal, Row } from 'react-bootstrap';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Alert, Card, Col, Collapse, Container, ListGroup, Modal, Row } from 'react-bootstrap';
+import { ErrorMessage, Field, Form, Formik, getIn } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
@@ -14,7 +14,7 @@ import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
 import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AryFormikTextInput } from '../../../components/Forms';
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import enums from '../../../helpers/enums';
 import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
@@ -23,6 +23,8 @@ import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInf
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import { setADCConceptList, setADCData, setADCSiteList, updateADCSite, useADCController } from '../context/ADCContext';
+import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
+import NotesListModal from '../../notes/components/NotesListModal';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -47,7 +49,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         descriptionInput: '',
         extraInfoInput: '',
         statusSelect: '',
-        reviewCommentsInput: '',
+        commentsInput: '',
         items: [],
         conceptValueHidden: 0,
     };
@@ -58,13 +60,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             .required('Description is required'),
         extraInfoInput: Yup.string()
             .max(500, 'Extra info must be less than 500 characters'),
+        commentsInput: Yup.string()
+            .max(250, 'Comments must be less than 500 characters'),
         items: Yup.array().of(
             Yup.object({
                 ID: Yup.string().required('ID is required'),
                 MD11: Yup.number()
                     .typeError('MD11 must be a number')
                     .min(0, 'MD11 must be greater than 0')
-                    .max(99, 'At last a concept value is not valid'),
+                    .max(99, 'MD11 must be less than 100'),
                 extraInfo: Yup.string()
                     .max(500, 'Extra info must be less than 500 characters'),
             })
@@ -117,6 +121,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [hasChanges, setHasChanges] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
+    const [originalStatus, setOriginalStatus] = useState(null);
+    const [statusOptions, setStatusOptions] = useState([]);
+    const [showComments, setShowComments] = useState(false);
+    const [saveNote, setSaveNote] = useState(''); 
+
     useEffect(() => {
 
         if (!!show) {
@@ -129,6 +138,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 actionsForCloseModal();
             }
             getRandomBackgroundImage().then(image => setBackgroundImage(image));
+            setOriginalStatus(null);
         }
     }, [show]);
 
@@ -156,7 +166,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 descriptionInput: adc.Description ?? '',
                 extraInfoInput: adc.ExtraInfo ?? '',
                 statusSelect: adc.Status,
-                reviewCommentsInput: adc.ReviewComments ?? '',
+                commentsInput: '',
                 items: itemsInputs,
                 conceptValueHidden: 0,
             });
@@ -168,15 +178,28 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 order: ADCConceptOrderType.indexSort,
             });
 
+            setOriginalStatus(adc.Status);
+            setStatusOptions(adcSetStatusOptions(adc.Status));
+            setShowComments(false);
+
             loadData();
             calculateData();
         }
     }, [adc]);
 
-    // useEffect(() => {
-    //     console.log('adcData', adcData);
-    //     console.log('adcSiteList', adcSiteList);
-    // }, [adcData, adcSiteList]);
+    useEffect(() => {
+        
+        if (!!adcSavedOk) {
+            console.log('...saved ok');
+
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({ OwnerID: adc.ID, Text: saveNote });
+                setSaveNote('');
+            }            
+            Swal.fire('ADC', 'Changes made successfully', 'success');            
+            actionsForCloseModal();
+        }
+    }, [adcSavedOk]);
     
     useEffect(() => {
         if (!!adcConcepts) {
@@ -233,6 +256,25 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         console.log('adcData', adcData);
         console.log('adcSiteList', adcSiteList);
 
+        let reviewComments = adc.ReviewComments;
+        let newStatus = adc.Status == ADCStatusType.nothing
+            ? ADCStatusType.new
+            : values.statusSelect;
+
+        if (adc.Status != newStatus) { // Si cambió el status crear una nota
+            const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
+
+            setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
+
+            if (newStatus == ADCStatusType.review) {
+                reviewComments = values.commentsInput;
+            } 
+
+            if (newStatus == ADCStatusType.rejected || newStatus == ADCStatusType.active) {
+                reviewComments = values.commentsInput;
+            }
+        }
+
         const toSave = {
             ID: adc.ID,
             Description: values.descriptionInput,
@@ -240,12 +282,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             TotalMD11: adcData.TotalMD11,
             TotalSurveillance: adcData.TotalSurveillance,
             TotalRR: adcData.TotalRR,
-            ReviewComments: '', // de este falta ver cuando se genera
+            ReviewComments: reviewComments,
             ExtraInfo: values.extraInfoInput,
-            Status: values.statusSelect,
+            Status: newStatus,
         };
 
         console.log('toSave', toSave);
+        adcSaveAsync(toSave);
+        console.log('send to save...');
         console.log('----- Sites -----');
 
         adcSiteList.forEach(adcSite => {
@@ -399,13 +443,65 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             </Col>
                                                         </Row> */}
                                                         <Row>
-                                                            <Col xs="12">
-                                                                <AryFormikTextInput
-                                                                    name="descriptionInput"
-                                                                    label="Description"
+                                                            <Col xs="6">
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <AryFormikTextInput
+                                                                            name="descriptionInput"
+                                                                            label="Description"
+                                                                            type="text"
+                                                                        />
+                                                                        <input type="hidden" name="conceptValueHidden" />
+                                                                    </Col>
+                                                                </Row>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <AryFormikSelectInput
+                                                                            name="statusSelect"
+                                                                            label="Status"
+                                                                            onChange={ (e) => {
+                                                                                const selectedValue = e.target.value;
+
+                                                                                formik.setFieldValue('statusSelect', selectedValue);
+                                                                                setShowComments(originalStatus != selectedValue);
+                                                                            }}
+                                                                        >
+                                                                            <option value="">(select a status)</option>
+                                                                            { statusOptions.map((option) => (
+                                                                                <option key={option.value} value={option.value}>{option.label}</option>
+                                                                            )) }
+                                                                        </AryFormikSelectInput>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Collapse in={ showComments }>
+                                                                    <Row>
+                                                                        <Col xs="12">
+                                                                            <AryFormikTextInput
+                                                                                name="commentsInput"
+                                                                                label="Comments"
+                                                                                type="text"
+                                                                                helpText="Add any comments for the status change"
+                                                                            />
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Collapse>
+                                                            </Col>
+                                                            <Col xs="6">
+                                                                <AryFormikTextArea
+                                                                    name="extraInfoInput"
+                                                                    label="Extra Info"
+                                                                    placehoolder="Add any extra info"
                                                                     type="text"
+                                                                    rows={ 3 }
                                                                 />
-                                                                <input type="hidden" name="conceptValueHidden" />
+                                                                {
+                                                                    !!adc.Notes && adc.Notes.length > 0 &&
+                                                                    <Row>
+                                                                        <Col xs="12">
+                                                                            <NotesListModal notes={adc.Notes} buttonLabel="View notes" />
+                                                                        </Col>
+                                                                    </Row>
+                                                                }
                                                             </Col>
                                                         </Row>
                                                         <Row>
@@ -418,9 +514,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 <th></th>
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
-                                                                                    <th key={adcSite.ID} className={headStyle}>
-                                                                                        { adcSite.SiteDescription }
-                                                                                    </th>
+                                                                                        <th key={adcSite.ID} className={headStyle}>
+                                                                                            { adcSite.SiteDescription }
+                                                                                        </th>
                                                                                     )
                                                                                 }
                                                                             </tr>
@@ -546,23 +642,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                     name={ `items[${index}].MD11` }
                                                                                                     className="form-control ari-form-control-with-end text-end"
                                                                                                 >
-                                                                                                    {({field, form, meta}) => ( //! AUN HAY UN ERROR CON LA VALIDACION
-                                                                                                        <input 
-                                                                                                            {...field}                                                                                                                
-                                                                                                            // className={`form-control ari-form-control-with-end text-end${meta.touched && meta.error ? ' is-invalid' : ''}`}
-                                                                                                            className="form-control ari-form-control-with-end text-end"
-                                                                                                            onBlur={(e) => {
-                                                                                                                const value = e.target.value;
-                                                                                                                // form.setFieldValue(`items[${index}].MD11`, value);
-                                                                                                                // console.log('onBlur - Actualizando MD11', value);
-                                                                                                                field.onBlur(e);
-                                                                                                                updateADCSite(dispatch, {
-                                                                                                                    ID: item.ID,
-                                                                                                                    MD11: Number(value),
-                                                                                                                })
-                                                                                                            }}
-                                                                                                        />
-                                                                                                    )}
+                                                                                                    {({field, form}) => {
+                                                                                                        const error = getIn(form.errors, `items[${index}].MD11`);
+                                                                                                        const touched = getIn(form.touched, `items[${index}].MD11`);
+                                                                                                        
+                                                                                                        return (
+                                                                                                            <input 
+                                                                                                                {...field}                                                                                                                
+                                                                                                                className={`form-control ari-form-control-with-end text-end${touched && error ? ' is-invalid' : ''}`} 
+                                                                                                                onBlur={(e) => {
+                                                                                                                    const value = e.target.value;
+
+                                                                                                                    field.onBlur(e);
+                                                                                                                    updateADCSite(dispatch, {
+                                                                                                                        ID: item.ID,
+                                                                                                                        MD11: Number(value),
+                                                                                                                    })
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        )
+                                                                                                    }}
                                                                                                 </Field>
                                                                                                 <span 
                                                                                                     className="input-group-text ari-input-group-text-end text-sm"
@@ -573,8 +672,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </div>
                                                                                             <ErrorMessage
                                                                                                 name={`items[${index}].MD11`}
+                                                                                                className="text-danger text-xs"
                                                                                                 component="div"
-                                                                                                className="text-danger"
                                                                                             />
                                                                                         </td>
                                                                                     )
@@ -722,53 +821,32 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                         </Row>
                                     </Modal.Body>
                                     <Modal.Footer>
-                                    <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
-                                        <div className="text-secondary mb-3 mb-sm-0">
-                                            <AryLastUpdatedInfo item={ adc } />
+                                        <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
+                                            <div className="text-secondary mb-3 mb-sm-0">
+                                                <AryLastUpdatedInfo item={ adc } />
+                                            </div>
+                                            <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                                <button 
+                                                    type="submit"
+                                                    className="btn bg-gradient-dark mb-0"
+                                                    disabled={ isADCSaving || !hasChanges || adc.Status >= ADCStatusType.inactive }
+                                                >
+                                                    {
+                                                        isADCSaving 
+                                                            ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
+                                                            : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
+                                                    }
+                                                    Save
+                                                </button>
+                                                <button type="button"
+                                                    className="btn btn-link text-secondary mb-0"
+                                                    onClick={ onCloseModal }
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
                                         </div>
-                                        {
-                                            !!formik.errors && !!formik.touched && Object.keys(formik.errors).length > 0 ?
-                                            <div className="m-0">
-                                                <Alert variant="danger" className="text-sm text-white mb-0">
-                                                    <h6 className="text-sm text-white font-weight-bold"> 
-                                                        There are some errors in the form
-                                                    </h6>
-                                                    <ListGroup variant="flush" size="sm">
-                                                        { Object.keys(formik.errors).map(key => 
-                                                            <ListGroup.Item 
-                                                                key={key} 
-                                                                className="text-xs bg-transparent p-1 border-0"
-                                                            >
-                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
-                                                                {formik.errors[key]}
-                                                            </ListGroup.Item>
-                                                        )} 
-                                                    </ListGroup>
-                                                </Alert>
-                                            </div> : null
-                                        }
-                                        <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
-                                            <button 
-                                                type="submit"
-                                                className="btn bg-gradient-dark mb-0"
-                                                disabled={ isADCSaving || !hasChanges || adc.Status >= ADCStatusType.inactive }
-                                            >
-                                                {
-                                                    isADCSaving 
-                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
-                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
-                                                }
-                                                Save
-                                            </button>
-                                            <button type="button"
-                                                className="btn btn-link text-secondary mb-0"
-                                                onClick={ onCloseModal }
-                                            >
-                                                Close
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Modal.Footer>
+                                    </Modal.Footer>
                                 </Form>
                             )
                         }}

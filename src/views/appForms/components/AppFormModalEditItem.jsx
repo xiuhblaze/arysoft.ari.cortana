@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Card, Col, ListGroup, Modal, Nav, Row } from "react-bootstrap";
+import { Alert, Card, Col, Collapse, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
 import { faBuilding, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
@@ -421,7 +421,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     const onFormSubmit = (values) => {
 
-        if (!!appForm.Status && appForm.Status >= AppFormStatusType.inactive) {
+        if (!!appForm.Status && appForm.Status >= AppFormStatusType.inactive) { //? No me acuerdo porque hice esto, creo que para que se inactive hasta que se ejecute la auditoria, REVISAR/HACK
             Swal.fire('App Form', 'You cannot change the data of an inactive application form', 'warning');
             return;
         }
@@ -737,8 +737,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             </AryFormikSelectInput>
                                                         </Col>
                                                     </Row>
-                                                    {
-                                                        showAddComments &&
+                                                    <Collapse in={ showAddComments }>
                                                         <Row>
                                                             <Col xs="12">
                                                                 <AryFormikTextInput
@@ -747,8 +746,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     helpText="Add any comments for the status change"
                                                                 />
                                                             </Col>
-                                                        </Row>  
-                                                    }
+                                                        </Row>
+                                                    </Collapse>
                                                     <Row>
                                                         <Col xs="12" className="text-center">
                                                         {

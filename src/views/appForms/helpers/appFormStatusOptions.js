@@ -51,32 +51,32 @@ const appFormStatusOptions = (appFormCurrentStatus) => {
                 { value: AppFormStatusType.applicantReview, label: 'Send to review' },
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
-            break;
+            
         case AppFormStatusType.active:
             return [
                 currentOption,
                 { value: AppFormStatusType.inactive, label: 'Inactive' }, // Mostrar advertencia que no se va a poder editar
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
-            break;
+            
         case AppFormStatusType.inactive:
             return [
                 currentOption,
                 // { value: AppFormStatusType.active, label: 'Active' },
                 // { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
-            break;
+            
         case AppFormStatusType.cancel:
             return [
                 currentOption,
                 { value: AppFormStatusType.new, label: 'New' },
             ]
-            break;
+            
         case AppFormStatusType.deleted:
             return [
                 { value: AppFormStatusType.deleted, label: 'Deleted' },
             ]
-            break;
+            
     }
 };
 

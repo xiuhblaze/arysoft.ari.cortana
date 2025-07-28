@@ -35,6 +35,13 @@ const enums = () => {
         createdDesc: 4,
     });
 
+    const ADCAlertType = Object.freeze({
+        nothing: 0,
+        employeesMistmatch: 1,
+    });
+
+    // ADC Concepts
+
     const ADCConceptOrderType = Object.freeze({
         nothing: 0,
         indexSort: 1,
@@ -52,6 +59,11 @@ const enums = () => {
     });
 
     // ADC Sites
+
+    const ADCSiteAlertType = Object.freeze({
+        nothing: 0,
+        employeesMistmatch: 1,
+    });
 
     const ADCSiteOrderType = Object.freeze({
         nothing: 0,
@@ -478,9 +490,11 @@ const enums = () => {
 
         ADCStatusType,
         ADCOrderType,
+        ADCAlertType,
         ADCConceptOrderType,
         ADCConceptUnitType,
         ADCSiteOrderType,
+        ADCSiteAlertType,
         AppFormOrderType,
         AppFormStatusType,
         AuditCycleStandardsOrderType,

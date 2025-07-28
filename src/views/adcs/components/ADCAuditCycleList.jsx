@@ -3,10 +3,11 @@ import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
 import { useADCsStore } from "../../../hooks/useADCsStore";
 import { Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCalendarDay, faEdit, faFileLines, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCalendarDay, faEdit, faFileLines, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ADCModalEditItem from "./ADCModalEditItem";
 import { ADCControllerProvider } from "../context/ADCContext";
+import Swal from "sweetalert2";
 
 const ADCAuditCycleList = () => {
 
@@ -36,7 +37,8 @@ const ADCAuditCycleList = () => {
 
     useEffect(() => {
         if (!!adcsErrorMessage) {
-            console.log(`ADCAuditCycleList(error): ${ adcsErrorMessage }`);
+            // console.log(`ADCAuditCycleList(error): ${ adcsErrorMessage }`);
+            Swal.fire('Audit Day Calculation', adcsErrorMessage, 'error');
         }
     }, [adcsErrorMessage]);
 
@@ -77,10 +79,19 @@ const ADCAuditCycleList = () => {
                                     <h6 className="text-xs text-dark text-gradient mb-0">
                                         {adc.AppFormStandardName}
                                     </h6>
+                                    {
+                                        !isNullOrEmpty(adc.Description) && <p className="text-xs text-secondary text-wrap mb-0"> 
+                                            {adc.Description}
+                                        </p>
+                                    }
                                     <div className="d-flex justify-content-start align-items-center text-xs text-secondary gap-1">
-                                        <FontAwesomeIcon icon={ faFileLines } 
+                                        {/* <FontAwesomeIcon icon={ faFileLines } 
                                             className={`text-${ isNullOrEmpty(adc.Description) ? 'secondary' : 'info' }`}
                                             title={ isNullOrEmpty(adc.Description) ? 'No description' : adc.Description }
+                                        /> |  */}
+                                        <FontAwesomeIcon icon={ faStickyNote } 
+                                            className={`text-${ adc.NotesCount == 0 ? 'secondary' : 'warning' }`}
+                                            title={ `${adc.NotesCount} notes` }
                                         /> | 
                                         <span title="Sites">
                                             <FontAwesomeIcon icon={ faBuilding } />: { adc.ADCSitesCount ?? '0' }
