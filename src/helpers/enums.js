@@ -38,6 +38,7 @@ const enums = () => {
     const ADCAlertType = Object.freeze({
         nothing: 0,
         employeesMistmatch: 1,
+        sitesMistmatch: 2
     });
 
     // ADC Concepts

@@ -85,37 +85,44 @@ const ADCControllerProvider = ({ children }) => {
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
 
-            // Decrementos
-            adcSite.ADCConceptValues.forEach(adccvItem => { // Procesar para hacer Decrementos
-                const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
+            if (state.adcConceptList.length > 0) {
+                
+                // Decrementos
+                adcSite.ADCConceptValues.forEach(adccvItem => { // Procesar para hacer Decrementos
+                    const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
 
-                if ((myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Decrease) 
-                    || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
+                    if (!!myConcept) {
+                        if ((myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Decrease) 
+                            || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
 
-                    if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
-                        totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100)); //! Verificar si e sobre Inital MD5 o sobre el restante de totalDays
-                    } else if (myConcept.DecreaseUnit == ADCConceptUnitType.days) {
-                        totalDays = totalDays - adccvItem.Value;
-                    }
-                }
-            });
+                            if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
+                                totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100)); //! Verificar si e sobre Inital MD5 o sobre el restante de totalDays
+                            } else if (myConcept.DecreaseUnit == ADCConceptUnitType.days) {
+                                totalDays = totalDays - adccvItem.Value;
+                            }
+                        }
+                    } 
+                });
 
-            const decreaseTotal = totalDays;
-            
-            // Incrementos
-            adcSite.ADCConceptValues.forEach(adccvItem => {
-                const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
+                const decreaseTotal = totalDays;
+                
+                // Incrementos
+                adcSite.ADCConceptValues.forEach(adccvItem => {
+                    const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
 
-                if ((myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Increase)
-                    || (!myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Increase)) {
+                    if (!!myConcept) {
+                        if ((myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Increase)
+                            || (!myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Increase)) {
 
-                    if (myConcept.IncreaseUnit == ADCConceptUnitType.percentage) {
-                        totalDays = totalDays + (decreaseTotal * (adccvItem.Value / 100));
-                    } else if (myConcept.IncreaseUnit == ADCConceptUnitType.days) {
-                        totalDays = totalDays + adccvItem.Value;
-                    }
-                }
-            }); 
+                            if (myConcept.IncreaseUnit == ADCConceptUnitType.percentage) {
+                                totalDays = totalDays + (decreaseTotal * (adccvItem.Value / 100));
+                            } else if (myConcept.IncreaseUnit == ADCConceptUnitType.days) {
+                                totalDays = totalDays + adccvItem.Value;
+                            }
+                        }
+                    } 
+                }); 
+            }
 
             //* Validaciones
 
@@ -124,8 +131,8 @@ const ADCControllerProvider = ({ children }) => {
             const exceedsReduction = totalDays < maxRedution;
             
             // Totales por sitio
+            totalEmployees += adcSite.NoEmployees;
             totalInitial += totalDays;
-            totalEmployees += adcSite.Employees;
             totalMD11 += adcSite.MD11;
             
             // Surveillance

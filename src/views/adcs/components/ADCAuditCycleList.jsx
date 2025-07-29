@@ -8,8 +8,12 @@ import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ADCModalEditItem from "./ADCModalEditItem";
 import { ADCControllerProvider } from "../context/ADCContext";
 import Swal from "sweetalert2";
+import enums from "../../../helpers/enums";
+import adcAlertsProps from "../helpers/adcAlertsProps";
+import adcStatusProps from "../helpers/adcStatusProps";
 
 const ADCAuditCycleList = () => {
+    const { ADCAlertType } = enums();
 
     const { auditCycle } = useAuditCyclesStore();
 
@@ -73,22 +77,30 @@ const ADCAuditCycleList = () => {
                         return (
                             <div key={adc.ID} className={itemStyle}>
                                 <div className="text-sm">
-                                    <FontAwesomeIcon icon={ faWindowMaximize } size="lg" className={`text-dark text-gradient`} />
+                                    <FontAwesomeIcon 
+                                        icon={ faWindowMaximize } 
+                                        size="lg" 
+                                        className={`text-${ !!adc.Alerts && adc.Alerts.length > 0 
+                                            ? 'danger' 
+                                            : adcStatusProps[adc.Status].variant 
+                                        } text-gradient`}  
+                                        title={ !!adc.Alerts && adc.Alerts.length > 0 
+                                            ? 'The ADC have alerts, see the details'
+                                            : adcStatusProps[adc.Status].description 
+                                        }
+                                    />
                                 </div>
                                 <div>
                                     <h6 className="text-xs text-dark text-gradient mb-0">
                                         {adc.AppFormStandardName}
                                     </h6>
                                     {
-                                        !isNullOrEmpty(adc.Description) && <p className="text-xs text-secondary text-wrap mb-0"> 
+                                        !isNullOrEmpty(adc.Description) && 
+                                        <p className="text-xs text-secondary text-wrap mb-0"> 
                                             {adc.Description}
                                         </p>
                                     }
                                     <div className="d-flex justify-content-start align-items-center text-xs text-secondary gap-1">
-                                        {/* <FontAwesomeIcon icon={ faFileLines } 
-                                            className={`text-${ isNullOrEmpty(adc.Description) ? 'secondary' : 'info' }`}
-                                            title={ isNullOrEmpty(adc.Description) ? 'No description' : adc.Description }
-                                        /> |  */}
                                         <FontAwesomeIcon icon={ faStickyNote } 
                                             className={`text-${ adc.NotesCount == 0 ? 'secondary' : 'warning' }`}
                                             title={ `${adc.NotesCount} notes` }

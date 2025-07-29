@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Card, Col, Collapse, Container, ListGroup, Modal, Row } from 'react-bootstrap';
+import { Card, Col, Collapse, Modal, Row } from 'react-bootstrap';
 import { ErrorMessage, Field, Form, Formik, getIn } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -12,7 +12,7 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import { ViewLoading } from '../../../components/Loaders';
 import adcStatusProps from '../helpers/adcStatusProps';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
-import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faMinus, faPercent, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
@@ -22,13 +22,14 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { setADCConceptList, setADCData, setADCSiteList, updateADCSite, useADCController } from '../context/ADCContext';
+import { setADCConceptList, setADCData, setADCSiteList, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
 import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
 import NotesListModal from '../../notes/components/NotesListModal';
+import AryFormDebug from '../../../components/Forms/AryFormDebug';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
-    const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
+    //const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
     const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
     const pStyle = 'text-sm text-wrap pe-0 pe-sm-5 mb-0';
     const [ controller, dispatch ] = useADCController();
@@ -50,9 +51,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         extraInfoInput: '',
         statusSelect: '',
         commentsInput: '',
-        items: [],
+        items: [],          
         conceptValueHidden: 0,
     };
+
+    //TODO: Ver la posibilidad de crear un array como items pero para guardar inputs hidden
+    //      que guarden el valor de TotalInitial por cada ADCSite, para validar si se pasan del 30% o mas
+    //      y asi evitar que se guarde el ADC
 
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
@@ -155,10 +160,21 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             }
 
             const itemsInputs = adc.ADCSites.map(adcSite => {
+                const adcConceptValueItems = adcSite.ADCConceptValues.map(acv => {
+                    return {
+                        ID: acv.ID,
+                        checkValue: acv.CheckValue ?? false,
+                        value: acv.Value ?? 0,
+                        justification: acv.Justification ?? '',
+                        valueUnit: acv.ValueUnit ?? ADCConceptUnitType.nothing,
+                    }
+                }); 
+
                 return {
                     ID: adcSite.ID,
                     MD11: adcSite.MD11 ?? '0',
                     extraInfo: adcSite.ExtraInfo ?? '',
+                    adcConceptValues: adcConceptValueItems,
                 }
             });
 
@@ -183,7 +199,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setShowComments(false);
 
             loadData();
-            calculateData();
+            updateTotals(dispatch);
+            //calculateData();
         }
     }, [adc]);
 
@@ -222,7 +239,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         if (!!adcData && !!adcSiteList && adcSiteList.length > 0) {            
             const totalEmployees = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.Employees, 0);
+                .reduce((acc, i) => acc + i.NoEmployees, 0);
             const totalInitial = adcSiteList
                 .filter(i => i.Status == DefaultStatusType.active)
                 .reduce((acc, i) => acc + i.InitialMD5, 0);
@@ -532,7 +549,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end`}>
-                                                                                                { adcSite.Employees } 
+                                                                                                { adcSite.NoEmployees } 
                                                                                                 <span className="px-2" title="Employees">
                                                                                                     <FontAwesomeIcon icon={ faUsers } fixedWidth />
                                                                                                 </span>
@@ -608,7 +625,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     </h6>
                                                                                 </th>                                                                                
                                                                                 {
-                                                                                    adcSiteList.map(adcSite =>  
+                                                                                    adcSiteList.map(adcSite =>  //! Ver si lo puedo agregar a Formik 20250729
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
                                                                                                 { adcSite.TotalInitial ?? 0 }
@@ -825,6 +842,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <div className="text-secondary mb-3 mb-sm-0">
                                                 <AryLastUpdatedInfo item={ adc } />
                                             </div>
+                                            <AryFormDebug formik={ formik } />
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <button 
                                                     type="submit"

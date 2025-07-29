@@ -164,7 +164,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         if (type === 'select-one') { // Cuando se cambia el select
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                //formik.setFieldValue('conceptValueHidden', true);
+                formik.setFieldValue('conceptValueHidden', 0);
             }
             updateConceptValues(value, formData.justification);
         }
@@ -177,7 +177,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                //formik.setFieldValue('conceptValueHidden', true);
+                formik.setFieldValue('conceptValueHidden', 0);
             }
             
             updateConceptValues(value ?? 0, formData.justification);
@@ -197,10 +197,10 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         // Verificar que sea un valor valido
         // Actualizar el valor en el ADCContext - Ya con updateADCConceptValue
         
-        // if (!!formik) {
-        //     formik.setFieldTouched('conceptValueHidden', true);
-        //     formik.setFieldValue('conceptValueHidden', true);
-        // }
+        if (!!formik) {
+            formik.setFieldTouched('conceptValueHidden', true);
+            formik.setFieldValue('conceptValueHidden', 0);
+        }
                 
         updateTotals(dispatch);
     }; // updateConceptValues
