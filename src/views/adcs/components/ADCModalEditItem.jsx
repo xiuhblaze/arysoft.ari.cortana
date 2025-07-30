@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Card, Col, Collapse, Modal, Row } from 'react-bootstrap';
+import { Alert, Card, Col, Collapse, Modal, Row } from 'react-bootstrap';
 import { ErrorMessage, Field, Form, Formik, getIn } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -22,10 +22,13 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { setADCConceptList, setADCData, setADCSiteList, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
+import { clearADCController, setADCConceptList, setADCData, setADCSiteList, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
 import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
 import NotesListModal from '../../notes/components/NotesListModal';
 import AryFormDebug from '../../../components/Forms/AryFormDebug';
+import adcAlertsProps from '../helpers/adcAlertsProps';
+import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
+import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -103,12 +106,23 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isADCSaving,
         adcSavedOk,
         adc,
-        adcsErrorMessage,
 
         adcAsync,
         adcSaveAsync,
         adcClear,
     } = useADCsStore();
+
+    const {
+        isADCSiteSaving,
+        adcSiteSavedOk,
+        adcSiteSaveAsync,
+    } = useADCSitesStore();
+
+    const {
+        isADCConceptValueSaving,
+        adcConceptValueSavedOk,
+        adcConceptValueSaveAsync,        
+    } = useADCConceptValuesStore();
 
     const {
         isADCConceptsLoading,
@@ -120,6 +134,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     // HOOKS
 
     const formikRef = useRef(null);
+
+    //const [firstTime, setFirstTime] = useState(true);
 
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -138,6 +154,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setShowModal(true);
             if (!!id) {
                 adcAsync(id);
+                clearADCController(dispatch);
             } else {
                 Swal.fire('ADC', 'You must specify the Audit Day Calculation ID', 'warning');
                 actionsForCloseModal();
@@ -160,21 +177,21 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             }
 
             const itemsInputs = adc.ADCSites.map(adcSite => {
-                const adcConceptValueItems = adcSite.ADCConceptValues.map(acv => {
-                    return {
-                        ID: acv.ID,
-                        checkValue: acv.CheckValue ?? false,
-                        value: acv.Value ?? 0,
-                        justification: acv.Justification ?? '',
-                        valueUnit: acv.ValueUnit ?? ADCConceptUnitType.nothing,
-                    }
-                }); 
+                // const adcConceptValueItems = adcSite.ADCConceptValues.map(acv => {
+                //     return {
+                //         ID: acv.ID,
+                //         checkValue: acv.CheckValue ?? false,
+                //         value: acv.Value ?? 0,
+                //         justification: acv.Justification ?? '',
+                //         valueUnit: acv.ValueUnit ?? ADCConceptUnitType.nothing,
+                //     }
+                // }); 
 
                 return {
                     ID: adcSite.ID,
                     MD11: adcSite.MD11 ?? '0',
                     extraInfo: adcSite.ExtraInfo ?? '',
-                    adcConceptValues: adcConceptValueItems,
+                    //adcConceptValues: adcConceptValueItems,
                 }
             });
 
@@ -199,10 +216,20 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setShowComments(false);
 
             loadData();
-            updateTotals(dispatch);
+            // updateTotals(dispatch);
             //calculateData();
         }
     }, [adc]);
+
+    // useEffect(() => {
+        
+    //     if (firstTime && !!adcData && adcSiteList.length > 0) {
+    //         console.log('firstTime', adcData ,adcSiteList);
+    //         updateTotals(dispatch);
+    //         setFirstTime(false);
+    //     }   
+    // }, [adcData, adcSiteList]);
+    
 
     useEffect(() => {
         
@@ -223,48 +250,21 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setADCConceptList(dispatch, adcConcepts);
         }
     }, [adcConcepts]);
+
+    useEffect(() => {
+        if (!!adcConceptsErrorMessage) {
+            console.log(`ADCModalEditItem(error): ${ adcConceptsErrorMessage }`);
+        }
+    }, [adcConceptsErrorMessage]);
     
     // METHODS
 
     const loadData = () => {
-        // console.log('loadData', adc);
         if (!!adc) {
             setADCData(dispatch, adc);
             setADCSiteList(dispatch, adc.ADCSites);
         }
     }; // loadData
-
-    const calculateData = () => {
-        // console.log('calculateData', adcData, adcSitesList);
-        if (!!adcData && !!adcSiteList && adcSiteList.length > 0) {            
-            const totalEmployees = adcSiteList
-                .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.NoEmployees, 0);
-            const totalInitial = adcSiteList
-                .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.InitialMD5, 0);
-            const totalMD11 = adcSiteList
-                .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.MD11, 0);
-            const totalSurveillance = adcSiteList
-                .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.Surveillance, 0);
-            const totalRR = adcSiteList
-                .filter(i => i.Status == DefaultStatusType.active)
-                .reduce((acc, i) => acc + i.RR, 0);
-
-            setADCData(dispatch, 
-                {
-                    ...adcData,
-                    TotalEmployees: totalEmployees,
-                    TotalInitial: totalInitial,
-                    TotalMD11: totalMD11,
-                    TotalSurveillance: totalSurveillance,
-                    TotalRR: totalRR,
-                }
-            );
-        }
-    }; // calculateData
 
     const onFormSubmit = (values) => {
 
@@ -280,14 +280,12 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         if (adc.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
-
+            console.log('text', text);
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
 
-            if (newStatus == ADCStatusType.review) {
-                reviewComments = values.commentsInput;
-            } 
-
-            if (newStatus == ADCStatusType.rejected || newStatus == ADCStatusType.active) {
+            if (newStatus == ADCStatusType.review 
+                || newStatus == ADCStatusType.rejected 
+                || newStatus == ADCStatusType.active) {
                 reviewComments = values.commentsInput;
             }
         }
@@ -322,7 +320,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 ExtraInfo: localADCSite?.extraInfo ?? '',
                 Status: adcSite.Status,
             };
-            console.log('toADCSiteSave', toADCSiteSave);
+            //console.log('toADCSiteSave', toADCSiteSave);
+            console.log('ADCSite, send to save...');
+
+            adcSiteSaveAsync(toADCSiteSave);
+
             console.log('----- Concept Values -----');
             adcSite.ADCConceptValues.forEach(adccvItem => {
                 
@@ -335,6 +337,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                     ValueUnit: adccvItem.ValueUnit,
                     Status: adccvItem.Status,
                 };
+
+                console.log('ADCConceptValue, send to save...');
+                adcConceptValueSaveAsync(toADCCVSave);
                 console.log('toADCCVSave', toADCCVSave);
             });
         });
@@ -398,10 +403,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                         innerRef={formikRef}
                     >
                         {(formik) => {
-                            // console.log('formik', formik.values);
                             useEffect(() => {
-                                setHasChanges(formik.dirty);
+                                setHasChanges(formik.dirty || Object.keys(formik.touched).length > 0);
                             }, [formik.dirty]);
+
+                            useEffect(() => {
+                                if(Object.keys(formik.touched).length > 0) {
+                                    setHasChanges(true);
+                                }
+                            }, [formik.touched]);
 
                             return (
                                 <Form>
@@ -451,16 +461,22 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <Col xs="12" sm="12">
                                                 <Card>
                                                     <Card.Body className="p-3">
-                                                        {/* <Row>
-                                                            <Col xs="12">
-                                                                <Alert variant="danger" className="text-white">
-                                                                    <FontAwesomeIcon icon={ faExclamationTriangle } className="me-3" />
-                                                                    The sites employees has changed, review the values and save the ADC
-                                                                </Alert>
-                                                            </Col>
-                                                        </Row> */}
+                                                        {
+                                                            adc.Alerts.length > 0 && (
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <Alert variant="danger" className="text-white">
+                                                                            <FontAwesomeIcon icon={ faExclamationTriangle } className="me-3" />
+                                                                            { adc.Alerts.map((alert) => 
+                                                                                <p key={alert} className="text-xs text-white mb-0">{ adcAlertsProps[alert].description }</p>) 
+                                                                            }
+                                                                        </Alert>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }
                                                         <Row>
-                                                            <Col xs="6">
+                                                            <Col xs="12" sm="8">
                                                                 <Row>
                                                                     <Col xs="12">
                                                                         <AryFormikTextInput
@@ -470,7 +486,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
                                                                     </Col>
+                                                                    <Col xs="12">
+                                                                        <AryFormikTextArea
+                                                                            name="extraInfoInput"
+                                                                            label="Extra Info"
+                                                                            placehoolder="Add any extra info"
+                                                                            type="text"
+                                                                            rows={ 2 }
+                                                                        />
+                                                                        {
+                                                                            !!adc.Notes && adc.Notes.length > 0 &&
+                                                                            <Row>
+                                                                                <Col xs="12">
+                                                                                    <NotesListModal notes={adc.Notes} buttonLabel="View notes" />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        }
+                                                                    </Col>
                                                                 </Row>
+                                                            </Col>
+                                                            <Col xs="12" sm="4">
                                                                 <Row>
                                                                     <Col xs="12">
                                                                         <AryFormikSelectInput
@@ -489,36 +524,21 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             )) }
                                                                         </AryFormikSelectInput>
                                                                     </Col>
+                                                                    <Col xs="12">
+                                                                        <Collapse in={ showComments }>
+                                                                            <Row>
+                                                                                <Col xs="12">
+                                                                                    <AryFormikTextInput
+                                                                                        name="commentsInput"
+                                                                                        label="Comments"
+                                                                                        type="text"
+                                                                                        helpText="Add any comments for the status change"
+                                                                                    />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        </Collapse>
+                                                                    </Col>
                                                                 </Row>
-                                                                <Collapse in={ showComments }>
-                                                                    <Row>
-                                                                        <Col xs="12">
-                                                                            <AryFormikTextInput
-                                                                                name="commentsInput"
-                                                                                label="Comments"
-                                                                                type="text"
-                                                                                helpText="Add any comments for the status change"
-                                                                            />
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Collapse>
-                                                            </Col>
-                                                            <Col xs="6">
-                                                                <AryFormikTextArea
-                                                                    name="extraInfoInput"
-                                                                    label="Extra Info"
-                                                                    placehoolder="Add any extra info"
-                                                                    type="text"
-                                                                    rows={ 3 }
-                                                                />
-                                                                {
-                                                                    !!adc.Notes && adc.Notes.length > 0 &&
-                                                                    <Row>
-                                                                        <Col xs="12">
-                                                                            <NotesListModal notes={adc.Notes} buttonLabel="View notes" />
-                                                                        </Col>
-                                                                    </Row>
-                                                                }
                                                             </Col>
                                                         </Row>
                                                         <Row>
@@ -599,18 +619,22 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             <ADCConceptYesNoInfo item={adcConcept} />
                                                                                         </td>
                                                                                         {
-                                                                                            adcSiteList.map(adcSite =>  
+                                                                                            adcSiteList.map(adcSite => 
                                                                                             <td key={adcSite.ID}>
                                                                                                 { adcSite.ADCConceptValues
                                                                                                     .filter(acv => acv.ADCConceptID == adcConcept.ID)
-                                                                                                    .map(acv => 
-                                                                                                        <ADCConceptValueInput 
-                                                                                                            key={acv.ID} 
-                                                                                                            name={`ADCConceptValue.${acv.ID}`}
-                                                                                                            adcConcept={adcConcept} 
-                                                                                                            adcConceptValue={acv} 
-                                                                                                            formik={formik}
-                                                                                                        />
+                                                                                                    .map(acv => {
+                                                                                                        //console.log('acv', acv);
+                                                                                                        return (
+                                                                                                            <ADCConceptValueInput 
+                                                                                                                key={acv.ID} 
+                                                                                                                name={`ADCConceptValue.${acv.ID}`}
+                                                                                                                adcConcept={adcConcept} 
+                                                                                                                adcConceptValue={acv} 
+                                                                                                                formik={formik}
+                                                                                                            />
+                                                                                                        )
+                                                                                                    }
                                                                                                 )}
                                                                                             </td>
                                                                                             )
@@ -625,7 +649,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     </h6>
                                                                                 </th>                                                                                
                                                                                 {
-                                                                                    adcSiteList.map(adcSite =>  //! Ver si lo puedo agregar a Formik 20250729
+                                                                                    adcSiteList.map(adcSite => 
                                                                                         <td key={adcSite.ID}>
                                                                                             <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
                                                                                                 { adcSite.TotalInitial ?? 0 }
@@ -645,7 +669,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     ) 
                                                                                 }
                                                                             </tr>
-                                                                            <tr>
+                                                                            {/* //! Verificar si MD11 debe de quedar bloqueado si es un solo Site */}
+                                                                            <tr> 
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         MD11
@@ -739,6 +764,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     <h6 className={h6Style}>
                                                                                         Extra Info
                                                                                     </h6>
+                                                                                    <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                        For site
+                                                                                    </p>
                                                                                 </th>
                                                                                 {
                                                                                     formik.values.items.map((item, index) =>   
@@ -748,7 +776,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                 name={ `items[${index}].extraInfo` }
                                                                                                 className="form-control"
                                                                                                 as="textarea"
-                                                                                                rows={ 3 }
+                                                                                                rows={ 2 }
                                                                                             />
                                                                                         </td>
                                                                                     )
@@ -757,6 +785,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                         </tbody>                                                                    
                                                                     </table>
                                                                     {/* <hr className="horizontal dark my-3" /> */}
+                                                                    {
+                                                                        !!formik.errors.conceptValueHidden && (
+                                                                            <div className="text-xs text-danger text-wrap mt-1">
+                                                                                <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
+                                                                                { formik.errors.conceptValueHidden }
+                                                                            </div>
+                                                                        )
+                                                                    }
                                                                 </div>
                                                             </Col>
                                                         </Row>
@@ -842,12 +878,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <div className="text-secondary mb-3 mb-sm-0">
                                                 <AryLastUpdatedInfo item={ adc } />
                                             </div>
-                                            <AryFormDebug formik={ formik } />
+                                            {/* <AryFormDebug formik={ formik } /> */}
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <button 
                                                     type="submit"
                                                     className="btn bg-gradient-dark mb-0"
                                                     disabled={ isADCSaving || !hasChanges || adc.Status >= ADCStatusType.inactive }
+                                                    //disabled={ isADCSaving || adc.Status >= ADCStatusType.inactive } 
                                                 >
                                                     {
                                                         isADCSaving 

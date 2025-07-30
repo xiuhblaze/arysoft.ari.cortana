@@ -10,6 +10,7 @@ const AryFormDebug = ({ formik }) => {
                     errors: formik.errors,
                     touched: formik.touched,
                     isValid: formik.isValid,
+                    isDirty: formik.dirty,
                     isSubmitting: formik.isSubmitting,
                     submitCount: formik.submitCount,
                 }, null, 2)}

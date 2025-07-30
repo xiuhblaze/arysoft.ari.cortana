@@ -31,11 +31,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
     ];
 
     // HOOKS
-
+    
     const [showModal, setShowModal] = useState(false);    
     const [formData, setFormData] = useState({
         checkValue: adcConceptValue.CheckValue ?? false,
-        value: adcConceptValue.Value ?? 0,
+        value: adcConceptValue.Value.toString() ?? '0',
         justification: adcConceptValue.Justification ?? '',
         error: null,
     });
@@ -85,13 +85,14 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             );
         } else {
             setMyProps({ icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
+            setFormData({
+                ...formData,
+                value: 0,
+                justification: '',
+                error: '',
+            });
+            setCurrentJustification('');
         }
-
-        setFormData({
-            ...formData,
-            value: 0,
-            error: '',
-        });
 
         if (!!formik && !isNullOrEmpty(formData.error)) {
             //console.log(formik.values.conceptValueHidden, 'aqui se debe restar');
@@ -164,7 +165,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         if (type === 'select-one') { // Cuando se cambia el select
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                formik.setFieldValue('conceptValueHidden', 0);
+                //formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden);
+                // formik.setFormikState(prevState => ({
+                //     ...prevState,
+                //     dirty: true,
+                // }))
             }
             updateConceptValues(value, formData.justification);
         }
@@ -177,12 +182,26 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                formik.setFieldValue('conceptValueHidden', 0);
+                //formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden);
+                //formik.setFieldValue('conceptValueHidden', 0);
             }
             
             updateConceptValues(value ?? 0, formData.justification);
         }
     }; // onBlur
+
+    const onSaveJustification = () => {
+        //console.log('onSaveJustification, update justification', formData.justification);
+        updateConceptValues(formData.value, formData.justification);
+        setCurrentJustification(formData.justification);
+
+        if (!!formik) {
+            formik.setFieldTouched('conceptValueHidden', true);
+            //formik.setFieldValue('conceptValueHidden', true);
+        }
+
+        setShowModal(false);
+    }; // onSaveJustification
 
     const updateConceptValues = (value, justification = '') => {
         
@@ -195,29 +214,15 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         });
 
         // Verificar que sea un valor valido
-        // Actualizar el valor en el ADCContext - Ya con updateADCConceptValue
         
-        if (!!formik) {
-            formik.setFieldTouched('conceptValueHidden', true);
-            formik.setFieldValue('conceptValueHidden', 0);
-        }
+        // if (!!formik) {
+        //     formik.setFieldTouched('conceptValueHidden', true);
+        //     //formik.setFieldValue('conceptValueHidden', 0);
+        // }
                 
         updateTotals(dispatch);
     }; // updateConceptValues
 
-    const onSaveJustification = () => {
-        //console.log('onSaveJustification, update justification', formData.justification);
-        updateConceptValues(formData.value);
-        setCurrentJustification(formData.justification);
-
-        if (!!formik) {
-            formik.setFieldTouched('conceptValueHidden', true);
-            //formik.setFieldValue('conceptValueHidden', true);
-        }
-
-        setShowModal(false);
-    }; // onSaveJustification
-    
     const onHideModal = () => {
 
         if (isNullOrEmpty(currentJustification)) {
@@ -260,7 +265,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                                 name="value"
                                 onChange={ onChange }
                                 className="form-select text-end ari-pe-2"
-                                value={formData.value ?? 0}
+                                value={formData.value.toString() ?? '0'}
                                 disabled={ myProps.disabled }
                             >
                                 { decreaseList.map((item, index) => (
