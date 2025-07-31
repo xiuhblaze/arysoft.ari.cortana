@@ -20,6 +20,7 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateADCSite = (state, value) => { //! Todavia no jala
         //const { ID, TotalInitial, MD11, Surveillance, RR, ExtraInfo, Status } = value;
+        console.log('updateADCSite()', value);
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             if (adcSite.ID == value.ID) {
@@ -32,7 +33,7 @@ const ADCControllerProvider = ({ children }) => {
         }); // newADCSiteList
 
         return newADCSiteList;
-    };
+    }; // updateADCSite
 
     const updateADCConceptValue = (state, value) => {
         const {adcConceptValueID, checkValue, newValue, unit, justification } = value;
@@ -70,7 +71,7 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
-        console.log('updateTotals()');
+        console.log('updateTotals()', state);
         const TOTAL_INITIAL_MIN_DAYS = 2;
         const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
         const RR_PERCENT_BASE = 33; // 33% de TotalInitial del site
@@ -178,6 +179,7 @@ const ADCControllerProvider = ({ children }) => {
     // REDUCER
 
     const reducer = (state, action) => {
+
         switch (action.type) {
             case 'SET_ADC_DATA': {
                 return { ...state, adcData: action.value };

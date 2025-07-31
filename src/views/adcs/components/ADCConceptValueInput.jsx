@@ -16,11 +16,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         ADCConceptUnitType,
     } = enums();
     const [controller, dispatch]= useADCController();
-    const { 
-        adcData,
-        adcSiteList,
-        adcConceptList,
-    } = controller;
+    // const { 
+    //     adcData,
+    //     adcSiteList,
+    //     adcConceptList,
+    // } = controller;
 
     const decreaseList = [
         { value: 0, label: '0' },
