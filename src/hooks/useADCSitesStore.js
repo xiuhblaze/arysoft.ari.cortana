@@ -159,7 +159,7 @@ export const useADCSitesStore = () => {
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
      * @param {ID, Name, LegalEntity, COID, Status, UpdatedUser} item Objeto tipo ADCSite
      */
-    const adcSiteSaveAsync = async (item) => {
+    const adcSiteSaveAsync = async (item, md11file) => {
         dispatch(onADCSiteSaving());
 
         const toSave = {
@@ -167,7 +167,20 @@ export const useADCSitesStore = () => {
             UpdatedUser: user.username,
         }
         try {
-            const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
+
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            };  
+            const data = JSON.stringify(toSave);
+
+            formData.append('data', data);
+            if (!!md11file) {
+                formData.append('file', md11file);
+            }
+            
+            const resp = await cortanaApi.put(`${ADC_SITE_URL}`, formData, { headers });
+            //const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
             dispatch(setADCSite(Data));
