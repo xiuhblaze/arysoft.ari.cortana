@@ -16,6 +16,10 @@ const ADCControllerProvider = ({ children }) => {
         adcData: null,
         adcSiteList: [],
         adcConceptList: [],
+        misc: {
+            total:0,                // No se si se necesite
+            isMultistandard: false, // Para saber si aplicar o no MD11
+        }
     } // initialState
 
     const updateADCSite = (state, value) => { //! Todavia no jala
@@ -71,17 +75,16 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
-        console.log('updateTotals()', state);
+        //console.log('updateTotals()', state);
         const TOTAL_INITIAL_MIN_DAYS = 2;
         const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
-        const RR_PERCENT_BASE = 33; // 33% de TotalInitial del site
 
         const { acdData, adcSiteList } = state;
         let totalInitial = 0;       // equivalente a ST1 y ST2
         let totalEmployees = 0;     // suma de los empleados de todos los Sites
         let totalMD11 = 0;
         let totalSurveillance = 0;
-        let totalRR = 0;
+        let total = 0;
         
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
@@ -143,15 +146,15 @@ const ADCControllerProvider = ({ children }) => {
             
             // Recertification
             
-            const rr = totalDays * ((100 - RR_PERCENT_BASE) / 100);
-            totalRR += rr;
+            // const rr = totalDays * ((100 - RR_PERCENT_BASE) / 100);
+            // totalRR += rr;
 
             return {
                 ...adcSite,
                 TotalInitial: round(totalDays, 2),
                 Surveillance: round(surveillance, 2),
                 //MD11: round(totalMD11, 2),
-                RR: round(rr, 2),
+                // RR: round(rr, 2),
                 ExceedsMaximumReduction: exceedsReduction,
             };
         }); // newADCSiteList
@@ -164,8 +167,9 @@ const ADCControllerProvider = ({ children }) => {
             TotalInitial: roundDays(totalInitial, 2, 'up'),
             TotalEmployees: totalEmployees, 
             TotalMD11: roundDays(totalMD11, 2, 'up'),
+            Total: 0,
             TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
-            TotalRR: roundDays(totalRR, 2, 'up'),
+            // TotalRR: roundDays(totalRR, 2, 'up'),
             //ExceedsMaximumReduction: totalInitial > (totalInitial * TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100),
         }
 
@@ -189,6 +193,9 @@ const ADCControllerProvider = ({ children }) => {
             }
             case 'SET_ADC_CONCEPTS': {
                 return { ...state, adcConceptList: action.value };
+            }
+            case 'SET_MISC': {
+                return { ...state, misc: action.value };
             }
             case 'UPDATE_ADC_SITE': {
                 const newState = updateTotals({
@@ -237,6 +244,7 @@ const useADCController = () => {
 const setADCData = (dispatch, value) => dispatch({ type: "SET_ADC_DATA", value });
 const setADCSiteList = (dispatch, value) => dispatch({ type: "SET_ADC_SITES_LIST", value });
 const setADCConceptList = (dispatch, value) => dispatch({ type: "SET_ADC_CONCEPTS", value });
+const setMisc = (dispatch, value) => dispatch({ type: "SET_MISC", value });
 const updateADCSite = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SITE", value });
 const updateADCConceptValue = (dispatch, value) => dispatch({ type: "UPDATE_ADC_CONCEPT_VALUE", value });
 const updateTotals = (dispatch) => dispatch({ type: "UPDATE_TOTALS" });
@@ -249,6 +257,7 @@ export {
     setADCData,
     setADCSiteList,
     setADCConceptList,
+    setMisc,
     
     updateADCSite,
     updateADCConceptValue,

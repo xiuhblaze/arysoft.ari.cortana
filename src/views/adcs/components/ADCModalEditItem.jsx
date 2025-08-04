@@ -22,13 +22,14 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCConceptValueInput from './ADCConceptValueInput';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { clearADCController, setADCConceptList, setADCData, setADCSiteList, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
+import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setMisc, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
 import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
 import NotesListModal from '../../notes/components/NotesListModal';
 import AryFormDebug from '../../../components/Forms/AryFormDebug';
 import adcAlertsProps from '../helpers/adcAlertsProps';
 import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
 import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
+import ADCMD11ValueInput from './ADCMD11ValueInput';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -40,6 +41,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcData,
         adcSiteList,
         adcConceptList,
+        misc,
     } = controller;
 
     const {
@@ -221,6 +223,20 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
     }, [adc]);
 
+    useEffect(() => {
+console.log('useEffect', adc, organization);
+        if (!!adc && !!organization && !!organization.Standards && organization.ID == adc.AppForm.OrganizationID) {
+            const isMultistandard = organization.Standards
+                .filter(item => item.Status == DefaultStatusType.active).length > 1;
+console.log('isMultistandard', isMultistandard);
+            setMisc(dispatch, {
+                ...misc,
+                isMultistandard: isMultistandard,
+            });
+        }
+    }, [adc, organization])
+    
+
     // useEffect(() => {
         
     //     if (firstTime && !!adcData && adcSiteList.length > 0) {
@@ -260,6 +276,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     // METHODS
 
     const loadData = () => {
+
         if (!!adc) {
             setADCData(dispatch, adc);
             setADCSiteList(dispatch, adc.ADCSites);
@@ -669,7 +686,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     ) 
                                                                                 }
                                                                             </tr>
-                                                                            {/* //! Verificar si MD11 debe de quedar bloqueado si es un solo Site */}
+                                                                            {/* //! Verificar si MD11 debe de quedar bloqueado si es un solo Standard, de hecho SI
                                                                             <tr> 
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
@@ -720,7 +737,32 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         </td>
                                                                                     )
                                                                                 }
-                                                                            </tr>
+                                                                            </tr> */}
+                                                                            {
+                                                                                misc.isMultistandard ? (
+                                                                                    <tr>
+                                                                                        <th className="text-end" colSpan={2}>
+                                                                                            <h6 className={h6Style}>
+                                                                                                MD11 with File
+                                                                                            </h6>
+                                                                                            <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                                Decrease
+                                                                                            </p>
+                                                                                        </th>
+                                                                                        {
+                                                                                            adcSiteList.map((adcSite, index) =>   
+                                                                                                <td key={adcSite.ID}>
+                                                                                                    <ADCMD11ValueInput 
+                                                                                                        name={ `items[${index}].MD11` }
+                                                                                                        item={adcSite} 
+                                                                                                        formik={formik} 
+                                                                                                    />
+                                                                                                </td>
+                                                                                            )
+                                                                                        }
+                                                                                    </tr>
+                                                                                ) : null
+                                                                            }
                                                                             <tr>
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
@@ -740,7 +782,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     )
                                                                                 }
                                                                             </tr>
-                                                                            <tr>
+                                                                            {/* <tr>
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Recertification (RR)
@@ -758,14 +800,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         </td>
                                                                                     )
                                                                                 }
-                                                                            </tr>
+                                                                            </tr> */}
                                                                             <tr>
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
                                                                                         Extra Info
                                                                                     </h6>
                                                                                     <p className="text-xs text-secondary text-wrap mb-0">
-                                                                                        For site
+                                                                                        for site
                                                                                     </p>
                                                                                 </th>
                                                                                 {
@@ -857,7 +899,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                     }}
                                                 />
                                             </Col>
-                                            <Col>
+                                            {/* <Col>
                                                 <MiniStatisticsCard
                                                     title="RR"
                                                     count={ adcData?.TotalRR ?? 0 }
@@ -870,7 +912,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         bgColor: 'dark',
                                                     }}
                                                 />
-                                            </Col>
+                                            </Col> */}
                                         </Row>
                                     </Modal.Body>
                                     <Modal.Footer>
