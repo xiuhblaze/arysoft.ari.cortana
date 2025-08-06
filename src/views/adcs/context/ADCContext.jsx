@@ -22,9 +22,8 @@ const ADCControllerProvider = ({ children }) => {
         }
     } // initialState
 
-    const updateADCSite = (state, value) => { //! Todavia no jala
-        //const { ID, TotalInitial, MD11, Surveillance, RR, ExtraInfo, Status } = value;
-        console.log('updateADCSite()', value);
+    const updateADCSite = (state, value) => {         
+console.log('updateADCSite()', value);
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             if (adcSite.ID == value.ID) {
@@ -81,13 +80,13 @@ const ADCControllerProvider = ({ children }) => {
 
         const { acdData, adcSiteList } = state;
         let totalInitial = 0;       // equivalente a ST1 y ST2
-        let totalEmployees = 0;     // suma de los empleados de todos los Sites
-        let totalMD11 = 0;
+        let totalEmployees = 0;     // suma de los empleados de todos los Sites        
         let totalSurveillance = 0;
         let total = 0;
         
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
+            let totalSiteDays = 0;
 
             if (state.adcConceptList.length > 0) {
                 
@@ -128,6 +127,17 @@ const ADCControllerProvider = ({ children }) => {
                 }); 
             }
 
+            //* Validaciones MD11
+
+            if (adcSite.MD11 > 0) {                
+                const decreaseInDays = totalDays * (adcSite.MD11 / 100);
+                totalSiteDays = totalDays - decreaseInDays;
+
+                //totalMD11 += adcSite.MD11;
+            } else {
+                totalSiteDays = totalDays;
+            }
+
             //* Validaciones
 
             // If the total initial is greater than the maximum allowed, it will be reduced to the maximum allowed
@@ -137,24 +147,20 @@ const ADCControllerProvider = ({ children }) => {
             // Totales por sitio
             totalEmployees += adcSite.NoEmployees;
             totalInitial += totalDays;
-            totalMD11 += adcSite.MD11;
+            total += totalSiteDays;
             
             // Surveillance
             const survPercentBase = 30; // 30% de TotalInitial del site
-            const surveillance = totalDays * (survPercentBase / 100);
+            const surveillance = state.adcData.IsMultistandard 
+                ? totalSiteDays * (survPercentBase / 100)
+                : totalDays * (survPercentBase / 100);
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
             
-            // Recertification
-            
-            // const rr = totalDays * ((100 - RR_PERCENT_BASE) / 100);
-            // totalRR += rr;
-
             return {
                 ...adcSite,
                 TotalInitial: round(totalDays, 2),
                 Surveillance: round(surveillance, 2),
-                //MD11: round(totalMD11, 2),
-                // RR: round(rr, 2),
+                Total: round(totalSiteDays, 2),
                 ExceedsMaximumReduction: exceedsReduction,
             };
         }); // newADCSiteList
@@ -166,12 +172,11 @@ const ADCControllerProvider = ({ children }) => {
             ...acdData,
             TotalInitial: roundDays(totalInitial, 2, 'up'),
             TotalEmployees: totalEmployees, 
-            TotalMD11: roundDays(totalMD11, 2, 'up'),
-            Total: 0,
+            TotalMD11: roundDays(total, 2, 'up'),
             TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
-            // TotalRR: roundDays(totalRR, 2, 'up'),
-            //ExceedsMaximumReduction: totalInitial > (totalInitial * TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100),
+            // TotalRR: roundDays(totalRR, 2, 'up'),            
         }
+        console.log('newADCData', newADCData);
 
         return {
             ...state,

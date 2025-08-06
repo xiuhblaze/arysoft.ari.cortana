@@ -96,7 +96,7 @@ const ADCMD11ValueInput = ({ item, name, formik, ...props }) => {
                     <label className="form-label">File evidence:</label>
                     <input type="file" name="file" 
                         className="form-control" 
-                        accept=".png, .jpg, .pdf, .doc, .docx, .xls, .xlsx, .zip, .rar, .7z"
+                        accept=".pdf, .doc, .docx, .xls, .xlsx, .zip, .rar, .7z"
                     />
                 </Modal.Body>
                 <Modal.Footer>

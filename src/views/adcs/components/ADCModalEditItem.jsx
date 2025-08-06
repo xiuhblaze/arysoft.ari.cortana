@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Card, Col, Collapse, Modal, Row } from 'react-bootstrap';
+import { Alert, Card, Col, Collapse, ListGroup, Modal, Row } from 'react-bootstrap';
 import { ErrorMessage, Field, Form, Formik, getIn } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
@@ -30,6 +30,7 @@ import adcAlertsProps from '../helpers/adcAlertsProps';
 import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
 import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
 import ADCMD11ValueInput from './ADCMD11ValueInput';
+import isObjectEmpty from '../../../helpers/isObjectEmpty';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -58,6 +59,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         commentsInput: '',
         items: [],          
         conceptValueHidden: 0,
+        exceedsMaximumReductionHidden: false,
     };
 
     //TODO: Ver la posibilidad de crear un array como items pero para guardar inputs hidden
@@ -81,10 +83,29 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                     .max(99, 'MD11 must be less than 100'),
                 extraInfo: Yup.string()
                     .max(500, 'Extra info must be less than 500 characters'),
+                fileInput: Yup.mixed()
+                    .test({
+                        name: 'is-type-valid',
+                        message: 'Some file error', // <- este solo es visible si el último return es false
+                        test: (value, ctx) => {
+                            if (!!value) {
+                                const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
+                                const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
+                                if (!validTypes.includes(extension)) {
+                                    return ctx.createError({
+                                        message: 'Only files with pdf, doc, docx, xls, xlsx, zip, rar or 7z extensions are allowed'
+                                    });
+                                }
+                            }
+                            return true;
+                        }
+                    }), 
             })
         ),
         conceptValueHidden: Yup.number()
-            .max(0, 'At last a concept value is not valid')
+            .max(0, 'At least one concept value is not valid'),
+        exceedsMaximumReductionHidden: Yup.boolean()
+            .oneOf([false], 'At least one site exceeds maximum reduction'),
     });
 
     // CUSTOM HOOKS
@@ -92,7 +113,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isOrganizationLoading,
         organization,
-        organizationsErrorMessage,
 
         organizationAsync,
     } = useOrganizationsStore();
@@ -137,8 +157,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     const formikRef = useRef(null);
 
-    //const [firstTime, setFirstTime] = useState(true);
-
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
@@ -179,21 +197,12 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             }
 
             const itemsInputs = adc.ADCSites.map(adcSite => {
-                // const adcConceptValueItems = adcSite.ADCConceptValues.map(acv => {
-                //     return {
-                //         ID: acv.ID,
-                //         checkValue: acv.CheckValue ?? false,
-                //         value: acv.Value ?? 0,
-                //         justification: acv.Justification ?? '',
-                //         valueUnit: acv.ValueUnit ?? ADCConceptUnitType.nothing,
-                //     }
-                // }); 
-
+                
                 return {
                     ID: adcSite.ID,
                     MD11: adcSite.MD11 ?? '0',
                     extraInfo: adcSite.ExtraInfo ?? '',
-                    //adcConceptValues: adcConceptValueItems,
+                    fileInput: '',
                 }
             });
 
@@ -204,6 +213,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 commentsInput: '',
                 items: itemsInputs,
                 conceptValueHidden: 0,
+                exceedsMaximumReductionHidden: false,
             });
 
             adcConceptsAsync({
@@ -224,28 +234,25 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }, [adc]);
 
     useEffect(() => {
-console.log('useEffect', adc, organization);
+
         if (!!adc && !!organization && !!organization.Standards && organization.ID == adc.AppForm.OrganizationID) {
             const isMultistandard = organization.Standards
                 .filter(item => item.Status == DefaultStatusType.active).length > 1;
-console.log('isMultistandard', isMultistandard);
+
             setMisc(dispatch, {
                 ...misc,
                 isMultistandard: isMultistandard,
             });
         }
-    }, [adc, organization])
-    
+    }, [adc, organization]);
 
-    // useEffect(() => {
+    useEffect(() => {
         
-    //     if (firstTime && !!adcData && adcSiteList.length > 0) {
-    //         console.log('firstTime', adcData ,adcSiteList);
-    //         updateTotals(dispatch);
-    //         setFirstTime(false);
-    //     }   
-    // }, [adcData, adcSiteList]);
-    
+        if (!!adcSiteList && adcSiteList.length > 0) {
+            const result = adcSiteList.some(item => item.ExceedsMaximumReduction); 
+            formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
+        }   
+    }, [adcSiteList]);
 
     useEffect(() => {
         
@@ -320,7 +327,7 @@ console.log('isMultistandard', isMultistandard);
         };
 
         console.log('toSave', toSave);
-        adcSaveAsync(toSave);
+        //adcSaveAsync(toSave); //! QUITAR COMENTARIO
         console.log('send to save...');
         console.log('----- Sites -----');
 
@@ -340,7 +347,7 @@ console.log('isMultistandard', isMultistandard);
             //console.log('toADCSiteSave', toADCSiteSave);
             console.log('ADCSite, send to save...');
 
-            adcSiteSaveAsync(toADCSiteSave);
+            //adcSiteSaveAsync(toADCSiteSave); //! QUITAR COMENTARIO
 
             console.log('----- Concept Values -----');
             adcSite.ADCConceptValues.forEach(adccvItem => {
@@ -356,7 +363,7 @@ console.log('isMultistandard', isMultistandard);
                 };
 
                 console.log('ADCConceptValue, send to save...');
-                adcConceptValueSaveAsync(toADCCVSave);
+                //adcConceptValueSaveAsync(toADCCVSave);    //! QUITAR COMENTARIO
                 console.log('toADCCVSave', toADCCVSave);
             });
         });
@@ -502,6 +509,7 @@ console.log('isMultistandard', isMultistandard);
                                                                             type="text"
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
+                                                                        <input type="hidden" name="exceedsMaximumReductionHidden" />
                                                                     </Col>
                                                                     <Col xs="12">
                                                                         <AryFormikTextArea
@@ -686,81 +694,50 @@ console.log('isMultistandard', isMultistandard);
                                                                                     ) 
                                                                                 }
                                                                             </tr>
-                                                                            {/* //! Verificar si MD11 debe de quedar bloqueado si es un solo Standard, de hecho SI
-                                                                            <tr> 
-                                                                                <th className="text-end" colSpan={2}>
-                                                                                    <h6 className={h6Style}>
-                                                                                        MD11
-                                                                                    </h6>
-                                                                                </th>
-                                                                                {
-                                                                                    formik.values.items.map((item, index) =>  
-                                                                                        <td key={item.ID}>
-                                                                                            <div className="input-group">
-                                                                                                <Field
-                                                                                                    name={ `items[${index}].MD11` }
-                                                                                                    className="form-control ari-form-control-with-end text-end"
-                                                                                                >
-                                                                                                    {({field, form}) => {
-                                                                                                        const error = getIn(form.errors, `items[${index}].MD11`);
-                                                                                                        const touched = getIn(form.touched, `items[${index}].MD11`);
-                                                                                                        
-                                                                                                        return (
-                                                                                                            <input 
-                                                                                                                {...field}                                                                                                                
-                                                                                                                className={`form-control ari-form-control-with-end text-end${touched && error ? ' is-invalid' : ''}`} 
-                                                                                                                onBlur={(e) => {
-                                                                                                                    const value = e.target.value;
-
-                                                                                                                    field.onBlur(e);
-                                                                                                                    updateADCSite(dispatch, {
-                                                                                                                        ID: item.ID,
-                                                                                                                        MD11: Number(value),
-                                                                                                                    })
-                                                                                                                }}
-                                                                                                            />
-                                                                                                        )
-                                                                                                    }}
-                                                                                                </Field>
-                                                                                                <span 
-                                                                                                    className="input-group-text ari-input-group-text-end text-sm"
-                                                                                                    style={{ paddingRight: '58px' }}
-                                                                                                >
-                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } title="Days" />
-                                                                                                </span>
-                                                                                            </div>
-                                                                                            <ErrorMessage
-                                                                                                name={`items[${index}].MD11`}
-                                                                                                className="text-danger text-xs"
-                                                                                                component="div"
-                                                                                            />
-                                                                                        </td>
-                                                                                    )
-                                                                                }
-                                                                            </tr> */}
                                                                             {
                                                                                 misc.isMultistandard ? (
-                                                                                    <tr>
-                                                                                        <th className="text-end" colSpan={2}>
-                                                                                            <h6 className={h6Style}>
-                                                                                                MD11 with File
-                                                                                            </h6>
-                                                                                            <p className="text-xs text-secondary text-wrap mb-0">
-                                                                                                Decrease
-                                                                                            </p>
-                                                                                        </th>
-                                                                                        {
-                                                                                            adcSiteList.map((adcSite, index) =>   
-                                                                                                <td key={adcSite.ID}>
-                                                                                                    <ADCMD11ValueInput 
-                                                                                                        name={ `items[${index}].MD11` }
-                                                                                                        item={adcSite} 
-                                                                                                        formik={formik} 
-                                                                                                    />
-                                                                                                </td>
-                                                                                            )
-                                                                                        }
-                                                                                    </tr>
+                                                                                    <>
+                                                                                        <tr>
+                                                                                            <th className="text-end" colSpan={2}>
+                                                                                                <h6 className={h6Style}>
+                                                                                                    MD11 with File
+                                                                                                </h6>
+                                                                                                <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                                    Decrease
+                                                                                                </p>
+                                                                                            </th>
+                                                                                            {
+                                                                                                adcSiteList.map((adcSite) =>   
+                                                                                                    <td key={adcSite.ID}>
+                                                                                                        <ADCMD11ValueInput 
+                                                                                                            name={ `adcSite[${adcSite.ID}].MD11` }
+                                                                                                            item={adcSite} 
+                                                                                                            formik={formik} 
+                                                                                                        />
+                                                                                                    </td>
+                                                                                                )
+                                                                                            }
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <th className="text-end" colSpan={2}>
+                                                                                                <h6 className={h6Style}>
+                                                                                                    Total
+                                                                                                </h6>
+                                                                                            </th>
+                                                                                            {
+                                                                                                adcSiteList.map((adcSite) =>
+                                                                                                    <td key={adcSite.ID}>
+                                                                                                        <p className={`${pStyle} text-end`}>
+                                                                                                            { adcSite.Total ?? 0}
+                                                                                                            <span className="px-2" title="Days">
+                                                                                                                <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    </td>
+                                                                                                )
+                                                                                            }
+                                                                                        </tr>
+                                                                                    </>
                                                                                 ) : null
                                                                             }
                                                                             <tr>
@@ -782,25 +759,6 @@ console.log('isMultistandard', isMultistandard);
                                                                                     )
                                                                                 }
                                                                             </tr>
-                                                                            {/* <tr>
-                                                                                <th className="text-end" colSpan={2}>
-                                                                                    <h6 className={h6Style}>
-                                                                                        Recertification (RR)
-                                                                                    </h6>
-                                                                                </th>
-                                                                                {
-                                                                                    adcSiteList.map(adcSite =>  
-                                                                                        <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-end`}>
-                                                                                                { adcSite.RR ?? 0 }
-                                                                                                <span className="px-2" title="Days">
-                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
-                                                                                                </span>
-                                                                                            </p>
-                                                                                        </td>
-                                                                                    )
-                                                                                }
-                                                                            </tr> */}
                                                                             <tr>
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
@@ -813,7 +771,6 @@ console.log('isMultistandard', isMultistandard);
                                                                                 {
                                                                                     formik.values.items.map((item, index) =>   
                                                                                         <td key={item.ID}>
-                                                                                            {/* <p className={`${pStyle} text-center`}>{ adcSite.ExtraInfo ?? '' }</p> */}
                                                                                             <Field
                                                                                                 name={ `items[${index}].extraInfo` }
                                                                                                 className="form-control"
@@ -826,13 +783,23 @@ console.log('isMultistandard', isMultistandard);
                                                                             </tr>
                                                                         </tbody>                                                                    
                                                                     </table>
-                                                                    {/* <hr className="horizontal dark my-3" /> */}
                                                                     {
-                                                                        !!formik.errors.conceptValueHidden && (
-                                                                            <div className="text-xs text-danger text-wrap mt-1">
-                                                                                <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
-                                                                                { formik.errors.conceptValueHidden }
-                                                                            </div>
+                                                                        !isObjectEmpty(formik.errors) && (
+                                                                            <>
+                                                                                <hr className="horizontal dark my-3" />
+                                                                                <ListGroup>
+                                                                                    {
+                                                                                        Object.keys(formik.errors).map(key => (
+                                                                                            <ListGroup.Item key={key} className="bg-transparent border-0 py-1 px-0">
+                                                                                                <div className="text-xs text-danger text-wrap mt-1">
+                                                                                                    <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
+                                                                                                    { formik.errors[key] }
+                                                                                                </div>
+                                                                                            </ListGroup.Item>
+                                                                                        ))
+                                                                                    }
+                                                                                </ListGroup>
+                                                                            </>
                                                                         )
                                                                     }
                                                                 </div>
@@ -871,20 +838,24 @@ console.log('isMultistandard', isMultistandard);
                                                     }}
                                                 />
                                             </Col>
-                                            <Col>
-                                                <MiniStatisticsCard
-                                                    title="Total MD11"
-                                                    count={ adcData?.TotalMD11 ?? 0 }
-                                                    percentage={{
-                                                        color: 'secondary',
-                                                        text: 'days',
-                                                    }}
-                                                    icon={{
-                                                        icon: faCalendarDay,
-                                                        bgColor: 'secondary',
-                                                    }}
-                                                />
-                                            </Col>
+                                            {
+                                                misc.isMultistandard ? (
+                                                    <Col>
+                                                        <MiniStatisticsCard
+                                                            title="Total MD11"
+                                                            count={ adcData?.TotalMD11 ?? 0 }
+                                                            percentage={{
+                                                                color: 'secondary',
+                                                                text: 'days',
+                                                            }}
+                                                            icon={{
+                                                                icon: faCalendarDay,
+                                                                bgColor: 'secondary',
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                ) : null
+                                            }
                                             <Col>
                                                 <MiniStatisticsCard
                                                     title="Surveillance"
@@ -920,7 +891,7 @@ console.log('isMultistandard', isMultistandard);
                                             <div className="text-secondary mb-3 mb-sm-0">
                                                 <AryLastUpdatedInfo item={ adc } />
                                             </div>
-                                            {/* <AryFormDebug formik={ formik } /> */}
+                                            <AryFormDebug formik={ formik } />
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <button 
                                                     type="submit"
