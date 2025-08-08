@@ -249,6 +249,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
+            console.log('useEffect', adcSiteList);
             const result = adcSiteList.some(item => item.ExceedsMaximumReduction); 
             formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
         }   
@@ -711,7 +712,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                     <td key={adcSite.ID}>
                                                                                                         <ADCMD11ValueInput 
                                                                                                             name={ `adcSite[${adcSite.ID}].MD11` }
-                                                                                                            item={adcSite} 
+                                                                                                            adcSite={adcSite} 
                                                                                                             formik={formik} 
                                                                                                         />
                                                                                                     </td>

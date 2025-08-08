@@ -176,7 +176,7 @@ console.log('updateADCSite()', value);
             TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
             // TotalRR: roundDays(totalRR, 2, 'up'),            
         }
-        console.log('newADCData', newADCData);
+        //console.log('newADCData', newADCData);
 
         return {
             ...state,
