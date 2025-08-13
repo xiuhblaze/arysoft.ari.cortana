@@ -1,40 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Card, Col, Collapse, ListGroup, Modal, Row } from 'react-bootstrap';
-import { ErrorMessage, Field, Form, Formik, getIn } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
 
+import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
+import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
+import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
 import { useADCsStore } from '../../../hooks/useADCsStore';
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import { useNotesStore } from '../../../hooks/useNotesStore';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
-import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
-import { ViewLoading } from '../../../components/Loaders';
-import adcStatusProps from '../helpers/adcStatusProps';
-import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
+import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setMisc, useADCController } from '../context/ADCContext';
 import { faCalendarDay, faClock, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import enums from '../../../helpers/enums';
-import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
-import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
-import ADCConceptValueInput from './ADCConceptValueInput';
-import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
-import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setMisc, updateADCSite, updateTotals, useADCController } from '../context/ADCContext';
-import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
-import NotesListModal from '../../notes/components/NotesListModal';
-import AryFormDebug from '../../../components/Forms/AryFormDebug';
+import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
-import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
-import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
+import ADCConceptValueInput from './ADCConceptValueInput';
+import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCMD11ValueInput from './ADCMD11ValueInput';
+import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
+import adcStatusProps from '../helpers/adcStatusProps';
+import AryFormDebug from '../../../components/Forms/AryFormDebug';
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
+import enums from '../../../helpers/enums';
+import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import isObjectEmpty from '../../../helpers/isObjectEmpty';
+import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
+import NotesListModal from '../../notes/components/NotesListModal';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
-    //const firstColStyle = 'text-dark text-xxs font-weight-bolder text-wrap';
     const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
     const pStyle = 'text-sm text-wrap pe-0 pe-sm-5 mb-0';
     const [ controller, dispatch ] = useADCController();
@@ -61,10 +61,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         conceptValueHidden: 0,
         exceedsMaximumReductionHidden: false,
     };
-
-    //TODO: Ver la posibilidad de crear un array como items pero para guardar inputs hidden
-    //      que guarden el valor de TotalInitial por cada ADCSite, para validar si se pasan del 30% o mas
-    //      y asi evitar que se guarde el ADC
 
     const validationSchema = Yup.object({
         descriptionInput: Yup.string()
@@ -153,6 +149,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcConceptsErrorMessage,
     } = useADCConceptsStore();
 
+    const {
+        noteCreateAsync,
+    } = useNotesStore();
+
     // HOOKS
 
     const formikRef = useRef(null);
@@ -227,9 +227,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setStatusOptions(adcSetStatusOptions(adc.Status));
             setShowComments(false);
 
-            loadData();
+            loadContextData();
             // updateTotals(dispatch);
-            //calculateData();
         }
     }, [adc]);
 
@@ -249,10 +248,12 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
-            console.log('useEffect', adcSiteList);
-            const result = adcSiteList.some(item => item.ExceedsMaximumReduction); 
-            formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
-        }   
+            // console.log('useEffect', adcSiteList);
+            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);             
+            if (!!formikRef?.current) {
+                formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
+            }
+        }
     }, [adcSiteList]);
 
     useEffect(() => {
@@ -283,29 +284,29 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     
     // METHODS
 
-    const loadData = () => {
+    const loadContextData = () => {
 
         if (!!adc) {
             setADCData(dispatch, adc);
             setADCSiteList(dispatch, adc.ADCSites);
         }
-    }; // loadData
+    }; // loadContextData
 
-    const onFormSubmit = (values) => {
+    const onFormSubmit = (values) => { //! Cambiar le modo de enviar esto, se hace bolas los envios asyncronos
 
-        console.log('onFormSubmit()');
-        console.log('values', values);
-        console.log('adcData', adcData);
-        console.log('adcSiteList', adcSiteList);
+        // console.log('onFormSubmit()');
+        // console.log('values', values);
+        // console.log('adcData', adcData);
+        // console.log('adcSiteList', adcSiteList);
 
         let reviewComments = adc.ReviewComments;
-        let newStatus = adc.Status == ADCStatusType.nothing
+        let newStatus = adc.Status == ADCStatusType.nothing && values.statusSelect == ADCStatusType.nothing
             ? ADCStatusType.new
             : values.statusSelect;
 
         if (adc.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
-            console.log('text', text);
+            //console.log('NOTE text', text);
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
 
             if (newStatus == ADCStatusType.review 
@@ -321,40 +322,40 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             TotalInitial: adcData.TotalInitial,
             TotalMD11: adcData.TotalMD11,
             TotalSurveillance: adcData.TotalSurveillance,
-            TotalRR: adcData.TotalRR,
             ReviewComments: reviewComments,
             ExtraInfo: values.extraInfoInput,
             Status: newStatus,
         };
 
-        console.log('toSave', toSave);
-        //adcSaveAsync(toSave); //! QUITAR COMENTARIO
-        console.log('send to save...');
-        console.log('----- Sites -----');
+        // console.log('toSave ADC', toSave);
+        adcSaveAsync(toSave);
+        // console.log('send to save ADC...');
+        // console.log('----- Sites -----');
 
-        adcSiteList.forEach(adcSite => {
-            const localADCSite = values.items.find(item => item.ID == adcSite.ID);
-            //console.log('localADCSite', localADCSite);
+        adcSiteList.forEach(contextADCSite => { //* SITES 
+            const formikADCSite = values.items.find(item => item.ID == contextADCSite.ID);
+            //console.log('formikADCSite', formikADCSite);
             const toADCSiteSave = {
-                ID: adcSite.ID,
-                SiteID: adcSite.SiteID,
-                TotalInitial: adcSite.TotalInitial,
-                MD11: localADCSite?.MD11 ?? 0,
-                Surveillance: adcSite.Surveillance,
-                RR: adcSite.RR,
-                ExtraInfo: localADCSite?.extraInfo ?? '',
-                Status: adcSite.Status,
+                ID: contextADCSite.ID,
+                SiteID: contextADCSite.SiteID,
+                TotalInitial: contextADCSite.TotalInitial,
+                MD11: contextADCSite.MD11 ?? 0,
+                Total: contextADCSite.Total ?? 0,
+                Surveillance: contextADCSite.Surveillance ?? 0,
+                ExtraInfo: formikADCSite?.extraInfo ?? '',
+                Status: contextADCSite.Status,
             };
-            //console.log('toADCSiteSave', toADCSiteSave);
-            console.log('ADCSite, send to save...');
+            // console.log('toADCSiteSave', toADCSiteSave);
+            // console.log('ADCSite, send to save...');
+            // console.log(!!contextADCSite?.MD11File ? 'with file' : 'without file');
 
-            //adcSiteSaveAsync(toADCSiteSave); //! QUITAR COMENTARIO
+            adcSiteSaveAsync(toADCSiteSave, contextADCSite?.MD11File ?? null);
 
-            console.log('----- Concept Values -----');
-            adcSite.ADCConceptValues.forEach(adccvItem => {
+            // console.log('----- Concept Values -----');
+            contextADCSite.ADCConceptValues.forEach(adccvItem => { //* CONCEPT VALUES
                 
                 //console.log('adccvItem', adccvItem);
-                const toADCCVSave = {
+                const toADCCVSave = { //! Analizar de donde lo estoy sacando porque no guarda el obtenido de la bdd
                     ID: adccvItem.ID,
                     CheckValue: adccvItem.CheckValue,
                     Value: adccvItem.Value,
@@ -363,9 +364,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                     Status: adccvItem.Status,
                 };
 
-                console.log('ADCConceptValue, send to save...');
-                //adcConceptValueSaveAsync(toADCCVSave);    //! QUITAR COMENTARIO
-                console.log('toADCCVSave', toADCCVSave);
+                // console.log('ADCConceptValue, send to save...');
+                adcConceptValueSaveAsync(toADCCVSave);
+                // console.log('toADCCVSave', toADCCVSave);
             });
         });
     }; // onFormSubmit

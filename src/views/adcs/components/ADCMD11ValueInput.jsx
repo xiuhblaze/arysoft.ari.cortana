@@ -7,6 +7,7 @@ import envVariables from '../../../helpers/envVariables';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import getRandomNumber from '../../../helpers/getRandomNumber';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
 const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
     const {
@@ -65,11 +66,6 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
             ...formData,
             file: file,
         });
-
-        updateADCSite(dispatch, {
-            ID: adcSite.ID,
-            MD11File: file, //! FALTA MANDAR ESTO AL BACKEND
-        });
     }; // onChangeFile
 
     const onClick = () => {
@@ -90,7 +86,15 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
         console.log('onSaveFile', e);
         console.log('formData', formData);
 
-        // onHideModal();
+        if (!!formData.file) {
+            // guardando el archivo en el context
+            updateADCSite(dispatch, {
+                ID: adcSite.ID,
+                MD11File: formData.file,
+            });
+        }
+
+        onHideModal();
     };
     return (
         <>
@@ -111,8 +115,9 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
                     </span>
                     <button 
                         type="button"
-                        className="btn btn-outline-light
-                         ari-btn-outline-light-2 px-3 mb-0"
+                        className={`btn ${ !!adcSite.MD11File || !isNullOrEmpty(adcSite.MD11Filename)
+                            ? 'btn-outline-secondary' 
+                            : 'btn-outline-light ari-btn-outline-light-2'} px-3 mb-0`}
                         onClick={ onClick }
                     >
                         <FontAwesomeIcon icon={ faFileUpload } title="Upload MD11 file evidence" />
@@ -164,7 +169,7 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
                         !!adcSite.MD11Filename ? (
                         <div className="text-xs text-secondary mt-1 me-2">
                             If you want to upload a new file, click on the input form and select file,
-                            <span className="text-dark">the new one will overwrite the current one.</span>
+                            &nbsp;<span className="text-dark">the new one will overwrite the current one.</span>
                         </div>
                         ) : null
                     }

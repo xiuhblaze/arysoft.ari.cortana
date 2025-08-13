@@ -135,8 +135,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isADCCreating,
         adcCreatedOk,
-        adcsErrorMessage,
         
+        adcsAsync,
         adcCreateAsync,
     } = useADCsStore();
 
@@ -273,8 +273,15 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         if (!!adcCreatedOk) {
             Swal.fire('ADC', 
-                'ADC created successfully, please close this modal, and you will be see the new ADC in the ADCs list',
+                'ADC created successfully, this modal will close, and you will be see the new ADC in the ADCs list',
                 'success');
+
+            adcsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+
+            onCloseModal();
         }
     }, [adcCreatedOk]);
     
@@ -759,12 +766,14 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                 >
                                                                     Generate Audit Day Calculation Form
                                                                 </button>
-                                                            ) : appForm.Status == AppFormStatusType.active ? ( // ! Aqui voy... Revisar bien este código.
-                                                                !!appForm?.ADCs && appForm.ADCs.filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
+                                                            ) : appForm.Status == AppFormStatusType.active ? ( 
+                                                                !!appForm?.ADCs && appForm.ADCs
+                                                                    .filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
                                                                     <button
                                                                         type="button"
-                                                                        className="btn bg-info text-white mb-0"
+                                                                        className="btn bg-gradient-info text-white w-100 mb-0"
                                                                         onClick={ onGenerateADC }
+                                                                        disabled={ isADCCreating }
                                                                     >
                                                                         Generate Audit Day Calculation Form
                                                                     </button>

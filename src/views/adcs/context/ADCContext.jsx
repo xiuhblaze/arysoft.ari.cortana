@@ -23,7 +23,7 @@ const ADCControllerProvider = ({ children }) => {
     } // initialState
 
     const updateADCSite = (state, value) => {         
-console.log('updateADCSite()', value);
+// console.log('updateADCSite()', value);
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             if (adcSite.ID == value.ID) {

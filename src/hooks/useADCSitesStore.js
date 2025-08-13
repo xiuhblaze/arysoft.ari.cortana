@@ -102,11 +102,11 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSitesAsync
 
     const adcSitesClear = () => {
         dispatch(clearADCSites());
-    };
+    }; // adcSitesClear
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
@@ -130,7 +130,7 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSiteAsync
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
@@ -153,7 +153,7 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSiteCreateAsync
 
     /**
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
@@ -166,6 +166,7 @@ export const useADCSitesStore = () => {
             ...item,
             UpdatedUser: user.username,
         }
+        console.log('adcSiteSaveAsync.toSave', toSave);
         try {
 
             const formData = new FormData();
@@ -187,9 +188,10 @@ export const useADCSitesStore = () => {
             dispatch(isADCSiteSaved());
         } catch (error) {
             const message = getError(error);
+            console.log('adcSiteSaveAsync.error', message);
             setError(message);
         }
-    };
+    }; // adcSiteSaveAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos

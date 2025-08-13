@@ -167,6 +167,7 @@ export const useADCConceptValuesStore = () => {
             ...item,
             UpdatedUser: user.username,
         }
+        console.log('adcConceptValueSaveAsync.toSave', toSave);
         try {
             const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
@@ -175,6 +176,7 @@ export const useADCConceptValuesStore = () => {
             dispatch(isADCConceptValueSaved());
         } catch (error) {
             const message = getError(error);
+            console.log('adcConceptValueSaveAsync.error', message);
             setError(message);
         }
     };

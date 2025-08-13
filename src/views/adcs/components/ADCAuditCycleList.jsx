@@ -49,11 +49,13 @@ const ADCAuditCycleList = () => {
     // METHODS
     
     const onShowModal = (id) => {
+        
         setADCID(id);
         setShowModal(true);
     };
 
     const onCloseModal = () => {
+
         adcsAsync({
             auditCycleID: auditCycle.ID,
             pageSize: 0,
