@@ -39,9 +39,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         justification: adcConceptValue.Justification ?? '',
         error: null,
     });
-    const [currentJustification, setCurrentJustification] = useState(adcConceptValue.Justification ?? '');  
-    
-    //const [checkValue, setCheckValue] = useState(adcConceptValue.CheckValue);    
+    const [currentJustification, setCurrentJustification] = useState(adcConceptValue.Justification ?? '');
     const [isDecrease, setIsDecrease] = useState(false);
     const [myProps, setMyProps] = useState({ 
         icon: faMinus, 
@@ -51,63 +49,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
     });
 
     useEffect(() => {
-        // let unitType = ADCConceptUnitType.nothing;
+        //console.log('Primera vez, formData:', formData);
 
-        // if (checkValue && adcConcept.WhenTrue && !!adcConcept.Increase) {
-        //     unitType = adcConcept.IncreaseUnit;
-        // } else if (!checkValue && adcConcept.WhenTrue && !!adcConcept.Decrease) {
-        //     unitType = adcConcept.DecreaseUnit;
-        // } else if (checkValue && !adcConcept.WhenTrue && !!adcConcept.Decrease) {
-        //     unitType = adcConcept.DecreaseUnit;            
-        // } else if (!checkValue && !adcConcept.WhenTrue && !!adcConcept.Increase) {
-        //     unitType = adcConcept.IncreaseUnit;
-        // }
-
-        const unit = formData.checkValue && adcConcept.WhenTrue && !!adcConcept.Increase
-            ? adcConcept.IncreaseUnit
-            : !formData.checkValue && adcConcept.WhenTrue && !!adcConcept.Decrease
-                ? adcConcept.DecreaseUnit
-                : formData.checkValue && !adcConcept.WhenTrue && !!adcConcept.Decrease
-                    ? adcConcept.DecreaseUnit
-                    : !formData.checkValue && !adcConcept.WhenTrue && !!adcConcept.Increase
-                        ? adcConcept.IncreaseUnit
-                        : ADCConceptUnitType.nothing;
-
-        setIsDecrease(
-            (!formData.checkValue && adcConcept.WhenTrue && !!adcConcept.Decrease) 
-            || (formData.checkValue && !adcConcept.WhenTrue && !!adcConcept.Decrease)
-        );
-
-        if (unit != ADCConceptUnitType.nothing) {
-            setMyProps(unit == ADCConceptUnitType.percentage 
-                ? { icon: faPercent, label: 'percent', disabled: false, unit: ADCConceptUnitType.percentage } 
-                : { icon: faCalendarDay, label: 'days', disabled: false, unit: ADCConceptUnitType.days }
-            );
-        } else {
-            setMyProps({ icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
-            setFormData({
-                ...formData,
-                value: 0,
-                justification: '',
-                error: '',
-            });
-            setCurrentJustification('');
-        }
-
-        if (!!formik && !isNullOrEmpty(formData.error)) {
-            //console.log(formik.values.conceptValueHidden, 'aqui se debe restar');
-            formik.setFieldValue(
-                'conceptValueHidden', 
-                formik.values.conceptValueHidden == 0 
-                    ? 0 
-                    : formik.values.conceptValueHidden - 1
-            );
-        }
-        // console.log('useEffect, update value,', 0);
-        updateConceptValues(0);
-
-    }, [formData.checkValue]);
-
+        setConceptValue(formData.checkValue);
+    }, []);
+    
     // METHODS
 
     const isValidDays = (value) => {
@@ -154,22 +100,77 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         return isValid;
     }; // isValidDays
 
+    const setConceptValue = (value) => {
+
+        const unit = value && adcConcept.WhenTrue && !!adcConcept.Increase
+            ? adcConcept.IncreaseUnit
+            : !value && adcConcept.WhenTrue && !!adcConcept.Decrease
+                ? adcConcept.DecreaseUnit
+                : value && !adcConcept.WhenTrue && !!adcConcept.Decrease
+                    ? adcConcept.DecreaseUnit
+                    : !value && !adcConcept.WhenTrue && !!adcConcept.Increase
+                        ? adcConcept.IncreaseUnit
+                        : ADCConceptUnitType.nothing;
+                
+        setIsDecrease(
+            (!value && adcConcept.WhenTrue && !!adcConcept.Decrease) 
+            || (value && !adcConcept.WhenTrue && !!adcConcept.Decrease)
+        );
+        
+        if (unit != ADCConceptUnitType.nothing) {
+            setMyProps(unit == ADCConceptUnitType.percentage 
+                ? { icon: faPercent, label: 'percent', disabled: false, unit: ADCConceptUnitType.percentage } 
+                : { icon: faCalendarDay, label: 'days', disabled: false, unit: ADCConceptUnitType.days }
+            );
+            setFormData({
+                ...formData,
+                checkValue: value,
+            });
+        } else {
+            setMyProps({ icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
+            setFormData({
+                ...formData,
+                checkValue: value,
+                value: 0,
+                justification: '',
+                error: '',
+            });
+            setCurrentJustification('');
+        }
+
+        if (!!formik && !isNullOrEmpty(formData.error)) {
+            formik.setFieldValue(
+                'conceptValueHidden', 
+                formik.values.conceptValueHidden == 0 
+                    ? 0 
+                    : formik.values.conceptValueHidden - 1
+            );
+        }
+    }; // setConceptValue
+
+    const onCheckChange = (e) => {        
+        const checked = e.target.checked;
+
+        setConceptValue(checked);
+
+        if (!!formik) {
+            formik.setFieldTouched('conceptValueHidden', true);
+        }
+
+        updateConceptValues(0);
+    }; // onCheckChange
+
     const onChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type } = e.target;
 
         setFormData({
             ...formData,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: value,
         });
 
         if (type === 'select-one') { // Cuando se cambia el select
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                //formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden);
-                // formik.setFormikState(prevState => ({
-                //     ...prevState,
-                //     dirty: true,
-                // }))
             }
             updateConceptValues(value, formData.justification);
         }
@@ -182,8 +183,6 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             
             if (!!formik) {
                 formik.setFieldTouched('conceptValueHidden', true);
-                //formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden);
-                //formik.setFieldValue('conceptValueHidden', 0);
             }
             
             updateConceptValues(value ?? 0, formData.justification);
@@ -191,13 +190,11 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
     }; // onBlur
 
     const onSaveJustification = () => {
-        //console.log('onSaveJustification, update justification', formData.justification);
         updateConceptValues(formData.value, formData.justification);
         setCurrentJustification(formData.justification);
 
         if (!!formik) {
             formik.setFieldTouched('conceptValueHidden', true);
-            //formik.setFieldValue('conceptValueHidden', true);
         }
 
         setShowModal(false);
@@ -219,8 +216,6 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         //     formik.setFieldTouched('conceptValueHidden', true);
         //     //formik.setFieldValue('conceptValueHidden', 0);
         // }
-                
-        updateTotals(dispatch);
     }; // updateConceptValues
 
     const onHideModal = () => {
@@ -254,7 +249,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                                 className="form-check-input"
                                 aria-label="Checkbox for following text input"
                                 style={{ height: '20px' }}
-                                onChange={ onChange }
+                                onChange={ onCheckChange }
                                 checked={formData.checkValue}
                             />
                         </div>

@@ -69,6 +69,8 @@ const ADCControllerProvider = ({ children }) => {
             return adcSite;
         }); // newADCSiteList
 
+        //console.log('newADCSiteList', newADCSiteList);
+
         return newADCSiteList;
     }; // updateADCConceptValue
 
@@ -99,7 +101,7 @@ const ADCControllerProvider = ({ children }) => {
                             || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
 
                             if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
-                                totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100)); //! Verificar si e sobre Inital MD5 o sobre el restante de totalDays
+                                totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100));
                             } else if (myConcept.DecreaseUnit == ADCConceptUnitType.days) {
                                 totalDays = totalDays - adccvItem.Value;
                             }
@@ -129,7 +131,7 @@ const ADCControllerProvider = ({ children }) => {
 
             //* Validaciones MD11
 
-            if (adcSite.MD11 > 0) {                
+            if (adcSite.MD11 > 0 && state.misc.isMultistandard) {                
                 const decreaseInDays = totalDays * (adcSite.MD11 / 100);
                 totalSiteDays = totalDays - decreaseInDays;
 
@@ -156,6 +158,8 @@ const ADCControllerProvider = ({ children }) => {
                 : totalDays * (survPercentBase / 100);
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
             
+            //console.log('totalDays', totalDays);
+
             return {
                 ...adcSite,
                 TotalInitial: round(totalDays, 2),
@@ -166,6 +170,7 @@ const ADCControllerProvider = ({ children }) => {
         }); // newADCSiteList
 
         // None initial certification shall be less than 2 audit days
+        // - NOTA: En el futuro, validar que sea un ADC Initial para aplicar esta regla (xBlaze: 20250814)
         if (totalInitial < TOTAL_INITIAL_MIN_DAYS) totalInitial = TOTAL_INITIAL_MIN_DAYS;
 
         const newADCData = {
@@ -191,13 +196,17 @@ const ADCControllerProvider = ({ children }) => {
 
         switch (action.type) {
             case 'SET_ADC_DATA': {
-                return { ...state, adcData: action.value };
+                //return { ...state, adcData: action.value };
+                //console.log('call updateTotals: SET_ADC_DATA');
+                return updateTotals({ ...state, adcData: action.value });
             }
             case 'SET_ADC_SITES_LIST': {
-                return { ...state, adcSiteList: action.value };
+                //return { ...state, adcSiteList: action.value };
+                //console.log('call updateTotals: SET_ADC_SITES_LIST');
+                return updateTotals({ ...state, adcSiteList: action.value });
             }
             case 'SET_ADC_CONCEPTS': {
-                return { ...state, adcConceptList: action.value };
+                return updateTotals({ ...state, adcConceptList: action.value });
             }
             case 'SET_MISC': {
                 return { ...state, misc: action.value };

@@ -57,7 +57,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         extraInfoInput: '',
         statusSelect: '',
         commentsInput: '',
-        items: [],          
+        items: [], // datos por cada adcSite
         conceptValueHidden: 0,
         exceedsMaximumReductionHidden: false,
     };
@@ -73,29 +73,29 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         items: Yup.array().of(
             Yup.object({
                 ID: Yup.string().required('ID is required'),
-                MD11: Yup.number()
-                    .typeError('MD11 must be a number')
-                    .min(0, 'MD11 must be greater than 0')
-                    .max(99, 'MD11 must be less than 100'),
+                // MD11: Yup.number()
+                //     .typeError('MD11 must be a number')
+                //     .min(0, 'MD11 must be greater than 0')
+                //     .max(99, 'MD11 must be less than 100'),
                 extraInfo: Yup.string()
                     .max(500, 'Extra info must be less than 500 characters'),
-                fileInput: Yup.mixed()
-                    .test({
-                        name: 'is-type-valid',
-                        message: 'Some file error', // <- este solo es visible si el último return es false
-                        test: (value, ctx) => {
-                            if (!!value) {
-                                const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
-                                const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
-                                if (!validTypes.includes(extension)) {
-                                    return ctx.createError({
-                                        message: 'Only files with pdf, doc, docx, xls, xlsx, zip, rar or 7z extensions are allowed'
-                                    });
-                                }
-                            }
-                            return true;
-                        }
-                    }), 
+                // fileInput: Yup.mixed()
+                //     .test({
+                //         name: 'is-type-valid',
+                //         message: 'Some file error', // <- este solo es visible si el último return es false
+                //         test: (value, ctx) => {
+                //             if (!!value) {
+                //                 const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
+                //                 const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
+                //                 if (!validTypes.includes(extension)) {
+                //                     return ctx.createError({
+                //                         message: 'Only files with pdf, doc, docx, xls, xlsx, zip, rar or 7z extensions are allowed'
+                //                     });
+                //                 }
+                //             }
+                //             return true;
+                //         }
+                //     }), 
             })
         ),
         conceptValueHidden: Yup.number()
@@ -200,9 +200,9 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 
                 return {
                     ID: adcSite.ID,
-                    MD11: adcSite.MD11 ?? '0',
+                    //MD11: adcSite.MD11 ?? '0',
                     extraInfo: adcSite.ExtraInfo ?? '',
-                    fileInput: '',
+                    //fileInput: '',
                 }
             });
 
@@ -228,7 +228,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setShowComments(false);
 
             loadContextData();
-            // updateTotals(dispatch);
         }
     }, [adc]);
 
@@ -271,7 +270,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }, [adcSavedOk]);
     
     useEffect(() => {
-        if (!!adcConcepts) {
+        if (!!adcConcepts && adcConcepts.length > 0) {
+            // console.log('useEffect: fill adcConcepts');
             setADCConceptList(dispatch, adcConcepts);
         }
     }, [adcConcepts]);
