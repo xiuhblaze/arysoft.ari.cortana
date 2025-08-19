@@ -166,7 +166,7 @@ export const useADCSitesStore = () => {
             ...item,
             UpdatedUser: user.username,
         }
-        console.log('adcSiteSaveAsync.toSave', toSave);
+        // console.log('adcSiteSaveAsync.toSave', toSave);
         try {
 
             const formData = new FormData();
@@ -192,6 +192,43 @@ export const useADCSitesStore = () => {
             setError(message);
         }
     }; // adcSiteSaveAsync
+
+    const adcSiteSaveListAsync = async (list, files) => {
+        dispatch(onADCSiteSaving());
+
+        const toSaveList = {
+            Items: list.map(item => {
+                return {
+                    ...item,
+                    UpdatedUser: user.username,
+                }
+            }),
+        }
+
+        console.log('toSaveList', toSaveList);
+
+        try {
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            };  
+            const data = JSON.stringify(toSaveList);
+
+            formData.append('data', data);
+            formData.append('files', files);
+
+
+            const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, formData, { headers });
+            const { Data } = await resp.data;
+
+            console.log('Data', Data);
+            dispatch(isADCSiteSaved());
+        } catch (error) {
+            const message = getError(error);
+            console.log('adcSiteSaveListAsync.error', message);
+            setError(message);
+        }
+    }; // adcSiteSaveListAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -243,6 +280,7 @@ export const useADCSitesStore = () => {
         adcSiteAsync,
         adcSiteCreateAsync,
         adcSiteSaveAsync,
+        adcSiteSaveListAsync,
         adcSiteDeleteAsync,
         adcSiteClear,
     }

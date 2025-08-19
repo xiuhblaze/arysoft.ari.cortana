@@ -179,7 +179,39 @@ export const useADCConceptValuesStore = () => {
             console.log('adcConceptValueSaveAsync.error', message);
             setError(message);
         }
-    };
+    }; // adcConceptValueSaveAsync
+
+    /**
+     * Llama al endpoint para actualizar una lista de registros existentes en la base de datos
+     * @param {array of ADCConceptValueItemUpdateDto} list 
+     */
+    const adcConceptValueSaveListAsync = async (list) => {
+        dispatch(onADCConceptValueSaving());
+
+        const toSaveList = {
+            Items: list.map(item => {
+                return {
+                    ...item,
+                    UpdatedUser: user.username,
+                }
+            }),
+        }
+
+        // console.log('toSaveList', toSaveList);
+
+        try {
+            const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, toSaveList);
+            const { Data } = await resp.data;
+
+            // console.log('Data', Data);
+
+            dispatch(isADCConceptValueSaved());
+        } catch (error) {
+            const message = getError(error);
+            console.log('adcConceptValueSaveListAsync.error', message);
+            setError(message);
+        }
+    }; // adcConceptValueSaveListAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -231,6 +263,7 @@ export const useADCConceptValuesStore = () => {
         adcConceptValueAsync,
         adcConceptValueCreateAsync,
         adcConceptValueSaveAsync,
+        adcConceptValueSaveListAsync,
         adcConceptValueDeleteAsync,
         adcConceptValueClear,
     }

@@ -48,7 +48,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         DefaultStatusType,
         ADCStatusType,
-        ADCConceptUnitType,
         ADCConceptOrderType
     } = enums();
 
@@ -134,12 +133,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isADCSiteSaving,
         adcSiteSavedOk,
         adcSiteSaveAsync,
+        adcSiteSaveListAsync,
     } = useADCSitesStore();
 
     const {
         isADCConceptValueSaving,
         adcConceptValueSavedOk,
-        adcConceptValueSaveAsync,        
+        adcConceptValueSaveListAsync,
     } = useADCConceptValuesStore();
 
     const {
@@ -257,8 +257,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         
-        if (!!adcSavedOk) {
-            console.log('...saved ok');
+        if (!!adcSavedOk && !!adcSiteSavedOk && !!adcConceptValueSavedOk) {
+            console.log('...adc saved ok');
 
             if (!isNullOrEmpty(saveNote)) {
                 noteCreateAsync({ OwnerID: adc.ID, Text: saveNote });
@@ -267,7 +267,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             Swal.fire('ADC', 'Changes made successfully', 'success');            
             actionsForCloseModal();
         }
-    }, [adcSavedOk]);
+    }, [adcSavedOk, adcSiteSavedOk, adcConceptValueSavedOk]);
     
     useEffect(() => {
         if (!!adcConcepts && adcConcepts.length > 0) {
@@ -292,13 +292,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
     }; // loadContextData
 
-    const onFormSubmit = (values) => { //! Cambiar le modo de enviar esto, se hace bolas los envios asyncronos
-
-        // console.log('onFormSubmit()');
-        // console.log('values', values);
-        // console.log('adcData', adcData);
-        // console.log('adcSiteList', adcSiteList);
-
+    const onFormSubmit = (values) => {
         let reviewComments = adc.ReviewComments;
         let newStatus = adc.Status == ADCStatusType.nothing && values.statusSelect == ADCStatusType.nothing
             ? ADCStatusType.new
@@ -327,15 +321,22 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             Status: newStatus,
         };
 
-        // console.log('toSave ADC', toSave);
         adcSaveAsync(toSave);
-        // console.log('send to save ADC...');
-        // console.log('----- Sites -----');
 
-        adcSiteList.forEach(contextADCSite => { //* SITES 
+        let files = [];
+        const toADCSiteSaveList = adcSiteList.map(contextADCSite => {
             const formikADCSite = values.items.find(item => item.ID == contextADCSite.ID);
-            //console.log('formikADCSite', formikADCSite);
-            const toADCSiteSave = {
+console.log('contextADCSite.MD11File', contextADCSite.MD11File);
+console.log('contextADCSite.IsMultiStandard', contextADCSite.IsMultiStandard);
+            if (!!contextADCSite.MD11File && !!contextADCSite.IsMultiStandard) {
+                // Cambiarle el nombre al archivo por el ID del ADCSite, dejandolo con la misma extensión
+                const fileName = `${contextADCSite.ID}.${contextADCSite.MD11File.name.split('.').pop()}`;
+                console.log('fileName', fileName);
+                contextADCSite.MD11File.name = fileName;
+                files.push(contextADCSite.MD11File);
+            }
+
+            return {
                 ID: contextADCSite.ID,
                 SiteID: contextADCSite.SiteID,
                 TotalInitial: contextADCSite.TotalInitial,
@@ -345,17 +346,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 ExtraInfo: formikADCSite?.extraInfo ?? '',
                 Status: contextADCSite.Status,
             };
-            // console.log('toADCSiteSave', toADCSiteSave);
-            // console.log('ADCSite, send to save...');
-            // console.log(!!contextADCSite?.MD11File ? 'with file' : 'without file');
+        });
 
-            adcSiteSaveAsync(toADCSiteSave, contextADCSite?.MD11File ?? null);
+        adcSiteSaveListAsync(toADCSiteSaveList, files);
 
-            // console.log('----- Concept Values -----');
-            contextADCSite.ADCConceptValues.forEach(adccvItem => { //* CONCEPT VALUES
-                
-                //console.log('adccvItem', adccvItem);
-                const toADCCVSave = { //! Analizar de donde lo estoy sacando porque no guarda el obtenido de la bdd
+        adcSiteList.forEach(contextADCSite => { //* SITES 
+            
+            const toADCConceptValuesSaveList = contextADCSite.ADCConceptValues.map(adccvItem => {
+                return {
                     ID: adccvItem.ID,
                     CheckValue: adccvItem.CheckValue,
                     Value: adccvItem.Value,
@@ -363,12 +361,18 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                     ValueUnit: adccvItem.ValueUnit,
                     Status: adccvItem.Status,
                 };
-
-                // console.log('ADCConceptValue, send to save...');
-                adcConceptValueSaveAsync(toADCCVSave);
-                // console.log('toADCCVSave', toADCCVSave);
             });
+
+            adcConceptValueSaveListAsync(toADCConceptValuesSaveList)
+                .then(() => {
+                    console.log('adcConceptValueSaveListAsync.then()');
+                })
+                .catch(() => {
+                    console.log('adcConceptValueSaveListAsync.catch()');
+                });
         });
+
+        //TODO: Considerar el mandar guardar todo hasta el final o incluso cascadear primero ADCConceptValues, luego ADCSites y al Final ADC desde el metodo then
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -647,7 +651,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         </td>
                                                                                         {
                                                                                             adcSiteList.map(adcSite => 
-                                                                                            <td key={adcSite.ID}>
+                                                                                            <td key={adcSite.ID} className="align-top">
                                                                                                 { adcSite.ADCConceptValues
                                                                                                     .filter(acv => acv.ADCConceptID == adcConcept.ID)
                                                                                                     .map(acv => {
@@ -893,16 +897,17 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <div className="text-secondary mb-3 mb-sm-0">
                                                 <AryLastUpdatedInfo item={ adc } />
                                             </div>
-                                            <AryFormDebug formik={ formik } />
+                                            {/*<AryFormDebug formik={ formik } />*/}
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <button 
                                                     type="submit"
                                                     className="btn bg-gradient-dark mb-0"
-                                                    disabled={ isADCSaving || !hasChanges || adc.Status >= ADCStatusType.inactive }
+                                                    disabled={ isADCSaving || isADCConceptValueSaving || isADCSiteSaving
+                                                        || !hasChanges || adc.Status >= ADCStatusType.inactive }
                                                     //disabled={ isADCSaving || adc.Status >= ADCStatusType.inactive } 
                                                 >
                                                     {
-                                                        isADCSaving 
+                                                        isADCSaving || isADCConceptValueSaving || isADCSiteSaving
                                                             ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
                                                             : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
                                                     }

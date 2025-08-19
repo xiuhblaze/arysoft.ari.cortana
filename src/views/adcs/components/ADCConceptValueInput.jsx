@@ -299,9 +299,16 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                 </div>
                 {
                     !isNullOrEmpty(currentJustification) ? (
-                        <div className="text-xs text-secondary text-wrap mt-1">
+                        <div 
+                            className="text-xs text-secondary text-wrap mt-1"
+                            title={ currentJustification.length > 30 ? currentJustification : null }
+                        >
                             <FontAwesomeIcon icon={ faStickyNote } fixedWidth className="text-warning me-1" />
-                            {currentJustification}
+                            {
+                                currentJustification.length > 30
+                                    ? currentJustification.substring(0, 30) + '...'
+                                    : currentJustification
+                            }
                         </div>
                     ) : null
                 }

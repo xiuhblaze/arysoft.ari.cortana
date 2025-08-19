@@ -326,7 +326,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                                         formik.setFieldValue('statusCheck', isChecked);
                                                         //setActiveShift(isChecked);
                                                     }} 
-                                                    checked={ formik.values.statusCheck }
+                                                    checked={ formik.values?.statusCheck ?? false }
                                                 />
                                                 <label 
                                                     className="form-check-label text-secondary mb-0"
