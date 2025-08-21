@@ -75,7 +75,7 @@ const EditSiteModal = ({ id, ...props }) => {
                 addressInput: site?.Address ?? '',
                 countryInput: site?.Country ?? DEFAULT_COUNTRY,
                 locationUrlInput: site?.LocationURL ?? '',
-                statusCheck: site?.Status === DefaultStatusType.active,
+                statusCheck: site.Status === DefaultStatusType.active || site.Status === DefaultStatusType.nothing,
             });
 
             // setActiveSite(site?.Status === DefaultStatusType.active);

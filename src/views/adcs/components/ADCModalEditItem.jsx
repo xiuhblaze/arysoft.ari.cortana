@@ -58,6 +58,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         commentsInput: '',
         items: [], // datos por cada adcSite
         conceptValueHidden: 0,
+        md11Hidden: 0,
         exceedsMaximumReductionHidden: false,
     };
 
@@ -99,6 +100,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         ),
         conceptValueHidden: Yup.number()
             .max(0, 'At least one concept value is not valid'),
+        md11Hidden: Yup.number()
+            .max(0, 'At least one MD11 value is not valid'),
         exceedsMaximumReductionHidden: Yup.boolean()
             .oneOf([false], 'At least one site exceeds maximum reduction'),
     });
@@ -213,6 +216,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 commentsInput: '',
                 items: itemsInputs,
                 conceptValueHidden: 0,
+                md11Hidden: 0,
                 exceedsMaximumReductionHidden: false,
             });
 
@@ -247,7 +251,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
-            // console.log('useEffect', adcSiteList);
+//console.log('useEffect', adcSiteList);
             const result = adcSiteList.some(item => item.ExceedsMaximumReduction);             
             if (!!formikRef?.current) {
                 formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
@@ -300,7 +304,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         if (adc.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
-            //console.log('NOTE text', text);
+console.log('NOTE text', text);
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
 
             if (newStatus == ADCStatusType.review 
@@ -326,14 +330,16 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         let files = [];
         const toADCSiteSaveList = adcSiteList.map(contextADCSite => {
             const formikADCSite = values.items.find(item => item.ID == contextADCSite.ID);
-console.log('contextADCSite.MD11File', contextADCSite.MD11File);
-console.log('contextADCSite.IsMultiStandard', contextADCSite.IsMultiStandard);
+
             if (!!contextADCSite.MD11File && !!contextADCSite.IsMultiStandard) {
                 // Cambiarle el nombre al archivo por el ID del ADCSite, dejandolo con la misma extensión
                 const fileName = `${contextADCSite.ID}.${contextADCSite.MD11File.name.split('.').pop()}`;
-                console.log('fileName', fileName);
-                contextADCSite.MD11File.name = fileName;
-                files.push(contextADCSite.MD11File);
+                console.log('fileName', fileName);                
+                files.push(
+                    new File([contextADCSite.MD11File], fileName, {
+                        type: contextADCSite.MD11File.type,
+                        lastModified: contextADCSite.MD11File.lastModified,
+                }));
             }
 
             return {
@@ -515,6 +521,7 @@ console.log('contextADCSite.IsMultiStandard', contextADCSite.IsMultiStandard);
                                                                             type="text"
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
+                                                                        <input type="hidden" name="md11Hidden" />
                                                                         <input type="hidden" name="exceedsMaximumReductionHidden" />
                                                                     </Col>
                                                                     <Col xs="12">

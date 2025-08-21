@@ -45,7 +45,7 @@ const SitesCard = ({ readOnly = false, ...props }) => {
             sitesAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
-                order: SiteOrderType.isMainSiteDesc,
+                order: SiteOrderType.isMainSiteDesc, //! Cambiar esto en la siguiente actualizacion del backend por: isMainSite (20250820)
             });
         }
     }, [organization]);

@@ -111,7 +111,9 @@ const ADCAuditCycleList = () => {
                                             <FontAwesomeIcon icon={ faBuilding } />: { adc.ADCSitesCount ?? '0' }
                                         </span> | 
                                         <span title="Total initial (days)">
-                                            <FontAwesomeIcon icon={ faCalendarDay } />: {adc.TotalInitial ?? '0'}
+                                            <FontAwesomeIcon icon={ faCalendarDay } />: {!!adc.TotalMD11 
+                                                ? adc.TotalMD11
+                                                : adc.TotalInitial ?? '0'}
                                         </span> |
                                         <span title="Total employees">
                                             <FontAwesomeIcon icon={ faUsers } />: { adc.TotalEmployees ?? '0' }

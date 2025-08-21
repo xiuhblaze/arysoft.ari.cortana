@@ -205,8 +205,6 @@ export const useADCSitesStore = () => {
             }),
         }
 
-        console.log('toSaveList', toSaveList);
-
         try {
             const formData = new FormData();
             const headers = {
@@ -215,8 +213,12 @@ export const useADCSitesStore = () => {
             const data = JSON.stringify(toSaveList);
 
             formData.append('data', data);
-            formData.append('files', files);
-
+            if (!!files && files.length > 0) {
+                // Enviar en un ciclo por cada archivo
+                for (let i = 0; i < files.length; i++) {
+                    formData.append(`files[${i}]`, files[i]);
+                }
+            }
 
             const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, formData, { headers });
             const { Data } = await resp.data;

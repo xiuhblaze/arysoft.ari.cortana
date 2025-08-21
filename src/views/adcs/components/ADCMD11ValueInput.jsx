@@ -1,4 +1,4 @@
-import { faFile, faFileUpload, faPercent } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faFile, faFileUpload, faPercent } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
@@ -20,8 +20,14 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
         { value: 10, label: '10' },
         { value: 20, label: '20' },
     ];
-    const [controller, dispatch] = useADCController();  
-    const { adcData, adcSiteList } = controller;
+
+    const initialValues = {
+        value: adcSite.MD11 ?? '0',
+        file: null,
+        error: null,
+    };
+    
+    // CUSTOM HOOKS
 
     const {
         organization
@@ -32,18 +38,22 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
     } = useAuditCyclesStore();
 
     // HOOKS
+
+    const [controller, dispatch] = useADCController();  
+    const { adcData, adcSiteList } = controller;
     
     const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({
-        value: adcSite.MD11 ?? '0',
-        file: null,
-        error: null,
-    });
+    const [formData, setFormData] = useState(initialValues);
 
     // METHODS
 
     const onChange = (e) => {
         const { name, value } = e.target;
+
+        // console.log('El select fué tocado - touch');
+        if (!!formik) {
+            formik.setFieldTouched('md11Hidden', true);
+        }
 
         setFormData({
             ...formData,
@@ -60,31 +70,51 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
         //const { name, value } = e.target;
         const file = e.target.files[0];
 
-        console.log('onChangeFile', file);
+        // Validdar que sea un archivo con extensión pdf, doc, docx, xls, xlsx, zip, rar o 7z
+        if (!!file) {
+            const extension = file.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
+            const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
+            if (!validTypes.includes(extension)) {
+                setFormData({
+                    ...formData,
+                    error: 'Only files with pdf, doc, docx, xls, xlsx, zip, rar or 7z extensions are allowed',
+                });
+                return;
+            }
+        }
 
         setFormData({
             ...formData,
             file: file,
+            error: null
         });
     }; // onChangeFile
 
     const onClick = () => {
         // console.log('open file dialog');
         onShowModal();
-    };
+    }; // onClick
 
     const onShowModal = () => {
+
+        setFormData(initialValues);
         setShowModal(true);
-    };
+    }; // onShowModal
 
     const onHideModal = () => {
-        setShowModal(false);
-    };
-
-    const onSaveFile = (e) => {
         
-        console.log('onSaveFile', e);
-        console.log('formData', formData);
+        setShowModal(false);
+    }; // onHideModal
+
+    const onSaveFile = () => {
+        
+// console.log('onSaveFile()');
+// console.log('formData', formData);
+
+        // console.log('El archivo fué seleccionado - touch');
+        if (!!formik) {
+            formik.setFieldTouched('md11Hidden', true);
+        }
 
         if (!!formData.file) {
             // guardando el archivo en el context
@@ -95,7 +125,8 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
         }
 
         onHideModal();
-    };
+    }; // onSaveFile
+
     return (
         <>
             <div {...props}>
@@ -173,12 +204,21 @@ const ADCMD11ValueInput = ({ adcSite, name, formik, ...props }) => {
                         </div>
                         ) : null
                     }
+                    {
+                        !isNullOrEmpty(formData.error) ? (
+                            <div className="text-xs text-danger text-wrap mt-1">
+                                <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
+                                { formData.error }
+                            </div>
+                        ) : null
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                         <button type="button"
                             className="btn bg-gradient-dark mb-0"
                             onClick={ onSaveFile }
+                            disabled={ !isNullOrEmpty(formData.error) }
                         >
                             Save
                         </button>
