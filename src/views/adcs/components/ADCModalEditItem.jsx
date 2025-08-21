@@ -14,7 +14,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setMisc, useADCController } from '../context/ADCContext';
-import { faCalendarDay, faClock, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
@@ -411,7 +411,7 @@ console.log('NOTE text', text);
     
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
-            size="xl"
+            size="xxxl"
             contentClassName="bg-gray-100 border-0 shadow-lg"
             fullscreen="sm-down"
         >
@@ -585,11 +585,11 @@ console.log('NOTE text', text);
                                                                     <table className='table align-items-center table-borderless'>
                                                                         <thead>
                                                                             <tr>
-                                                                                <th></th>
+                                                                                <th style={{minWidth: '300px'}}></th>
                                                                                 <th></th>
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
-                                                                                        <th key={adcSite.ID} className={headStyle}>
+                                                                                        <th key={adcSite.ID} className={headStyle} style={{minWidth: '220px'}}>
                                                                                             { adcSite.SiteDescription }
                                                                                         </th>
                                                                                     )
@@ -800,18 +800,23 @@ console.log('NOTE text', text);
                                                                         !isObjectEmpty(formik.errors) && (
                                                                             <>
                                                                                 <hr className="horizontal dark my-3" />
-                                                                                <ListGroup>
-                                                                                    {
-                                                                                        Object.keys(formik.errors).map(key => (
-                                                                                            <ListGroup.Item key={key} className="bg-transparent border-0 py-1 px-0">
-                                                                                                <div className="text-xs text-danger text-wrap mt-1">
-                                                                                                    <FontAwesomeIcon icon={ faExclamationTriangle } fixedWidth className="text-danger me-1" />
-                                                                                                    { formik.errors[key] }
-                                                                                                </div>
+                                                                                <Alert variant="danger" className="text-sm text-white">
+                                                                                    <h6 className="text-sm text-white font-weight-bold mb-0"> 
+                                                                                        There are some errors in the form
+                                                                                    </h6>
+                                                                                    <p className="text-xs text-white mb-0 opacity-8">Please, check the list of errors below</p>
+                                                                                    <ListGroup variant="flush" size="sm">
+                                                                                        { Object.keys(formik.errors).map(key => 
+                                                                                            <ListGroup.Item 
+                                                                                                key={key} 
+                                                                                                className="text-xs bg-transparent p-1 border-0"
+                                                                                            >
+                                                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                                                                                {formik.errors[key]}
                                                                                             </ListGroup.Item>
-                                                                                        ))
-                                                                                    }
-                                                                                </ListGroup>
+                                                                                        )} 
+                                                                                    </ListGroup>
+                                                                                </Alert>
                                                                             </>
                                                                         )
                                                                     }
@@ -883,20 +888,6 @@ console.log('NOTE text', text);
                                                     }}
                                                 />
                                             </Col>
-                                            {/* <Col>
-                                                <MiniStatisticsCard
-                                                    title="RR"
-                                                    count={ adcData?.TotalRR ?? 0 }
-                                                    percentage={{
-                                                        color: 'dark',
-                                                        text: 'days',
-                                                    }}
-                                                    icon={{
-                                                        icon: faCalendarDay,
-                                                        bgColor: 'dark',
-                                                    }}
-                                                />
-                                            </Col> */}
                                         </Row>
                                     </Modal.Body>
                                     <Modal.Footer>
