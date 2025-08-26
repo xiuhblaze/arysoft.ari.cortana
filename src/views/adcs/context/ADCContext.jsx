@@ -19,6 +19,10 @@ const ADCControllerProvider = ({ children }) => {
         misc: {
             total:0,                // No se si se necesite
             isMultistandard: false, // Para saber si aplicar o no MD11
+        },
+        conceptValueHidden: {
+            value: 0,
+            touch: false,        
         }
     } // initialState
 
@@ -80,11 +84,13 @@ const ADCControllerProvider = ({ children }) => {
         const TOTAL_INITIAL_MIN_DAYS = 2;
         const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
 
-        const { acdData, adcSiteList } = state;
+        const { adcData, adcSiteList } = state;
         let totalInitial = 0;       // equivalente a ST1 y ST2
         let totalEmployees = 0;     // suma de los empleados de todos los Sites        
         let totalSurveillance = 0;
         let total = 0;
+
+// console.log('acdData, adcSiteList', adcData, adcSiteList);
         
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
@@ -172,9 +178,9 @@ const ADCControllerProvider = ({ children }) => {
         // None initial certification shall be less than 2 audit days
         // - NOTA: En el futuro, validar que sea un ADC Initial para aplicar esta regla (xBlaze: 20250814)
         if (totalInitial < TOTAL_INITIAL_MIN_DAYS) totalInitial = TOTAL_INITIAL_MIN_DAYS;
-
+// console.log('ADCContext.adcData', adcData);
         const newADCData = {
-            ...acdData,
+            ...adcData,
             TotalInitial: roundDays(totalInitial, 2, 'up'),
             TotalEmployees: totalEmployees, 
             TotalMD11: roundDays(total, 2, 'up'),
@@ -196,13 +202,9 @@ const ADCControllerProvider = ({ children }) => {
 
         switch (action.type) {
             case 'SET_ADC_DATA': {
-                //return { ...state, adcData: action.value };
-                //console.log('call updateTotals: SET_ADC_DATA');
                 return updateTotals({ ...state, adcData: action.value });
             }
             case 'SET_ADC_SITES_LIST': {
-                //return { ...state, adcSiteList: action.value };
-                //console.log('call updateTotals: SET_ADC_SITES_LIST');
                 return updateTotals({ ...state, adcSiteList: action.value });
             }
             case 'SET_ADC_CONCEPTS': {
@@ -210,6 +212,12 @@ const ADCControllerProvider = ({ children }) => {
             }
             case 'SET_MISC': {
                 return { ...state, misc: action.value };
+            }
+            case 'SET_CONCEPT_VALUE_HIDDEN': {
+                return { ...state, conceptValueHidden: { ...state.conceptValueHidden, value: action.value } };
+            }
+            case 'SET_CONCEPT_VALUE_TOUCH': {
+                return { ...state, conceptValueHidden: { ...state.conceptValueHidden, touch: action.value } };
             }
             case 'UPDATE_ADC_SITE': {
                 const newState = updateTotals({
@@ -259,6 +267,8 @@ const setADCData = (dispatch, value) => dispatch({ type: "SET_ADC_DATA", value }
 const setADCSiteList = (dispatch, value) => dispatch({ type: "SET_ADC_SITES_LIST", value });
 const setADCConceptList = (dispatch, value) => dispatch({ type: "SET_ADC_CONCEPTS", value });
 const setMisc = (dispatch, value) => dispatch({ type: "SET_MISC", value });
+const setConceptValueHidden = (dispatch, value) => dispatch({ type: "SET_CONCEPT_VALUE_HIDDEN", value });
+const setConceptValueTouched = (dispatch, value) => dispatch({ type: "SET_CONCEPT_VALUE_TOUCH", value });
 const updateADCSite = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SITE", value });
 const updateADCConceptValue = (dispatch, value) => dispatch({ type: "UPDATE_ADC_CONCEPT_VALUE", value });
 const updateTotals = (dispatch) => dispatch({ type: "UPDATE_TOTALS" });
@@ -272,6 +282,8 @@ export {
     setADCSiteList,
     setADCConceptList,
     setMisc,
+    setConceptValueHidden,
+    setConceptValueTouched,
     
     updateADCSite,
     updateADCConceptValue,

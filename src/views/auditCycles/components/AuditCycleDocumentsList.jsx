@@ -76,6 +76,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                             && (showAllFiles || doc.Status == DefaultStatusType.active)
                         );
 
+                        // Para indicar si hay o no documentos o formularios de acuerdo al tipo
                         if ((item.id == AuditCycleDocumentType.appForm && !!appForms && appForms.length > 0) || documents.length > 0) {
                             iconColorStyle = `text-${item.variant} text-gradient`;
                         } else if ((item.id == AuditCycleDocumentType.adc && !!adcs && adcs.length > 0) || documents.length > 0) {

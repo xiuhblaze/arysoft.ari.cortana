@@ -1,26 +1,23 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { setIn, useField } from 'formik';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAlignLeft, faCalendarDay, faCheckToSlot, faExclamationTriangle, faJ, faMinus, faPercent, faStickyNote } from '@fortawesome/free-solid-svg-icons';
+import { faAlignLeft, faCalendarDay, faCheckToSlot, faExclamationTriangle, faMinus, faPercent, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 
 import enums from '../../../helpers/enums';
-import { setADCSiteList, updateADCConceptValue, updateTotals, useADCController } from '../context/ADCContext';
+import { setConceptValueHidden, setConceptValueTouched, updateADCConceptValue, useADCController } from '../context/ADCContext';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
-const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props }) => {
-    // const [field, meta] = useField(props);
-
+const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props }) => {
     const {
+        ADCStatusType,
         ADCConceptUnitType,
     } = enums();
     const [controller, dispatch]= useADCController();
-    // const { 
-    //     adcData,
-    //     adcSiteList,
-    //     adcConceptList,
-    // } = controller;
+    const { 
+        adcData,
+        conceptValueHidden,
+    } = controller;
 
     const decreaseList = [
         { value: 0, label: '0' },
@@ -49,11 +46,9 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
     });
 
     useEffect(() => {
-        //console.log('Primera vez, formData:', formData);
-
         setConceptValue(formData.checkValue);
     }, []);
-    
+
     // METHODS
 
     const isValidDays = (value) => {
@@ -62,7 +57,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
 
         if (regex.test(value) || value === '') { // Validar que sea un numero
 
-            // Validar que esté dentro del rango permitido - si es incremento
+            // Validar que esté dentro del rango permitido - si es incremento (decremento es un select)
             if ((formData.checkValue && adcConcept.WhenTrue && !!adcConcept.Increase)
                 || (!formData.checkValue && !adcConcept.WhenTrue && !!adcConcept.Increase)) {
 
@@ -72,21 +67,15 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                         ...formData,
                         error: 'The increase value must be positive and less than the maximum allowed',
                     });
-                    if (!!formik && isNullOrEmpty(formData.error)) {
-                        //formik.setFieldError('conceptValueHidden', 'At last a concept value is not valid');
-                        //console.log(formik.values.conceptValueHidden, 'aqui se debe sumar');
-                        formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden + 1);
-                    }
+                    if (isNullOrEmpty(formData.error)) {
+                        setConceptValueHidden(dispatch, conceptValueHidden.value + 1);
+                    }                    
                 } else {
                     setFormData({
                         ...formData,
                         error: ''
                     });
-                    if (!!formik && !isNullOrEmpty(formData.error)) {
-                        //formik.setFieldError('conceptValueHidden', '');
-                        //console.log(formik.values.conceptValueHidden, 'aqui se debe restar');
-                        formik.setFieldValue('conceptValueHidden', formik.values.conceptValueHidden == 0 ? 0 : formik.values.conceptValueHidden - 1);
-                    }
+                    setConceptValueHidden(dispatch, conceptValueHidden.value == 0 ? 0 : conceptValueHidden.value - 1);
                 }
             } 
         } else {
@@ -138,13 +127,8 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             setCurrentJustification('');
         }
 
-        if (!!formik && !isNullOrEmpty(formData.error)) {
-            formik.setFieldValue(
-                'conceptValueHidden', 
-                formik.values.conceptValueHidden == 0 
-                    ? 0 
-                    : formik.values.conceptValueHidden - 1
-            );
+        if (!isNullOrEmpty(formData.error)) {
+            setConceptValueHidden(dispatch, conceptValueHidden.value == 0 ? 0 : conceptValueHidden.value - 1);
         }
     }; // setConceptValue
 
@@ -152,11 +136,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         const checked = e.target.checked;
 
         setConceptValue(checked);
-
-        if (!!formik) {
-            formik.setFieldTouched('conceptValueHidden', true);
-        }
-
+        setConceptValueTouched(dispatch, true);
         updateConceptValues(0);
     }; // onCheckChange
 
@@ -169,9 +149,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         });
 
         if (type === 'select-one') { // Cuando se cambia el select
-            if (!!formik) {
-                formik.setFieldTouched('conceptValueHidden', true);
-            }
+            setConceptValueTouched(dispatch, true);
             updateConceptValues(value, formData.justification);
         }
     }; // onChange
@@ -180,11 +158,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
         const { name, value } = e.target;
         
         if (name === 'value' && isValidDays(value)) {
-            
-            if (!!formik) {
-                formik.setFieldTouched('conceptValueHidden', true);
-            }
-            
+            setConceptValueTouched(dispatch, true);
             updateConceptValues(value ?? 0, formData.justification);
         }
     }; // onBlur
@@ -192,11 +166,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
     const onSaveJustification = () => {
         updateConceptValues(formData.value, formData.justification);
         setCurrentJustification(formData.justification);
-
-        if (!!formik) {
-            formik.setFieldTouched('conceptValueHidden', true);
-        }
-
+        setConceptValueTouched(dispatch, true);
         setShowModal(false);
     }; // onSaveJustification
 
@@ -209,13 +179,6 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             unit: myProps.unit,
             justification,
         });
-
-        // Verificar que sea un valor valido
-        
-        // if (!!formik) {
-        //     formik.setFieldTouched('conceptValueHidden', true);
-        //     //formik.setFieldValue('conceptValueHidden', 0);
-        // }
     }; // updateConceptValues
 
     const onHideModal = () => {
@@ -251,6 +214,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                                 style={{ height: '20px' }}
                                 onChange={ onCheckChange }
                                 checked={formData.checkValue}
+                                disabled={ adcData.Status >= ADCStatusType.inactive }
                             />
                         </div>
                     </div>
@@ -261,7 +225,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                                 onChange={ onChange }
                                 className="form-select text-end ari-pe-2"
                                 value={formData.value.toString() ?? '0'}
-                                disabled={ myProps.disabled }
+                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
                             >
                                 { decreaseList.map((item, index) => (
                                     <option key={index} value={item.value} className="text-end">{item.label}</option>
@@ -276,7 +240,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                                 value={formData.value ?? '0'}
                                 onChange={ onChange }
                                 onBlur={ onBlur }
-                                disabled={ myProps.disabled }
+                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
                             />
                         )
                     }
@@ -288,7 +252,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                             ? 'btn-outline-light ari-btn-outline-light-2' 
                             : 'btn-outline-secondary'} px-3 mb-0`}
                         type="button"
-                        disabled={ myProps.disabled }
+                        disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
                         onClick={ (e) => {
                             e.preventDefault();
                             onShowModal();
@@ -351,6 +315,7 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
                         <button type="button"
                             className="btn bg-gradient-dark mb-0"
                             onClick={ onSaveJustification }
+                            disabled={ adcData.Status >= ADCStatusType.inactive }
                         >
                             Save
                         </button>
@@ -365,6 +330,6 @@ const ADCConceptValueInput = ({ adcConcept, adcConceptValue, formik, ...props })
             </Modal>            
         </>
     )
-}
+}); // ADCConceptValueInput - React.memo
 
 export default ADCConceptValueInput;

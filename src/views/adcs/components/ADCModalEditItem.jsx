@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Card, Col, Collapse, ListGroup, Modal, Row } from 'react-bootstrap';
 import { Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
@@ -13,7 +13,7 @@ import { useNotesStore } from '../../../hooks/useNotesStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
-import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setMisc, useADCController } from '../context/ADCContext';
+import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setConceptValueHidden, setMisc, useADCController } from '../context/ADCContext';
 import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
@@ -43,6 +43,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcSiteList,
         adcConceptList,
         misc,
+        conceptValueHidden,
     } = controller;
 
     const {
@@ -73,34 +74,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         items: Yup.array().of(
             Yup.object({
                 ID: Yup.string().required('ID is required'),
-                // MD11: Yup.number()
-                //     .typeError('MD11 must be a number')
-                //     .min(0, 'MD11 must be greater than 0')
-                //     .max(99, 'MD11 must be less than 100'),
                 extraInfo: Yup.string()
                     .max(500, 'Extra info must be less than 500 characters'),
-                // fileInput: Yup.mixed()
-                //     .test({
-                //         name: 'is-type-valid',
-                //         message: 'Some file error', // <- este solo es visible si el último return es false
-                //         test: (value, ctx) => {
-                //             if (!!value) {
-                //                 const extension = value.name.split(/[.]+/).pop()?.toLowerCase() ?? '';
-                //                 const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar', '7z'];
-                //                 if (!validTypes.includes(extension)) {
-                //                     return ctx.createError({
-                //                         message: 'Only files with pdf, doc, docx, xls, xlsx, zip, rar or 7z extensions are allowed'
-                //                     });
-                //                 }
-                //             }
-                //             return true;
-                //         }
-                //     }), 
             })
         ),
         conceptValueHidden: Yup.number()
+            .typeError('Concept value must be a number')
             .max(0, 'At least one concept value is not valid'),
         md11Hidden: Yup.number()
+            .typeError('MD11 value must be a number')
             .max(0, 'At least one MD11 value is not valid'),
         exceedsMaximumReductionHidden: Yup.boolean()
             .oneOf([false], 'At least one site exceeds maximum reduction'),
@@ -135,7 +117,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isADCSiteSaving,
         adcSiteSavedOk,
-        adcSiteSaveAsync,
         adcSiteSaveListAsync,
     } = useADCSitesStore();
 
@@ -231,7 +212,16 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setStatusOptions(adcSetStatusOptions(adc.Status));
             setShowComments(false);
 
-            loadContextData();
+            if (adc.Status >= ADCStatusType.inactive) {
+                if (!!adc.HistoricalDataJSON) {
+                    loadFromHistoricalData();
+                } else {
+                    Swal.fire('ADC', 'The historical data is not available, contact the system administrator', 'warning');
+                    onCloseModal();
+                }
+            } else {
+                loadContextData();
+            }
         }
     }, [adc]);
 
@@ -251,7 +241,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
-//console.log('useEffect', adcSiteList);
             const result = adcSiteList.some(item => item.ExceedsMaximumReduction);             
             if (!!formikRef?.current) {
                 formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
@@ -262,8 +251,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSavedOk && !!adcSiteSavedOk && !!adcConceptValueSavedOk) {
-            console.log('...adc saved ok');
-
             if (!isNullOrEmpty(saveNote)) {
                 noteCreateAsync({ OwnerID: adc.ID, Text: saveNote });
                 setSaveNote('');
@@ -275,8 +262,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     
     useEffect(() => {
         if (!!adcConcepts && adcConcepts.length > 0) {
-            // console.log('useEffect: fill adcConcepts');
-            setADCConceptList(dispatch, adcConcepts);
+
+            if (!!adc && adc.Status >= ADCStatusType.inactive) {
+                const historicalData = JSON.parse(adc.HistoricalDataJSON);
+                const newADCConcepts = historicalData.ADCConcepts
+                    .sort((a, b) => a.IndexSort - b.IndexSort)
+                    .map(historicalAdcConcept => {
+
+                    const adcConcept = adcConcepts.find(ac => ac.ID == historicalAdcConcept.ADCConceptID);
+
+                    return {
+                        ...adcConcept,
+                        Description: historicalAdcConcept.Description,
+                        ExtraInfo: historicalAdcConcept.ExtraInfo,
+                    };
+                }); // newADCConcepts
+
+                setADCConceptList(dispatch, newADCConcepts);
+            } else {
+                setADCConceptList(dispatch, adcConcepts);
+            }
         }
     }, [adcConcepts]);
 
@@ -285,16 +290,46 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             console.log(`ADCModalEditItem(error): ${ adcConceptsErrorMessage }`);
         }
     }, [adcConceptsErrorMessage]);
+
+    // - Formik
+
+    useEffect(() => {
+        if (formikRef.current) {
+            formikRef.current.setFieldTouched('conceptValueHidden', conceptValueHidden.touch);
+        }
+    }, [conceptValueHidden.touch]);
+
+    useEffect(() => {
+        if (formikRef.current) {
+            const numericValue = Number(conceptValueHidden.value);                                
+            formikRef.current.setFieldValue('conceptValueHidden', numericValue);
+        }
+    }, [conceptValueHidden.value]);
     
     // METHODS
 
     const loadContextData = () => {
 
-        if (!!adc) {
-            setADCData(dispatch, adc);
-            setADCSiteList(dispatch, adc.ADCSites);
-        }
+        setADCData(dispatch, adc);
+        setADCSiteList(dispatch, adc.ADCSites);
+        setConceptValueHidden(dispatch, 0);
     }; // loadContextData
+
+    const loadFromHistoricalData = () => {
+        const historicalData = JSON.parse(adc.HistoricalDataJSON);
+        const newADCSites = adc.ADCSites.map(adcSite => {
+            const historicalADCSite = historicalData.Sites.find(s => s.SiteID == adcSite.SiteID);
+            
+            return {
+                ...adcSite,
+                SiteDescription: historicalADCSite.Description,
+            };
+        }); // newADCSites
+
+        setADCData(dispatch, adc);
+        setADCSiteList(dispatch, newADCSites);
+        setConceptValueHidden(dispatch, 0);
+    }; // loadFromHistoricalData
 
     const onFormSubmit = (values) => {
         let reviewComments = adc.ReviewComments;
@@ -304,7 +339,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         if (adc.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
-console.log('NOTE text', text);
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
 
             if (newStatus == ADCStatusType.review 
@@ -334,7 +368,6 @@ console.log('NOTE text', text);
             if (!!contextADCSite.MD11File && !!contextADCSite.IsMultiStandard) {
                 // Cambiarle el nombre al archivo por el ID del ADCSite, dejandolo con la misma extensión
                 const fileName = `${contextADCSite.ID}.${contextADCSite.MD11File.name.split('.').pop()}`;
-                console.log('fileName', fileName);                
                 files.push(
                     new File([contextADCSite.MD11File], fileName, {
                         type: contextADCSite.MD11File.type,
@@ -369,16 +402,9 @@ console.log('NOTE text', text);
                 };
             });
 
-            adcConceptValueSaveListAsync(toADCConceptValuesSaveList)
-                .then(() => {
-                    console.log('adcConceptValueSaveListAsync.then()');
-                })
-                .catch(() => {
-                    console.log('adcConceptValueSaveListAsync.catch()');
-                });
+            adcConceptValueSaveListAsync(toADCConceptValuesSaveList);
         });
 
-        //TODO: Considerar el mandar guardar todo hasta el final o incluso cascadear primero ADCConceptValues, luego ADCSites y al Final ADC desde el metodo then
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -411,7 +437,7 @@ console.log('NOTE text', text);
     
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
-            size="xxxl"
+            size={ adcSiteList.length > 3 ? 'xxxl' : 'xl' }
             contentClassName="bg-gray-100 border-0 shadow-lg"
             fullscreen="sm-down"
         >
@@ -502,10 +528,17 @@ console.log('NOTE text', text);
                                                                 <Row>
                                                                     <Col xs="12">
                                                                         <Alert variant="danger" className="text-white">
-                                                                            <FontAwesomeIcon icon={ faExclamationTriangle } className="me-3" />
-                                                                            { adc.Alerts.map((alert) => 
-                                                                                <p key={alert} className="text-xs text-white mb-0">{ adcAlertsProps[alert].description }</p>) 
-                                                                            }
+                                                                            <ListGroup variant="flush" size="sm">
+                                                                                { adc.Alerts.map((alert) => 
+                                                                                    <ListGroup.Item 
+                                                                                        key={alert} 
+                                                                                        className="text-xs bg-transparent p-1 border-0"
+                                                                                    >
+                                                                                        <FontAwesomeIcon icon={ faExclamationCircle } className="me-2" />
+                                                                                        { adcAlertsProps[alert].description }
+                                                                                    </ListGroup.Item>
+                                                                                )} 
+                                                                            </ListGroup>
                                                                         </Alert>
                                                                     </Col>
                                                                 </Row>
@@ -519,6 +552,7 @@ console.log('NOTE text', text);
                                                                             name="descriptionInput"
                                                                             label="Description"
                                                                             type="text"
+                                                                            disabled={ adc.Status >= ADCStatusType.inactive }
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
                                                                         <input type="hidden" name="md11Hidden" />
@@ -531,6 +565,7 @@ console.log('NOTE text', text);
                                                                             placehoolder="Add any extra info"
                                                                             type="text"
                                                                             rows={ 2 }
+                                                                            disabled={ adc.Status >= ADCStatusType.inactive }
                                                                         />
                                                                         {
                                                                             !!adc.Notes && adc.Notes.length > 0 &&
@@ -566,11 +601,12 @@ console.log('NOTE text', text);
                                                                         <Collapse in={ showComments }>
                                                                             <Row>
                                                                                 <Col xs="12">
-                                                                                    <AryFormikTextInput
+                                                                                    <AryFormikTextArea
                                                                                         name="commentsInput"
                                                                                         label="Comments"
                                                                                         type="text"
                                                                                         helpText="Add any comments for the status change"
+                                                                                        rows={ 2 }
                                                                                     />
                                                                                 </Col>
                                                                             </Row>
@@ -662,14 +698,12 @@ console.log('NOTE text', text);
                                                                                                 { adcSite.ADCConceptValues
                                                                                                     .filter(acv => acv.ADCConceptID == adcConcept.ID)
                                                                                                     .map(acv => {
-                                                                                                        //console.log('acv', acv);
                                                                                                         return (
                                                                                                             <ADCConceptValueInput 
                                                                                                                 key={acv.ID} 
                                                                                                                 name={`ADCConceptValue.${acv.ID}`}
                                                                                                                 adcConcept={adcConcept} 
                                                                                                                 adcConceptValue={acv} 
-                                                                                                                formik={formik}
                                                                                                             />
                                                                                                         )
                                                                                                     }
@@ -789,6 +823,7 @@ console.log('NOTE text', text);
                                                                                                 className="form-control"
                                                                                                 as="textarea"
                                                                                                 rows={ 2 }
+                                                                                                disabled={ adc.Status >= ADCStatusType.inactive }
                                                                                             />
                                                                                         </td>
                                                                                     )
@@ -895,14 +930,13 @@ console.log('NOTE text', text);
                                             <div className="text-secondary mb-3 mb-sm-0">
                                                 <AryLastUpdatedInfo item={ adc } />
                                             </div>
-                                            {/*<AryFormDebug formik={ formik } />*/}
+                                            {/* <AryFormDebug formik={ formik } /> */}
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <button 
                                                     type="submit"
                                                     className="btn bg-gradient-dark mb-0"
                                                     disabled={ isADCSaving || isADCConceptValueSaving || isADCSiteSaving
                                                         || !hasChanges || adc.Status >= ADCStatusType.inactive }
-                                                    //disabled={ isADCSaving || adc.Status >= ADCStatusType.inactive } 
                                                 >
                                                     {
                                                         isADCSaving || isADCConceptValueSaving || isADCSiteSaving

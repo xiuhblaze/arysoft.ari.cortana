@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Card, Col, Collapse, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCopy, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -125,6 +125,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         appFormAsync,
         appFormCreateAsync,
         appFormSaveAsync,
+        appFormDuplicateAsync,
         appFormClear,
     } = useAppFormsStore();
 
@@ -520,11 +521,31 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }; // actionsForCloseModal
 
     const onGenerateADC = () => {
-        console.log('onGenerateADC, appForm', appForm.ID);
+        //console.log('onGenerateADC, appForm', appForm.ID);
 
         if (!!appForm) {
             adcCreateAsync({
                 AppFormID: appForm.ID,
+            });
+        }
+    }; // onGenerateADC
+
+    const onDuplicateAppForm = () => {
+        
+        if (!!appForm) {
+
+            appFormDuplicateAsync({
+                ID: appForm.ID,
+            }).then((duplicatedAppForm) => {
+                
+                if (!!duplicatedAppForm) {
+                    Swal.fire('App Form', 'The app form was duplicated successfully', 'success');
+                    actionsForCloseModal();
+                    //appFormAsync(duplicatedAppForm.ID);
+                }
+            }).catch((error) => {
+                Swal.fire('App Form', error.message, 'error');
+                //console.log('onDuplicateAppForm.error', error);
             });
         }
     };
@@ -755,33 +776,56 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             </Col>
                                                         </Row>
                                                     </Collapse>
-                                                    <Row>
-                                                        <Col xs="12" className="text-center">
-                                                        {
-                                                            appForm.Status < AppFormStatusType.active ? (
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn bg-secondary text-white mb-0"
-                                                                    disabled
-                                                                >
-                                                                    Generate Audit Day Calculation Form
-                                                                </button>
-                                                            ) : appForm.Status == AppFormStatusType.active ? ( 
-                                                                !!appForm?.ADCs && appForm.ADCs
-                                                                    .filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
+                                                    {
+                                                        appForm.Status < AppFormStatusType.active ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
                                                                     <button
                                                                         type="button"
-                                                                        className="btn bg-gradient-info text-white w-100 mb-0"
-                                                                        onClick={ onGenerateADC }
-                                                                        disabled={ isADCCreating }
+                                                                        className="btn bg-secondary text-white mb-0"
+                                                                        disabled
                                                                     >
+                                                                        <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
                                                                         Generate Audit Day Calculation Form
                                                                     </button>
-                                                                ) : null
+                                                                </Col>
+                                                            </Row>
+                                                        ) : appForm.Status == AppFormStatusType.active ? ( 
+                                                            !!appForm?.ADCs && appForm.ADCs
+                                                                .filter(adc => adc.Status >= DefaultStatusType.active)
+                                                                .length == 0 ? (
+                                                                    <Row>
+                                                                        <Col xs="12" className="text-center">
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn bg-gradient-info text-white w-100 mb-0"
+                                                                                onClick={ onGenerateADC }
+                                                                                disabled={ isADCCreating }
+                                                                            >
+                                                                                <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
+                                                                                Generate Audit Day Calculation Form
+                                                                            </button>
+                                                                        </Col>
+                                                                    </Row>
                                                             ) : null
-                                                        }
-                                                        </Col>
-                                                    </Row>
+                                                        ) : null
+                                                    }
+                                                    {
+                                                        appForm.Status >= AppFormStatusType.inactive ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-gradient-success text-white w-100 mb-0"
+                                                                        onClick={ onDuplicateAppForm }
+                                                                    >
+                                                                        <FontAwesomeIcon icon={ faCopy } className="me-1" size="lg" />
+                                                                        Duplicate App Form
+                                                                    </button>
+                                                                </Col>
+                                                            </Row>
+                                                        ) : null
+                                                    }
                                                 </Card.Body>
                                             </Card>
                                         </Col>

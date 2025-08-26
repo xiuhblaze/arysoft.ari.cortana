@@ -221,9 +221,8 @@ export const useADCSitesStore = () => {
             }
 
             const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, formData, { headers });
-            const { Data } = await resp.data;
+            // const { Data } = await resp.data;
 
-            console.log('Data', Data);
             dispatch(isADCSiteSaved());
         } catch (error) {
             const message = getError(error);
