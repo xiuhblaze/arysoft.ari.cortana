@@ -220,7 +220,7 @@ const AppFormPreview = ({formik}) => {
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Process activities/scope</td>
-                                            <td className={ bodyStyle }>{ formik?.values?.activitiesScopeInput ?? '' }</td>
+                                            <td className={ bodyStyle }>{ ShowFormatTextInput(formik?.values?.activitiesScopeInput ?? '') }</td>
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Process/services</td>
@@ -243,7 +243,7 @@ const AppFormPreview = ({formik}) => {
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Legal requirements associated with product/service</td>
-                                            <td className={ bodyStyle }>{ formik?.values?.legalRequirementsInput ?? '' }</td>
+                                            <td className={ bodyStyle }>{ ShowFormatTextInput(formik?.values?.legalRequirementsInput ?? '') }</td>
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Any critical complaint?</td>
@@ -391,7 +391,7 @@ const AppFormPreview = ({formik}) => {
                                                                             : null
                                                                         }
                                                                     </td> 
-                                                                    <td className="text-wrap">{shift.ActivitiesDescription}</td>
+                                                                    <td className="text-wrap">{ ShowFormatTextInput(shift.ActivitiesDescription) }</td>
                                                                 </tr>
                                                             ))  
                                                         }
@@ -424,8 +424,8 @@ const AppFormPreview = ({formik}) => {
                                             <tbody>
                                                 <tr>
                                                     <td className="text-center">{!!formik?.values?.anyConsultancyCheck ? 'Yes' : 'No'}</td>
-                                                    <td>
-                                                        { formik?.values?.anyConsultancyByInput }
+                                                    <td className="text-wrap">
+                                                        { ShowFormatTextInput(formik?.values?.anyConsultancyByInput) }
                                                     </td>
                                                 </tr>
                                             </tbody>

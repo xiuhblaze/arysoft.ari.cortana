@@ -29,10 +29,11 @@ const AppFormISO9K = ({ formik, readonly = false, ...props }) => {
                     </div>
                 </Col>
                 <Col xs="12">
-                    <AryFormikTextInput
+                    <AryFormikTextArea
                         name="activitiesScopeInput"
                         label="Process activities/scope"
                         disabled={readonly}
+                        rows={3}
                     />
                 </Col>
                 <Col xs="12">
@@ -59,10 +60,11 @@ const AppFormISO9K = ({ formik, readonly = false, ...props }) => {
                     </Row>
                 </Col>
                 <Col xs="12">
-                    <AryFormikTextInput
+                    <AryFormikTextArea
                         name="legalRequirementsInput"
                         label="Legal requirements associated with product/service"
                         disabled={readonly}
+                        rows={3}
                     />
                 </Col>
                 <Col xs="12">
