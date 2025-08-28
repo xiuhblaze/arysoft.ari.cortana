@@ -184,9 +184,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 
                 return {
                     ID: adcSite.ID,
-                    //MD11: adcSite.MD11 ?? '0',
                     extraInfo: adcSite.ExtraInfo ?? '',
-                    //fileInput: '',
                 }
             });
 
@@ -366,7 +364,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             const formikADCSite = values.items.find(item => item.ID == contextADCSite.ID);
 
             if (!!contextADCSite.MD11File && !!contextADCSite.IsMultiStandard) {
-                // Cambiarle el nombre al archivo por el ID del ADCSite, dejandolo con la misma extensión
                 const fileName = `${contextADCSite.ID}.${contextADCSite.MD11File.name.split('.').pop()}`;
                 files.push(
                     new File([contextADCSite.MD11File], fileName, {
@@ -625,8 +622,20 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 <th></th>
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
-                                                                                        <th key={adcSite.ID} className={headStyle} style={{minWidth: '220px'}}>
-                                                                                            { adcSite.SiteDescription }
+                                                                                        <th key={adcSite.ID} className="align-top" style={{minWidth: '220px'}}>
+                                                                                            <div className={headStyle}>
+                                                                                                { adcSite.SiteDescription }
+                                                                                            </div>
+                                                                                            <div 
+                                                                                                className="text-xs text-secondary text-wrap font-weight-lighter mb-0"
+                                                                                                title={ adcSite.SiteAddress.length > 20 ? adcSite.SiteAddress : null }
+                                                                                            >
+                                                                                                { 
+                                                                                                    adcSite.SiteAddress.length > 20 
+                                                                                                        ? adcSite.SiteAddress.substring(0, 20) + '...'
+                                                                                                        : adcSite.SiteAddress
+                                                                                                }
+                                                                                            </div>
                                                                                         </th>
                                                                                     )
                                                                                 }

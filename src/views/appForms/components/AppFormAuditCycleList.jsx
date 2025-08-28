@@ -10,6 +10,7 @@ import appFormStatusProps from "../helpers/appFormStatusProps";
 import { ViewLoading } from "../../../components/Loaders";
 import { AppFormControllerProvider } from "../context/appFormContext";
 import { Spinner } from "react-bootstrap";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const AppFormAuditCycleList = React.memo(() => {
     const {
@@ -111,6 +112,12 @@ const AppFormAuditCycleList = React.memo(() => {
                                     <h6 className="text-xs text-dark text-gradient mb-0">
                                         {standardName}
                                     </h6>
+                                    {
+                                        !isNullOrEmpty(appForm.Description) && 
+                                        <p className="text-xs text-secondary text-wrap mb-0"> 
+                                            {appForm.Description}
+                                        </p>
+                                    }
                                     <div className="d-flex justify-content-start align-items-center text-xs text-secondary gap-1">
                                         <FontAwesomeIcon icon={ faStickyNote } 
                                             className={`text-${ appForm.NotesCount == 0 ? 'secondary' : 'warning' }`}

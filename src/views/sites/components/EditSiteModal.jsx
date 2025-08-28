@@ -89,7 +89,7 @@ const EditSiteModal = ({ id, ...props }) => {
             sitesAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
-                order: SiteOrderType.isMainSiteDesc,
+                order: SiteOrderType.isMainSite,
             });
             siteClear();
             setShowModal(false);

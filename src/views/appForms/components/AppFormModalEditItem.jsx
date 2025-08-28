@@ -76,6 +76,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isDesignResponsibilityCheck: false,
         designResponsibilityJustificationInput: '',
         // General
+        descriptionInput: '',
         auditLanguageSelect: '', // Hacer un props general para los select de idioma
         currentCertificationsExpirationInput: '',
         currentStandardsInput: '',
@@ -313,6 +314,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
+            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -369,6 +371,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
+            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -473,6 +476,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             IsDesignResponsibility: values.isDesignResponsibilityCheck,
             DesignResponsibilityJustify: values.designResponsibilityJustificationInput, // Corregir
             // General
+            Description: values.descriptionInput,
             AuditLanguage: values.auditLanguageSelect,
             CurrentCertificationsExpiration: values.currentCertificationsExpirationInput,
             CurrentStandards: values.currentStandardsInput,
@@ -650,6 +654,15 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     </option>
                                                                 )) }
                                                             </AryFormikSelectInput>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row className="mb-3">
+                                                        <Col xs="12">
+                                                            <AryFormikTextInput
+                                                                name="descriptionInput"
+                                                                label="Description"
+                                                                disabled={ appForm.Status >= AppFormStatusType.inactive }
+                                                            />
                                                         </Col>
                                                     </Row>
                                                     <Row>

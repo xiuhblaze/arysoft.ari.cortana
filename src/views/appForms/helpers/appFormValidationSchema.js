@@ -91,6 +91,8 @@ const appFormValidationSchema = (currentStatus) => {
                 otherwise: schema => schema.notRequired(),
             }),
         // General
+        descriptionInput: Yup.string()
+            .max(500, 'Description must be less than 500 characters'),
         auditLanguageSelect: Yup.string()
             .required('Audit language is required'),
         currentCertificationsExpirationInput: Yup.string()
