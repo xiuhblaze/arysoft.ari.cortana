@@ -57,6 +57,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const { 
         AppFormOrderType,
         AppFormStatusType,
+        ADCStatusType,
         DefaultStatusType,
         StandardBaseType,
         OrganizationStatusType,
@@ -803,24 +804,22 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     </button>
                                                                 </Col>
                                                             </Row>
-                                                        ) : appForm.Status == AppFormStatusType.active ? ( 
-                                                            !!appForm?.ADCs && appForm.ADCs
-                                                                .filter(adc => adc.Status >= DefaultStatusType.active)
-                                                                .length == 0 ? (
-                                                                    <Row>
-                                                                        <Col xs="12" className="text-center">
-                                                                            <button
-                                                                                type="button"
-                                                                                className="btn bg-gradient-info text-white w-100 mb-0"
-                                                                                onClick={ onGenerateADC }
-                                                                                disabled={ isADCCreating }
-                                                                            >
-                                                                                <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
-                                                                                Generate Audit Day Calculation Form
-                                                                            </button>
-                                                                        </Col>
-                                                                    </Row>
-                                                            ) : null
+                                                        ) : appForm.Status == AppFormStatusType.active 
+                                                            && !!appForm?.ADCs && !appForm.ADCs.some(adc => 
+                                                                adc.Status != ADCStatusType.cancel) ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-gradient-info text-white w-100 mb-0"
+                                                                        onClick={ onGenerateADC }
+                                                                        disabled={ isADCCreating }
+                                                                    >
+                                                                        <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
+                                                                        Generate Audit Day Calculation Form
+                                                                    </button>
+                                                                </Col>
+                                                            </Row>
                                                         ) : null
                                                     }
                                                     {

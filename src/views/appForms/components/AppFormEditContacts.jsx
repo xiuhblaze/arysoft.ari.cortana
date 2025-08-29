@@ -43,6 +43,13 @@ const AppFormEditContacts = ({ readonly = false, ...props }) => {
         if (readonly) { return; }
 
         setIsAddging(true);
+
+        if (contactsList.some( i => i.ID == contactSelected)) {
+            Swal.fire('Add contact', `The contact is already added`, 'warning');
+            setIsAddging(false);
+            return;
+        }
+
         contactAddAsync(contactSelected)
             .then(data => {
                 if (!!data) {

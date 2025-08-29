@@ -75,7 +75,7 @@ const AppFormAuditCycleList = React.memo(() => {
                             </Spinner>
                         </div>
                     ) : !!appForms && appForms.length > 0 && appForms.map(appForm => {
-                        const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action gap-2 px-2 py-1`;
+                        const itemStyle = `d-flex justify-content-between align-items-center rounded-1 ${ appFormStatusProps[appForm.Status].bgCss } gap-2 px-2 py-1`;
 
                         let standardName = '';
                         let sitesCount = 0;

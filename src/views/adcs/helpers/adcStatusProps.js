@@ -24,7 +24,7 @@ const adcStatusProps = [
     {
         value: ADCStatusType.rejected,
         label: 'Rejected',
-        variant: 'warning',
+        variant: 'danger',
         description: 'Rejected by reviewer, check the comments'
     },
     { 

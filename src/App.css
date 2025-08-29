@@ -130,6 +130,22 @@ option {
   background-color: RGBA(71, 110, 126, var(--bs-bg-opacity, 1)) !important;
 }
 
+.bg-warning-light {
+  background-color: #fef5d6 !important;
+}
+
+.bg-warning-light:hover {
+  background-color: #ebe3c6 !important;
+}
+
+.bg-danger-light {
+  background-color: #fbcdcd !important;
+}
+
+.bg-danger-light:hover {
+  background-color: #e8bebe !important;
+}
+
 .text-ari {
   color: #297b8f;
 }
@@ -151,5 +167,36 @@ option {
   .mx-print-3 {
     margin-right: 1rem !important;
     margin-left: 1rem !important;
+  }
+}
+
+/* ARI Animation
+******************************************************************************/
+
+.jump {
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+  transform: translateY(0);
+}
+
+.jump.animate {
+  animation: jump 0.6s ease-out;
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-12px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  70% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

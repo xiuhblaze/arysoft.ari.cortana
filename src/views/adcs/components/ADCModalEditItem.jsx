@@ -14,7 +14,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setConceptValueHidden, setMisc, useADCController } from '../context/ADCContext';
-import { faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleLeft, faArrowLeft, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
@@ -32,6 +32,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
+import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -565,12 +566,29 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             disabled={ adc.Status >= ADCStatusType.inactive }
                                                                         />
                                                                         {
-                                                                            !!adc.Notes && adc.Notes.length > 0 &&
+                                                                            !!adc.Notes ? (
                                                                             <Row>
                                                                                 <Col xs="12">
                                                                                     <NotesListModal notes={adc.Notes} buttonLabel="View notes" />
+                                                                                    {
+                                                                                        adc.Status == ADCStatusType.rejected && (
+                                                                                            <AryJumpAnimation jumpHeight={8}>
+                                                                                                <FontAwesomeIcon icon={ faArrowCircleLeft } className="ms-2 text-danger" size="sm" />
+                                                                                            </AryJumpAnimation>
+                                                                                        )
+                                                                                    }
                                                                                 </Col>
-                                                                            </Row>
+                                                                            </Row> ) : null
+                                                                        }
+                                                                        {
+                                                                            adc.Status == ADCStatusType.rejected ? ( 
+                                                                            <Row>
+                                                                                <Col xs="12">
+                                                                                    <div className="text-danger text-xs">
+                                                                                        The status is rejected, please, check the comments in the notes
+                                                                                    </div>
+                                                                                </Col>
+                                                                            </Row> ) : null
                                                                         }
                                                                     </Col>
                                                                 </Row>

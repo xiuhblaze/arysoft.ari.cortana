@@ -40,6 +40,13 @@ const AppFormEditSites = ({ readonly = false, ...props }) => {
         if (readonly) { return; }
 
         setIsAddging(true);
+
+        if (sitesList.some( i => i.ID == siteSelected)) {
+            Swal.fire('Add site', `The site is already added`, 'warning');
+            setIsAddging(false);
+            return;
+        }
+
         siteAddAsync(siteSelected)
             .then(data => {
                 if (!!data) {
