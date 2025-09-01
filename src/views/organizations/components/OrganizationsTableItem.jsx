@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuilding, faEdit, faEnvelope, faGlobe, faLandmark, faLocationDot, faLocationPin, faPhone, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 import defaultPhoto from '../../../assets/img/icoOrganizationDefault.jpg';
+import primaryPhoto from '../../../assets/img/icoOrganizationPrimary.jpg';
 import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
@@ -24,7 +25,9 @@ const OrganizationsTableItem = ({ item, className, applicantsOnly = false, onSho
     } = enums();
     const pathPhotoFilename = !!item.LogoFile
         ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}`
-        : defaultPhoto;
+        : applicantsOnly
+            ? primaryPhoto
+            : defaultPhoto;
 
     const myClassName = item.Status != OrganizationStatusType.active && item.Status != OrganizationStatusType.applicant
         ? !!className 
