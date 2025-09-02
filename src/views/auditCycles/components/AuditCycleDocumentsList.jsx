@@ -149,7 +149,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
-                                            <ADCAuditCycleList />
+                                            <ADCAuditCycleList showAll={ showAllFiles } />
                                         </div>
                                     </div> : null
                                 }

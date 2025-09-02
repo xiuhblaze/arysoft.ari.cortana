@@ -707,39 +707,39 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             </h6>
                                                                                         </th>
                                                                                     </tr>
-                                                                                ) : (
+                                                                                ) : adcConceptList.length > 0 ? (
                                                                                     adcConceptList.map(adcConcept => 
-                                                                                    <tr key={ adcConcept.ID }>
-                                                                                        <th>
-                                                                                            <h6 className={h6Style}>{adcConcept.Description}</h6>
-                                                                                            <p className="text-xs text-secondary text-wrap mb-0">
-                                                                                                { adcConcept.ExtraInfo }
-                                                                                            </p>
-                                                                                        </th>
-                                                                                        <td>
-                                                                                            <ADCConceptYesNoInfo item={adcConcept} />
-                                                                                        </td>
-                                                                                        {
-                                                                                            adcSiteList.map(adcSite => 
-                                                                                            <td key={adcSite.ID} className="align-top">
-                                                                                                { adcSite.ADCConceptValues
-                                                                                                    .filter(acv => acv.ADCConceptID == adcConcept.ID)
-                                                                                                    .map(acv => {
-                                                                                                        return (
-                                                                                                            <ADCConceptValueInput 
-                                                                                                                key={acv.ID} 
-                                                                                                                name={`ADCConceptValue.${acv.ID}`}
-                                                                                                                adcConcept={adcConcept} 
-                                                                                                                adcConceptValue={acv} 
-                                                                                                            />
-                                                                                                        )
-                                                                                                    }
-                                                                                                )}
+                                                                                        <tr key={ adcConcept.ID }>
+                                                                                            <th>
+                                                                                                <h6 className={h6Style}>{adcConcept.Description}</h6>
+                                                                                                <p className="text-xs text-secondary text-wrap mb-0">
+                                                                                                    { adcConcept.ExtraInfo }
+                                                                                                </p>
+                                                                                            </th>
+                                                                                            <td>
+                                                                                                <ADCConceptYesNoInfo item={adcConcept} />
                                                                                             </td>
-                                                                                            )
-                                                                                        }
-                                                                                    </tr>
-                                                                                ))
+                                                                                            {
+                                                                                                adcSiteList.map(adcSite => 
+                                                                                                <td key={adcSite.ID} className="align-top">
+                                                                                                    { adcSite.ADCConceptValues
+                                                                                                        .filter(acv => acv.ADCConceptID == adcConcept.ID)
+                                                                                                        .map(acv => {
+                                                                                                            return (
+                                                                                                                <ADCConceptValueInput 
+                                                                                                                    key={acv.ID} 
+                                                                                                                    name={`ADCConceptValue.${acv.ID}`}
+                                                                                                                    adcConcept={adcConcept} 
+                                                                                                                    adcConceptValue={acv} 
+                                                                                                                />
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )}
+                                                                                                </td>
+                                                                                                )
+                                                                                            }
+                                                                                        </tr>
+                                                                                    )) : null
                                                                             }
                                                                             <tr>
                                                                                 <th className="text-end" colSpan={2}>

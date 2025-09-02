@@ -103,19 +103,25 @@ const MiniNextAuditCard = () => {
                         <div className="numbers">
                             <p className="text-sm mb-0 text-capitalize font-weight-bold">
                                 {
-                                    isUserLoading || isLoading ? 'Loading...'
-                                    : !!nextAudit ? 'Next audit'
-                                    : 'No next audits'
+                                    isUserLoading || isLoading 
+                                        ? 'Loading...'
+                                        : !!nextAudit 
+                                            ? 'Next audit'
+                                            : 'No next audit'
                                 }
                             </p>
                             <h5 
                                 className="font-weight-bolder mb-0"
                                 title={ !!nextAudit ? getLocalDate(new Date(nextAudit.StartDate), false) : null }
                             >
-                                { !!nextAudit 
-                                    ? differenceInDays(getLocalDate(nextAudit.StartDate, false), (new Date()).setHours(0, 0, 0, 0)) 
-                                    : <FontAwesomeIcon icon={ faSpinner } className="text-secondary" size="sm" spin /> } 
-                                <span className="text-info text-sm font-weight-bolder ms-1">days left</span>
+                                { isUserLoading || isLoading 
+                                    ? <FontAwesomeIcon icon={ faSpinner } className="text-secondary" size="sm" spin />
+                                    : !!nextAudit 
+                                        ? <>
+                                            { differenceInDays(getLocalDate(nextAudit.StartDate, false), (new Date()).setHours(0, 0, 0, 0))  }
+                                            <span className="text-info text-sm font-weight-bolder ms-1">days left</span>
+                                        </>
+                                        : <span className="text-info text-sm font-weight-bolder ms-1">-</span> } 
                             </h5>
                         </div>
                     </Col>

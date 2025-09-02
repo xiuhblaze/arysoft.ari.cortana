@@ -12,8 +12,8 @@ import enums from "../../../helpers/enums";
 import adcAlertsProps from "../helpers/adcAlertsProps";
 import adcStatusProps from "../helpers/adcStatusProps";
 
-const ADCAuditCycleList = () => {
-    const { ADCAlertType } = enums();
+const ADCAuditCycleList = ({ showAll = false }) => {
+    const { ADCAlertType, ADCStatusType } = enums();
 
     const { auditCycle } = useAuditCyclesStore();
 
@@ -73,7 +73,9 @@ const ADCAuditCycleList = () => {
                                 <span className="visually-hidden">Loading...</span>
                             </Spinner>
                         </div>
-                    ) : !!adcs && adcs.length > 0 ? adcs.map(adc => {
+                    ) : !!adcs && adcs.length > 0 ? adcs
+                        .filter(adc => showAll || adc.Status <= ADCStatusType.inactive)
+                        .map(adc => {
                         const itemStyle = `d-flex justify-content-between align-items-center rounded-1 item-action gap-2 px-2 py-1`;
 
                         return (
