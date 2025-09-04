@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Card, Col, ListGroup, Modal, Nav, Row } from "react-bootstrap";
+import { Alert, Card, Col, Collapse, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCopy, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -57,6 +57,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const { 
         AppFormOrderType,
         AppFormStatusType,
+        ADCStatusType,
         DefaultStatusType,
         StandardBaseType,
         OrganizationStatusType,
@@ -76,6 +77,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isDesignResponsibilityCheck: false,
         designResponsibilityJustificationInput: '',
         // General
+        descriptionInput: '',
         auditLanguageSelect: '', // Hacer un props general para los select de idioma
         currentCertificationsExpirationInput: '',
         currentStandardsInput: '',
@@ -125,6 +127,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         appFormAsync,
         appFormCreateAsync,
         appFormSaveAsync,
+        appFormDuplicateAsync,
         appFormClear,
     } = useAppFormsStore();
 
@@ -135,8 +138,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isADCCreating,
         adcCreatedOk,
-        adcsErrorMessage,
         
+        adcsAsync,
         adcCreateAsync,
     } = useADCsStore();
 
@@ -273,16 +276,24 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         if (!!adcCreatedOk) {
             Swal.fire('ADC', 
-                'ADC created successfully, please close this modal, and you will be see the new ADC in the ADCs list',
+                'ADC created successfully, this modal will close, and you will be see the new ADC in the ADCs list',
                 'success');
+
+            adcsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+
+            onCloseModal();
         }
     }, [adcCreatedOk]);
     
-    useEffect(() => {
-        if (!!adcsErrorMessage) {
-            Swal.fire('App Form, creating ADC', adcsErrorMessage, 'error');
-        }
-    }, [adcsErrorMessage]);
+    // useEffect(() => {
+    //     if (!!adcsErrorMessage) {
+    //         //Swal.fire('App Form, creating ADC', adcsErrorMessage, 'error');
+    //         console.log(`AppForm, creating ADC(error): ${ adcsErrorMessage }`);
+    //     }
+    // }, [adcsErrorMessage]);
     
     // METHODS 
 
@@ -304,6 +315,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
+            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -360,6 +372,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
+            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -420,7 +433,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     const onFormSubmit = (values) => {
 
-        if (!!appForm.Status && appForm.Status >= AppFormStatusType.inactive) {
+        if (!!appForm.Status && appForm.Status >= AppFormStatusType.inactive) { //? No me acuerdo porque hice esto, creo que para que se inactive hasta que se ejecute la auditoria, REVISAR/HACK
             Swal.fire('App Form', 'You cannot change the data of an inactive application form', 'warning');
             return;
         }
@@ -464,6 +477,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             IsDesignResponsibility: values.isDesignResponsibilityCheck,
             DesignResponsibilityJustify: values.designResponsibilityJustificationInput, // Corregir
             // General
+            Description: values.descriptionInput,
             AuditLanguage: values.auditLanguageSelect,
             CurrentCertificationsExpiration: values.currentCertificationsExpirationInput,
             CurrentStandards: values.currentStandardsInput,
@@ -512,11 +526,31 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }; // actionsForCloseModal
 
     const onGenerateADC = () => {
-        console.log('onGenerateADC, appForm', appForm.ID);
+        //console.log('onGenerateADC, appForm', appForm.ID);
 
         if (!!appForm) {
             adcCreateAsync({
                 AppFormID: appForm.ID,
+            });
+        }
+    }; // onGenerateADC
+
+    const onDuplicateAppForm = () => {
+        
+        if (!!appForm) {
+
+            appFormDuplicateAsync({
+                ID: appForm.ID,
+            }).then((duplicatedAppForm) => {
+                
+                if (!!duplicatedAppForm) {
+                    Swal.fire('App Form', 'The app form was duplicated successfully', 'success');
+                    actionsForCloseModal();
+                    //appFormAsync(duplicatedAppForm.ID);
+                }
+            }).catch((error) => {
+                Swal.fire('App Form', error.message, 'error');
+                //console.log('onDuplicateAppForm.error', error);
             });
         }
     };
@@ -621,6 +655,15 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     </option>
                                                                 )) }
                                                             </AryFormikSelectInput>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row className="mb-3">
+                                                        <Col xs="12">
+                                                            <AryFormikTextInput
+                                                                name="descriptionInput"
+                                                                label="Description"
+                                                                disabled={ appForm.Status >= AppFormStatusType.inactive }
+                                                            />
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -736,8 +779,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             </AryFormikSelectInput>
                                                         </Col>
                                                     </Row>
-                                                    {
-                                                        showAddComments &&
+                                                    <Collapse in={ showAddComments }>
                                                         <Row>
                                                             <Col xs="12">
                                                                 <AryFormikTextInput
@@ -746,33 +788,56 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                     helpText="Add any comments for the status change"
                                                                 />
                                                             </Col>
-                                                        </Row>  
-                                                    }
-                                                    <Row>
-                                                        <Col xs="12" className="text-center">
-                                                        {
-                                                            appForm.Status < AppFormStatusType.active ? (
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn bg-secondary text-white mb-0"
-                                                                    disabled
-                                                                >
-                                                                    Generate Audit Day Calculation Form
-                                                                </button>
-                                                            ) : appForm.Status == AppFormStatusType.active ? ( // ! Aqui voy... Revisar bien este código.
-                                                                !!appForm?.ADCs && appForm.ADCs.filter(adc => adc.Status == DefaultStatusType.active).length == 0 ? (
+                                                        </Row>
+                                                    </Collapse>
+                                                    {
+                                                        appForm.Status < AppFormStatusType.active ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
                                                                     <button
                                                                         type="button"
-                                                                        className="btn bg-info text-white mb-0"
-                                                                        onClick={ onGenerateADC }
+                                                                        className="btn bg-secondary text-white mb-0"
+                                                                        disabled
                                                                     >
+                                                                        <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
                                                                         Generate Audit Day Calculation Form
                                                                     </button>
-                                                                ) : null
-                                                            ) : null
-                                                        }
-                                                        </Col>
-                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                        ) : appForm.Status == AppFormStatusType.active 
+                                                            && !!appForm?.ADCs && !appForm.ADCs.some(adc => 
+                                                                adc.Status != ADCStatusType.cancel) ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-gradient-info text-white w-100 mb-0"
+                                                                        onClick={ onGenerateADC }
+                                                                        disabled={ isADCCreating }
+                                                                    >
+                                                                        <FontAwesomeIcon icon={ faGear } className="me-1" size="lg" />
+                                                                        Generate Audit Day Calculation Form
+                                                                    </button>
+                                                                </Col>
+                                                            </Row>
+                                                        ) : null
+                                                    }
+                                                    {
+                                                        appForm.Status >= AppFormStatusType.inactive ? (
+                                                            <Row>
+                                                                <Col xs="12" className="text-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn bg-gradient-success text-white w-100 mb-0"
+                                                                        onClick={ onDuplicateAppForm }
+                                                                    >
+                                                                        <FontAwesomeIcon icon={ faCopy } className="me-1" size="lg" />
+                                                                        Duplicate App Form
+                                                                    </button>
+                                                                </Col>
+                                                            </Row>
+                                                        ) : null
+                                                    }
                                                 </Card.Body>
                                             </Card>
                                         </Col>

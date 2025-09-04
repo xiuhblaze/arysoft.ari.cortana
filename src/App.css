@@ -38,6 +38,15 @@ option {
   background-color: #e9ecef !important;
 }
 
+.ari-pe-2 {
+  padding-right: 2rem !important;
+}
+
+.ari-btn-outline-light-2 {
+  color: #d2d6da !important;
+  border-color: #d2d6da !important;
+}
+
 /* ARI Tables
 ******************************************************************************/
 
@@ -53,6 +62,62 @@ option {
   padding: .25rem .25rem !important;
 }
 
+.ari-table-col {
+  width: 1.5rem;
+}
+
+.ari-truncate {
+  white-space: nowrap;      /* No permite saltos de línea */
+  overflow: hidden;         /* Oculta el contenido que se desborda */
+  text-overflow: ellipsis;  /* Muestra los puntos suspensivos */
+}
+
+/* ARI Inputs
+******************************************************************************/
+
+.ari-form-control-with-end {
+  padding-right: 7px !important;
+  margin-right: -5px;
+}
+
+.ari-input-group-text-end {
+  position: relative !important;  
+}
+
+/* ARI Modal
+******************************************************************************/
+
+@media (min-width: 992px) {
+
+  .modal-lg,
+  .modal-xl,
+  .modal-xxl,
+  .modal-xxxl {
+    --bs-modal-width: 800px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .modal-xl
+  .modal-xxl,
+  .modal-xxxl {
+    --bs-modal-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .modal-xxl,
+  .modal-xxxl {
+    --bs-modal-width: 1340px;
+  }
+}
+
+@media (min-width: 1900px) {
+  .modal-xxxl {
+    --bs-modal-width: 1800px;
+  }
+}
+
 /* ARI Color
 ******************************************************************************/
 
@@ -63,6 +128,22 @@ option {
 .bg-ari {
   color: #fff !important;
   background-color: RGBA(71, 110, 126, var(--bs-bg-opacity, 1)) !important;
+}
+
+.bg-warning-light {
+  background-color: #fef5d6 !important;
+}
+
+.bg-warning-light:hover {
+  background-color: #ebe3c6 !important;
+}
+
+.bg-danger-light {
+  background-color: #fbcdcd !important;
+}
+
+.bg-danger-light:hover {
+  background-color: #e8bebe !important;
 }
 
 .text-ari {
@@ -86,5 +167,36 @@ option {
   .mx-print-3 {
     margin-right: 1rem !important;
     margin-left: 1rem !important;
+  }
+}
+
+/* ARI Animation
+******************************************************************************/
+
+.jump {
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+  transform: translateY(0);
+}
+
+.jump.animate {
+  animation: jump 0.6s ease-out;
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-12px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  70% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

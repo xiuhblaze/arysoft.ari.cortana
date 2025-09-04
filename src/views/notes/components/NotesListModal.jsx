@@ -38,9 +38,12 @@ const NotesListModal = ({notes, buttonLabel, order = 'desc', ...props}) => {
     return (
         <>
             <Button
+                { ...props }
                 variant="link"
                 className="text-dark p-0 mb-0"
                 onClick={onShowModal}
+                disabled={ notes.length == 0 }
+                title={ notes.length == 0 ? 'No notes' : `Notes (${notes.length})` }
             >
                 <FontAwesomeIcon icon={faStickyNote} size="lg" className="text-warning" />
                 { !!buttonLabel ? <span className="ms-1">{buttonLabel}</span> : null }

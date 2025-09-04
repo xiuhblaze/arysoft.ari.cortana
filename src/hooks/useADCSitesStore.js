@@ -102,11 +102,11 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSitesAsync
 
     const adcSitesClear = () => {
         dispatch(clearADCSites());
-    };
+    }; // adcSitesClear
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
@@ -130,7 +130,7 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSiteAsync
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
@@ -153,30 +153,83 @@ export const useADCSitesStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // adcSiteCreateAsync
 
     /**
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
      * @param {ID, Name, LegalEntity, COID, Status, UpdatedUser} item Objeto tipo ADCSite
      */
-    const adcSiteSaveAsync = async (item) => {
+    const adcSiteSaveAsync = async (item, md11file) => {
         dispatch(onADCSiteSaving());
 
         const toSave = {
             ...item,
             UpdatedUser: user.username,
         }
+        // console.log('adcSiteSaveAsync.toSave', toSave);
         try {
-            const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
+
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            };  
+            const data = JSON.stringify(toSave);
+
+            formData.append('data', data);
+            if (!!md11file) {
+                formData.append('file', md11file);
+            }
+            
+            const resp = await cortanaApi.put(`${ADC_SITE_URL}`, formData, { headers });
+            //const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
             dispatch(setADCSite(Data));
             dispatch(isADCSiteSaved());
         } catch (error) {
             const message = getError(error);
+            console.log('adcSiteSaveAsync.error', message);
             setError(message);
         }
-    };
+    }; // adcSiteSaveAsync
+
+    const adcSiteSaveListAsync = async (list, files) => {
+        dispatch(onADCSiteSaving());
+
+        const toSaveList = {
+            Items: list.map(item => {
+                return {
+                    ...item,
+                    UpdatedUser: user.username,
+                }
+            }),
+        }
+
+        try {
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            };  
+            const data = JSON.stringify(toSaveList);
+
+            formData.append('data', data);
+            if (!!files && files.length > 0) {
+                // Enviar en un ciclo por cada archivo
+                for (let i = 0; i < files.length; i++) {
+                    formData.append(`files[${i}]`, files[i]);
+                }
+            }
+
+            const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, formData, { headers });
+            // const { Data } = await resp.data;
+
+            dispatch(isADCSiteSaved());
+        } catch (error) {
+            const message = getError(error);
+            console.log('adcSiteSaveListAsync.error', message);
+            setError(message);
+        }
+    }; // adcSiteSaveListAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -228,6 +281,7 @@ export const useADCSitesStore = () => {
         adcSiteAsync,
         adcSiteCreateAsync,
         adcSiteSaveAsync,
+        adcSiteSaveListAsync,
         adcSiteDeleteAsync,
         adcSiteClear,
     }

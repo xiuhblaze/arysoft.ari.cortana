@@ -179,7 +179,27 @@ export const useAppFormsStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // appFormSaveAsync
+
+    const appFormDuplicateAsync = async (appForm) => {
+
+        const toDuplicate = {
+            ID: appForm.ID,
+            UpdatedUser: user.username,
+        };
+
+        try {
+            const resp = await cortanaApi.post(`${APPFORM_URL}/duplicate`, toDuplicate);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+
+        return null;
+    }; // appFormDuplicateAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -393,6 +413,7 @@ export const useAppFormsStore = () => {
         appFormAsync,
         appFormCreateAsync,
         appFormSaveAsync,
+        appFormDuplicateAsync,
         appFormDeleteAsync,
         appFormClear,
 
