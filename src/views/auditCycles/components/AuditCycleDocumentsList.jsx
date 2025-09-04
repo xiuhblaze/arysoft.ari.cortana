@@ -120,6 +120,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
+                                            { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
                                             <AppFormAuditCycleList />
                                         </div>
                                     </div> : null
@@ -149,6 +150,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
+                                            { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
                                             <ADCAuditCycleList showAll={ showAllFiles } />
                                         </div>
                                     </div> : null

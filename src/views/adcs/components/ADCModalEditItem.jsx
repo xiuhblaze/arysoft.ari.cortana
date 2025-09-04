@@ -109,6 +109,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isADCSaving,
         adcSavedOk,
         adc,
+        adcsErrorMessage,
 
         adcAsync,
         adcSaveAsync,
@@ -283,6 +284,13 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             }
         }
     }, [adcConcepts]);
+
+    useEffect(() => { 
+        if (!!adcsErrorMessage) {
+            console.log(`ADCModalEditItem(error): ${ adcsErrorMessage }`);
+            actionsForCloseModal();
+        }
+    }, [adcsErrorMessage]);
 
     useEffect(() => {
         if (!!adcConceptsErrorMessage) {
@@ -522,7 +530,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 <Card>
                                                     <Card.Body className="p-3">
                                                         {
-                                                            adc.Alerts.length > 0 && (
+                                                            !!adc.Alerts && adc.Alerts.length > 0 && (
                                                                 <Row>
                                                                     <Col xs="12">
                                                                         <Alert variant="danger" className="text-white">

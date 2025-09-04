@@ -13,13 +13,13 @@ const adcAlertsProps = [
         value: ADCAlertType.employeesMistmatch,
         label: 'Employees mismatch',
         variant: 'danger',
-        description: 'The number of employees in the site does not match the number of employees in the ADC'
+        description: 'The number of employees at some of the sites does not match the number of employees at the ADC. The information has been updated. Please check.'
     },
     {
         value: ADCAlertType.sitesMistmatch,
         label: 'Sites mismatch',
         variant: 'danger',
-        description: 'The number or kind of sites does not match the number or kind of sites in the ADC'
+        description: 'The Sites do not match the AppForm, it has been updated, check the added sites'
     }
 ];
 

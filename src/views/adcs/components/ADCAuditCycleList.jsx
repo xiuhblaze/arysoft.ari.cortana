@@ -3,7 +3,7 @@ import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
 import { useADCsStore } from "../../../hooks/useADCsStore";
 import { Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCalendarDay, faEdit, faFileLines, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCalendarDay, faEdit, faFileLines, faGear, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ADCModalEditItem from "./ADCModalEditItem";
 import { ADCControllerProvider } from "../context/ADCContext";
@@ -19,9 +19,11 @@ const ADCAuditCycleList = ({ showAll = false }) => {
 
     const {
         isADCsLoading,
+        adc,
         adcs,
-        adcsAsync,
         adcsErrorMessage,
+
+        adcsAsync,
     } = useADCsStore();
 
     // HOOKS
@@ -41,7 +43,6 @@ const ADCAuditCycleList = ({ showAll = false }) => {
 
     useEffect(() => {
         if (!!adcsErrorMessage) {
-            // console.log(`ADCAuditCycleList(error): ${ adcsErrorMessage }`);
             Swal.fire('Audit Day Calculation', adcsErrorMessage, 'error');
         }
     }, [adcsErrorMessage]);
@@ -52,16 +53,19 @@ const ADCAuditCycleList = ({ showAll = false }) => {
         
         setADCID(id);
         setShowModal(true);
-    };
+    }; // onShowModal
 
     const onCloseModal = () => {
 
-        adcsAsync({
-            auditCycleID: auditCycle.ID,
-            pageSize: 0,
-        });
+        if (!!adc && adc.Status < ADCStatusType.inactive) {
+            adcsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+        }
+
         setShowModal(false);
-    };
+    }; // onCloseModal
         
     return (
         <>
@@ -128,7 +132,7 @@ const ADCAuditCycleList = ({ showAll = false }) => {
                                         onClick={ () => { onShowModal(adc.ID) } } 
                                         title="Edit ADC"
                                     >
-                                        <FontAwesomeIcon icon={ faEdit } size="lg" />
+                                        <FontAwesomeIcon icon={ faGear } size="lg" />
                                     </button>
                                 </div>
                             </div>

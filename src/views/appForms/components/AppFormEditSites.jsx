@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { setSitesList, useAppFormController } from "../context/appFormContext";
 import { useSitesStore } from "../../../hooks/useSiteStore";
 import enums from "../../../helpers/enums";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const AppFormEditSites = ({ readonly = false, ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -38,6 +39,7 @@ const AppFormEditSites = ({ readonly = false, ...props }) => {
     const onClickAdd = () => {
 
         if (readonly) { return; }
+        if (isNullOrEmpty(siteSelected)) { return; }
 
         setIsAddging(true);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faEdit, faStickyNote, faUser, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faEdit, faGear, faGears, faStickyNote, faUser, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 
 import enums from "../../../helpers/enums";
 import { useAppFormsStore } from "../../../hooks/useAppFormsStore"
@@ -11,6 +11,8 @@ import { ViewLoading } from "../../../components/Loaders";
 import { AppFormControllerProvider } from "../context/appFormContext";
 import { Spinner } from "react-bootstrap";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import { useADCsStore } from "../../../hooks/useADCsStore";
+import { useShiftsStore } from "../../../hooks/useShiftsStore";
 
 const AppFormAuditCycleList = React.memo(() => {
     const {
@@ -30,6 +32,14 @@ const AppFormAuditCycleList = React.memo(() => {
         appFormsAsync,
     } = useAppFormsStore();
 
+    const {
+        adcsAsync,
+    } = useADCsStore();
+
+    const {
+        shiftSavedOk,
+    } = useShiftsStore();
+
     // HOOKS
 
     const [showModal, setShowModal] = useState(false);
@@ -46,6 +56,22 @@ const AppFormAuditCycleList = React.memo(() => {
         }
     }, [auditCycle]);
 
+    useEffect(() => {
+        if (!!shiftSavedOk) {
+            //console.log('shiftSavedOk, actualizar la lista de appForms y de ADCs', shiftSavedOk);
+            appFormsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+                order: AppFormOrderType.createdDesc,
+            });
+
+            adcsAsync({
+                auditCycleID: auditCycle.ID,
+                pageSize: 0,
+            });
+        }
+    }, [shiftSavedOk]);
+
     // METHODS
 
     const onShowModal = (id) => {
@@ -59,6 +85,11 @@ const AppFormAuditCycleList = React.memo(() => {
             auditCycleID: auditCycle.ID,
             pageSize: 0,
             order: AppFormOrderType.createdDesc,
+        });
+
+        adcsAsync({
+            auditCycleID: auditCycle.ID,
+            pageSize: 0,
         });
         
         setShowModal(false);
@@ -140,7 +171,7 @@ const AppFormAuditCycleList = React.memo(() => {
                                         onClick={ () => { onShowModal(appForm.ID) } } 
                                         title="Edit application form"
                                     >
-                                        <FontAwesomeIcon icon={ faEdit } size="lg" />
+                                        <FontAwesomeIcon icon={ faGear } size="lg" />
                                     </button>
                                 </div>
                             </div>
