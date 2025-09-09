@@ -163,8 +163,6 @@ const ADCControllerProvider = ({ children }) => {
                 ? totalSiteDays * (survPercentBase / 100)
                 : totalDays * (survPercentBase / 100);
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
-            
-            //console.log('totalDays', totalDays);
 
             return {
                 ...adcSite,
