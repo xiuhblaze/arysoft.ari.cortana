@@ -137,6 +137,9 @@ const enums = () => {
         recertification: 5,
         transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
         special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+        surveillance3: 8,
+        surveillance4: 9,
+        surveillance5: 10,
     });
 
     const AuditDocumentType = Object.freeze({

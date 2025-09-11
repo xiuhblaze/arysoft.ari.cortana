@@ -33,6 +33,9 @@ import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
 import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation';
+import auditStepProps from '../../audits/helpers/auditStepProps';
+import ADCSiteAuditInput from './ADCSiteAuditInput';
+import getAuditStepList from '../../audits/helpers/getAuditStepList';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -43,8 +46,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcData,
         adcSiteList,
         adcConceptList,
+        adcSiteAuditsList,
         misc,
         conceptValueHidden,
+        siteAuditHidden,
     } = controller;
 
     const {
@@ -60,6 +65,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         commentsInput: '',
         items: [], // datos por cada adcSite
         conceptValueHidden: 0,
+        siteAuditHidden: 0,
         md11Hidden: 0,
         exceedsMaximumReductionHidden: false,
     };
@@ -152,6 +158,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [statusOptions, setStatusOptions] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [saveNote, setSaveNote] = useState(''); 
+    const [auditStepList, setAuditStepList] = useState([]);
 
     useEffect(() => {
 
@@ -197,6 +204,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 commentsInput: '',
                 items: itemsInputs,
                 conceptValueHidden: 0,
+                siteAuditHidden: 0,
                 md11Hidden: 0,
                 exceedsMaximumReductionHidden: false,
             });
@@ -211,6 +219,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setOriginalStatus(adc.Status);
             setStatusOptions(adcSetStatusOptions(adc.Status));
             setShowComments(false);
+
+            // Obteniendo la lista de tipos de auditorias
+            const currentAuditStandard = auditCycle.AuditCycleStandards
+                .find(acs => acs.StandardID == adc.AppForm.StandardID);
+            setAuditStepList(getAuditStepList(
+                currentAuditStandard.CycleType, 
+                currentAuditStandard.InitialStep,
+                auditCycle.Periodicity
+            ));
 
             if (adc.Status >= ADCStatusType.inactive) {
                 if (!!adc.HistoricalDataJSON) {
@@ -241,7 +258,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     useEffect(() => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
-            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);             
+            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
+console.log(adcSiteList);
             if (!!formikRef?.current) {
                 formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
             }
@@ -312,13 +330,19 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             formikRef.current.setFieldValue('conceptValueHidden', numericValue);
         }
     }, [conceptValueHidden.value]);
-    
+
+    useEffect(() => {
+        if (formikRef.current) {
+            formikRef.current.setFieldTouched('siteAuditHidden', siteAuditHidden.touch);
+        }
+    }, [siteAuditHidden.touch]);
+        
     // METHODS
 
     const loadContextData = () => {
 
         setADCData(dispatch, adc);
-        setADCSiteList(dispatch, adc.ADCSites);
+        setADCSiteList(dispatch, adc.ADCSites);        
         setConceptValueHidden(dispatch, 0);
     }; // loadContextData
 
@@ -395,8 +419,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         adcSiteSaveListAsync(toADCSiteSaveList, files);
 
-        adcSiteList.forEach(contextADCSite => { //* SITES 
-            
+        adcSiteList.forEach(contextADCSite => { //* SITES
             const toADCConceptValuesSaveList = contextADCSite.ADCConceptValues.map(adccvItem => {
                 return {
                     ID: adccvItem.ID,
@@ -561,6 +584,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             disabled={ adc.Status >= ADCStatusType.inactive }
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
+                                                                        <input type="hidden" name="siteAuditHidden" />
                                                                         <input type="hidden" name="md11Hidden" />
                                                                         <input type="hidden" name="exceedsMaximumReductionHidden" />
                                                                     </Col>
@@ -864,6 +888,28 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     )
                                                                                 }
                                                                             </tr>
+                                                                            { auditStepList.length > 0 ? auditStepList.map(auditStep =>
+                                                                                <tr key={ auditStep }>
+                                                                                    <th colSpan={2}>
+                                                                                        <h6 className={ `${h6Style} text-end`}>
+                                                                                            { auditStepProps[auditStep].label }
+                                                                                        </h6>
+                                                                                    </th>
+                                                                                    {
+                                                                                        adcSiteList.map(adcSite => 
+                                                                                            <td key={adcSite.ID} className="align-middle">
+                                                                                                {/* { adcSite.ADCSiteAudits
+                                                                                                    .filter(asa => asa.AuditStep == auditStep)
+                                                                                                    .map(asa => <ADCSiteAuditInput key={asa.ID} adcSiteAudit={asa} />)
+                                                                                                } */}                                                                                                
+                                                                                                <ADCSiteAuditInput 
+                                                                                                    adcSiteAudit={ adcSite.ADCSiteAudits.find(asa => asa.AuditStep == auditStep) } 
+                                                                                                />
+                                                                                            </td>
+                                                                                        )
+                                                                                    }
+                                                                                </tr>
+                                                                            ) : null }
                                                                         </tbody>                                                                    
                                                                     </table>
                                                                     {
