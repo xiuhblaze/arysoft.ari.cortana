@@ -36,6 +36,7 @@ import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation
 import auditStepProps from '../../audits/helpers/auditStepProps';
 import ADCSiteAuditInput from './ADCSiteAuditInput';
 import getAuditStepList from '../../audits/helpers/getAuditStepList';
+import { useADCSiteAuditsStore } from '../../../hooks/useADCSiteAuditsStore';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -133,6 +134,12 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcConceptValueSavedOk,
         adcConceptValueSaveListAsync,
     } = useADCConceptValuesStore();
+
+    const {
+        isADCSiteAuditSaving,
+        adcSiteAuditSavedOk,
+        adcSiteAuditSaveListAsync,
+    } = useADCSiteAuditsStore();
 
     const {
         isADCConceptsLoading,
@@ -259,7 +266,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         
         if (!!adcSiteList && adcSiteList.length > 0) {
             const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
-console.log(adcSiteList);
+
             if (!!formikRef?.current) {
                 formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
             }
@@ -434,6 +441,18 @@ console.log(adcSiteList);
             adcConceptValueSaveListAsync(toADCConceptValuesSaveList);
         });
 
+        adcSiteList.forEach(contextADCSite => {
+            const toADCSiteAuditSaveList = contextADCSite.ADCSiteAudits.map(adcsaItem => {
+                return {
+                    ID: adcsaItem.ID,
+                    Value: adcsaItem.Value,
+                    AuditStep: adcsaItem.AuditStep,
+                    Status: adcsaItem.Status,
+                };
+            });
+
+            adcSiteAuditSaveListAsync(toADCSiteAuditSaveList);
+        });
     }; // onFormSubmit
 
     const onCloseModal = () => {

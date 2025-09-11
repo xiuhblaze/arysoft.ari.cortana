@@ -25,7 +25,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const ADC_SITE_URL = '/adcConceptValues'; 
+const ADC_CONCEPT_VALUES_URL = '/adcConceptValues'; 
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {
@@ -85,14 +85,14 @@ export const useADCConceptValuesStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
-     * @param {StandardID, Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
+     * @param {ADCConceptID, ADCSiteID, Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const adcConceptValuesAsync = async (options = {}) => {
         dispatch(onADCConceptValuesLoading());
 
         try {
             const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${ADC_SITE_URL}${query}`);
+            const resp = await cortanaApi.get(`${ADC_CONCEPT_VALUES_URL}${query}`);
             const { Data, Meta } = await resp.data;
 
             dispatch(setADCConceptValues({
@@ -123,7 +123,7 @@ export const useADCConceptValuesStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.get(`${ADC_SITE_URL}/${id}`);
+            const resp = await cortanaApi.get(`${ADC_CONCEPT_VALUES_URL}/${id}`);
             const { Data } = await resp.data;
             
             dispatch(setADCConceptValue(Data));
@@ -135,7 +135,7 @@ export const useADCConceptValuesStore = () => {
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
-     * @param {OrganizationID} identificador de la organizacion asociada a la compañia
+     * @param {ADCConceptID, ADCSiteID} identificador del concepto asociado y del sitio para el que se necesita el valor
      */
     const adcConceptValueCreateAsync = async (item) => {
         dispatch(onADCConceptValueCreating());
@@ -145,7 +145,7 @@ export const useADCConceptValuesStore = () => {
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(ADC_SITE_URL, params);
+            const resp = await cortanaApi.post(ADC_CONCEPT_VALUES_URL, params);
             const { Data } = await resp.data;
 
             dispatch(setADCConceptValue(Data));
@@ -158,7 +158,7 @@ export const useADCConceptValuesStore = () => {
 
     /**
      * Llama al endpoint para actualizar la información de un registro existente en la base de datos
-     * @param {ID, Name, LegalEntity, COID, Status, UpdatedUser} item Objeto tipo ADCConceptValue
+     * @param {ID, CheckValue, Value, Justification, ValueUnit, Status, UpdatedUser} item Objeto tipo ADCConceptValue
      */
     const adcConceptValueSaveAsync = async (item) => {
         dispatch(onADCConceptValueSaving());
@@ -169,7 +169,7 @@ export const useADCConceptValuesStore = () => {
         }
         //console.log('adcConceptValueSaveAsync.toSave', toSave);
         try {
-            const resp = await cortanaApi.put(`${ADC_SITE_URL}/${toSave.ID}`, toSave);
+            const resp = await cortanaApi.put(`${ADC_CONCEPT_VALUES_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
             dispatch(setADCConceptValue(Data));
@@ -197,12 +197,10 @@ export const useADCConceptValuesStore = () => {
             }),
         }
 
-        // console.log('toSaveList', toSaveList);
-
         try {
-            const resp = await cortanaApi.put(`${ADC_SITE_URL}/list`, toSaveList);
-            const { Data } = await resp.data;
-
+            const resp = await cortanaApi.put(`${ADC_CONCEPT_VALUES_URL}/list`, toSaveList);
+            await resp.data;
+            // const { Data } = await resp.data;
             // console.log('Data', Data);
 
             dispatch(isADCConceptValueSaved());
@@ -226,7 +224,7 @@ export const useADCConceptValuesStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${ADC_SITE_URL}/${id}`, { data: toDelete });
+            const resp = await cortanaApi.delete(`${ADC_CONCEPT_VALUES_URL}/${id}`, { data: toDelete });
             dispatch(isADCConceptValueDeleted());
         } catch (error) {
             //console.log(error);

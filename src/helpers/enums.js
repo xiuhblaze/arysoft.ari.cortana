@@ -126,6 +126,12 @@ const enums = () => {
         audit: 9,
     });
 
+    const AuditCyclePeriodicityType = Object.freeze({
+        nothing: 0,
+        annual: 1,
+        biannual: 2,
+    });
+
     // Audits
 
     const AuditStepType = Object.freeze({
@@ -504,6 +510,7 @@ const enums = () => {
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
+        AuditCyclePeriodicityType,
         AuditDocumentType,
         AuditStepType,
         AuditOrderType,
