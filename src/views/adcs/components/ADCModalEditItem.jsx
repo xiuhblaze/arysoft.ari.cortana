@@ -264,6 +264,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         
+        //console.log('adcSiteList', adcSiteList);
         if (!!adcSiteList && adcSiteList.length > 0) {
             const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
 
@@ -483,6 +484,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         setShowModal(false);
     }; // actionsForCloseModal
     
+//console.log("Renderizando ADCModalEditItem - showModal:", showModal);
+
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
             size={ adcSiteList.length > 3 ? 'xxxl' : 'xl' }
@@ -690,23 +693,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 <th style={{minWidth: '300px'}}></th>
                                                                                 <th></th>
                                                                                 {
-                                                                                    adcSiteList.map(adcSite =>  
-                                                                                        <th key={adcSite.ID} className="align-top" style={{minWidth: '220px'}}>
-                                                                                            <div className={headStyle}>
-                                                                                                { adcSite.SiteDescription }
-                                                                                            </div>
-                                                                                            <div 
-                                                                                                className="text-xs text-secondary text-wrap font-weight-lighter mb-0"
-                                                                                                title={ adcSite.SiteAddress.length > 20 ? adcSite.SiteAddress : null }
-                                                                                            >
-                                                                                                { 
-                                                                                                    adcSite.SiteAddress.length > 20 
-                                                                                                        ? adcSite.SiteAddress.substring(0, 20) + '...'
-                                                                                                        : adcSite.SiteAddress
-                                                                                                }
-                                                                                            </div>
-                                                                                        </th>
-                                                                                    )
+                                                                                    adcSiteList.map(adcSite => { 
+                                                                                        //console.log('adcSite', adcSite);
+                                                                                        return (
+                                                                                            <th key={adcSite.ID} className="align-top" style={{minWidth: '220px'}}>
+                                                                                                <div className={headStyle}>
+                                                                                                    { adcSite.SiteDescription }
+                                                                                                </div>
+                                                                                                <div 
+                                                                                                    className="text-xs text-secondary text-wrap font-weight-lighter mb-0"
+                                                                                                    title={ adcSite.SiteAddress.length > 20 ? adcSite.SiteAddress : null }
+                                                                                                >
+                                                                                                    { 
+                                                                                                        adcSite.SiteAddress.length > 20 
+                                                                                                            ? adcSite.SiteAddress.substring(0, 20) + '...'
+                                                                                                            : adcSite.SiteAddress
+                                                                                                    }
+                                                                                                </div>
+                                                                                            </th>
+                                                                                        )
+                                                                                    })
                                                                                 }
                                                                             </tr>
                                                                         </thead>
@@ -907,7 +913,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     )
                                                                                 }
                                                                             </tr>
-                                                                            { auditStepList.length > 0 ? auditStepList.map(auditStep =>
+                                                                            { adcSiteList.length > 1 && !!auditStepList && auditStepList.length > 0 ? auditStepList.map(auditStep =>
                                                                                 <tr key={ auditStep }>
                                                                                     <th colSpan={2}>
                                                                                         <h6 className={ `${h6Style} text-end`}>
@@ -915,17 +921,18 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                         </h6>
                                                                                     </th>
                                                                                     {
-                                                                                        adcSiteList.map(adcSite => 
-                                                                                            <td key={adcSite.ID} className="align-middle">
-                                                                                                {/* { adcSite.ADCSiteAudits
-                                                                                                    .filter(asa => asa.AuditStep == auditStep)
-                                                                                                    .map(asa => <ADCSiteAuditInput key={asa.ID} adcSiteAudit={asa} />)
-                                                                                                } */}                                                                                                
-                                                                                                <ADCSiteAuditInput 
-                                                                                                    adcSiteAudit={ adcSite.ADCSiteAudits.find(asa => asa.AuditStep == auditStep) } 
-                                                                                                />
-                                                                                            </td>
-                                                                                        )
+                                                                                        adcSiteList.map(adcSite => {
+                                                                                            const myAudit = adcSite.ADCSiteAudits.find(asa => asa.AuditStep == auditStep);
+                                                                                            // console.log('myAudit', myAudit);
+                                                                                            if (!myAudit) return null;
+                                                                                            return (
+                                                                                                <td key={adcSite.ID} className="align-middle">
+                                                                                                    <ADCSiteAuditInput 
+                                                                                                        adcSiteAudit={ myAudit } 
+                                                                                                    />
+                                                                                                </td>
+                                                                                            )
+                                                                                        })
                                                                                     }
                                                                                 </tr>
                                                                             ) : null }

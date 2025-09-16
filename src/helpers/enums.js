@@ -94,7 +94,7 @@ const enums = () => {
         active: 6,             // AppForm activo
         inactive: 7,           // Ya no está en uso este appForm
         cancel: 8,             // En algún momento el appForm fué cancelado
-        deleted: 9,           // Eliminación logica
+        deleted: 9,            // Eliminación logica
     });
 
     // Audits cycles

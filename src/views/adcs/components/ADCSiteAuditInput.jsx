@@ -1,18 +1,22 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useADCController, setSiteAuditValueTouched, updateADCSiteAudit } from '../context/ADCContext';
 import enums from "../../../helpers/enums";
 
 const ADCSiteAuditInput = ({ adcSiteAudit, ...props }) => {
-
-    if (!adcSiteAudit) return null;
+//console.log("1. Inicio del componente", { adcSiteAudit });
+    
+    // Early returns con mejor debugging
+    if (!adcSiteAudit) {
+        //console.log("adcSiteAudit no existe");
+        return null;
+    }
 
     const { ADCStatusType } = enums();
     
-    const [controller, dispatch] = useADCController();
+    const [controller, dispatch] = useADCController();     
     const { 
         adcData,
-        siteAuditHidden
     } = controller;
 
     // HOOKS
@@ -22,15 +26,24 @@ const ADCSiteAuditInput = ({ adcSiteAudit, ...props }) => {
         error: null,
     });
 
+    useEffect(() => {
+        //console.log("useEffect: Sincronizando valor", adcSiteAudit.Value);
+        setFormData(prev => ({
+            ...prev,
+            checkValue: adcSiteAudit.Value ?? false
+        }));
+    }, [adcSiteAudit.Value])
+    
+
     // METHODS
 
-    const onChange = (e) => { //! Falta darle el seguimiento al check en el context y despues guardarlo en la bdd
+    const onChange = (e) => {
         const { checked } = e.target;
-
-        setFormData({
-            ...formData,
+//console.log("onChange local", checked);
+        setFormData(prev => ({
+            ...prev,
             checkValue: checked,
-        });
+        }));
 
         setSiteAuditValueTouched(dispatch, true);
 
@@ -39,6 +52,8 @@ const ADCSiteAuditInput = ({ adcSiteAudit, ...props }) => {
             value: checked,
         });
     }; // onChange
+
+    //console.log("Renderizando - formData:", formData.checkValue, "prop:", adcSiteAudit.Value);
 
     return (
         <div {...props} className="mx-auto">

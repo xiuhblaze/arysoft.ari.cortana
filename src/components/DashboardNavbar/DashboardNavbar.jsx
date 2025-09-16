@@ -61,7 +61,7 @@ export const DashboardNavbar = () => {
     };
 
     const onChangePwd = () => {
-        console.log('onChangePwd');
+        //console.log('onChangePwd');
         setShowChangePwd(true);
     };
 

@@ -87,13 +87,13 @@ const ADCControllerProvider = ({ children }) => {
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             let hasChanges = false;
-            // console.log('updateADCSiteAudit', adcSite);
+            //console.log('updateADCSiteAudit.adcSite', adcSite);
 
             const newADCSiteAuditList = adcSite.ADCSiteAudits.map(adcSiteAudit => {
 
                 if (adcSiteAudit.ID == adcSiteAuditID) {
                     hasChanges = true;
-                    
+                    //console.log('updateADCSiteAudit.adcSiteAudit', adcSiteAudit);
                     return {
                         ...adcSiteAudit,
                         Value: checkValue ?? adcSiteAudit.Value,
@@ -110,6 +110,8 @@ const ADCControllerProvider = ({ children }) => {
                     ADCSiteAudits: newADCSiteAuditList,
                 };
             }
+
+            return adcSite;
         }); // newADCSiteList
 
         return newADCSiteList;
@@ -275,7 +277,7 @@ const ADCControllerProvider = ({ children }) => {
                 return { ...newState };
             }
             case 'UPDATE_ADC_SITE_AUDIT': {
-                console.log('UPDATE_ADC_SITE_AUDIT', action.value);
+                //console.log('UPDATE_ADC_SITE_AUDIT', action.value);
                 const newState = {
                     ...state, 
                     adcSiteList: updateADCSiteAudit(state, action.value)

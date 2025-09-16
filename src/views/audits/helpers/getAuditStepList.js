@@ -7,7 +7,7 @@ export const getAuditStepList = (cycleType, initialStep, periodicity) => {
 
     switch (cycleType) {
         case AuditCycleType.initial: {
-            auditStepList.push(AuditStepType.stage1);
+            // auditStepList.push(AuditStepType.stage1);
             auditStepList.push(AuditStepType.stage2);
             auditStepList.push(AuditStepType.surveillance1);
             auditStepList.push(AuditStepType.surveillance2);
