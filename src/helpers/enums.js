@@ -494,6 +494,21 @@ const enums = () => {
         organization: 4,
     });
 
+    const UserSettingOrderType = Object.freeze({
+        nothing: 0,
+        userName: 1,
+        updated: 2,
+        userNameDesc: 3,
+        updatedDesc: 4,
+    });
+
+    const UserSettingSearchOptionsType = Object.freeze({
+        nothing: 0,
+        onScreen: 1,    // Mantiene busqueda actual solo mientras la pantalla está visible
+        onSession: 2,   // Mantiene busqueda actual mientras la sesión está activa
+        indefinitely: 3 // Mantiene busqueda actual indefinidamente
+    });
+
     return {
         DefaultStatusType,
         DefaultValidityStatusType,
@@ -542,10 +557,12 @@ const enums = () => {
         ShiftOrderType,
         ShiftType,
         SiteOrderType,
-        StandardOrderType,
         StandardBaseType,
+        StandardOrderType,
         UserOrderType,
         UserType,
+        UserSettingOrderType,
+        UserSettingSearchOptionsType,
     }
 };
 

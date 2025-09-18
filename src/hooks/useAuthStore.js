@@ -1,6 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import envVariables from "../helpers/envVariables";
-import { clearAuthErrorMessage, onChecking, onLogin, onLogout, setAuthErrorMessage } from "../store/slices/authslice";
+import { 
+    clearAuthErrorMessage, 
+    clearUserSettings, 
+    onChecking, 
+    onLogin,
+    onLogout, 
+    setAuthErrorMessage, 
+    setUserSettings,
+} from "../store/slices/authslice";
 import cortanaApi from '../api/cortanaApi';
 import { jwtDecode } from "jwt-decode";
 import getError from "../helpers/getError";
@@ -9,7 +17,12 @@ import isString from "../helpers/isString";
 import isNullOrEmpty from "../helpers/isNullOrEmpty";
 
 const AUTH_URL = '/auth';
-const { VITE_TOKEN } = envVariables();
+const USER_SETTINGS_URL = '/userSettings';
+
+const { 
+    VITE_TOKEN, 
+    VITE_USER_SETTINGS 
+} = envVariables();
 
 export const useAuthStore = () => {
 
@@ -27,6 +40,7 @@ export const useAuthStore = () => {
     const {
         status,
         user,
+        userSettings,
         userErrorMessage,
     } = useSelector(state => state.auth);
 
@@ -64,8 +78,13 @@ export const useAuthStore = () => {
 
     const checkAuthToken = () => {
         const token = localStorage.getItem(VITE_TOKEN) || null;
+        const userSettings = localStorage.getItem(VITE_USER_SETTINGS) || null;
 
-        if (!token) return dispatch(onLogout());
+        if (!token) {
+            dispatch(clearUserSettings());
+            dispatch(onLogout());
+            return ;
+        } 
 
         try {
             const user = setUserInfo(token);
@@ -80,12 +99,14 @@ export const useAuthStore = () => {
                 throw new Error('Session was expired');
             }
             localStorage.setItem(VITE_TOKEN, token);
+            dispatch(setUserSettings(JSON.parse(userSettings)));
             dispatch(onLogin(user));
 
         } catch (error) {
             // console.log(error); // Oculto temporalmente, creo que no lo wa dejar aquí
             const message = getError(error);
             setError(message);
+            dispatch(clearUserSettings());
             dispatch(onLogout());
         }
     };
@@ -98,16 +119,29 @@ export const useAuthStore = () => {
             const token = result.data.Data;
             const user = setUserInfo(token);
             localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
+
+            const userSettings = await getUserSettingsAsync(user.id);
+
+            if (!!userSettings && Array.isArray(userSettings) && userSettings.length > 0) {
+                const settings = JSON.parse(userSettings[0].Settings);
+                localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(settings));
+                dispatch(setUserSettings(settings));
+            } else {
+                dispatch(clearUserSettings());    
+            }
+
             dispatch(onLogin(user));
         } catch (error) {
             const message = getError(error);
             setError(message);
+            dispatch(clearUserSettings());
             dispatch(onLogout());
         }
     };
 
     const logout = () => {
         localStorage.clear();
+        dispatch(clearUserSettings());
         setError('Sesión finalizada');
         dispatch(onLogout());
     };
@@ -182,11 +216,24 @@ export const useAuthStore = () => {
         return false;
     }; // hasRole
 
+    const getUserSettingsAsync = async (id) => {
+        try {
+            const resp = await cortanaApi.get(`${USER_SETTINGS_URL}?userid=${id}`);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+    }; // getUserSettingsAsync
+
     return {
         ROLES,
         
         status,
         user,
+        userSettings,
         userErrorMessage,
 
         changePasswordAsync,

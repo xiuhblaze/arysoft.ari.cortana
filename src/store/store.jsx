@@ -31,6 +31,7 @@ import shiftsSlice from "./slices/shiftsSlice";
 import sitesSlice from "./slices/sitesSlice";
 import standardsSlice from "./slices/standardsSlice";
 import usersSlice from "./slices/usersSlice";
+import userSettingsSlice from "./slices/userSettingsSlice";
 
 export const store = configureStore({
     reducer: {
@@ -65,6 +66,7 @@ export const store = configureStore({
         sites: sitesSlice.reducer,
         standards: standardsSlice.reducer,
         users: usersSlice.reducer,
+        userSettings: userSettingsSlice.reducer,
     },
     middleware: (getDefaultMiddleware) => 
         {
