@@ -502,7 +502,7 @@ const enums = () => {
         updatedDesc: 4,
     });
 
-    const UserSettingSearchOptionsType = Object.freeze({
+    const UserSettingSearchModeType = Object.freeze({
         nothing: 0,
         onScreen: 1,    // Mantiene busqueda actual solo mientras la pantalla está visible
         onSession: 2,   // Mantiene busqueda actual mientras la sesión está activa
@@ -562,7 +562,7 @@ const enums = () => {
         UserOrderType,
         UserType,
         UserSettingOrderType,
-        UserSettingSearchOptionsType,
+        UserSettingSearchModeType,
     }
 };
 

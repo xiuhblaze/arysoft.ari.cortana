@@ -140,11 +140,12 @@ export const useUserSettingsStore = () => {
         dispatch(onUserSettingCreating());
 
         try {
-            const params = {
+            const toCreate = {
                 ...item,
                 UpdatedUser: user.username,
             };
-            const resp = await cortanaApi.post(USER_SETTINGS_URL, params);
+console.log('userSettingCreateAsync.toCreate', toCreate);
+            const resp = await cortanaApi.post(USER_SETTINGS_URL, toCreate);
             const { Data } = await resp.data;
 
             dispatch(setUserSetting(Data));
@@ -162,12 +163,12 @@ export const useUserSettingsStore = () => {
     const userSettingSaveAsync = async (item) => {
         dispatch(onUserSettingSaving());
 
-        const toSave = {
-            ...item,
-            UpdatedUser: user.username,
-        }
-
         try {
+            const toSave = {
+                ...item,
+                UpdatedUser: user.username,
+            }
+console.log('userSettingSaveAsync.toSave', toSave);
             const resp = await cortanaApi.put(`${USER_SETTINGS_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 

@@ -74,6 +74,18 @@ export const useAuthStore = () => {
         return user;
     }; // setUserInfo
 
+    const getUserSettingsAsync = async (id) => {
+        try {
+            const resp = await cortanaApi.get(`${USER_SETTINGS_URL}?userid=${id}`);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+    }; // getUserSettingsAsync
+
     //* Export Methods
 
     const checkAuthToken = () => {
@@ -94,12 +106,15 @@ export const useAuthStore = () => {
             }
 
             // TODO: Falta refrescar el token
-            if (!user) {
+            if (!user) { // Creo que aquí nunca entra
                 localStorage.removeItem(VITE_TOKEN);
+                localStorage.removeItem(VITE_USER_SETTINGS);
+                console.log('Session was expired - creo que aquí nunca entra');
                 throw new Error('Session was expired');
             }
             localStorage.setItem(VITE_TOKEN, token);
             dispatch(setUserSettings(JSON.parse(userSettings)));
+console.log('setUserSettings: changed', userSettings);
             dispatch(onLogin(user));
 
         } catch (error) {
@@ -109,7 +124,7 @@ export const useAuthStore = () => {
             dispatch(clearUserSettings());
             dispatch(onLogout());
         }
-    };
+    }; // checkAuthToken
 
     const loginASync = async (values) => {
         dispatch(onChecking());
@@ -118,16 +133,22 @@ export const useAuthStore = () => {
             const result = await cortanaApi.post(AUTH_URL, values);
             const token = result.data.Data;
             const user = setUserInfo(token);
-            localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
-
             const userSettings = await getUserSettingsAsync(user.id);
+
+            localStorage.setItem(VITE_TOKEN, token)
 
             if (!!userSettings && Array.isArray(userSettings) && userSettings.length > 0) {
                 const settings = JSON.parse(userSettings[0].Settings);
-                localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(settings));
-                dispatch(setUserSettings(settings));
+                const allSettings = {
+                    ...settings,
+                    ID: userSettings[0].ID,
+                }
+                setUserSettingsLocalStorage(allSettings);
+                // localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(allSettings));
+                // dispatch(setUserSettings(allSettings));
             } else {
-                dispatch(clearUserSettings());    
+                localStorage.removeItem(VITE_USER_SETTINGS);
+                dispatch(clearUserSettings());
             }
 
             dispatch(onLogin(user));
@@ -137,14 +158,14 @@ export const useAuthStore = () => {
             dispatch(clearUserSettings());
             dispatch(onLogout());
         }
-    };
+    }; // loginASync
 
     const logout = () => {
         localStorage.clear();
         dispatch(clearUserSettings());
-        setError('Sesión finalizada');
+        setError('Session ended');
         dispatch(onLogout());
-    };
+    }; // logout
 
     const changePasswordAsync = async (values) => {
 
@@ -216,17 +237,12 @@ export const useAuthStore = () => {
         return false;
     }; // hasRole
 
-    const getUserSettingsAsync = async (id) => {
-        try {
-            const resp = await cortanaApi.get(`${USER_SETTINGS_URL}?userid=${id}`);
-            const { Data } = await resp.data;
-
-            return Data;
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
-    }; // getUserSettingsAsync
+    const setUserSettingsLocalStorage = (settings) => {
+//console.log('settings', settings);
+        localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(settings));
+        dispatch(setUserSettings(settings));
+        console.log('setUserSettings: changed', settings);
+    };
 
     return {
         ROLES,
@@ -242,5 +258,6 @@ export const useAuthStore = () => {
         loginASync,
         logout,
         validatePasswordAsync,
+        setUserSettingsLocalStorage,
     }
 };
