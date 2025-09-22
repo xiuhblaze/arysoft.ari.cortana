@@ -15,8 +15,6 @@ import * as Yup from 'yup';
 import envVariables from '../../../helpers/envVariables';
 
 const EditShiftModal = ({ id, ...props }) => {
-    // const NEW_ITEM = 'shift.new';
-    // const UPDATE_ITEM = 'shift.update';
     const {
         DefaultStatusType,
         ShiftOrderType,
@@ -86,27 +84,24 @@ const EditShiftModal = ({ id, ...props }) => {
 
     const [showModal, setShowModal] = useState(false);
     const [initialValues, setInitialValues] = useState(formDefaultValues);
-    // const [activeShift, setActiveShift] = useState(false);
-    const [currentAction, setCurrentAction] = useState(null);
     const [showSecondShift, setShowSecondShift] = useState(false);
 
     useEffect(() => {
+        
         if (!!shift && showModal) {
             setInitialValues({
-                typeSelect: shift?.Type ?? ShiftType.nothing,
-                noEmployeesInput: shift?.NoEmployees ?? '',
-                activitiesDescriptionInput: shift?.ActivitiesDescription ?? '',
-                shiftStartInput: shift?.ShiftStart ? shift?.ShiftStart.slice(0, 5) : '',
-                shiftEndInput: shift?.ShiftEnd ? shift?.ShiftEnd.slice(0, 5) : '',
-                shiftStart2Input: shift?.ShiftStart2 ? shift?.ShiftStart2.slice(0, 5) : '',
-                shiftEnd2Input: shift?.ShiftEnd2 ? shift?.ShiftEnd2.slice(0, 5) : '',
-                extraInfoInput: shift?.ExtraInfo ?? '',
+                typeSelect: shift.Type ?? ShiftType.nothing,
+                noEmployeesInput: shift.NoEmployees ?? '',
+                activitiesDescriptionInput: shift.ActivitiesDescription ?? '',
+                shiftStartInput: !!shift.ShiftStart ? shift.ShiftStart.slice(0, 5) : '',
+                shiftEndInput: !!shift.ShiftEnd ? shift.ShiftEnd.slice(0, 5) : '',
+                shiftStart2Input: !!shift.ShiftStart2 ? shift.ShiftStart2.slice(0, 5) : '',
+                shiftEnd2Input: !!shift.ShiftEnd2 ? shift.ShiftEnd2.slice(0, 5) : '',
+                extraInfoInput: shift.ExtraInfo ?? '',
                 statusCheck: shift.Status == DefaultStatusType.active
                     || shift.Status == DefaultStatusType.nothing,
             });
-
-            setShowSecondShift(shift.ShiftStart2 && shift.ShiftEnd2);
-            //setActiveShift(shift?.Status === DefaultStatusType.active);
+            setShowSecondShift(!!shift.ShiftStart2 && !!shift.ShiftEnd2);
         }
     }, [shift]);
     
@@ -117,16 +112,16 @@ const EditShiftModal = ({ id, ...props }) => {
                 siteID: site.ID,
                 pageSize: 0,
                 order: ShiftOrderType.type,
-            })
-            shiftClear();
-            setShowModal(false);
+            });
+            
+            actionForCloseModal();
         }
     }, [shiftSavedOk]);
 
     useEffect(() => { 
         if (!!shiftsErrorMessage && showModal) {
             Swal.fire('Shifts', shiftsErrorMessage, 'error');
-            setShowModal(false);
+            actionForCloseModal();
         }
     }, [shiftsErrorMessage]);
 
@@ -136,21 +131,17 @@ const EditShiftModal = ({ id, ...props }) => {
         setShowModal(true);
         
         if (!!id) {
-            //setCurrentAction(UPDATE_ITEM);
             shiftAsync(id);
         } else {
             shiftCreateAsync({
                 SiteID: site.ID,
             });
-            //setCurrentAction(NEW_ITEM);
         }
     }; // onShowModal
 
     const onCloseModal = () => {
-        // shiftClear();
-        setShowModal(false);
-        //setCurrentAction(null);
-        setShowSecondShift(false);
+
+        actionForCloseModal();
     }; // onCloseModal
 
     const onFormSubmit = (values) => {
@@ -166,11 +157,15 @@ const EditShiftModal = ({ id, ...props }) => {
             ExtraInfo: values.extraInfoInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
-
-        // console.log(toSave);
-
         shiftSaveAsync(toSave);
     }; // onFormSubmit
+
+    const actionForCloseModal = () => {
+
+        shiftClear();
+        setShowSecondShift(false);
+        setShowModal(false);
+    }; // actionForCloseModal
 
     return (
         <div {...props}>
@@ -326,7 +321,7 @@ const EditShiftModal = ({ id, ...props }) => {
                                                         formik.setFieldValue('statusCheck', isChecked);
                                                         //setActiveShift(isChecked);
                                                     }} 
-                                                    checked={ formik.values.statusCheck }
+                                                    checked={ formik.values?.statusCheck ?? false }
                                                 />
                                                 <label 
                                                     className="form-check-label text-secondary mb-0"

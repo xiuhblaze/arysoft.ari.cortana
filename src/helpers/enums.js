@@ -15,6 +15,65 @@ const enums = () => {
         danger: 3,
     });
 
+    // ADC
+
+    const ADCStatusType = Object.freeze({
+        nothing: 0,    // Nuevo registro - temporal sino se guarda, se elimina
+        new: 1,        // Nuevo registro almacenado con la información mínima
+        review: 2,     // Registro enviado a revisión
+        rejected: 3,   // Registro rechazado por el revisor, no se puede modificar
+        active: 4,     // Registro aprobado y activo
+        inactive: 5,   // Registro inactivo, ya no está en uso, no modificable
+        cancel: 6,     // En algún momento el registro fué cancelado
+        deleted: 7,     // Eliminación lógica 
+    });
+    const ADCOrderType = Object.freeze({
+        nothing: 0,        // No ordenar
+        description: 1,    // Ordenar por descripción
+        created: 2,        // Ordenar por fecha de creación
+        descriptionDesc: 3,
+        createdDesc: 4,
+    });
+
+    const ADCAlertType = Object.freeze({
+        nothing: 0,
+        employeesMistmatch: 1,
+        sitesMistmatch: 2
+    });
+
+    // ADC Concepts
+
+    const ADCConceptOrderType = Object.freeze({
+        nothing: 0,
+        indexSort: 1,
+        description: 2,
+        standard: 3,
+        indexSortDesc: 4,
+        descriptionDesc: 5,
+        standardDesc: 6,
+    });
+
+    const ADCConceptUnitType = Object.freeze({
+        nothing: 0,     // No se ha definido unidad
+        percentage: 1,  // Porcentaje
+        days: 2,        // Días
+    });
+
+    // ADC Sites
+
+    const ADCSiteAlertType = Object.freeze({
+        nothing: 0,
+        employeesMistmatch: 1,
+    });
+
+    const ADCSiteOrderType = Object.freeze({
+        nothing: 0,
+        siteDescription: 1,
+        isMainSite: 2,
+        siteDescriptionDesc: 3,
+        isMainSiteDesc: 4,
+    });
+
     // Application Forms
 
     const AppFormOrderType = Object.freeze({
@@ -56,7 +115,7 @@ const enums = () => {
     const AuditCycleDocumentType = Object.freeze({
         nothing: 0,
         appForm: 1,        // Application form
-        acd: 2,            // Audit day calculation
+        adc: 2,            // Audit day calculation
         proposal: 3,
         contract: 4,
         auditProgramme: 5, // Confirmation letter
@@ -390,9 +449,10 @@ const enums = () => {
         iso27K: 4,
         iso37K: 5,
         iso45K: 6,
-        fssc22K: 7,
-        haccp: 8,
-        gMarkets: 9,
+        fssc22K: 7,     // Food Safety System Certification 22000
+        haccp: 8,       // Hazard Analysis and Critical Control Points
+        gMarkets: 9,    // Global Markets
+        sqf: 10,        // Safe Quality Food
     });
 
     const StandardOrderType = Object.freeze({
@@ -429,6 +489,13 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
 
+        ADCStatusType,
+        ADCOrderType,
+        ADCAlertType,
+        ADCConceptOrderType,
+        ADCConceptUnitType,
+        ADCSiteOrderType,
+        ADCSiteAlertType,
         AppFormOrderType,
         AppFormStatusType,
         AuditCycleStandardsOrderType,

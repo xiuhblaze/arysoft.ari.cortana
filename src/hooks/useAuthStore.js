@@ -83,7 +83,7 @@ export const useAuthStore = () => {
             dispatch(onLogin(user));
 
         } catch (error) {
-            console.log(error);
+            // console.log(error); // Oculto temporalmente, creo que no lo wa dejar aquí
             const message = getError(error);
             setError(message);
             dispatch(onLogout());

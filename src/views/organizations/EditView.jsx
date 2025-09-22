@@ -14,6 +14,7 @@ import SitesCard from "../sites/components/SitesCard";
 
 import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
 import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
+import primaryPhoto from '../../assets/img/icoOrganizationPrimary.jpg';
 import envVariables from "../../helpers/envVariables";
 import OrganizationEditCard from "./components/OrganizationEditCard";
 //import CertificatesCard from "../certificates/components/CertificatesCard";
@@ -111,7 +112,9 @@ const EditView = ({ applicantsOnly = false, ...props }) => {
                                         ? photoPreview
                                         : !!organization && !!organization.LogoFile
                                             ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`
-                                            : defaultPhoto
+                                            : applicantsOnly
+                                                ? primaryPhoto
+                                                : defaultPhoto
                                     }
                                     className="border-radius-md"
                                     alt="Profile photo"

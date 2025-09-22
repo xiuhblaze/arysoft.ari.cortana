@@ -43,6 +43,10 @@ const standardBaseProps = [
         id: StandardBaseType.gMarkets,  
         label: 'Global Markets',
     },
+    {
+        id: StandardBaseType.sqf,
+        label: 'Safe Quality Food',
+    }
 ];
 
 export default standardBaseProps;

@@ -75,7 +75,7 @@ const EditSiteModal = ({ id, ...props }) => {
                 addressInput: site?.Address ?? '',
                 countryInput: site?.Country ?? DEFAULT_COUNTRY,
                 locationUrlInput: site?.LocationURL ?? '',
-                statusCheck: site?.Status === DefaultStatusType.active,
+                statusCheck: site.Status === DefaultStatusType.active || site.Status === DefaultStatusType.nothing,
             });
 
             // setActiveSite(site?.Status === DefaultStatusType.active);
@@ -89,7 +89,7 @@ const EditSiteModal = ({ id, ...props }) => {
             sitesAsync({
                 organizationID: organization.ID,
                 pageSize: 0,
-                order: SiteOrderType.isMainSiteDesc,
+                order: SiteOrderType.isMainSite,
             });
             siteClear();
             setShowModal(false);

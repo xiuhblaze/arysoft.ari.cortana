@@ -1,22 +1,24 @@
-import { faEdit, faFile, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useEffect, useState } from 'react'
-import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore'
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore'
-import { Col, Modal, Row } from 'react-bootstrap'
-import * as Yup from "yup";
-import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore'
-import { ViewLoading } from '../../../components/Loaders'
+import { useEffect, useState } from 'react';
+
+import { Col, Modal, Row } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faFile, faFileCirclePlus, faPlus, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Form, Formik } from 'formik'
-import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo'
+import * as Yup from "yup";
+import Swal from 'sweetalert2'
+
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms'
+import { useAuditCycleDocumentsStore } from '../../../hooks/useAuditCycleDocumentsStore';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
+//import { useOrganizationStandardsStore } from '../../../hooks/useOrganizationStandardsStore';
+import { ViewLoading } from '../../../components/Loaders'
+import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo'
+import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps'
 import enums from '../../../helpers/enums'
 import envVariables from '../../../helpers/envVariables'
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
-import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
-import auditCycleDocumentTypeProps from '../helpers/auditCycleDocumentTypeProps'
-import Swal from 'sweetalert2'
 import getRandomNumber from '../../../helpers/getRandomNumber'
+import isNullOrEmpty from '../../../helpers/isNullOrEmpty'
 
 const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
     const {
@@ -73,9 +75,9 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
         auditCycle,
     } = useAuditCyclesStore();
 
-    const {
-        organizationStandards
-    } = useOrganizationStandardsStore();
+    // const {
+    //     organizationStandards
+    // } = useOrganizationStandardsStore();
 
     const {
         isAuditCycleDocumentLoading,
@@ -180,12 +182,12 @@ const AuditCycleDocumentEditItem = ({ id, documentType, ...props }) => {
                 title={!!id ? 'Edit document information' : 'Add new document'}
                 onClick={ onShowModal }
             >
-                <FontAwesomeIcon icon={!!id ? faEdit : faPlus} className="text-dark" size="lg" />
+                <FontAwesomeIcon icon={!!id ? faEdit : faFileCirclePlus} className="text-dark" size="lg" />
             </button>
             <Modal show={showModal} onHide={onCloseModal}>
                 <Modal.Header>
                     <Modal.Title>
-                        <FontAwesomeIcon icon={ !!id ? faEdit : faPlus } className="px-3" />
+                        <FontAwesomeIcon icon={ !!id ? faEdit : faFileCirclePlus } className="px-3" />
                         { !!id ? 'Edit document info' : 'Add document file' }
                     </Modal.Title>
                 </Modal.Header>

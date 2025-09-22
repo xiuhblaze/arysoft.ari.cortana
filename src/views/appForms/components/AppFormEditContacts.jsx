@@ -12,7 +12,7 @@ import isString from '../../../helpers/isString';
 import { setContactsList, useAppFormController } from '../context/appFormContext';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 
-const AppFormEditContacts = ({ ...props }) => {
+const AppFormEditContacts = ({ readonly = false, ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
     const { contactsList } = controller;
 
@@ -39,7 +39,17 @@ const AppFormEditContacts = ({ ...props }) => {
     };
 
     const onClickAdd = () => {
+
+        if (readonly) { return; }
+
         setIsAddging(true);
+
+        if (contactsList.some( i => i.ID == contactSelected)) {
+            Swal.fire('Add contact', `The contact is already added`, 'warning');
+            setIsAddging(false);
+            return;
+        }
+
         contactAddAsync(contactSelected)
             .then(data => {
                 if (!!data) {
@@ -63,6 +73,9 @@ const AppFormEditContacts = ({ ...props }) => {
     }; // onClickAdd
 
     const onClickRemove = (id) => {
+
+        if (readonly) { return; }
+
         setIsDeleting(id);
         contactDelAsync(id)
             .then(data => {
@@ -80,47 +93,58 @@ const AppFormEditContacts = ({ ...props }) => {
 
     return (
         <Row {...props}>
-            <Col xs="8" sm="10">
-                <label className="form-label">Contacts</label>
-                <select 
-                    className="form-select" 
-                    value={contactSelected ?? ''} 
-                    onChange={onContactSelected}
-                    disabled={ isAdding || isDeleting }
-                >
-                    <option value="">(select a contact)</option>
-                    {
-                        !!contacts && contacts.length > 0 && contacts.map(contact => (
-                            <option 
-                                key={contact.ID} 
-                                value={contact.ID}
-                                disabled={ contact.Status != DefaultStatusType.active }
+            {
+                readonly ? (
+                    <Col xs="8" sm="10">
+                        <label className="form-label">Contacts</label>
+                    </Col>
+                 ) : (
+                <>
+                    <Col xs="8" sm="10">
+                        <label className="form-label">Contacts</label>
+                        <select 
+                            className="form-select" 
+                            value={contactSelected ?? ''} 
+                            onChange={onContactSelected}
+                            disabled={ isAdding || isDeleting }
+                        >
+                            <option value="">(select a contact)</option>
+                            {
+                                !!contacts && contacts.length > 0 && contacts.map(contact => (
+                                    <option 
+                                        key={contact.ID} 
+                                        value={contact.ID}
+                                        disabled={ contact.Status != DefaultStatusType.active }
+                                    >
+                                        {contact.FullName}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </Col>
+                    <Col xs="4" sm="2">
+                        <div className="d-grid gap-1 align-items-end">
+                            <label className="form-label">&nbsp;</label>
+                            <button type="button"
+                                className="btn btn-link text-dark px-2"
+                                onClick={onClickAdd}
+                                disabled={ isAdding }
                             >
-                                {contact.FullName}
-                            </option>
-                        ))
-                    }
-                </select>
-            </Col>
-            <Col xs="4" sm="2">
-                <div className="d-grid gap-1 align-items-end">
-                    <label className="form-label">&nbsp;</label>
-                    <button type="button"
-                        className="btn btn-link text-dark px-2"
-                        onClick={onClickAdd}
-                        disabled={ isAdding }
-                    >
-                        { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
-                    </button>
-                </div>
-            </Col>
+                                { isAdding ? <FontAwesomeIcon icon={ faSpinner } spin /> : 'ADD' }
+                            </button>
+                        </div>
+                    </Col>
+                </>
+            )}
             <Col xs="12">
                 <ListGroup variant='flush' className="mb-3">
                     {
                         contactsList
-                            //.sort((a, b) => a.FullName.localeCompare(b.FullName))
                             .map(item => 
-                                <ListGroup.Item key={item.ID} className="bg-transparent border-0 py-1 px-0 text-xs">
+                                <ListGroup.Item key={item.ID} 
+                                    className={`bg-transparent border-0 py-1 px-0 text-xs${ item.Status != DefaultStatusType.active ? ' opacity-6' : ''}`}
+                                    title={ item.Status != DefaultStatusType.active ? 'Inactive' : '' }
+                                > 
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div className="d-flex justify-content-start align-items-center">
                                             <FontAwesomeIcon icon={ faUser } className="me-2" size="lg" />
@@ -171,7 +195,7 @@ const AppFormEditContacts = ({ ...props }) => {
                                                 className="btn btn-link p-0 mb-0 text-secondary"
                                                 onClick={() => onClickRemove(item.ID)}
                                                 title="Delete"
-                                                disabled={isDeleting == item.ID}
+                                                disabled={isDeleting == item.ID || readonly}
                                             >   
                                                 {
                                                     isDeleting == item.ID 

@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
 import { useStandardsStore } from '../../../hooks/useStandardsStore';
 import { useAuthStore } from '../../../hooks/useAuthStore';
+import getInitialRange from '../helpers/getInitialRange';
 
 const CalendarToolbar = ({ ...props }) => {
     const {
@@ -158,10 +159,14 @@ const CalendarToolbar = ({ ...props }) => {
     const onCleanSearch = () => {
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
+            ...savedSearch,
+            text: '',
+            organizationID: '',
+            auditorID: '',
+            standardID: '',
+            status: '',
             includeDeleted: false,
-            order: AuditOrderType.date,
+            pageNumber: 0,
         };
 
         setInitialValues(formDefaultData);

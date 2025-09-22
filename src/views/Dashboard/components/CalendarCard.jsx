@@ -31,6 +31,7 @@ import CalendarEvent from "./CalendarEvent";
 import enums from "../../../helpers/enums";
 import auditStepProps from "../../audits/helpers/auditStepProps";
 import auditStatusProps from "../../audits/helpers/auditStatusProps";
+import getInitialRange from "../helpers/getInitialRange";
 
 const locales = {
     'en-US': enUS,
@@ -75,7 +76,7 @@ const CalendarCard = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     useEffect(() => {
-        const {start, end} = getInitialRange();
+        const {start, end} = getInitialRange(lastview);
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const newSearch = {
             currentDate: currentDate,
@@ -215,39 +216,39 @@ const CalendarCard = () => {
         return events;
     }; // getEvents
 
-    const getInitialRange = () => {
-        // Por defecto, calculamos el rango basado en la fecha actual y la vista predeterminada
-        const currentDate = new Date();
-        const view = lastview; // O la vista que uses por defecto
+    // const getInitialRange = () => {
+    //     // Por defecto, calculamos el rango basado en la fecha actual y la vista predeterminada
+    //     const currentDate = new Date();
+    //     const view = lastview; // O la vista que uses por defecto
 
-        let start, end;
+    //     let start, end;
 
-        if (view === 'month') {
-            const firstDayOfMonth = startOfMonth(currentDate);
-            const lastDayOfMonth = endOfMonth(currentDate);
-            const firstVisibleDay = startOfWeek(firstDayOfMonth);
-            const lastVisibleDay = endOfWeek(lastDayOfMonth);
+    //     if (view === 'month') {
+    //         const firstDayOfMonth = startOfMonth(currentDate);
+    //         const lastDayOfMonth = endOfMonth(currentDate);
+    //         const firstVisibleDay = startOfWeek(firstDayOfMonth);
+    //         const lastVisibleDay = endOfWeek(lastDayOfMonth);
 
-            start = firstVisibleDay;
-            end = lastVisibleDay;         
-        } else if (view === 'week') {
+    //         start = firstVisibleDay;
+    //         end = lastVisibleDay;         
+    //     } else if (view === 'week') {
 
-            start = startOfWeek(currentDate);
-            end = endOfWeek(currentDate);
-        } else if (view === 'day') {
-            start = startOfDay(currentDate);
-            end = endOfDay(currentDate);  
-        } else {
-            // Agenda view (por defecto 4 días en muchas configuraciones)
-            start = currentDate;
-            end = addDays(currentDate, 4);
-        }
+    //         start = startOfWeek(currentDate);
+    //         end = endOfWeek(currentDate);
+    //     } else if (view === 'day') {
+    //         start = startOfDay(currentDate);
+    //         end = endOfDay(currentDate);  
+    //     } else {
+    //         // Agenda view (por defecto 4 días en muchas configuraciones)
+    //         start = currentDate;
+    //         end = addDays(currentDate, 4);
+    //     }
 
-        if (!!start) start.setHours(0, 0, 0, 0);
-        if (!!end) end.setHours(23, 59, 59, 999);
+    //     if (!!start) start.setHours(0, 0, 0, 0);
+    //     if (!!end) end.setHours(23, 59, 59, 999);
     
-        return { start, end };
-    }; // getInitialRange
+    //     return { start, end };
+    // }; // getInitialRange
 
     // Se ejecuta cada que se rendereiza un evento del calendario
     const eventPropGetter = (event, start, end, isSelected) => {

@@ -116,7 +116,7 @@ export const useOrganizationStandardsStore = () => {
      * @returns null
      */
     const organizationStandardAsync = async (id) => {
-        console.log('organizationStandardAsync', id);
+        // console.log('organizationStandardAsync', id);
         dispatch(onOrganizationStandardLoading());
 
         if (!id) {

@@ -24,7 +24,9 @@ export const MiniStatisticsCard = ({ title, count, percentage, icon }) => {
             </div>
           </Col>
           <Col xs="4" className="d-flex align-items-center justify-content-end">
-            <div className={`icon icon-shape bg-gradient-${ iconBg } shadow text-white border-radius-md d-flex align-items-center justify-content-center`}>
+            <div className={`icon icon-shape bg-gradient-${ iconBg } shadow text-white border-radius-md d-flex align-items-center justify-content-center`}
+              style={{ minWidth: '48px' }}
+            >
               <FontAwesomeIcon icon={ iconFig } size="lg" className="opacity-10" aria-hidden="true" />
             </div>
           </Col>

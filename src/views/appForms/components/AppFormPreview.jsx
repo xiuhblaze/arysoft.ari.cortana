@@ -16,6 +16,8 @@ import languagesProps from "../../../helpers/languagesProps";
 import standardBaseProps from "../../standards/helpers/standardBaseProps";
 
 import logoARI from "../../../assets/img/lgoARI.png";
+import hojaMembretadaEncabezado from "../../../assets/img/imgHojaMembretadaEncabezado.png";
+import hojaMembretadaPie from "../../../assets/img/imgHojaMembretadaPie.png";
 
 const shiftText = [
     '',
@@ -28,9 +30,10 @@ const shiftText = [
 const AppFormPreview = ({formik}) => {
     const [ controller, dispatch ] = useAppFormController();
     const { 
+        organizationData,
+        standardData,
         contactsList,
         nacecodesList,
-        standardData,
         sitesList,        
     } = controller;
     const { DefaultStatusType, StandardBaseType } = enums();
@@ -75,9 +78,17 @@ const AppFormPreview = ({formik}) => {
                         </div>
                     </div>
                     <div ref={ contentRef }>
-                        <div className="d-none d-print-block">
+                        <div 
+                            className="d-none d-print-block pt-3"
+                            style={{
+                                backgroundImage: `url(${hojaMembretadaEncabezado})`,
+                                backgroundSize: '100% auto',
+                                backgroundPosition: 'top center',
+                                width: '100%',
+                            }}
+                        >
                             <div className="d-flex jutify-content-start align-items-center">
-                                <img src={ logoARI } alt="logoARI" className="me-4" style={{ maxHeight: '1in' }} />
+                                <img src={ logoARI } alt="logoARI" className="ms-3 me-4" style={{ maxHeight: '1in' }} />
                                 <h5 className="">Application Form <br />
                                     <small className="text-secondary ms-2">{ 
                                         standardBaseProps[!!standardData?.standardBase 
@@ -88,7 +99,7 @@ const AppFormPreview = ({formik}) => {
                                 </h5>
                             </div>
                         </div>
-                        <table className="table table-borderless table-hover">
+                        <table className="table table-borderless table-hover mx-print-3">
                             <tbody>
                                 <tr>
                                     <td className={ headerStyle }>Standard</td>
@@ -103,15 +114,15 @@ const AppFormPreview = ({formik}) => {
                                 </tr>
                                 <tr>
                                     <td className={ headerStyle }>Organization</td>
-                                    <td className={ bodyStyle }>{ organization.Name }</td>
+                                    {/* <td className={ bodyStyle }>{ organization.Name }</td> */}
+                                    <td className={ bodyStyle }>{ !!organizationData ? organizationData.OrganizationName : null }</td>
                                 </tr>
                                 <tr>
                                     <td className={ headerStyle }>Legal entity</td>
                                     <td className={ bodyStyle }>
                                         { 
-                                            !!organization.Companies && organization.Companies.length > 0 &&
-                                            organization.Companies
-                                                .filter(company => company.Status == DefaultStatusType.active)
+                                            !!organizationData && !!organizationData.Companies && organizationData.Companies.length > 0 &&
+                                            organizationData.Companies
                                                 .map(company => <div key={company.ID}>
                                                 <span className="text-dark">{ company.Name }</span>
                                                 <span className="ms-1">
@@ -144,11 +155,11 @@ const AppFormPreview = ({formik}) => {
                                 <tr style={separatorStyle}></tr>
                                 <tr>
                                     <td className={ headerStyle }>Website</td>
-                                    <td className={ bodyStyle }>{ organization.Website}</td>
+                                    <td className={ bodyStyle }>{ !!organizationData ? organizationData.Website : null }</td>
                                 </tr>
                                 <tr>
                                     <td className={ headerStyle }>Phone number</td>
-                                    <td className={ bodyStyle }>{ organization.Phone }</td>
+                                    <td className={ bodyStyle }>{ !!organizationData ? organizationData.Phone : null }</td>
                                 </tr>
                                 <tr>
                                     <td className={ headerStyle }>Contact</td>
@@ -209,7 +220,7 @@ const AppFormPreview = ({formik}) => {
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Process activities/scope</td>
-                                            <td className={ bodyStyle }>{ formik?.values?.activitiesScopeInput ?? '' }</td>
+                                            <td className={ bodyStyle }>{ ShowFormatTextInput(formik?.values?.activitiesScopeInput ?? '') }</td>
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Process/services</td>
@@ -232,7 +243,7 @@ const AppFormPreview = ({formik}) => {
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Legal requirements associated with product/service</td>
-                                            <td className={ bodyStyle }>{ formik?.values?.legalRequirementsInput ?? '' }</td>
+                                            <td className={ bodyStyle }>{ ShowFormatTextInput(formik?.values?.legalRequirementsInput ?? '') }</td>
                                         </tr>
                                         <tr>
                                             <td className={ headerStyle }>Any critical complaint?</td>
@@ -380,7 +391,7 @@ const AppFormPreview = ({formik}) => {
                                                                             : null
                                                                         }
                                                                     </td> 
-                                                                    <td className="text-wrap">{shift.ActivitiesDescription}</td>
+                                                                    <td className="text-wrap">{ ShowFormatTextInput(shift.ActivitiesDescription) }</td>
                                                                 </tr>
                                                             ))  
                                                         }
@@ -413,8 +424,8 @@ const AppFormPreview = ({formik}) => {
                                             <tbody>
                                                 <tr>
                                                     <td className="text-center">{!!formik?.values?.anyConsultancyCheck ? 'Yes' : 'No'}</td>
-                                                    <td>
-                                                        { formik?.values?.anyConsultancyByInput }
+                                                    <td className="text-wrap">
+                                                        { ShowFormatTextInput(formik?.values?.anyConsultancyByInput) }
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -423,7 +434,16 @@ const AppFormPreview = ({formik}) => {
                                 </tr>
                             </tbody>
                         </table>
-                        <div className="d-none d-print-block">
+                        <div 
+                            className="d-none d-print-block pb-3"
+                            style={{
+                                backgroundImage: `url(${hojaMembretadaPie})`,
+                                backgroundSize: '100% auto',
+                                backgroundPosition: 'bottom center',
+                                backgroundRepeat: 'no-repeat',
+                                width: '100%',
+                            }}
+                        >
                             <div className="d-flex justify-content-center flex-column">
                                 <h6 className="text-center text-sm">
                                     This application will be in force for a validity of 10 days,
@@ -440,7 +460,7 @@ const AppFormPreview = ({formik}) => {
                                     liable for any negative consequence of the use of electronic communication, 
                                     including but not limited to, damage as a result of in or non-complete delivery.
                                 </p>
-                                <p className="text-center text-xs">
+                                <p className="text-center text-xs mb-4">
                                     <a href="https://aarrin.com" target="_blank">
                                         <FontAwesomeIcon icon={ faGlobeAmericas } className="opacity-6 text-dark me-2" />
                                         aarrin.com

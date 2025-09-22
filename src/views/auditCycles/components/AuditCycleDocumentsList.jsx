@@ -18,6 +18,9 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 // import AppFormModalEditItem from '../../appForms/components/AppFormModalEditItem';
 import AppFormButtonNewItem from '../../appForms/components/AppFormButtonNewItem';
 import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleList';
+import ADCAuditCycleList from '../../adcs/components/ADCAuditCycleList';
+import { useADCsStore } from '../../../hooks/useADCsStore';
+import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     // console.log('AuditCycleDocumentsList');
@@ -36,6 +39,14 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
     const {
         auditCycleDocuments
     } = useAuditCycleDocumentsStore();
+
+    const {
+        appForms
+    } = useAppFormsStore();
+
+    const {
+        adcs
+    } = useADCsStore();
 
     // HOOKS
 
@@ -59,12 +70,22 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                 auditCycleDocumentTypeProps
                     .filter(i => i.id != AuditCycleDocumentType.nothing && i.id != AuditCycleDocumentType.audit)
                     .map(item => {
+                        let iconColorStyle = 'secondary';
+
                         const documents = auditCycleDocuments.filter(doc => doc.DocumentType == item.id
                             && (showAllFiles || doc.Status == DefaultStatusType.active)
                         );
-                        const iconColorStyle = `text-${ documents.length == 0 
-                            ? 'secondary'
-                            : item.variant} text-gradient`;
+
+                        // Para indicar si hay o no documentos o formularios de acuerdo al tipo
+                        if ((item.id == AuditCycleDocumentType.appForm && !!appForms && appForms.length > 0) || documents.length > 0) {
+                            iconColorStyle = `text-${item.variant} text-gradient`;
+                        } else if ((item.id == AuditCycleDocumentType.adc && !!adcs && adcs.length > 0) || documents.length > 0) {
+                            iconColorStyle = `text-${item.variant} text-gradient`;
+                        } else {
+                            iconColorStyle = `text-${ documents.length == 0 
+                                ? 'secondary'
+                                : item.variant} text-gradient`;
+                        }
 
                         if (organization.Status == OrganizationStatusType.applicant
                             && item.id > AuditCycleDocumentType.proposal
@@ -99,12 +120,13 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
+                                            { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
                                             <AppFormAuditCycleList />
                                         </div>
                                     </div> : null
                                 }
                                 {
-                                    item.id != AuditCycleDocumentType.appForm && // TODOS LOS DEMAS
+                                    item.id == AuditCycleDocumentType.adc ?
                                     <div  className="timeline-block mb-3">
                                         <div className="timeline-step">
                                             <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
@@ -116,7 +138,6 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     <p className="text-xs text-secondary mb-0">{item.helpText}</p>
                                                 </div>
                                                 <div className="d-flex align-items-center gap-3">
-                                                    { item.id == AuditCycleDocumentType.appForm && <AppFormButtonNewItem /> }
                                                     <div className="text-dark text-sm font-weight-bold">
                                                         <AuditCycleDocumentEditItem 
                                                             documentType={ item.id }
@@ -129,8 +150,40 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
                                                 }
                                             </div>
+                                            { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
+                                            <ADCAuditCycleList showAll={ showAllFiles } />
                                         </div>
-                                    </div>
+                                    </div> : null
+                                }
+                                { // EL RESTO DE PASOS
+                                    item.id != AuditCycleDocumentType.appForm 
+                                    && item.id != AuditCycleDocumentType.adc ? (
+                                        <div  className="timeline-block mb-3">
+                                            <div className="timeline-step">
+                                                <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
+                                            </div>
+                                            <div className="timeline-content" style={{ maxWidth: 'none' }}>
+                                                <div className='d-flex justify-content-between align-items-center me-1 mb-0'>
+                                                    <div>
+                                                        <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
+                                                        <p className="text-xs text-secondary mb-0">{item.helpText}</p>
+                                                    </div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <div className="text-dark text-sm font-weight-bold">
+                                                            <AuditCycleDocumentEditItem 
+                                                                documentType={ item.id }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
+                                                    {
+                                                        documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : null
                                 }
                                 {
                                     item.id == AuditCycleDocumentType.auditProgramme &&

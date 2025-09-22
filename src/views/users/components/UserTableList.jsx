@@ -50,7 +50,7 @@ const UserTableList = () => {
                             </th>
                             <th className={headStyle}>Info</th>
                             <th className={headStyle}>Roles</th>
-                            <th className={headStyle}>Last access</th>
+                            <th className={headStyle}>Last</th>
                             <th></th>
                         </tr>
                     </thead>
