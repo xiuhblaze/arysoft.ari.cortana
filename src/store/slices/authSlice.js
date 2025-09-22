@@ -8,6 +8,7 @@ export const authSlice = createSlice({
     isPwdSaving: false,
     pwdSavedOk: false,
     userErrorMessage: null,
+    userSettings: null,
   },
   reducers: {
     onChecking: (state) => {
@@ -36,6 +37,12 @@ export const authSlice = createSlice({
     },
     clearAuthErrorMessage: (state) => {
       state.userErrorMessage = null
+    },
+    setUserSettings: (state, action) => {
+      state.userSettings = action.payload;
+    },
+    clearUserSettings: (state) => {
+      state.userSettings = null;
     }
   }
 });
@@ -46,6 +53,8 @@ export const {
   onLogout,
   setAuthErrorMessage,
   clearAuthErrorMessage,
+  setUserSettings,
+  clearUserSettings,
 } = authSlice.actions;
 
 export default authSlice;

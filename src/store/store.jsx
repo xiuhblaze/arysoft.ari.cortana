@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import adcConceptsSlice from "./slices/adcConceptsSlice";
 import adcConceptValuesSlice from "./slices/adcConceptValuesSlice";
+import adcSiteAuditsSlice from "./slices/adcSiteAuditsSlice";
 import adcSitesSlice from "./slices/adcSitesSlice";
 import adcsSlice from "./slices/adcsSlice";
 import appFormsSlice from "./slices/appFormsSlice";
@@ -30,12 +31,14 @@ import shiftsSlice from "./slices/shiftsSlice";
 import sitesSlice from "./slices/sitesSlice";
 import standardsSlice from "./slices/standardsSlice";
 import usersSlice from "./slices/usersSlice";
+import userSettingsSlice from "./slices/userSettingsSlice";
 
 export const store = configureStore({
     reducer: {
         adcConcepts: adcConceptsSlice.reducer,
         adcConceptValues: adcConceptValuesSlice.reducer,
         adcs: adcsSlice.reducer,
+        adcSiteAudits: adcSiteAuditsSlice.reducer,
         adcSites: adcSitesSlice.reducer,
         appForms: appFormsSlice.reducer,
         auditAuditors: auditAuditorsSlice.reducer,
@@ -63,6 +66,7 @@ export const store = configureStore({
         sites: sitesSlice.reducer,
         standards: standardsSlice.reducer,
         users: usersSlice.reducer,
+        userSettings: userSettingsSlice.reducer,
     },
     middleware: (getDefaultMiddleware) => 
         {

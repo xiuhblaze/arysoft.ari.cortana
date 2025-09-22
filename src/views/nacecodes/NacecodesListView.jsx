@@ -12,6 +12,7 @@ import NaceTableList from "./components/NaceTableList";
 import NacecodesToolbar from "./components/NacecodesToolbar";
 import useNacecodesStore from "../../hooks/useNaceCodesStore";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
+import { useViewNavigation } from "../../hooks/useViewNavigation";
 
 export const NacecodesListView = () => {
     const navigate = useNavigate();
@@ -19,8 +20,11 @@ export const NacecodesListView = () => {
         NACECODES_OPTIONS,
         VITE_PAGE_SIZE,
     } = envVariables();
-    const [controller, dispatch] = useArysoftUIController();
     const { NacecodeOrderType } = enums();
+
+    // CUSTOM HOOKS
+
+    const [controller, dispatch] = useArysoftUIController();
     const {
         nacecodesMeta,
         nacecode,
@@ -28,6 +32,15 @@ export const NacecodesListView = () => {
         nacecodeErrorMessage,
         nacecodesAsync,
     } = useNacecodesStore();
+    const {
+        onSearch,
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: NACECODES_OPTIONS,
+        //OrderType: NacecodeOrderType,
+        DefultOrder: NacecodeOrderType.sector,
+        itemsAsync: nacecodesAsync,
+    });
 
 
     useEffect(() => {

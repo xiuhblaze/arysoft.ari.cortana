@@ -17,7 +17,7 @@ const ListView = () => {
     //const navigate = useNavigate();
     const {
         ORGANIZATIONS_OPTIONS,
-        VITE_PAGE_SIZE,
+        //VITE_PAGE_SIZE,
     } = envVariables();
     const { OrganizationOrderType } = enums();
     
@@ -26,8 +26,6 @@ const ListView = () => {
     const [controller, dispatch] = useArysoftUIController();
     const {
         organizationsMeta,
-        organization,
-        organizationCreatedOk,
         organizationsErrorMessage,
         organizationsAsync,
     } = useOrganizationsStore();
@@ -37,7 +35,7 @@ const ListView = () => {
     useEffect(() => {
         const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
         const newSearch = {
-            pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
+            // pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
             pageNumber: 1,
             order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
         };

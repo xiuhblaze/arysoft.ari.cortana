@@ -94,7 +94,7 @@ const enums = () => {
         active: 6,             // AppForm activo
         inactive: 7,           // Ya no está en uso este appForm
         cancel: 8,             // En algún momento el appForm fué cancelado
-        deleted: 9,           // Eliminación logica
+        deleted: 9,            // Eliminación logica
     });
 
     // Audits cycles
@@ -126,6 +126,12 @@ const enums = () => {
         audit: 9,
     });
 
+    const AuditCyclePeriodicityType = Object.freeze({
+        nothing: 0,
+        annual: 1,
+        biannual: 2,
+    });
+
     // Audits
 
     const AuditStepType = Object.freeze({
@@ -137,6 +143,9 @@ const enums = () => {
         recertification: 5,
         transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
         special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+        surveillance3: 8,
+        surveillance4: 9,
+        surveillance5: 10,
     });
 
     const AuditDocumentType = Object.freeze({
@@ -485,6 +494,21 @@ const enums = () => {
         organization: 4,
     });
 
+    const UserSettingOrderType = Object.freeze({
+        nothing: 0,
+        userName: 1,
+        updated: 2,
+        userNameDesc: 3,
+        updatedDesc: 4,
+    });
+
+    const UserSettingSearchModeType = Object.freeze({
+        nothing: 0,
+        onScreen: 1,    // Mantiene busqueda actual solo mientras la pantalla está visible
+        onSession: 2,   // Mantiene busqueda actual mientras la sesión está activa
+        indefinitely: 3 // Mantiene busqueda actual indefinidamente
+    });
+
     return {
         DefaultStatusType,
         DefaultValidityStatusType,
@@ -501,6 +525,7 @@ const enums = () => {
         AuditCycleStandardsOrderType,
         AuditCycleType,
         AuditCycleDocumentType,
+        AuditCyclePeriodicityType,
         AuditDocumentType,
         AuditStepType,
         AuditOrderType,
@@ -532,10 +557,12 @@ const enums = () => {
         ShiftOrderType,
         ShiftType,
         SiteOrderType,
-        StandardOrderType,
         StandardBaseType,
+        StandardOrderType,
         UserOrderType,
         UserType,
+        UserSettingOrderType,
+        UserSettingSearchModeType,
     }
 };
 
