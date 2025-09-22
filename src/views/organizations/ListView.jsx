@@ -17,7 +17,7 @@ const ListView = () => {
     //const navigate = useNavigate();
     const {
         ORGANIZATIONS_OPTIONS,
-        VITE_PAGE_SIZE,
+        //VITE_PAGE_SIZE,
     } = envVariables();
     const { OrganizationOrderType } = enums();
     
@@ -26,8 +26,6 @@ const ListView = () => {
     const [controller, dispatch] = useArysoftUIController();
     const {
         organizationsMeta,
-        organization,
-        organizationCreatedOk,
         organizationsErrorMessage,
         organizationsAsync,
     } = useOrganizationsStore();

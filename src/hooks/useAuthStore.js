@@ -112,9 +112,8 @@ export const useAuthStore = () => {
                 console.log('Session was expired - creo que aquí nunca entra');
                 throw new Error('Session was expired');
             }
-            localStorage.setItem(VITE_TOKEN, token);
+            localStorage.setItem(VITE_TOKEN, token);            
             dispatch(setUserSettings(JSON.parse(userSettings)));
-console.log('setUserSettings: changed', userSettings);
             dispatch(onLogin(user));
 
         } catch (error) {
@@ -135,7 +134,7 @@ console.log('setUserSettings: changed', userSettings);
             const user = setUserInfo(token);
             const userSettings = await getUserSettingsAsync(user.id);
 
-            localStorage.setItem(VITE_TOKEN, token)
+            //localStorage.setItem(VITE_TOKEN, token) // Lo envié hacia abajo para que primero se limpie el localStorage
 
             if (!!userSettings && Array.isArray(userSettings) && userSettings.length > 0) {
                 const settings = JSON.parse(userSettings[0].Settings);
@@ -143,14 +142,28 @@ console.log('setUserSettings: changed', userSettings);
                     ...settings,
                     ID: userSettings[0].ID,
                 }
-                setUserSettingsLocalStorage(allSettings);
+                setUserSettingsLocalStorage(allSettings); // Esta linea susituye las dos siguientes
                 // localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(allSettings));
                 // dispatch(setUserSettings(allSettings));
+                switch (settings.searchMode) {
+                    case UserSettingSearchModeType.onSession:                        
+                        console.log('onSession - borrar localStorage');
+                        localStorage.clear();
+                        break;
+                    case UserSettingSearchModeType.onScreen:
+                        console.log('onScreen - borrar localStorage y no guardar en localStorage');
+                        localStorage.clear();
+                        break;
+                    case UserSettingSearchModeType.indefinitely:
+                        console.log('indefinitely - utilizar como está actualmente');
+                        break;
+                }
             } else {
                 localStorage.removeItem(VITE_USER_SETTINGS);
                 dispatch(clearUserSettings());
             }
-
+            
+            localStorage.setItem(VITE_TOKEN, token);
             dispatch(onLogin(user));
         } catch (error) {
             const message = getError(error);
@@ -238,11 +251,10 @@ console.log('setUserSettings: changed', userSettings);
     }; // hasRole
 
     const setUserSettingsLocalStorage = (settings) => {
-//console.log('settings', settings);
+
         localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(settings));
         dispatch(setUserSettings(settings));
-        console.log('setUserSettings: changed', settings);
-    };
+    }; // setUserSettingsLocalStorage
 
     return {
         ROLES,

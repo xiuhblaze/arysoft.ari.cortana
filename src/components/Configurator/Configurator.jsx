@@ -30,6 +30,12 @@ export const Configurator = () => {
 
     const onCloseConfigurator = () => setOpenConfigurator(dispatch, false);
 
+    const helpTexts = [
+        'Select a search mode',
+        'Keeps current search only while the screen is visible',
+        'Keeps current search only while the session is active',
+        'Keeps current search indefinitely',
+    ]
     const formDefaultValues = {
         pageSizeInput: VITE_PAGE_SIZE,
         searchModeSelect: UserSettingSearchModeType.onSession,
@@ -42,7 +48,7 @@ export const Configurator = () => {
         searchModeSelect: Yup.string()
             .required("Search mode is required"),
     });
-
+    
     // CUSTOM HOOKS
 
     const {
@@ -71,26 +77,29 @@ export const Configurator = () => {
 
     useEffect(() => {
         if (!!authUserSettings) {
-            console.log('authUserSettings', authUserSettings);
+            
             setInitialValues({
                 pageSizeInput: authUserSettings.pageSize ?? VITE_PAGE_SIZE,
                 searchModeSelect: authUserSettings.searchMode ?? UserSettingSearchModeType.onSession,
             });
+
+            setSearchMode(authUserSettings.searchMode ?? UserSettingSearchModeType.onSession);
         }
     }, [authUserSettings]);
 
     useEffect(() => {
         if (!!userSettingCreatedOk) {
+
             Swal.fire('Settings', `User settings created successfully`, 'success');
-console.log('userSetting', userSetting);
             if (!!userSetting) {
                 const allSettings = {
                     ID: userSetting.ID,
                     ...JSON.parse(userSetting.Settings),
                 };
+
                 setUserSettingsLocalStorage(allSettings);
-console.log('userSettingClear();');
                 userSettingClear();
+                updateLocalStorage(allSettings);
             }
             onCloseConfigurator();
         }
@@ -98,16 +107,17 @@ console.log('userSettingClear();');
 
     useEffect(() => {
         if (!!userSettingSavedOk) {
+            
             Swal.fire('Settings', `User settings updated successfully`, 'success');
-console.log('userSetting', userSetting);
             if (!!userSetting) {
                 const allSettings = {
                     ID: userSetting.ID,
                     ...JSON.parse(userSetting.Settings),
                 };
+
                 setUserSettingsLocalStorage(allSettings);
-console.log('userSettingClear();');
                 userSettingClear();
+                updateLocalStorage(allSettings);
             }
             onCloseConfigurator();
         }
@@ -121,8 +131,6 @@ console.log('userSettingClear();');
             pageSize: Number(values.pageSizeInput),
             searchMode: values.searchModeSelect,
         };
-
-//console.log('authUserSettings', authUserSettings);
         
         if (!!authUserSettings) {
             const toSave = {
@@ -130,17 +138,32 @@ console.log('userSettingClear();');
                 Settings: JSON.stringify(settings),
                 Status: DefaultStatusType.active,
             };
-//console.log('need to update', toSave);
+
             userSettingSaveAsync(toSave);            
         } else {
             const toCreate = {
                 UserID: user.id,
                 Settings: JSON.stringify(settings),
             };            
-//console.log('need to create', toCreate);
+
             userSettingCreateAsync(toCreate);
         }
     }; // onFormSubmit
+
+    const updateLocalStorage = (settings) => {
+
+        switch (settings.searchMode) {
+            case UserSettingSearchModeType.onSession:
+                console.log('onSession - borrar localStorage');
+                break;
+            case UserSettingSearchModeType.onScreen:
+                console.log('onScreen - borrar localStorage y no guardar en localStorage');
+                break;
+            case UserSettingSearchModeType.indefinitely:
+                console.log('indefinitely - utilizar como está actualmente');
+                break;
+        }
+    }; // updateLocalStorage
     
 
     return (
@@ -189,15 +212,7 @@ console.log('userSettingClear();');
                                                 setSearchMode(searchMode);
                                                 formik.setFieldValue('searchModeSelect', searchMode);
                                             }}
-                                            helpText={
-                                                searchMode == UserSettingSearchModeType.onScreen
-                                                    ? 'Keeps current search only while the screen is visible'
-                                                    : searchMode == UserSettingSearchModeType.onSession
-                                                        ? 'Keeps current search only while the session is active'
-                                                        : searchMode == UserSettingSearchModeType.indefinitely
-                                                            ? 'Keeps current search indefinitely'
-                                                            : 'Select a search mode'
-                                            }
+                                            helpText={ helpTexts[searchMode] }
                                         >
                                             <option value={UserSettingSearchModeType.onScreen}>On screen</option>
                                             <option value={UserSettingSearchModeType.onSession}>On session</option>

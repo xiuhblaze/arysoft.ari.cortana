@@ -144,7 +144,7 @@ export const useUserSettingsStore = () => {
                 ...item,
                 UpdatedUser: user.username,
             };
-console.log('userSettingCreateAsync.toCreate', toCreate);
+//console.log('userSettingCreateAsync.toCreate', toCreate);
             const resp = await cortanaApi.post(USER_SETTINGS_URL, toCreate);
             const { Data } = await resp.data;
 
@@ -168,7 +168,7 @@ console.log('userSettingCreateAsync.toCreate', toCreate);
                 ...item,
                 UpdatedUser: user.username,
             }
-console.log('userSettingSaveAsync.toSave', toSave);
+//console.log('userSettingSaveAsync.toSave', toSave);
             const resp = await cortanaApi.put(`${USER_SETTINGS_URL}/${toSave.ID}`, toSave);
             const { Data } = await resp.data;
 
