@@ -1,25 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import envVariables from "../helpers/envVariables";
 import { useSelector } from "react-redux";
+import enums from "../helpers/enums";
 
 const { VITE_PAGE_SIZE } = envVariables();
 
 export const useViewNavigation = ({
     LS_OPTIONS, // nombre del localStorage
-    //OrderType,  // enum con los tipos de orden
     DefultOrder, // orden por defecto de tipo OrderType
-
     itemsAsync, // metodo que obtiene los registros
 }) => {
+
+    const { UserSettingSearchModeType } = enums();
+
+    // HOOKS
 
     const {
         userSettings,
     } = useSelector(state => state.auth);
-    
-    // HOOKS
-    
-    const [currentOrder, setCurrentOrder] = useState(DefultOrder);
 
+    const [currentOrder, setCurrentOrder] = useState(DefultOrder);
+    const [currentPageSize, setCurrentPageSize] = useState(userSettings?.pageSize ?? VITE_PAGE_SIZE);
+
+    useEffect(() => {
+        console.log('useViewNavigation.useEffect[]: called');
+        if (userSettings?.searchMode == UserSettingSearchModeType.onScreen) {
+            localStorage.removeItem(LS_OPTIONS);
+        }
+    }, []);
+    
+
+    useEffect(() => {
+        //console.log('useEffect[]: currentPageSize', currentPageSize);
+        if (!!userSettings.pageSize && userSettings.pageSize !== currentPageSize) {
+            //console.log('useEffect[]: userSettings.pageSize', userSettings.pageSize);
+            onSearch();
+            setCurrentPageSize(userSettings.pageSize);
+        }
+    }, [userSettings.pageSize]);
+    
     // METHODS
 
     const getSavedSearch = () => {
@@ -30,6 +49,7 @@ export const useViewNavigation = ({
         const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            pageSize: userSettings?.pageSize ?? VITE_PAGE_SIZE,
             order: order
         };
 
@@ -43,6 +63,7 @@ export const useViewNavigation = ({
         const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
         const search = {
             ...savedSearch,
+            pageSize: userSettings?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: page,
         };
 
@@ -62,6 +83,7 @@ export const useViewNavigation = ({
             ? {
                 ...savedSearch,
                 ...options,
+                pageSize: userSettings?.pageSize ?? VITE_PAGE_SIZE,
                 pageNumber: 1,
             }
             : newSearch;
@@ -72,7 +94,7 @@ export const useViewNavigation = ({
     }; // onSearch
 
     const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
+        //const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
         const search = {
             //pageSize: savedSearch?.pageSize ?? userSettings?.pageSize ?? VITE_PAGE_SIZE,
             pageSize: userSettings?.pageSize ?? VITE_PAGE_SIZE,

@@ -11,7 +11,7 @@ import AuditorSimpleItem from "../auditors/components/AuditorSimpleItem";
 import enums from "../../helpers/enums";
 import StandardEditCard from "./components/StandardEditCard";
 
-const EditView = () => {
+const StandardEditView = () => {
     const { id } = useParams();
     const [controller, dispatch] = useArysoftUIController();
     const navigate = useNavigate();
@@ -96,4 +96,4 @@ const EditView = () => {
     )
 }
 
-export default EditView;
+export default StandardEditView;

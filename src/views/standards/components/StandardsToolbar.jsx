@@ -11,39 +11,46 @@ import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
 
-export const ToolbarForm = () => {
+export const StandardsToolbar = () => {
     const { DefaultStatusType, StandardOrderType } = enums();
-    const { 
-        STANDARDS_OPTIONS, 
-        VITE_PAGE_SIZE
-    } = envVariables();
+    const { STANDARDS_OPTIONS } = envVariables();
     const {
         BUTTON_ADD_CLASS,
         BUTTON_SEARCH_CLASS,
         BUTTON_CLEAR_SEARCH_CLASS,
     } = defaultCSSClasses();
+    const formDefaultData = {
+        textInput: '',
+        statusSelect: '',
+        includeDeletedCheck: false,
+    }
 
     // CUSTOM HOOKS
 
     const { ROLES, hasRole } = useAuthStore();
-
     const {
         isStandardCreating,
         standardsAsync,
         standardCreateAsync,
     } = useStandardsStore();
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: STANDARDS_OPTIONS,
+        DefultOrder: StandardOrderType.name,
+        itemsAsync: standardsAsync,
+    });
 
     // HOOKS
 
-    const [initialValues, setInitialValues] = useState({
-        textInput: '',
-        statusSelect: '',
-        includeDeletedCheck: false,
-    })
+    const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
+        const savedSearch = getSavedSearch(); // JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch?.text ?? '',
@@ -60,39 +67,39 @@ export const ToolbarForm = () => {
     };
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
+        //const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
+            //...savedSearch,
             text: values.textInput,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
-
-        standardsAsync(search);
-        localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
+        onSearch(search);
+        // standardsAsync(search);
+        // localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
     };
 
-    const onCleanSearch = (e) => {
-        e.preventDefault();
+    // const onCleanSearch = (e) => {
+    //     e.preventDefault();
 
-        const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
-            order: StandardOrderType.name,
-        };
+    //     const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
+    //     const search = {
+    //         pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
+    //         pageNumber: 1,
+    //         includeDeleted: false,
+    //         order: StandardOrderType.name,
+    //     };
 
-        setInitialValues({
-            textInput: '',
-            statusSelect: '',
-            includeDeletedCheck: false,
-        });
+    //     setInitialValues({
+    //         textInput: '',
+    //         statusSelect: '',
+    //         includeDeletedCheck: false,
+    //     });
 
-        standardsAsync(search);
-        localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
-    };
+    //     standardsAsync(search);
+    //     localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
+    // };
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -175,4 +182,4 @@ export const ToolbarForm = () => {
     )
 }
 
-export default ToolbarForm;
+export default StandardsToolbar;

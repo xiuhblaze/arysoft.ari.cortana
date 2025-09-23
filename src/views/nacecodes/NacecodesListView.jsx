@@ -13,18 +13,22 @@ import NacecodesToolbar from "./components/NacecodesToolbar";
 import useNacecodesStore from "../../hooks/useNaceCodesStore";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 import { useViewNavigation } from "../../hooks/useViewNavigation";
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 export const NacecodesListView = () => {
     const navigate = useNavigate();
-    const {
-        NACECODES_OPTIONS,
-        VITE_PAGE_SIZE,
-    } = envVariables();
-    const { NacecodeOrderType } = enums();
+    const { NACECODES_OPTIONS } = envVariables();
+    const { 
+        NacecodeOrderType,
+        UserSettingSearchModeType,
+    } = enums();
 
     // CUSTOM HOOKS
 
     const [controller, dispatch] = useArysoftUIController();
+    const {
+        userSettings,
+    } =useAuthStore();
     const {
         nacecodesMeta,
         nacecode,
@@ -37,25 +41,14 @@ export const NacecodesListView = () => {
         onPageChange
     } = useViewNavigation({
         LS_OPTIONS: NACECODES_OPTIONS,
-        //OrderType: NacecodeOrderType,
         DefultOrder: NacecodeOrderType.sector,
         itemsAsync: nacecodesAsync,
     });
 
+    // HOOKS
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        const newSearch = {
-            pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
-            pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : NacecodeOrderType.sector,
-        };
-
-        const search = !!savedSearch ? savedSearch : newSearch;
-
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-
+        onSearch();
         setNavbarTitle(dispatch, null);
     }, []);
 
@@ -71,33 +64,6 @@ export const NacecodesListView = () => {
         }
     }, [nacecodeErrorMessage]);
 
-
-    // Methods
-
-    const onClickGoPage = (page = 1) => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            pageNumber: page,
-        };
-
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    };
-
-    const onClickOrderList = (order = AdminOrdenType.fechaInicioDesc) => {
-        //console.log('onClickOrderList', order);
-
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            order: order
-        }
-
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    };
-
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
             <Row>
@@ -111,7 +77,7 @@ export const NacecodesListView = () => {
                                 <AryPagination
                                     currentPage={nacecodesMeta.CurrentPage}
                                     totalPages={nacecodesMeta.TotalPages}
-                                    onClickGoPage={onClickGoPage}
+                                    onClickGoPage={onPageChange}
                                 />
                             )}
                             <NaceTableList />
@@ -120,7 +86,7 @@ export const NacecodesListView = () => {
                                     <AryPagination
                                         currentPage={nacecodesMeta.CurrentPage}
                                         totalPages={nacecodesMeta.TotalPages}
-                                        onClickGoPage={onClickGoPage}
+                                        onClickGoPage={onPageChange}
                                         className="mt-2"
                                     />
                                     <AryListStatistics meta={ nacecodesMeta } className="my-3" />

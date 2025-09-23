@@ -15,10 +15,11 @@ import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
 import isString from "../helpers/isString";
 import isNullOrEmpty from "../helpers/isNullOrEmpty";
+import enums from "../helpers/enums";
 
 const AUTH_URL = '/auth';
 const USER_SETTINGS_URL = '/userSettings';
-
+const { UserSettingSearchModeType } = enums();
 const { 
     VITE_TOKEN, 
     VITE_USER_SETTINGS 

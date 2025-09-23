@@ -14,10 +14,15 @@ import debounce from "lodash.debounce";
 import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
 import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
 
 export const NacecodesToolbar = () => {
-    const { DefaultStatusType, NacecodeOrderType } = enums();
-    const { NACECODES_OPTIONS, VITE_PAGE_SIZE } = envVariables();
+    const { 
+        DefaultStatusType,
+        NacecodeOrderType,
+        UserSettingSearchModeType,
+    } = enums();
+    const { NACECODES_OPTIONS } = envVariables();
     const {
         BUTTON_ADD_CLASS,
         BUTTON_SEARCH_CLASS,
@@ -38,20 +43,34 @@ export const NacecodesToolbar = () => {
 
     // CUSTOM HOOKS
 
-    const { ROLES, hasRole } = useAuthStore();
+    const { 
+        ROLES, 
+        hasRole,
+    } = useAuthStore();
 
     const {
         isNacecodeCreating,
         nacecodesAsync,
         nacecodeCreateAsync
     } = useNacecodesStore();
+
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: NACECODES_OPTIONS,
+        DefultOrder: NacecodeOrderType.sector,
+        itemsAsync: nacecodesAsync,
+    });
     
     // HOOKS
     
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
+        const savedSearch = getSavedSearch();
+        
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch?.text ?? '',
@@ -70,9 +89,7 @@ export const NacecodesToolbar = () => {
     // METHODS
 
     const sendSearch = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
             text: values.textInput,
             sector: values.sectorInput,
             division: values.divisionInput,
@@ -82,11 +99,9 @@ export const NacecodesToolbar = () => {
             accreditedStatus: values.accreditedStatusSelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
-            pageNumber: 1,
+            //pageNumber: 1,
         };
-
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
+        onSearch(search);
     }; // sendSearch
 
     const debouncedSearch = debounce(sendSearch, 500, {
@@ -100,37 +115,7 @@ export const NacecodesToolbar = () => {
 
     const onSearchSubmit = (values) => {
         debouncedSearch(values);
-        // const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        // const search = {
-        //     ...savedSearch,
-        //     text: values.textInput,
-        //     sector: values.sectorInput,
-        //     division: values.divisionInput,
-        //     group: values.groupInput,
-        //     class: values.classInput,
-        //     onlyOption: values.onlySelect,
-        //     status: values.statusSelect,
-        //     includeDeleted: values.includeDeletedCheck,
-        //     pageNumber: 1,
-        // };
-
-        // nacecodesAsync(search);
-        // localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
-
-    const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
-            order: NacecodeOrderType.sector,
-        };
-
-        setInitialValues(formDefaultData);
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    }; // onCleanSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">

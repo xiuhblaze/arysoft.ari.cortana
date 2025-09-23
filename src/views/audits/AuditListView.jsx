@@ -8,6 +8,7 @@ import { useAuditsStore } from '../../hooks/useAuditsStore';
 import AuditsToolBar from './components/AuditsToolBar';
 import AuditTableList from './components/AuditTableList';
 import AryPagination from '../../components/AryPagination/AryPagination';
+import AryListStatistics from '../../components/AryListStatistics/AryListStatistics';
 
 const AuditListView = () => {
 
@@ -58,11 +59,14 @@ const AuditListView = () => {
                             ) : null}
                             <AuditTableList />
                             { !!auditsMeta ? (
-                                <AryPagination
-                                    currentPage={auditsMeta.CurrentPage}
-                                    totalPages={auditsMeta.TotalPages}
-                                    onClickGoPage={onPageChange}
-                                />
+                                <>
+                                    <AryPagination
+                                        currentPage={auditsMeta.CurrentPage}
+                                        totalPages={auditsMeta.TotalPages}
+                                        onClickGoPage={onPageChange}
+                                    />
+                                    <AryListStatistics meta={ auditsMeta } className="my-3" />
+                                </>
                             ) : null}
                         </Card.Body>
                     </Card>
