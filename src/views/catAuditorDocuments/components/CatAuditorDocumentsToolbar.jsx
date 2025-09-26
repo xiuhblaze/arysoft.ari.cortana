@@ -10,6 +10,7 @@ import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Fo
 import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
 import { useStandardsStore } from '../../../hooks/useStandardsStore';
 import { useAuthStore } from '../../../hooks/useAuthStore';
+import { useViewNavigation } from '../../../hooks/useViewNavigation';
 
 const CatAuditorDocumentsToolbar = () => {
     const formDefaultData = {
@@ -27,16 +28,13 @@ const CatAuditorDocumentsToolbar = () => {
         DefaultStatusType,
         StandardOrderType,
     } = enums();
-    const {
-        CATAUDITORDOCUMENTS_OPTIONS,
-        VITE_PAGE_SIZE,
-    } = envVariables();
+    const { CATAUDITORDOCUMENTS_OPTIONS } = envVariables();
     const {
         BUTTON_ADD_CLASS,
         BUTTON_SEARCH_CLASS,
         BUTTON_CLEAR_SEARCH_CLASS,
     } = defaultCSSClasses();
-
+    
     // CUSTOM HOOKS
 
     const { ROLES, hasRole } = useAuthStore();
@@ -54,15 +52,23 @@ const CatAuditorDocumentsToolbar = () => {
         standards,
         standardsAsync,
     } = useStandardsStore();
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: CATAUDITORDOCUMENTS_OPTIONS,
+        DefultOrder: CatAuditorDocumentOrderType.documentType,
+        itemsAsync: catAuditorDocumentsAsync,
+    });
 
     // HOOKS
 
     const navigate = useNavigate();
-
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
+        const savedSearch = getSavedSearch(); // JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
@@ -95,9 +101,9 @@ const CatAuditorDocumentsToolbar = () => {
     }; // onNewItem
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
+        //const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
+        //  ...savedSearch,
             standardID: values.standardSelect,
             text: values.textInput,
             documentType: values.documentTypeSelect,
@@ -106,24 +112,24 @@ const CatAuditorDocumentsToolbar = () => {
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
-        
-        catAuditorDocumentsAsync(search);
-        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
+        onSearch(search);
+        // catAuditorDocumentsAsync(search);
+        // localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
 
-    const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
-            order: CatAuditorDocumentOrderType.documentType,
-        };
+    // const onCleanSearch = () => {
+    //     const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
+    //     const search = {
+    //         pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
+    //         pageNumber: 1,
+    //         includeDeleted: false,
+    //         order: CatAuditorDocumentOrderType.documentType,
+    //     };
 
-        setInitialValues(formDefaultData);
-        catAuditorDocumentsAsync(search);
-        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
-    }; // onCleanSearch
+    //     setInitialValues(formDefaultData);
+    //     catAuditorDocumentsAsync(search);
+    //     localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
+    // }; // onCleanSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justifiy-content-between gap-2">
@@ -261,4 +267,4 @@ const CatAuditorDocumentsToolbar = () => {
     )
 }
 
-export default CatAuditorDocumentsToolbar
+export default CatAuditorDocumentsToolbar;

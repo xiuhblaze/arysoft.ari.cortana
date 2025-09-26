@@ -24,7 +24,7 @@ import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
 import { useAuditCyclesStore } from "../../hooks/useAuditCyclesStore";
 import { useAuditCycleDocumentsStore } from "../../hooks/useAuditCycleDocumentsStore";
 
-const EditView = ({ applicantsOnly = false, ...props }) => {
+const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     const {
         URL_ORGANIZATION_FILES,
         VITE_FILES_URL,
@@ -192,4 +192,4 @@ const EditView = ({ applicantsOnly = false, ...props }) => {
     )
 }
 
-export default EditView;
+export default OrganiztionEditView;

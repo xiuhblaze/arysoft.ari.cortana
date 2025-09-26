@@ -12,13 +12,10 @@ import AryPagination from "../../components/AryPagination/AryPagination";
 import OrganizationsTableList from "./components/OrganizationsTableList";
 import OrganizationsToolbar from "./components/OrganizationsToolbar";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
+import { useViewNavigation } from "../../hooks/useViewNavigation";
 
-const ListView = () => {
-    //const navigate = useNavigate();
-    const {
-        ORGANIZATIONS_OPTIONS,
-        //VITE_PAGE_SIZE,
-    } = envVariables();
+const OrganizationsListView = () => {    
+    const { ORGANIZATIONS_OPTIONS } = envVariables();
     const { OrganizationOrderType } = enums();
     
     // CUSTOM HOOKS
@@ -29,22 +26,30 @@ const ListView = () => {
         organizationsErrorMessage,
         organizationsAsync,
     } = useOrganizationsStore();
+    const {
+        onSearch,
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: ORGANIZATIONS_OPTIONS,
+        DefultOrder: OrganizationOrderType.folioDesc,
+        itemsAsync: organizationsAsync,
+    });
 
     // HOOKS
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-        const newSearch = {
-            // pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
-            pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
-        };
+        // const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
+        // const newSearch = {
+        //     // pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
+        //     pageNumber: 1,
+        //     order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
+        // };
 
-        const search = !!savedSearch ? savedSearch : newSearch;
+        // const search = !!savedSearch ? savedSearch : newSearch;
 
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-
+        // organizationsAsync(search);
+        // localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
+        onSearch();
         setNavbarTitle(dispatch, null);
     }, []);
 
@@ -100,7 +105,7 @@ const ListView = () => {
                                     <AryPagination
                                         currentPage={organizationsMeta.CurrentPage}
                                         totalPages={organizationsMeta.TotalPages}
-                                        onClickGoPage={onClickGoPage}
+                                        onClickGoPage={onPageChange}
                                         className="mt-2"
                                     />
                                     <AryListStatistics meta={organizationsMeta} className="my-3" />
@@ -114,4 +119,4 @@ const ListView = () => {
     )
 }
 
-export default ListView
+export default OrganizationsListView;

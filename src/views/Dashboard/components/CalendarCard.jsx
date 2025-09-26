@@ -32,6 +32,7 @@ import enums from "../../../helpers/enums";
 import auditStepProps from "../../audits/helpers/auditStepProps";
 import auditStatusProps from "../../audits/helpers/auditStatusProps";
 import getInitialRange from "../helpers/getInitialRange";
+import { useAuthStore } from "../../../hooks/useAuthStore";
 
 const locales = {
     'en-US': enUS,
@@ -55,10 +56,15 @@ const CalendarCard = () => {
     const {
         AuditStatusType,
         AuditOrderType,
-        DefaultStatusType
+        DefaultStatusType,
+        UserSettingSearchModeType,
     } = enums();
 
     // CUSTOM HOOKS
+
+    const {
+        userSettings
+    } = useAuthStore();
 
     const {
         isAuditsLoading,
@@ -76,6 +82,11 @@ const CalendarCard = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     useEffect(() => {
+
+        if (!!userSettings && userSettings?.searchMode == UserSettingSearchModeType.onScreen) {
+            localStorage.removeItem(DASHBOARD_OPTIONS);
+        }
+
         const {start, end} = getInitialRange(lastview);
         const savedSearch = JSON.parse(localStorage.getItem(DASHBOARD_OPTIONS)) || null;
         const newSearch = {
@@ -84,7 +95,8 @@ const CalendarCard = () => {
             endDate: end,
             pageSize: 0,
             pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : AuditOrderType.date,
+            //order: savedSearch?.order ? savedSearch.order : AuditOrderType.date,
+            order: AuditOrderType.date,
         };
         const search = !!savedSearch ? savedSearch : newSearch;
         

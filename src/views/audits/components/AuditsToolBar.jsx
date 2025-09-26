@@ -1,22 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react'
-import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
-import { useAuditNavigation } from '../hooks/useAuditNavigation';
-import { useAuditsStore } from '../../../hooks/useAuditsStore';
-import { Form, Formik } from 'formik';
-import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect, useRef, useState } from 'react'
 import { faSearch, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
-import AryFormDebug from '../../../components/Forms/AryFormDebug';
-import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
-import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
-import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Form, Formik } from 'formik';
 import Select from 'react-select';
+
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import { useAuditorsStore } from '../../../hooks/useAuditorsStore';
+import { useAuditsStore } from '../../../hooks/useAuditsStore';
+import { useAuthStore } from '../../../hooks/useAuthStore';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
+import { useStandardsStore } from '../../../hooks/useStandardsStore';
+import { useViewNavigation } from '../../../hooks/useViewNavigation';
+import defaultCSSClasses from '../../../helpers/defaultCSSClasses';
 import enums from '../../../helpers/enums';
+import envVariables from '../../../helpers/envVariables';
 import getSelectSearchOptions from '../../../helpers/getSelectSearchOptions';
 import getSelectSearchOptionSelected from '../../../helpers/getSelectSearchOptionSelected';
-import { useAuthStore } from '../../../hooks/useAuthStore';
+
+// import AryFormDebug from '../../../components/Forms/AryFormDebug';
 
 const AuditsToolBar = () => {
+    const { AUDITS_OPTIONS } = envVariables();
+    const {
+        AuditOrderType,
+        AuditorOrderType,
+        AuditStatusType,
+        OrganizationOrderType,
+        StandardOrderType,
+    } = enums();
+    const {
+        BUTTON_SEARCH_CLASS,
+        BUTTON_CLEAR_SEARCH_CLASS,
+    } = defaultCSSClasses();
 
     const formDefaultValues = {
         organizationSelect: '',
@@ -28,19 +43,8 @@ const AuditsToolBar = () => {
         statusSelect: '',
         includeDeletedCheck: false,
     };
-    const {
-        AuditStatusType,
-        AuditorOrderType,
-        OrganizationOrderType,
-        StandardOrderType,
-    } = enums();
 
-    const {
-        BUTTON_SEARCH_CLASS,
-        BUTTON_CLEAR_SEARCH_CLASS,
-    } = defaultCSSClasses();
-
-    const customSelectStyles = {
+    const customSelectStyles = { // para el select, se muestre sobre otros elementos
         menu: (provided, state) => ({
             ...provided,
             zIndex: 1000,
@@ -52,13 +56,8 @@ const AuditsToolBar = () => {
     const { ROLES, hasRole } = useAuthStore();
 
     const {
-        getSavedSearch,
-        onSearch,
-        onCleanSearch,
-    } = useAuditNavigation();
-
-    const {
-        isAuditsLoading
+        isAuditsLoading,
+        auditsAsync,
     } = useAuditsStore();
 
     const {
@@ -80,6 +79,16 @@ const AuditsToolBar = () => {
         standardsAsync
     } = useStandardsStore();
 
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+     } = useViewNavigation({
+        LS_OPTIONS: AUDITS_OPTIONS,
+        DefultOrder: AuditOrderType.dateDesc,
+        itemsAsync: auditsAsync,
+    });
+
     // HOOKS
 
     const formikRef = useRef(null);
@@ -87,11 +96,9 @@ const AuditsToolBar = () => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
 
     useEffect(() => {
-        //console.log('AuditsToolBar.useEffect[]:');
         const savedSearch = getSavedSearch();
 
         if (!!savedSearch) {
-            //console.log('useEffect[]: savedSearch', savedSearch.text ?? '');
             setInitialValues({
                 organizationSelect: savedSearch.organizationID ?? '',
                 auditorSelect: savedSearch.auditorID ?? '',
@@ -190,16 +197,24 @@ const AuditsToolBar = () => {
                                                     formik.setFieldValue('auditorSelect', selectedValue);
                                                 }}
                                             >
-                                                <option value="">(all auditors)</option>
                                                 {
-                                                    !!auditors && auditors.length > 0 && auditors.map((item) => 
-                                                        <option
-                                                            key={item.ID}
-                                                            value={item.ID}
-                                                            className="text-capitalize"
-                                                        >
-                                                            {item.FullName}
-                                                        </option>
+                                                    isAuditorsLoading ? (
+                                                        <option value="">(loading...)</option>
+                                                    ) : (
+                                                        <>
+                                                            <option value="">(all auditors)</option>
+                                                            {
+                                                                !!auditors && auditors.length > 0 && auditors.map((item) => 
+                                                                    <option
+                                                                        key={item.ID}
+                                                                        value={item.ID}
+                                                                        className="text-capitalize"
+                                                                    >
+                                                                        {item.FullName}
+                                                                    </option>
+                                                                )
+                                                            }
+                                                        </>
                                                     )
                                                 }
                                             </AryFormikSelectInput>
@@ -212,16 +227,24 @@ const AuditsToolBar = () => {
                                                     formik.setFieldValue('standardSelect', selectedValue);
                                                 }}
                                             >
-                                                <option value="">(all standards)</option>
                                                 {
-                                                    !!standards && standards.length > 0 && standards.map(item =>
-                                                        <option
-                                                            key={item.ID}
-                                                            value={item.ID}
-                                                            className="text-capitalize"
-                                                        >
-                                                            {item.Name}
-                                                        </option>
+                                                    isStandardsLoading ? (
+                                                        <option value="">(loading...)</option>
+                                                    ) : (
+                                                        <>
+                                                            <option value="">(all standards)</option>
+                                                            {
+                                                                !!standards && standards.length > 0 && standards.map(item =>
+                                                                    <option
+                                                                        key={item.ID}
+                                                                        value={item.ID}
+                                                                        className="text-capitalize"
+                                                                    >
+                                                                        {item.Name}
+                                                                    </option>
+                                                                )
+                                                            }
+                                                        </>
                                                     )
                                                 }
                                             </AryFormikSelectInput>
@@ -294,7 +317,10 @@ const AuditsToolBar = () => {
                                 </div>
                                 <div className="d-flex justify-content-between gap-2">
                                     <div className="d-grid d-md-block flex-grow-1 ps-md-2">
-                                        <button type="submit" className={ BUTTON_SEARCH_CLASS }>
+                                        <button type="submit"
+                                            className={ BUTTON_SEARCH_CLASS }
+                                            disabled={ isAuditsLoading }
+                                        >
                                             <FontAwesomeIcon icon={faSearch} className="me-1" />
                                             Search
                                         </button>

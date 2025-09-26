@@ -13,23 +13,15 @@ import { useADCConceptsStore } from '../../hooks/useADCConceptsStore';
 import ADCConceptTableList from './components/ADCConceptTableList';
 import AryPagination from '../../components/AryPagination/AryPagination';
 import ADCConceptToolBar from './components/ADCConceptToolBar';
+import { useViewNavigation } from '../../hooks/useViewNavigation';
 
 const ADCConceptListView = () => {
-
-    const {
-        ADCCONCEPTS_OPTIONS
-    } = envVariables();
-
-    const {
-        ADCConceptOrderType,
-    } = enums();
-
-    const navigate = useNavigate();
+    const { ADCCONCEPTS_OPTIONS } = envVariables();
+    const { ADCConceptOrderType } = enums();
 
     // CUSTOM HOOKS
 
     const [controller, dispatch] = useArysoftUIController();
-
     const {
         adcConcept,
         adcConceptCreatedOk,
@@ -38,10 +30,18 @@ const ADCConceptListView = () => {
         adcConceptsAsync
     } = useADCConceptsStore();
 
+    // const {
+    //     onSearch,
+    //     onPageChange,
+    // } = useModuleNavigation(adcConceptsAsync, ADCCONCEPTS_OPTIONS, ADCConceptOrderType.standard);
     const {
         onSearch,
-        onPageChange,
-    } = useModuleNavigation(adcConceptsAsync, ADCCONCEPTS_OPTIONS, ADCConceptOrderType.standard);
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: ADCCONCEPTS_OPTIONS,
+        DefultOrder: ADCConceptOrderType.standard,
+        itemsAsync: adcConceptsAsync,
+    });
 
     // HOOKS
 
@@ -50,11 +50,11 @@ const ADCConceptListView = () => {
         setNavbarTitle(dispatch, null);
     }, []);
 
-    useEffect(() => {        
-        if (!!adcConceptCreatedOk) {
-            navigate(`/adc-concepts/${adcConcept.ID}`);
-        }
-    }, [adcConceptCreatedOk]);
+    // useEffect(() => {        
+    //     if (!!adcConceptCreatedOk) {
+    //         navigate(`/adc-concepts/${adcConcept.ID}`);
+    //     }
+    // }, [adcConceptCreatedOk]);
 
     useEffect(() => {
         if (!!adcConceptsErrorMessage) {

@@ -1,38 +1,26 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
-import envVariables from "../../helpers/envVariables";
 import { setNavbarTitle, useArysoftUIController } from "../../context/context";
-import enums from "../../helpers/enums";
-
-import AryPagination from "../../components/AryPagination/AryPagination";
-import NaceTableList from "./components/NaceTableList";
-import NacecodesToolbar from "./components/NacecodesToolbar";
-import useNacecodesStore from "../../hooks/useNaceCodesStore";
-import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 import { useViewNavigation } from "../../hooks/useViewNavigation";
-import { useAuthStore } from "../../hooks/useAuthStore";
+import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
+import AryPagination from "../../components/AryPagination/AryPagination";
+import enums from "../../helpers/enums";
+import envVariables from "../../helpers/envVariables";
+import NacecodesToolbar from "./components/NacecodesToolbar";
+import NaceTableList from "./components/NaceTableList";
+import useNacecodesStore from "../../hooks/useNaceCodesStore";
 
 export const NacecodesListView = () => {
-    const navigate = useNavigate();
     const { NACECODES_OPTIONS } = envVariables();
-    const { 
-        NacecodeOrderType,
-        UserSettingSearchModeType,
-    } = enums();
+    const { NacecodeOrderType } = enums();
 
     // CUSTOM HOOKS
 
-    const [controller, dispatch] = useArysoftUIController();
-    const {
-        userSettings,
-    } =useAuthStore();
+    const [controller, dispatch] = useArysoftUIController();    
     const {
         nacecodesMeta,
-        nacecode,
-        nacecodeCreatedOk,
         nacecodeErrorMessage,
         nacecodesAsync,
     } = useNacecodesStore();
@@ -51,12 +39,6 @@ export const NacecodesListView = () => {
         onSearch();
         setNavbarTitle(dispatch, null);
     }, []);
-
-    useEffect(() => {
-        if (nacecodeCreatedOk) {
-            navigate(`/nace-codes/${nacecode.ID}`);
-        }
-    }, [nacecodeCreatedOk]);
 
     useEffect(() => {
         if (!!nacecodeErrorMessage) {

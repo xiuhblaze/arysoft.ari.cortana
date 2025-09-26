@@ -23,21 +23,20 @@ export const useViewNavigation = ({
     const [currentPageSize, setCurrentPageSize] = useState(userSettings?.pageSize ?? VITE_PAGE_SIZE);
 
     useEffect(() => {
-        console.log('useViewNavigation.useEffect[]: called');
-        if (userSettings?.searchMode == UserSettingSearchModeType.onScreen) {
+        // console.log('useViewNavigation.useEffect[]: called');        
+        if (!!userSettings && userSettings?.searchMode == UserSettingSearchModeType.onScreen) {
             localStorage.removeItem(LS_OPTIONS);
         }
     }, []);
     
-
     useEffect(() => {
-        //console.log('useEffect[]: currentPageSize', currentPageSize);
-        if (!!userSettings.pageSize && userSettings.pageSize !== currentPageSize) {
-            //console.log('useEffect[]: userSettings.pageSize', userSettings.pageSize);
+        
+        if (!userSettings) return;
+        if (userSettings?.pageSize !== currentPageSize) {
             onSearch();
             setCurrentPageSize(userSettings.pageSize);
         }
-    }, [userSettings.pageSize]);
+    }, [userSettings?.pageSize]);
     
     // METHODS
 
@@ -93,10 +92,11 @@ export const useViewNavigation = ({
         localStorage.setItem(LS_OPTIONS, JSON.stringify(search));
     }; // onSearch
 
-    const onCleanSearch = () => {
+    const onCleanSearch = (customSearch) => {
         //const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
         const search = {
             //pageSize: savedSearch?.pageSize ?? userSettings?.pageSize ?? VITE_PAGE_SIZE,
+            ...customSearch,
             pageSize: userSettings?.pageSize ?? VITE_PAGE_SIZE,
             pageNumber: 1,
             order: DefultOrder,

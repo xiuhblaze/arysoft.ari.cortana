@@ -129,7 +129,7 @@ export const Configurator = () => {
     const onFormSubmit = (values) => {
         const settings = {
             pageSize: Number(values.pageSizeInput),
-            searchMode: values.searchModeSelect,
+            searchMode: Number(values.searchModeSelect),
         };
         
         if (!!authUserSettings) {
@@ -216,7 +216,7 @@ export const Configurator = () => {
                                         >
                                             <option value={UserSettingSearchModeType.onScreen}>On screen</option>
                                             <option value={UserSettingSearchModeType.onSession}>On session</option>
-                                            <option value={UserSettingSearchModeType.indefinitely}>Indefinitely</option>
+                                            {/* <option value={UserSettingSearchModeType.indefinitely}>Indefinitely</option> */}
                                         </AryFormikSelectInput>
                                     </Col>
                                 </Row>

@@ -13,6 +13,7 @@ import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
 
 const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     const formDefaultData = {
@@ -60,6 +61,16 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
         standards,
         standardsAsync,
     } = useStandardsStore();
+
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: SEARCH_OPTIONS,
+        DefultOrder: OrganizationOrderType.folioDesc,
+        itemsAsync: organizationsAsync,
+    });
     
     // HOOKS
     
@@ -69,7 +80,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     const [statusOptions, setStatusOptions] = useState(null);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        const savedSearch = getSavedSearch(); // JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
@@ -117,9 +128,9 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     };
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        //const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
+          //  ...savedSearch,
             folio: values.folioInput,
             text: values.textInput,
             standardID: values.standardSelect,
@@ -130,27 +141,33 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
+        onSearch(search);
+        // organizationsAsync(search);
+        // localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
+    }; // onSearchSubmit
 
-        organizationsAsync(search);
-        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
-    };
+    const onCleanSearchLocal = () => {
+        // const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        // const search = {
+        //     pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
+        //     pageNumber: 1,
+        //     includeDeleted: false,
+        //     status: applicantsOnly
+        //         ? OrganizationStatusType.applicant
+        //         : savedSearch?.status ?? '',
+        //     order: OrganizationOrderType.folioDesc,
+        // };
 
-    const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
+        // setInitialValues(formDefaultData);
+        // organizationsAsync(search);
+        // localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
+        const savedSearch = getSavedSearch();
+        onCleanSearch({
             status: applicantsOnly
                 ? OrganizationStatusType.applicant
                 : savedSearch?.status ?? '',
-            order: OrganizationOrderType.folioDesc,
-        };
-
-        setInitialValues(formDefaultData);
-        organizationsAsync(search);
-        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
-    };
+        });
+    }; // onCleanSearchLocal
 
     return (
         <div {...props} className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -287,8 +304,8 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                                     <div className="d-grid d-md-block ps-md-2">
                                         <button type="button" 
                                             className={ BUTTON_CLEAR_SEARCH_CLASS }
-                                            onClick={(values) => {
-                                                onCleanSearch(values);
+                                            onClick={() => {
+                                                onCleanSearchLocal();
                                                 formik.resetForm(initialValues);
                                         }}>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />

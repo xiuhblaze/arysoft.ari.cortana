@@ -1,26 +1,24 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
-
-import envVariables from "../../../helpers/envVariables";
-import enums from "../../../helpers/enums";
-
-import useNacecodesStore from "../../../hooks/useNaceCodesStore";
-import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
-import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import debounce from "lodash.debounce";
-import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
-import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
+
+import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 import { useAuthStore } from "../../../hooks/useAuthStore";
 import { useViewNavigation } from "../../../hooks/useViewNavigation";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
+import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
+import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
+import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 
 export const NacecodesToolbar = () => {
     const { 
         DefaultStatusType,
         NacecodeOrderType,
-        UserSettingSearchModeType,
     } = enums();
     const { NACECODES_OPTIONS } = envVariables();
     const {
@@ -50,6 +48,8 @@ export const NacecodesToolbar = () => {
 
     const {
         isNacecodeCreating,
+        nacecodeCreatedOk,
+        nacecode,
         nacecodesAsync,
         nacecodeCreateAsync
     } = useNacecodesStore();
@@ -65,7 +65,8 @@ export const NacecodesToolbar = () => {
     });
     
     // HOOKS
-    
+
+    const navigate = useNavigate();
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
@@ -86,7 +87,18 @@ export const NacecodesToolbar = () => {
         }
     }, []);
 
+    useEffect(() => {
+
+        if (nacecodeCreatedOk) {
+            navigate(`/nace-codes/${nacecode.ID}`);
+        }
+    }, [nacecodeCreatedOk]);
+    
     // METHODS
+
+    const onNewItem = () => {
+        nacecodeCreateAsync();
+    }; // onNewItem
 
     const sendSearch = (values) => {
         const search = {
@@ -107,12 +119,8 @@ export const NacecodesToolbar = () => {
     const debouncedSearch = debounce(sendSearch, 500, {
         leading: true,
         trailing: false,
-    });
-     
-    const onNewItem = () => {
-        nacecodeCreateAsync();
-    };
-
+    }); // debouncedSearch
+    
     const onSearchSubmit = (values) => {
         debouncedSearch(values);
     }; // onSearchSubmit
