@@ -198,8 +198,9 @@ export const useAuditCycleStandardsStore = () => {
         }
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
-            console.log(resp);
+            await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
+            //const resp = await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
+            //console.log(resp);
             dispatch(isAuditCycleStandardDeleted());
         } catch (error) {
             const message = getError(error);

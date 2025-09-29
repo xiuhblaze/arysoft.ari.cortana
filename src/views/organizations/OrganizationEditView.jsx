@@ -23,6 +23,10 @@ import OrganizationStandardsCard from "./components/OrganizationStandardsCard";
 import AuditCyclesCard from "../auditCycles/components/AuditCyclesCard";
 import { useAuditCyclesStore } from "../../hooks/useAuditCyclesStore";
 import { useAuditCycleDocumentsStore } from "../../hooks/useAuditCycleDocumentsStore";
+import OrganizationModalEditItem from "./components/OrganizationModalEditItem";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     const {
@@ -37,6 +41,7 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     
     const [controller, dispatch] = useArysoftUIController();
     
+    const { ROLES, hasRole } = useAuthStore();
     const {
         isOrganizationLoading,
         organization,
@@ -59,6 +64,7 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     const { id } = useParams();
 
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
 
@@ -89,6 +95,15 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
 
     const updatePhotoPreview = (value) => {
         setPhotoPreview(value);
+    };
+
+    const onShowModal = () => {
+        console.log('onShowModal');
+        setShowModal(true);
+    };
+
+    const onCloseModal = () => {
+        setShowModal(false);
     };
 
     return (
@@ -140,6 +155,18 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                                 !!organization && 
                                 <Status value={organization.Status} />
                             }
+                            {
+                                !!organization && 
+                                (hasRole(ROLES.admin) || hasRole(ROLES.editor) || hasRole(ROLES.auditor)) ?
+                                <button 
+                                    className="btn btn-link h4 py-0 ps-4 pe-0 mb-0" 
+                                    onClick={onShowModal}
+                                    title="Edit organization"
+                                >
+                                    <FontAwesomeIcon icon={faEdit} className="text-dark me-2" />
+                                </button>
+                                : null
+                            }
                         </div>
                     </div>
                 </div>
@@ -150,6 +177,10 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                         <ViewLoading />
                     ) : !!organization && (
                         <>
+                            <OrganizationModalEditItem
+                                show={showModal}
+                                onHide={onCloseModal}
+                            />
                             <Row>
                                 <Col xs="12" sm="6" xxl="6">
                                     <OrganizationEditCard
