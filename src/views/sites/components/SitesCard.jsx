@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, ListGroup } from 'react-bootstrap'
 import { useSitesStore } from '../../../hooks/useSiteStore'
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore'
 import { ViewLoading } from '../../../components/Loaders'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBuilding, faLocationDot, faLocationPin } from '@fortawesome/free-solid-svg-icons'
+import { faBuilding, faCity, faLocationDot, faLocationPin } from '@fortawesome/free-solid-svg-icons'
 import EditSiteModal from './EditSiteModal'
 import enums from '../../../helpers/enums'
 import Swal from 'sweetalert2'
@@ -69,7 +69,10 @@ const SitesCard = ({ readOnly = false, ...props }) => {
         <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
-                    <h6>Sites</h6>
+                    <h5>
+                        <FontAwesomeIcon icon={ faCity } className="text-dark me-2" />
+                        Sites
+                    </h5>
                     {
                         !readOnly && <EditSiteModal />
                     }

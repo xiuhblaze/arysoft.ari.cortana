@@ -4,7 +4,7 @@ import { setNavbarTitle, useArysoftUIController } from "../../context/context";
 import Swal from 'sweetalert2';
 
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
-import { Col, Container, Image, Row } from "react-bootstrap";
+import { Col, Container, Image, ListGroup, Row } from "react-bootstrap";
 import { ViewLoading } from "../../components/Loaders";
 import Status from "./components/Status";
 import organizationStatusProps from "./helpers/organizationStatusProps";
@@ -12,7 +12,7 @@ import organizationStatusProps from "./helpers/organizationStatusProps";
 import ContactsCard from "../contacts/components/ContactsCard";
 import SitesCard from "../sites/components/SitesCard";
 
-import imgHeaderBackground from '../../assets/img/bgWavesWhite.jpg';
+import imgHeaderBackground from '../../assets/img/bgminimal06.jpg';
 import defaultPhoto from '../../assets/img/icoOrganizationDefault.jpg';
 import primaryPhoto from '../../assets/img/icoOrganizationPrimary.jpg';
 import envVariables from "../../helpers/envVariables";
@@ -25,8 +25,11 @@ import { useAuditCyclesStore } from "../../hooks/useAuditCyclesStore";
 import { useAuditCycleDocumentsStore } from "../../hooks/useAuditCycleDocumentsStore";
 import OrganizationModalEditItem from "./components/OrganizationModalEditItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faGlobe, faNoteSticky, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "../../hooks/useAuthStore";
+import getRandomNumber from "../../helpers/getRandomNumber";
+import getRandomBackgroundImage from "../../helpers/getRandomBackgroundImage";
+import isNullOrEmpty from "../../helpers/isNullOrEmpty";
 
 const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     const {
@@ -34,6 +37,7 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
         VITE_FILES_URL,
     } = envVariables();
     const { 
+        DefaultStatusType,
         OrganizationStatusType
     } = enums();
 
@@ -63,7 +67,8 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     
     const { id } = useParams();
 
-    const [photoPreview, setPhotoPreview] = useState(null);
+    // const [photoPreview, setPhotoPreview] = useState(null);
+    const [backgroundImage, setBackgroundImage] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -82,6 +87,12 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
     useEffect(() => {
         if (!!organization) {
             setNavbarTitle(dispatch, organization.Name);
+            getRandomBackgroundImage().then(image => setBackgroundImage(image));
+
+            if (organization.Status == OrganizationStatusType.nothing) {
+                //  console.log('es nuevo, mostrar la modal');
+                setShowModal(true);
+            }
         }
     }, [organization]);
 
@@ -93,12 +104,12 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
 
     // METHODS
 
-    const updatePhotoPreview = (value) => {
-        setPhotoPreview(value);
-    };
+    // const updatePhotoPreview = (value) => {
+    //     setPhotoPreview(value);
+    // };
 
     const onShowModal = () => {
-        console.log('onShowModal');
+        // console.log('onShowModal');
         setShowModal(true);
     };
 
@@ -112,8 +123,10 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                 <div
                     className="page-header min-height-200 border-radius-lg"
                     style={{
-                        background: `url(${imgHeaderBackground})`,
-                        backgroundPositionY: '50%'
+                        backgroundImage: `url(${backgroundImage ?? imgHeaderBackground})`,
+                        backgroundPosition: 'center 50%',
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
                     }}
                 >
                     <span className={`mask bg-gradient-${isOrganizationLoading || !organization ? 'dark' : organizationStatusProps[organization.Status].bgColor} opacity-6`} />
@@ -123,13 +136,11 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                         <div className="d-flex justify-content-start align-items-center gap-3"> 
                             <div className="avatar avatar-xl position-relative">
                                 <Image
-                                    src={!!photoPreview
-                                        ? photoPreview
-                                        : !!organization && !!organization.LogoFile
-                                            ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}`
-                                            : applicantsOnly
-                                                ? primaryPhoto
-                                                : defaultPhoto
+                                    src={!!organization && !!organization.LogoFile
+                                        ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/${organization.LogoFile}?v=${getRandomNumber(4)}`
+                                        : applicantsOnly
+                                            ? primaryPhoto
+                                            : defaultPhoto
                                     }
                                     className="border-radius-md"
                                     alt="Profile photo"
@@ -143,11 +154,56 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                                           </span> 
                                         : '' 
                                     }
-                                    {!!organization ? organization.Name : 'organization...'}
+                                    { !!organization?.FolderFolio 
+                                        ? <span className="text-secondary me-1" title="Folder folio">
+                                            [{organization.FolderFolio.toString().padStart(2, '0')}]
+                                          </span> 
+                                        : ''
+                                    } 
+                                    {!!organization ? organization.Name : 'loading...'}
                                 </h5>
-                                <p className="mb-0 font-weight-bold text-sm">
-                                    {!!organization ? organization.LegalEntity : ''}
-                                </p>
+                                <div className="mb-0 font-weight-bold text-sm">
+                                    {
+                                        !!organization && !!organization.Companies
+                                        ? <div className="d-flex flex-wrap flex-column text-xs gap-1 mb-0">
+                                            {
+                                                organization.Companies.filter(c => c.Status == DefaultStatusType.active || c.Status == DefaultStatusType.inactive)
+                                                    .map(c => 
+                                                        <span 
+                                                            key={c.ID} 
+                                                            className={`text-wrap ${c.Status != DefaultStatusType.active ? 'text-secondary' : ''} me-1`}
+                                                            title={c.Status != DefaultStatusType.active ? 'Inactive' : 'Active'}
+                                                        >
+                                                            {c.Name} - {c.LegalEntity}
+                                                            { c.COID && <span className="text-xs text-secondary ms-1" title="COID">({c.COID})</span> }
+                                                        </span>
+                                                    )
+                                            }
+                                        </div>
+                                        : null
+                                    }
+                                </div>
+                                {
+                                    !!organization ?
+                                    <ListGroup horizontal className="border-0">
+                                        <ListGroup.Item className="text-xs border-0 bg-transparent px-2 py-1">
+                                            <FontAwesomeIcon icon={ faGlobe } className="me-1" fixedWidth />
+                                            { isNullOrEmpty(organization.Website) ? '(no website)' : organization.Website }
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="text-xs border-0 bg-transparent px-2 py-1">
+                                            <FontAwesomeIcon icon={ faPhone } className="me-1" fixedWidth />
+                                            { isNullOrEmpty(organization.Phone) ? '(no phone)' : organization.Phone }
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="text-xs border-0 bg-transparent px-2 py-1">
+                                            <FontAwesomeIcon icon={ faNoteSticky } 
+                                                className={`me-1 ${ !!organization.Notes && organization.Notes.length > 0 ? 'text-warning' : 'text-secondary' }`} 
+                                                fixedWidth 
+                                                title={ !!organization.Notes && organization.Notes.length > 0 ? 'Notes' : 'No notes' }
+                                            />
+                                        </ListGroup.Item>
+                                    </ListGroup> 
+                                    : null
+                                }
                             </div>
                         </div>
                         <div>
@@ -182,39 +238,39 @@ const OrganiztionEditView = ({ applicantsOnly = false, ...props }) => {
                                 onHide={onCloseModal}
                             />
                             <Row>
-                                <Col xs="12" sm="6" xxl="6">
-                                    <OrganizationEditCard
+                                <Col xs="12" sm="8" xxl="8">
+                                    {/* <OrganizationEditCard
                                         updatePhotoPreview={updatePhotoPreview}
                                         className="h-100"
-                                    />
+                                    /> */}
+                                    <AuditCyclesCard organizationID={organization.ID} />
                                 </Col>
-                                <Col xs="12" sm="6" xxl="6">
+                                <Col xs="12" sm="4" xxl="4">
                                     <Row className="mb-4">
                                         <Col xs="12">
                                             <OrganizationStandardsCard />
                                         </Col>
                                     </Row>
-                                    <Row>
+                                    <Row className="mb-4">
                                         <Col xs="12">
-                                            <AuditCyclesCard organizationID={organization.ID} />
+                                            <ContactsCard />
+                                        </Col>
+                                    </Row>
+                                    <Row className="mb-4">
+                                        <Col xs="12">
+                                            <SitesCard />
                                         </Col>
                                     </Row>
                                 </Col>
                             </Row>
-                            <Row className="mt-4">
+                            {/* <Row className="mt-4">
                                 <Col xs={12} sm={applicantsOnly ? 6 : 4}>
                                     <ContactsCard />
                                 </Col>
                                 <Col xs={12} sm={applicantsOnly ? 6 : 4}>
                                     <SitesCard />
-                                </Col>
-                                {/* {
-                                    !applicantsOnly &&
-                                    <Col xs={12} sm={4}>
-                                        <CertificatesCard />
-                                    </Col>
-                                } */}
-                            </Row>
+                                </Col>                                
+                            </Row> */}
                         </>
                     )
                 }

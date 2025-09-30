@@ -1,0 +1,13 @@
+/* ARI CHANGELOG
+******************************************************************************/
+
+.changelog-content * {
+  /* font-size: 100% !important; */
+}
+
+.changelog-content h1 { font-size: 1.8rem !important; }
+.changelog-content h2 { font-size: 1.5rem !important; }
+.changelog-content h3 { font-size: 1.2rem !important; }
+.changelog-content p { font-size: 0.85rem !important; }
+.changelog-content li { font-size: 0.85rem !important; }
+.changelog-content code { font-size: 0.8rem !important; }

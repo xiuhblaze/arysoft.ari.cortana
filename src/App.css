@@ -84,6 +84,17 @@ option {
   position: relative !important;  
 }
 
+.ari-form-control-warning {
+  border-color: #ffc107 !important;
+  background-color: #fff3cd !important;
+}
+
+.ari-form-control-warning:focus {
+  border-color: #ffb300;
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+  background-color: #fff3cd;
+}
+
 /* ARI Modal
 ******************************************************************************/
 
