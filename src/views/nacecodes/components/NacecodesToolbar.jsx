@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -67,6 +67,8 @@ export const NacecodesToolbar = () => {
     // HOOKS
 
     const navigate = useNavigate();
+    const formikRef = useRef(null);
+
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
@@ -125,6 +127,13 @@ export const NacecodesToolbar = () => {
         debouncedSearch(values);
     }; // onSearchSubmit
 
+    const handleClearSearch = () => {
+        setInitialValues(formDefaultData);
+        formikRef.current.resetForm(initialValues);
+
+        onCleanSearch();
+    }; // handleClearSearch
+
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
             <div>
@@ -143,6 +152,7 @@ export const NacecodesToolbar = () => {
                     initialValues={initialValues}
                     onSubmit={onSearchSubmit}
                     enableReinitialize
+                    innerRef={formikRef}
                 >
                     {(formik) => (
                         <Form>
@@ -239,10 +249,7 @@ export const NacecodesToolbar = () => {
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={ handleClearSearch }>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>

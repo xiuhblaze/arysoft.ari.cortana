@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { useViewNavigation } from "../../hooks/useViewNavigation";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 import AryPagination from "../../components/AryPagination/AryPagination";
@@ -38,6 +38,7 @@ export const NacecodesListView = () => {
     useEffect(() => {
         onSearch();
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {

@@ -147,16 +147,16 @@ export const useAuthStore = () => {
                 // localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(allSettings));
                 // dispatch(setUserSettings(allSettings));
                 switch (settings.searchMode) {
-                    case UserSettingSearchModeType.onSession:                        
-                        console.log('onSession - borrar localStorage');
+                    case UserSettingSearchModeType.onScreen:
+                        //console.log('onScreen - borrar localStorage y no guardar en localStorage');
                         localStorage.clear();
                         break;
-                    case UserSettingSearchModeType.onScreen:
-                        console.log('onScreen - borrar localStorage y no guardar en localStorage');
+                    case UserSettingSearchModeType.onSession:                        
+                        //console.log('onSession - borrar localStorage');
                         localStorage.clear();
                         break;
                     case UserSettingSearchModeType.indefinitely:
-                        console.log('indefinitely - utilizar como está actualmente');
+                        //console.log('indefinitely - utilizar como está actualmente');
                         break;
                 }
             } else {

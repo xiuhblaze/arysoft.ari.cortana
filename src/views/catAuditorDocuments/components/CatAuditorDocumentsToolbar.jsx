@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import enums from '../../../helpers/enums';
 import envVariables from '../../../helpers/envVariables';
 import { useCatAuditorDocumentsStore } from '../../../hooks/useCatAuditorDocumentsStore';
@@ -65,6 +65,7 @@ const CatAuditorDocumentsToolbar = () => {
     // HOOKS
 
     const navigate = useNavigate();
+    const formikRef = useRef(null);
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
@@ -117,6 +118,13 @@ const CatAuditorDocumentsToolbar = () => {
         // localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
 
+    const handleClearSearch = () => {
+        setInitialValues(formDefaultData);
+        formikRef.current.resetForm(initialValues);
+
+        onCleanSearch();
+    }; // handleClearSearch
+
     // const onCleanSearch = () => {
     //     const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
     //     const search = {
@@ -149,6 +157,7 @@ const CatAuditorDocumentsToolbar = () => {
                     initialValues={ initialValues }
                     onSubmit={ onSearchSubmit }
                     enableReinitialize
+                    innerRef={formikRef}
                 >
                     { formik => (
                         <Form>
@@ -248,12 +257,7 @@ const CatAuditorDocumentsToolbar = () => {
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS}
-                                            onClick={ (values) => {
-                                                onCleanSearch(values);
-                                                formik.resetForm(initialValues);
-                                            }}
-                                        >
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={ handleClearSearch }>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>

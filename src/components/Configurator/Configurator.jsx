@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faClose, faCog, faSave } from "@fortawesome/free-solid-svg-icons"
-import { Button, Card, Col, Row } from "react-bootstrap"
+import { Button, Card, Col, Container, Row } from "react-bootstrap"
 import * as Yup from 'yup';
 
 import {
@@ -99,7 +99,7 @@ export const Configurator = () => {
 
                 setUserSettingsLocalStorage(allSettings);
                 userSettingClear();
-                updateLocalStorage(allSettings);
+                //updateLocalStorage(allSettings);
             }
             onCloseConfigurator();
         }
@@ -117,7 +117,7 @@ export const Configurator = () => {
 
                 setUserSettingsLocalStorage(allSettings);
                 userSettingClear();
-                updateLocalStorage(allSettings);
+                //updateLocalStorage(allSettings);
             }
             onCloseConfigurator();
         }
@@ -150,20 +150,20 @@ export const Configurator = () => {
         }
     }; // onFormSubmit
 
-    const updateLocalStorage = (settings) => {
+    // const updateLocalStorage = (settings) => {
 
-        switch (settings.searchMode) {
-            case UserSettingSearchModeType.onSession:
-                console.log('onSession - borrar localStorage');
-                break;
-            case UserSettingSearchModeType.onScreen:
-                console.log('onScreen - borrar localStorage y no guardar en localStorage');
-                break;
-            case UserSettingSearchModeType.indefinitely:
-                console.log('indefinitely - utilizar como está actualmente');
-                break;
-        }
-    }; // updateLocalStorage
+    //     switch (settings.searchMode) {
+    //         case UserSettingSearchModeType.onSession:
+    //             console.log('onSession - borrar localStorage');
+    //             break;
+    //         case UserSettingSearchModeType.onScreen:
+    //             console.log('onScreen - borrar localStorage y no guardar en localStorage');
+    //             break;
+    //         case UserSettingSearchModeType.indefinitely:
+    //             console.log('indefinitely - utilizar como está actualmente');
+    //             break;
+    //     }
+    // }; // updateLocalStorage
     
 
     return (
@@ -184,8 +184,7 @@ export const Configurator = () => {
                     </div>
                 </Card.Header>
                 <hr className="horizontal dark my-1" />
-                <Card.Body className="pt-sm-3 pt-0">
-                    
+                <Card.Body className="pt-sm-3 pt-0 px-0">
                     <Formik
                         initialValues={ initialValues }
                         validationSchema={ validationSchema }
@@ -194,6 +193,7 @@ export const Configurator = () => {
                     >
                         { formik => (
                             <Form>
+                                <Container fluid className="px-3">
                                 <Row>
                                     <Col xs="12">
                                         <AryFormikTextInput name="pageSizeInput"
@@ -233,9 +233,18 @@ export const Configurator = () => {
                                         </div>
                                     </Col>
                                 </Row>
+                                </Container>
                             </Form>
                         )}
                     </Formik>
+                    <hr className="horizontal dark" />
+                    {
+                        !!helpContent ? (
+                            <div>
+                                { helpContent }
+                            </div>
+                        ) : null
+                    }
                 </Card.Body>
             </Card>
         </div>

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import enums from "../../helpers/enums";
@@ -57,6 +57,7 @@ const ApplicantsListView = () => {
             status: OrganizationStatusType.applicant,
         });
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
     
     useEffect(() => {

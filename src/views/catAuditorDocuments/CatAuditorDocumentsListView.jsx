@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useCatAuditorDocumentsStore } from '../../hooks/useCatAuditorDocumentsStore';
 import AryListStatistics from '../../components/AryListStatistics/AryListStatistics';
 import AryPagination from '../../components/AryPagination/AryPagination';
@@ -53,6 +53,7 @@ const CatAuditorDocumentsListView = () => {
         // localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
         onSearch();        
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {

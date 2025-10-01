@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Form, Formik } from "formik";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 
-import envVariables from "../../../helpers/envVariables";
-import enums from "../../../helpers/enums";
-
-import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
-import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { useViewNavigation } from "../../../hooks/useViewNavigation";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
 
 export const StandardsToolbar = () => {
     const { DefaultStatusType, StandardOrderType } = enums();
@@ -47,10 +45,11 @@ export const StandardsToolbar = () => {
 
     // HOOKS
 
+    const formikRef = useRef(null);
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = getSavedSearch(); // JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
+        const savedSearch = getSavedSearch();
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch?.text ?? '',
@@ -67,39 +66,21 @@ export const StandardsToolbar = () => {
     };
 
     const onSearchSubmit = (values) => {
-        //const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
         const search = {
-            //...savedSearch,
             text: values.textInput,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
         onSearch(search);
-        // standardsAsync(search);
-        // localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
-    };
+    }; // onSearchSubmit
 
-    // const onCleanSearch = (e) => {
-    //     e.preventDefault();
+    const handleClearSearch = () => {
+        setInitialValues(formDefaultData);
+        formikRef.current.resetForm(initialValues);
 
-    //     const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-    //     const search = {
-    //         pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-    //         pageNumber: 1,
-    //         includeDeleted: false,
-    //         order: StandardOrderType.name,
-    //     };
-
-    //     setInitialValues({
-    //         textInput: '',
-    //         statusSelect: '',
-    //         includeDeletedCheck: false,
-    //     });
-
-    //     standardsAsync(search);
-    //     localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
-    // };
+        onCleanSearch();
+    }; // handleClearSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -119,6 +100,7 @@ export const StandardsToolbar = () => {
                     initialValues={initialValues}
                     onSubmit={onSearchSubmit}
                     enableReinitialize
+                    innerRef={formikRef}
                 >
                     {(formik) => (
                         <Form>
@@ -165,10 +147,7 @@ export const StandardsToolbar = () => {
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={handleClearSearch}>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>

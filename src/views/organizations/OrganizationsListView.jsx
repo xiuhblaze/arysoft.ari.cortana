@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2';
 
 import envVariables from "../../helpers/envVariables";
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import enums from "../../helpers/enums";
 
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
@@ -13,6 +13,7 @@ import OrganizationsTableList from "./components/OrganizationsTableList";
 import OrganizationsToolbar from "./components/OrganizationsToolbar";
 import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 import { useViewNavigation } from "../../hooks/useViewNavigation";
+import Helper from "../../components/Helper/Helper";
 
 const OrganizationsListView = () => {    
     const { ORGANIZATIONS_OPTIONS } = envVariables();
@@ -51,6 +52,7 @@ const OrganizationsListView = () => {
         // localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
         onSearch();
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, <Helper title="Organizations" urlContent="/help/organizationsHelp.md" />);
     }, []);
 
     useEffect(() => {

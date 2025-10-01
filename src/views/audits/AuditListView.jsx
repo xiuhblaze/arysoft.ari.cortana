@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useAuditNavigation } from './hooks/useAuditNavigation';
 import { useAuditsStore } from '../../hooks/useAuditsStore';
 import AuditsToolBar from './components/AuditsToolBar';
@@ -46,6 +46,7 @@ const AuditListView = () => {
         onSearch();
 
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {

@@ -148,12 +148,9 @@ const AuditsToolBar = () => {
     }; // onSearchSubmit
 
     const onClickClearSearch = () => {
-        //console.log('onClickClearSearch');
 
         setInitialValues(formDefaultValues);
-        formikRef.current.resetForm(formDefaultValues);
-        //console.log(formikRef);
-        
+        formikRef.current.resetForm(formDefaultValues);                
         onCleanSearch();
     }; // onClickclearSearch
 

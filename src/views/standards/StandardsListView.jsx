@@ -2,23 +2,22 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
-import envVariables from "../../helpers/envVariables";
-import enums from "../../helpers/enums";
-
-import { useStandardsStore } from "../../hooks/useStandardsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import StandardsTableList from "./components/StandardsTableList";
-import AryPagination from "../../components/AryPagination/AryPagination";
-import StandardsToolbar from "./components/StandardsToolbar";
-import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { useStandardsStore } from "../../hooks/useStandardsStore";
 import { useViewNavigation } from "../../hooks/useViewNavigation";
+import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
+import AryPagination from "../../components/AryPagination/AryPagination";
+import enums from "../../helpers/enums";
+import envVariables from "../../helpers/envVariables";
+import StandardsTableList from "./components/StandardsTableList";
+import StandardsToolbar from "./components/StandardsToolbar";
 
 const StandardsListView = () => {
     const navigate = useNavigate();
 
     const { STANDARDS_OPTIONS } = envVariables();
-    const { DefaultStatusType, StandardOrderType } = enums();
+    const { StandardOrderType } = enums();
 
     // CUSTOM HOOKS
 
@@ -43,19 +42,9 @@ const StandardsListView = () => {
     // HOOKS
 
     useEffect(() => {
-        // const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-        // const newSearch = {
-        //     pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
-        //     pageNumber: 1,
-        //     order: savedSearch?.order ? savedSearch.order : StandardOrderType.name,
-        // };
-
-        // const search = !!savedSearch ? savedSearch : newSearch;
-
-        // standardsAsync(search);
-        // localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
         onSearch();
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {
@@ -69,30 +58,6 @@ const StandardsListView = () => {
             Swal.fire('Standards', standardErrorMessage, 'error');
         }
     }, [standardErrorMessage]);
-
-    // METHODS
-
-    // const onClickGoPage = (page = 1) => {
-    //     const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-    //     const search = {
-    //         ...savedSearch,
-    //         pageNumber: page,
-    //     };
-
-    //     standardsAsync(search);
-    //     localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
-    // };
-
-    // const onClickOrderList = (order = StandardOrderType.name) => {
-    //     const savedSearch = JSON.parse(localStorage.getItem(STANDARDS_OPTIONS)) || null;
-    //     const search = {
-    //         ...savedSearch,
-    //         order: order
-    //     }
-
-    //     standardsAsync(search);
-    //     localStorage.setItem(STANDARDS_OPTIONS, JSON.stringify(search));
-    // };
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">

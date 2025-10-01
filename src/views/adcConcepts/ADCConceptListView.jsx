@@ -7,7 +7,7 @@ import enums from '../../helpers/enums';
 import envVariables from '../../helpers/envVariables';
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useModuleNavigation } from '../../hooks/useModuleNavigation';
 import { useADCConceptsStore } from '../../hooks/useADCConceptsStore';
 import ADCConceptTableList from './components/ADCConceptTableList';
@@ -48,6 +48,7 @@ const ADCConceptListView = () => {
     useEffect(() => {
         onSearch();
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     // useEffect(() => {        

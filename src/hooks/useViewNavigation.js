@@ -92,6 +92,9 @@ export const useViewNavigation = ({
         localStorage.setItem(LS_OPTIONS, JSON.stringify(search));
     }; // onSearch
 
+    /***
+     * customSearch: solo es util para el componente OrganizationsToolbar actualmente
+     */
     const onCleanSearch = (customSearch) => {
         //const savedSearch = JSON.parse(localStorage.getItem(LS_OPTIONS)) || null;
         const search = {

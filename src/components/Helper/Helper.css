@@ -1,0 +1,35 @@
+/* ARI HELPER
+******************************************************************************/
+
+.helper-content * {
+  font-size: 100% !important;  
+  /* max-height: calc(100vh - 450px);
+  overflow-y: auto; */
+}
+
+.helper-content h1 { 
+  font-size: 1.25rem !important; 
+  font-weight: 600 !important;
+}
+.helper-content h2 { 
+  font-size: 1.1rem !important; 
+  font-weight: 600 !important;
+}
+.helper-content h3 { 
+  font-size: 1.0rem !important; 
+  font-weight: 600 !important;
+}
+.helper-content p { 
+  font-size: 0.85rem !important; 
+  line-height: 1.25 !important;
+}
+.helper-content li { 
+  font-size: 0.85rem !important; 
+  line-height: 1.25rem !important;
+}
+.helper-content code { 
+  font-size: 0.85rem !important; 
+}
+.helper-content hr { 
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+}

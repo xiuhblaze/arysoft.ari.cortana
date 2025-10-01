@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { useAuditorsStore } from "../../hooks/useAuditorsStore";
 import { useStandardsStore } from "../../hooks/useStandardsStore";
 import { ViewLoading } from "../../components/Loaders";
@@ -14,7 +14,6 @@ import StandardEditCard from "./components/StandardEditCard";
 const StandardEditView = () => {
     const { id } = useParams();
     const [controller, dispatch] = useArysoftUIController();
-    const navigate = useNavigate();
     const { DefaultStatusType } = enums();
 
     // CUSTOM HOOKS
@@ -25,9 +24,6 @@ const StandardEditView = () => {
         standardErrorMessage,
 
         standardAsync,
-        standardSaveAsync,
-        standardDeleteAsync,
-        standardClear,
     } = useStandardsStore();
 
     const {
@@ -37,6 +33,11 @@ const StandardEditView = () => {
     } = useAuditorsStore();
 
     // HOOKS
+
+    useEffect(() => {
+        setHelpContent(dispatch, null);
+    }, []);
+    
 
     useEffect(() => {
         if (!!id) standardAsync(id);

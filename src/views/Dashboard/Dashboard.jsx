@@ -7,12 +7,13 @@ import {
     faHourglassStart
 } from '@fortawesome/free-solid-svg-icons';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { DashboardLayout } from "../../layouts/dashboard";
 import { MiniStatisticsCard } from "../../components/Cards";
 
 import CalendarCard from './components/CalendarCard';
 import MiniNextAuditCard from './components/MiniNextAuditCard';
+import Helper from '../../components/Helper/Helper';
 
 export const Dashboard = () => {
     
@@ -29,7 +30,8 @@ export const Dashboard = () => {
 
     useEffect(() => {
 
-        setNavbarTitle(despatch, null);
+        setNavbarTitle(despatch, 'Dashboard');
+        setHelpContent(despatch, <Helper title="Dashboard" urlContent="/help/dashboardHelp.md" />);
     }, []);
 
     return (
