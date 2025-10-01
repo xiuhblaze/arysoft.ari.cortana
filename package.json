@@ -34,6 +34,7 @@
     "react-router-dom": "^6.30.0",
     "react-select": "^5.10.1",
     "react-to-print": "^3.0.6",
+    "remark-gfm": "^4.0.1",
     "sort-by": "^1.2.0",
     "sweetalert2": "^11.7.18",
     "yup": "^1.2.0"

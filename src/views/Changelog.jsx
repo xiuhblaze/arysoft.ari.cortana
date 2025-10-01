@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown';
 import { Col, Container, Row, Card } from 'react-bootstrap';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
 
 import { DashboardLayout } from '../layouts/dashboard';
 import { ViewLoading } from '../components/Loaders';
@@ -16,9 +17,13 @@ const Changelog = () => {
 
     useEffect(() => {
         fetch('/CHANGELOG.md')
-            .then(res => res.text())
+            .then(res => {
+                if (!res.ok) throw new Error('Error al cargar contenido');
+                return (res.text());
+            })
             .then(text => {
-                setContent(text);
+                const cleanText = text.replace(/<!--[\s\S]*?-->/g, '');                
+                setContent(cleanText);
                 setLoading(false);
             })
             .catch(err => {
@@ -39,12 +44,9 @@ const Changelog = () => {
                                     ? ( <ViewLoading /> ) 
                                     : (
                                         <div className="changelog-content">
-                                            <ReactMarkdown
-                                                components={{ html: () => null }}
-                                                skipHtml={true}
-                                            >
+                                            <Markdown remarkPlugins={[remarkGfm]}>
                                                 {content}
-                                            </ReactMarkdown>
+                                            </Markdown>
                                         </div>
                                     )
                                 }

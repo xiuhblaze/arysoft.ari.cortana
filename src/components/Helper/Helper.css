@@ -33,3 +33,14 @@
 .helper-content hr { 
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
 }
+
+.helper-content table thead th:empty,
+.helper-content table thead th:only-child:empty {
+    display: none;
+}
+
+.helper-content table thead:has(th:empty) {
+    display: none;
+}
+
+/* ! Aqui me quede - Buscar la forma de integrar el css de las tablas */

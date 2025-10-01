@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import './Helper.css';
 
@@ -10,9 +11,13 @@ const Helper = ({ title, urlContent }) => {
 
     useEffect(() => {
         fetch(urlContent)
-            .then(res => res.text())
+            .then(res => {
+                if (!res.ok) throw new Error('Error al cargar contenido');
+                return (res.text());
+            })
             .then(text => {
-                setContent(text);
+                const cleanText = text.replace(/<!--[\s\S]*?-->/g, '');                
+                setContent(cleanText);
                 setLoading(false);
             })
             .catch(err => {
@@ -34,7 +39,7 @@ const Helper = ({ title, urlContent }) => {
                             className="helper-content"
                             style={{ maxHeight: 'calc(100vh - 500px)', overflowY: 'auto' }}
                         >
-                            <ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} >
                                 {content}
                             </ReactMarkdown>
                         </div>
