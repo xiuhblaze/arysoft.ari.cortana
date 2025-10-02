@@ -34,6 +34,14 @@
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
 }
 
+.helper-content table {
+  border-collapse: inherit;
+  color: #67748e;
+  background-color: transparent;
+  border-color: #e9ecef;
+  width: 100%;
+}
+
 .helper-content table thead th:empty,
 .helper-content table thead th:only-child:empty {
     display: none;

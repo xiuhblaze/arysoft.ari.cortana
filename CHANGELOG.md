@@ -3,7 +3,19 @@
 *Registro de cambios en el proyecto ARI IT*
 
 ---
-## [0.1.0.1] - 2025-09-30
+
+## [0.1.0.02] - 2025-10-02
+
+### Added
+
+- **Nueva sección de ayuda**
+Se agrega una sección de ayuda para cada vista, con un breve resumen de las funcionalidades disponibles. Hay opción para que la ayuda se muestre en ingles o español. Esta sección se encuenta disponible en la barra de navegación desde la opcion de configuración.
+
+    *Aun no estan disponibles las secciones de ayuda para todos los formularios.*
+
+---
+
+## [0.1.0.01] - 2025-09-30
 
 ### Added
 - **Nueva funcionalidad para configurar la forma en que se guardan las busquedas**  
@@ -19,7 +31,7 @@ enfocandose a la administración de los Ciclos de Auditorias principalmente, ocu
 
 ---
 
-## [0.1.0.0] - 2025-09-30
+## [0.1.0.00] - 2025-09-30
 
 ### Added
 - Modulo de historial de cambios

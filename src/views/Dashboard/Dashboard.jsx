@@ -31,7 +31,7 @@ export const Dashboard = () => {
     useEffect(() => {
 
         setNavbarTitle(despatch, 'Dashboard');
-        setHelpContent(despatch, <Helper title="Dashboard" urlContent="/help/dashboardHelp.md" />);
+        setHelpContent(despatch, <Helper title="Dashboard" url="/help/" filename="dashboardHelp.md" />);
     }, []);
 
     return (

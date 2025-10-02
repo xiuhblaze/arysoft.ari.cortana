@@ -1,19 +1,17 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom"
 import Swal from 'sweetalert2';
 
-import envVariables from "../../helpers/envVariables";
-import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
-import enums from "../../helpers/enums";
-
-import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import { Card, Col, Container, Row } from "react-bootstrap";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
+import { useViewNavigation } from "../../hooks/useViewNavigation";
+import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
 import AryPagination from "../../components/AryPagination/AryPagination";
+import enums from "../../helpers/enums";
+import envVariables from "../../helpers/envVariables";
+import Helper from "../../components/Helper/Helper";
 import OrganizationsTableList from "./components/OrganizationsTableList";
 import OrganizationsToolbar from "./components/OrganizationsToolbar";
-import AryListStatistics from "../../components/AryListStatistics/AryListStatistics";
-import { useViewNavigation } from "../../hooks/useViewNavigation";
-import Helper from "../../components/Helper/Helper";
 
 const OrganizationsListView = () => {    
     const { ORGANIZATIONS_OPTIONS } = envVariables();
@@ -39,20 +37,10 @@ const OrganizationsListView = () => {
     // HOOKS
 
     useEffect(() => {
-        // const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-        // const newSearch = {
-        //     // pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
-        //     pageNumber: 1,
-        //     order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.folioDesc,
-        // };
 
-        // const search = !!savedSearch ? savedSearch : newSearch;
-
-        // organizationsAsync(search);
-        // localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
         onSearch();
         setNavbarTitle(dispatch, null);
-        setHelpContent(dispatch, <Helper title="Organizations" urlContent="/help/organizationsHelp.md" />);
+        setHelpContent(dispatch, <Helper title="Organizations" url="/help/" filename="organizationsHelp.md" />);
     }, []);
 
     useEffect(() => {
@@ -62,28 +50,6 @@ const OrganizationsListView = () => {
     }, [organizationsErrorMessage]);
 
     // METHODS
-
-    const onClickGoPage = (page = 1) => {
-        const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            pageNumber: page,
-        };
-
-        organizationsAsync(search);
-        localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    }; // onClickGoPage
-
-    // const onClickOrderList = (order = OrganizationOrderType.name) => {
-    //     const savedSearch = JSON.parse(localStorage.getItem(ORGANIZATIONS_OPTIONS)) || null;
-    //     const search = {
-    //         ...savedSearch,
-    //         order: order
-    //     }
-
-    //     organizationsAsync(search);
-    //     localStorage.setItem(ORGANIZATIONS_OPTIONS, JSON.stringify(search));
-    // }; // onClickOrderList
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">

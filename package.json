@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run copy-changelog && vite",
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "copy-changelog": "copy CHANGELOG.md public/CHANGELOG.md"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
