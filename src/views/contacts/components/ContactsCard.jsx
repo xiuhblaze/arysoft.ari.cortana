@@ -10,7 +10,7 @@ import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 import envVariables from "../../../helpers/envVariables";
 import { checkFileExists } from "../../../helpers/checkFileExists";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import { faEnvelope, faNoteSticky, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faNoteSticky, faPhone, faUserFriends } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
@@ -62,7 +62,10 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
         <Card {...props} className="h-100">
             <Card.Header className="pb-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
-                    <h6 className="mb-0">Contacts</h6>
+                    <h5 className="mb-0">
+                        <FontAwesomeIcon icon={ faUserFriends } className="text-dark me-2" size="lg" />
+                        Contacts
+                    </h5>
                     {
                         !readOnly ? (
                             <EditContactModal />

@@ -12,6 +12,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import Status from './Status';
 import organizationStatusProps from '../helpers/organizationStatusProps';
 import auditStatusProps from '../../audits/helpers/auditStatusProps';
+import getRandomNumber from '../../../helpers/getRandomNumber';
 
 const OrganizationsTableItem = ({ item, className, applicantsOnly = false, onShowModal, ...props }) => {
     
@@ -24,7 +25,7 @@ const OrganizationsTableItem = ({ item, className, applicantsOnly = false, onSho
         OrganizationStatusType
     } = enums();
     const pathPhotoFilename = !!item.LogoFile
-        ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}`
+        ? `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${item.ID}/${item.LogoFile}?v=${ getRandomNumber(4) }`
         : applicantsOnly
             ? primaryPhoto
             : defaultPhoto;

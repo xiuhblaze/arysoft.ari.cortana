@@ -4,7 +4,7 @@ import { Card, Col, Container, Row } from 'react-bootstrap';
 import * as Yup from "yup";
 
 import enums from '../../helpers/enums';
-import { useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useCatAuditorDocumentsStore } from '../../hooks/useCatAuditorDocumentsStore';
 import { useEffect, useState } from 'react';
 import { ViewLoading } from '../../components/Loaders';
@@ -98,6 +98,12 @@ const CatAuditorDocumentEditView = () => {
     const [IsRequired, setIsRequired] = useState(false);
 
     useEffect(() => {
+        
+        setHelpContent(dispatch, null);
+    }, []);
+    
+
+    useEffect(() => {
         if (!!id) catAuditorDocumentAsync(id);
     }, [id]);
     
@@ -120,6 +126,7 @@ const CatAuditorDocumentEditView = () => {
             });
 
             let title = !isNullOrEmpty(catAuditorDocument.Name) ? catAuditorDocument.Name : '';
+            setNavbarTitle(dispatch, title);
 
             standardsAsync({
                 status: DefaultStatusType.active,

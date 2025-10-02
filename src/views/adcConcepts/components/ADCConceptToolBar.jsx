@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import { useNavigate } from "react-router-dom";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
 
 
 const ADCConceptToolBar = () => {
@@ -38,7 +40,9 @@ const ADCConceptToolBar = () => {
 
     const {
         isADCConceptCreating,
+        adcConceptCreatedOk,
         isADCConceptsLoading,
+        adcConcept,
         adcConceptsAsync,
         adcConceptCreateAsync,
     } = useADCConceptsStore();
@@ -48,15 +52,24 @@ const ADCConceptToolBar = () => {
         standards,
         standardsAsync
     } = useStandardsStore();
-
     const {
         getSavedSearch,
         onSearch,
-        onCleanSearch,
-    } = useModuleNavigation(adcConceptsAsync, ADCCONCEPTS_OPTIONS, ADCConceptOrderType.standard);
+        onCleanSearch
+    } = useViewNavigation({
+        LS_OPTIONS: ADCCONCEPTS_OPTIONS,
+        DefultOrder: ADCConceptOrderType.standard,
+        itemsAsync: adcConceptsAsync,
+    });
+    // const {
+    //     getSavedSearch,
+    //     onSearch,
+    //     onCleanSearch,
+    // } = useModuleNavigation(adcConceptsAsync, ADCCONCEPTS_OPTIONS, ADCConceptOrderType.standard);
 
     // HOOKS
 
+    const navigate = useNavigate();
     const formikRef = useRef(null);
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
@@ -79,6 +92,12 @@ const ADCConceptToolBar = () => {
             order: StandardOrderType.name,
         });
     }, []);
+    
+    useEffect(() => {        
+        if (!!adcConceptCreatedOk) {
+            navigate(`/adc-concepts/${adcConcept.ID}`);
+        }
+    }, [adcConceptCreatedOk]);
 
     // METHODS
 

@@ -1,15 +1,21 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useAuditNavigation } from './hooks/useAuditNavigation';
 import { useAuditsStore } from '../../hooks/useAuditsStore';
 import AuditsToolBar from './components/AuditsToolBar';
 import AuditTableList from './components/AuditTableList';
 import AryPagination from '../../components/AryPagination/AryPagination';
+import AryListStatistics from '../../components/AryListStatistics/AryListStatistics';
+import { useViewNavigation } from '../../hooks/useViewNavigation';
+import envVariables from '../../helpers/envVariables';
+import enums from '../../helpers/enums';
 
-const AuditListView = () => {
+const AuditListView = () => {    
+    const { AUDITS_OPTIONS } = envVariables();
+    const { AuditOrderType } = enums();
 
     // CUSTOM HOOKS
 
@@ -17,12 +23,21 @@ const AuditListView = () => {
     const {
         auditsMeta,
         auditsErrorMessage,
+        auditsAsync,
     } = useAuditsStore();
 
+    // const {
+    //     onSearch,
+    //     onPageChange,
+    // } = useAuditNavigation();
     const {
         onSearch,
-        onPageChange,
-    } = useAuditNavigation();
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: AUDITS_OPTIONS,
+        DefultOrder: AuditOrderType.dateDesc,
+        itemsAsync: auditsAsync,
+    });
 
     // HOOKS
 
@@ -31,6 +46,7 @@ const AuditListView = () => {
         onSearch();
 
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {
@@ -58,11 +74,14 @@ const AuditListView = () => {
                             ) : null}
                             <AuditTableList />
                             { !!auditsMeta ? (
-                                <AryPagination
-                                    currentPage={auditsMeta.CurrentPage}
-                                    totalPages={auditsMeta.TotalPages}
-                                    onClickGoPage={onPageChange}
-                                />
+                                <>
+                                    <AryPagination
+                                        currentPage={auditsMeta.CurrentPage}
+                                        totalPages={auditsMeta.TotalPages}
+                                        onClickGoPage={onPageChange}
+                                    />
+                                    <AryListStatistics meta={ auditsMeta } className="my-3" />
+                                </>
                             ) : null}
                         </Card.Body>
                     </Card>

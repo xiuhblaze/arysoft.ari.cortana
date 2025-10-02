@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Card, Col, Container, Row } from 'react-bootstrap';
 import envVariables from '../../helpers/envVariables';
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import enums from '../../helpers/enums';
 import { useAuditorsStore } from '../../hooks/useAuditorsStore';
 import Swal from 'sweetalert2';
@@ -46,6 +46,7 @@ const AuditorsListView = () => {
         localStorage.setItem(AUDITORS_OPTIONS, JSON.stringify(search));
 
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {

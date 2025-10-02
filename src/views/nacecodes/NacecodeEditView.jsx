@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 import * as Yup from "yup";
 
 import { AryFormikSelectInput, AryFormikTextInput } from '../../components/Forms';
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { ViewLoading } from '../../components/Loaders';
 import enums from '../../helpers/enums';
 import Status from './components/Status';
@@ -107,6 +107,11 @@ export const NacecodeEditView = () => {
     // HOOKS
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+
+    useEffect(() => {
+        setHelpContent(dispatch, null);
+    }, []);
+    
 
     useEffect(() => {
         if (!!id) nacecodeAsync(id);

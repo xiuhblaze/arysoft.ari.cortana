@@ -1,7 +1,7 @@
 import { faLandmark, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect } from 'react'
-import { Col, ListGroup, Row } from 'react-bootstrap'
+import { Col, ListGroup, Row, Spinner } from 'react-bootstrap'
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore'
 import { useAuditCycleStandardsStore } from '../../../hooks/useAuditCycleStandardsStore'
 import { ViewLoading } from '../../../components/Loaders'
@@ -10,6 +10,8 @@ import enums from '../../../helpers/enums'
 import auditCycleProps from '../helpers/auditCycleProps'
 import AuditCycleStandardItem from './AuditCycleStandardItem'
 import AuditCycleStandardEditItem from './AuditCycleStandardEditItem'
+import { useAuthStore } from '../../../hooks/useAuthStore'
+import ComponentLoading from '../../../components/Loaders/ComponentLoading'
 
 const AuditCycleStandardsList = ({ readOnly = false, ...props }) => {   
 
@@ -18,6 +20,8 @@ const AuditCycleStandardsList = ({ readOnly = false, ...props }) => {
     } = enums();
 
     // CUSTOM HOOKS
+
+    const { ROLES, hasRole } = useAuthStore();
 
     const {
         auditCycle,
@@ -37,6 +41,7 @@ const AuditCycleStandardsList = ({ readOnly = false, ...props }) => {
             auditCycleStandardsAsync({
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,
+                includeDeleted: hasRole(ROLES.admin),
             });
         }
     }, [auditCycle]);
@@ -57,7 +62,7 @@ const AuditCycleStandardsList = ({ readOnly = false, ...props }) => {
                 </label>
                 {
                     isAuditCycleStandardsLoading ? (
-                        <ViewLoading />
+                        <ComponentLoading size="md" boxSize="lg" variant="dark" />
                     ) : !!auditCycleStandards && auditCycleStandards.length > 0 ? (
                     <ListGroup className="mb-3">
                         {

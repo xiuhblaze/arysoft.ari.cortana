@@ -135,6 +135,10 @@ const AuditCycleEditItem = ({ id, ...props }) => {
 
     const onCloseModal = () => {
 
+        auditCyclesAsync({ // que refresque por si movieron los standares
+                organizationID: organization.ID,
+                pageSize: 0,
+            });
         // auditCycleClear();
         setShowModal(false);
     };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
 
@@ -10,9 +10,10 @@ import envVariables from "../../../helpers/envVariables";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
 import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
-import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
+// import certificateValidityStatusProps from "../../certificates/helpers/certificateValidityStatusProps";
 import { useStandardsStore } from "../../../hooks/useStandardsStore";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
 
 const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     const formDefaultData = {
@@ -24,7 +25,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
         includeDeletedCheck: false,
     };
     const { 
-        CertificatesValidityStatusType,
+        //CertificatesValidityStatusType,
         OrganizationOrderType, 
         OrganizationStatusType,
         StandardOrderType,
@@ -32,7 +33,6 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     const {
         APPLICANTS_OPTIONS,
         ORGANIZATIONS_OPTIONS,
-        VITE_PAGE_SIZE
     } = envVariables();
     const {
         BUTTON_ADD_CLASS,
@@ -60,16 +60,27 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
         standards,
         standardsAsync,
     } = useStandardsStore();
+
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: SEARCH_OPTIONS,
+        DefultOrder: OrganizationOrderType.folioDesc,
+        itemsAsync: organizationsAsync,
+    });
     
     // HOOKS
     
     const navigate = useNavigate();
+    const formikRef = useRef(null);
 
     const [initialValues, setInitialValues] = useState(formDefaultData);
     const [statusOptions, setStatusOptions] = useState(null);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        const savedSearch = getSavedSearch(); // JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
 
         if (!!savedSearch) {
             setInitialValues({
@@ -117,9 +128,9 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
     };
 
     const onSearchSubmit = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        //const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
+          //  ...savedSearch,
             folio: values.folioInput,
             text: values.textInput,
             standardID: values.standardSelect,
@@ -130,27 +141,35 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
             includeDeleted: values.includeDeletedCheck,
             pageNumber: 1,
         };
+        onSearch(search);
+        // organizationsAsync(search);
+        // localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
+    }; // onSearchSubmit
 
-        organizationsAsync(search);
-        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
-    };
+    const handleClearSearch = () => {
+        // const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
+        // const search = {
+        //     pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
+        //     pageNumber: 1,
+        //     includeDeleted: false,
+        //     status: applicantsOnly
+        //         ? OrganizationStatusType.applicant
+        //         : savedSearch?.status ?? '',
+        //     order: OrganizationOrderType.folioDesc,
+        // };
 
-    const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(SEARCH_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
+        // setInitialValues(formDefaultData);
+        // organizationsAsync(search);
+        // localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
+        setInitialValues(formDefaultData);
+        formikRef.current.resetForm(initialValues);
+        const savedSearch = getSavedSearch();
+        onCleanSearch({
             status: applicantsOnly
                 ? OrganizationStatusType.applicant
                 : savedSearch?.status ?? '',
-            order: OrganizationOrderType.folioDesc,
-        };
-
-        setInitialValues(formDefaultData);
-        organizationsAsync(search);
-        localStorage.setItem(SEARCH_OPTIONS, JSON.stringify(search));
-    };
+        });
+    }; // handleClearSearch
 
     return (
         <div {...props} className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -173,6 +192,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                     initialValues={initialValues}
                     onSubmit={onSearchSubmit}
                     enableReinitialize
+                    innerRef={formikRef}
                 >
                     {(formik) => (
                         <Form>
@@ -287,10 +307,7 @@ const OrganizationsToolbar = ({ applicantsOnly = false, ...props }) => {
                                     <div className="d-grid d-md-block ps-md-2">
                                         <button type="button" 
                                             className={ BUTTON_CLEAR_SEARCH_CLASS }
-                                            onClick={(values) => {
-                                                onCleanSearch(values);
-                                                formik.resetForm(initialValues);
-                                        }}>
+                                            onClick={handleClearSearch}>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>

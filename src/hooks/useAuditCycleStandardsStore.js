@@ -187,24 +187,30 @@ export const useAuditCycleStandardsStore = () => {
     const auditCycleStandardDeleteAsync = async (id) => {
         dispatch(onAuditCycleStandardDeleting());
 
+        if (!id) {
+            setError('You must specify the ID');
+            return;
+        }
+
         const toDelete = {
-            AuditCycleStandardID: id,
+            ID: id,
             UpdatedUser: user.username,
         }
 
         try {
-            const resp = await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
+            await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
+            //const resp = await cortanaApi.delete(`${AUDITCYCLESTANDARD_URL}/${id}`, { data: toDelete });
+            //console.log(resp);
             dispatch(isAuditCycleStandardDeleted());
         } catch (error) {
-            //console.log(error);
             const message = getError(error);
             setError(message);
         }
-    }
+    }; // auditCycleStandardDeleteAsync
 
     const auditCycleStandardClear = () => {
         dispatch(clearAuditCycleStandard());
-    }
+    }; // auditCycleStandardClear
 
     return {
         // properties

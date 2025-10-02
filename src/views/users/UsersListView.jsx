@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Card, Container, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2";
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { useUsersStore } from "../../hooks/useUsersStore";
 import useUsersNavigation from "./hooks/useUsersNavigation";
 import AryPagination from "../../components/AryPagination/AryPagination";
@@ -34,6 +34,7 @@ export const UsersListView = () => {
         onSearch();
 
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
 
     useEffect(() => {
