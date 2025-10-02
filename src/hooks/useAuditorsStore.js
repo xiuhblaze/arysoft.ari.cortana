@@ -232,7 +232,7 @@ export const useAuditorsStore = () => {
             const resp = await cortanaApi.delete(`${AUDITOR_ROUTE}/${id}/photofile`, { data: toDeleteFile });
             const { Data } = await resp.data;
 
-            console.log('auditorDeleteFileAsync.Data', Data)
+            //console.log('auditorDeleteFileAsync.Data', Data)
 
             if (!!Data) {
                 setAuditor({

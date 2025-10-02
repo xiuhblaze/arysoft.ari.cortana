@@ -152,7 +152,7 @@ export const useCertificatesStore = () => {
                 ...item,
                 UpdatedUser: user.username,
             };
-            console.log(params);
+            // console.log(params);
             const resp = await cortanaApi.post(CERTIFICATES_ROUTE, params);
             const { Data } = await resp.data;
 

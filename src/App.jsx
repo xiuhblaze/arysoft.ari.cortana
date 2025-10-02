@@ -10,6 +10,7 @@ import privateRoute from './routes/privateRoutes';
 import './app.css';
 import { Login } from './views/Login/Login';
 import Profile from './views/profile/Profile';
+import Changelog from './views/Changelog';
 
 const LazyUsers = lazy(() => import('./views/users'));
 
@@ -49,7 +50,8 @@ function App() {
                 status === 'authenticated' ? (
                     <>
                         {renderRoutes(privateRoute)}
-                        <Route path="/profile" element={ <Profile /> } />
+                        <Route path="/profile" element={ <Profile /> } />                        
+                        <Route path="/updates" element={ <Changelog /> } />
                         <Route path="/users/*" element={ <LazyUsers /> } />
                         <Route path="/*" element={<Navigate to={privateRoute[0].path} />} />
                     </>

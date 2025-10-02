@@ -90,7 +90,6 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
     }; // isValidDays
 
     const setConceptValue = (value) => {
-
         const unit = value && adcConcept.WhenTrue && !!adcConcept.Increase
             ? adcConcept.IncreaseUnit
             : !value && adcConcept.WhenTrue && !!adcConcept.Decrease
@@ -137,7 +136,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
 
         setConceptValue(checked);
         setConceptValueTouched(dispatch, true);
-        updateConceptValues(0);
+        updateConceptValues(0, formData.justification, checked);
     }; // onCheckChange
 
     const onChange = (e) => {
@@ -170,11 +169,11 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
         setShowModal(false);
     }; // onSaveJustification
 
-    const updateConceptValues = (value, justification = '') => {
+    const updateConceptValues = (value, justification = '', checkValue = null) => {
         
         updateADCConceptValue(dispatch, {
             adcConceptValueID: adcConceptValue.ID,
-            checkValue: formData.checkValue,
+            checkValue: checkValue ?? formData.checkValue,
             newValue: Number(value),
             unit: myProps.unit,
             justification,

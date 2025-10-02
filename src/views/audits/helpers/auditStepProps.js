@@ -50,7 +50,25 @@ const auditStepProps = [
         label: 'Special',
         abbreviation: 'sp',
         variant: 'warning',
-    }
+    },
+    {
+        id: AuditStepType.surveillance3,
+        label: 'Surveillance 3',
+        abbreviation: 's3',
+        variant: 'dark',
+    },
+    {
+        id: AuditStepType.surveillance4,
+        label: 'Surveillance 4',
+        abbreviation: 's4',
+        variant: 'dark',
+    },
+    {
+        id: AuditStepType.surveillance5,
+        label: 'Surveillance 5',
+        abbreviation: 's5',
+        variant: 'dark',
+    },
 ];
 
 export default auditStepProps;

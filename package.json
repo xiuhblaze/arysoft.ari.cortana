@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run copy-changelog && vite",
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "copy-changelog": "copy CHANGELOG.md public/CHANGELOG.md"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
@@ -29,10 +30,12 @@
     "react-bootstrap": "^2.8.0",
     "react-content-loader": "^7.0.2",
     "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.30.0",
     "react-select": "^5.10.1",
     "react-to-print": "^3.0.6",
+    "remark-gfm": "^4.0.1",
     "sort-by": "^1.2.0",
     "sweetalert2": "^11.7.18",
     "yup": "^1.2.0"

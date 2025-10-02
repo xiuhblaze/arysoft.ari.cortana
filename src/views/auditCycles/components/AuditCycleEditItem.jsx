@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react';
 
+import { Col, Modal, Row } from 'react-bootstrap';
 import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Formik } from 'formik';
-import { Col, Modal, Row } from 'react-bootstrap';
+import * as Yup from "yup";
+import Swal from 'sweetalert2';
+
+import { AryFormikSelectInput, AryFormikTextInput } from '../../../components/Forms';
+import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
 import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 import { ViewLoading } from '../../../components/Loaders';
-import * as Yup from "yup";
-import getISODate from '../../../helpers/getISODate';
-import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
-import enums from '../../../helpers/enums';
-import { AryFormikTextInput } from '../../../components/Forms';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
-import Swal from 'sweetalert2';
 import AuditCycleStandardsList from './AuditCycleStandardsList';
+import enums from '../../../helpers/enums';
+import getISODate from '../../../helpers/getISODate';
 
 const AuditCycleEditItem = ({ id, ...props }) => {
 
     const {
+        AuditCyclePeriodicityType,
         DefaultStatusType,
     } = enums();
 
@@ -25,6 +27,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
         nameInput: '',
         startDateInput: '',
         endDateInput: '',
+        periodicitySelect: '',
         extraInfoInput: '',
         statusCheck: false,
     };
@@ -76,6 +79,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                 nameInput: auditCycle?.Name ?? '',
                 startDateInput: !!auditCycle?.StartDate ? getISODate(auditCycle.StartDate) : '',
                 endDateInput: !!auditCycle?.EndDate ? getISODate(auditCycle.EndDate) : '',
+                periodicitySelect: auditCycle?.Periodicity ?? '',
                 extraInfoInput: auditCycle?.ExtraInfo ?? '',
                 statusCheck: auditCycle.Status === DefaultStatusType.active,
             });
@@ -119,6 +123,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                     nameInput: auditCycle?.Name ?? '',
                     startDateInput: !!auditCycle?.StartDate ? getISODate(auditCycle.StartDate) : '',
                     endDateInput: !!auditCycle?.EndDate ? getISODate(auditCycle.EndDate) : '',
+                    periodicitySelect: auditCycle?.Periodicity ?? '',
                     extraInfoInput: auditCycle?.ExtraInfo ?? '',
                     statusCheck: auditCycle.Status === DefaultStatusType.active,
                 });
@@ -130,6 +135,10 @@ const AuditCycleEditItem = ({ id, ...props }) => {
 
     const onCloseModal = () => {
 
+        auditCyclesAsync({ // que refresque por si movieron los standares
+                organizationID: organization.ID,
+                pageSize: 0,
+            });
         // auditCycleClear();
         setShowModal(false);
     };
@@ -140,6 +149,7 @@ const AuditCycleEditItem = ({ id, ...props }) => {
             Name: values.nameInput,
             StartDate: values.startDateInput,
             EndDate: values.endDateInput,
+            Periodicity: values.periodicitySelect ?? '',
             ExtraInfo: values.extraInfoInput,
             Status: values.statusCheck ? DefaultStatusType.active : DefaultStatusType.inactive,
         };
@@ -203,6 +213,27 @@ const AuditCycleEditItem = ({ id, ...props }) => {
                                         </Col>
                                         <Col xs="12">
                                             <AuditCycleStandardsList />
+                                        </Col>
+                                        <Col xs="12">
+                                            <AryFormikSelectInput
+                                                name="periodicitySelect"
+                                                label="Periodicity"
+                                                onChange={ (e) => {
+                                                    const selectedValue = e.target.value;
+                                                    formik.setFieldValue('periodicitySelect', selectedValue);                                                    
+                                                }}
+                                                helpText="the frequency with which audits are performed"
+                                            >
+                                                { Object.keys(AuditCyclePeriodicityType).map((key) => (
+                                                    <option 
+                                                        key={key} 
+                                                        value={AuditCyclePeriodicityType[key]}
+                                                        className="text-capitalize"
+                                                    >
+                                                        {key === 'nothing' ? '(select)' : key}
+                                                    </option>
+                                                ))}
+                                            </AryFormikSelectInput>
                                         </Col>
                                         <Col xs="12">
                                             <AryFormikTextInput

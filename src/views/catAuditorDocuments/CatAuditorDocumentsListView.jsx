@@ -1,18 +1,20 @@
-import { Card, Col, Container, Row } from 'react-bootstrap';
-import envVariables from '../../helpers/envVariables';
-import enums from '../../helpers/enums';
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
-import { useCatAuditorDocumentsStore } from '../../hooks/useCatAuditorDocumentsStore';
-import AryPagination from '../../components/AryPagination/AryPagination';
-import AryListStatistics from '../../components/AryListStatistics/AryListStatistics';
 import { useEffect } from 'react';
+import { Card, Col, Container, Row } from 'react-bootstrap';
+
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { useCatAuditorDocumentsStore } from '../../hooks/useCatAuditorDocumentsStore';
+import AryListStatistics from '../../components/AryListStatistics/AryListStatistics';
+import AryPagination from '../../components/AryPagination/AryPagination';
 import CatAuditorDocumentsTable from './components/CatAuditorDocumentsTable';
 import CatAuditorDocumentsToolbar from './components/CatAuditorDocumentsToolbar';
+import enums from '../../helpers/enums';
+import envVariables from '../../helpers/envVariables';
+import Swal from 'sweetalert2';
+import { useViewNavigation } from '../../hooks/useViewNavigation';
 
-const CatAuditorDocumentsListView = () => {
+const CatAuditorDocumentsListView = () => {    
     const {
         CATAUDITORDOCUMENTS_OPTIONS,
-        VITE_PAGE_PAGESIZE,
     } = envVariables();
 
     const {
@@ -27,37 +29,51 @@ const CatAuditorDocumentsListView = () => {
         catAuditorDocumentsAsync,
         catAuditorDocumentsErrorMessage,
     } = useCatAuditorDocumentsStore();
+    const {
+        onSearch,
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: CATAUDITORDOCUMENTS_OPTIONS,
+        DefultOrder: CatAuditorDocumentOrderType.documentType,
+        itemsAsync: catAuditorDocumentsAsync,
+    });
 
     // HOOKS
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
-        const newSearch = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_PAGESIZE,
-            pageNumber: 1,
-            order: savedSearch?.order ?? CatAuditorDocumentOrderType.documentType
-        };
-        const search = savedSearch ?? newSearch;
+        // const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
+        // const newSearch = {
+        //     pageSize: savedSearch?.pageSize ?? VITE_PAGE_PAGESIZE,
+        //     pageNumber: 1,
+        //     order: savedSearch?.order ?? CatAuditorDocumentOrderType.documentType
+        // };
+        // const search = savedSearch ?? newSearch;
 
-        catAuditorDocumentsAsync(search);
-        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
-        
+        // catAuditorDocumentsAsync(search);
+        // localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
+        onSearch();        
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
-    
 
+    useEffect(() => {
+        if (!!catAuditorDocumentsErrorMessage) {
+            Swal.fire('Auditor\'s documents', catAuditorDocumentsErrorMessage, 'error');
+        }
+    }, [catAuditorDocumentsErrorMessage]);
+    
     // METHODS
 
-    const onClickGoPage = (page = 1) => {
-        const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            pageNumber: page,
-        };
+    // const onClickGoPage = (page = 1) => {
+    //     const savedSearch = JSON.parse(localStorage.getItem(CATAUDITORDOCUMENTS_OPTIONS)) || null;
+    //     const search = {
+    //         ...savedSearch,
+    //         pageNumber: page,
+    //     };
 
-        catAuditorDocumentsAsync(search);
-        localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
-    }; // onClickGoPage
+    //     catAuditorDocumentsAsync(search);
+    //     localStorage.setItem(CATAUDITORDOCUMENTS_OPTIONS, JSON.stringify(search));
+    // }; // onClickGoPage
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
@@ -72,7 +88,7 @@ const CatAuditorDocumentsListView = () => {
                                 <AryPagination
                                     currentPage={catAuditorDocumentsMeta.CurrentPage}
                                     totalPages={catAuditorDocumentsMeta.TotalPages}
-                                    onClickGoPage={ onClickGoPage }
+                                    onClickGoPage={ onPageChange }
                                 />
                             )}
                             <CatAuditorDocumentsTable />
@@ -81,7 +97,7 @@ const CatAuditorDocumentsListView = () => {
                                     <AryPagination
                                         currentPage={catAuditorDocumentsMeta.CurrentPage}
                                         totalPages={catAuditorDocumentsMeta.TotalPages}
-                                        onClickGoPage={ onClickGoPage }
+                                        onClickGoPage={ onPageChange }
                                     />
                                     <AryListStatistics
                                         meta={ catAuditorDocumentsMeta }

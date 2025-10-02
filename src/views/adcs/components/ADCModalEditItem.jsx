@@ -33,6 +33,10 @@ import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
 import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation';
+import auditStepProps from '../../audits/helpers/auditStepProps';
+import ADCSiteAuditInput from './ADCSiteAuditInput';
+import getAuditStepList from '../../audits/helpers/getAuditStepList';
+import { useADCSiteAuditsStore } from '../../../hooks/useADCSiteAuditsStore';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -43,8 +47,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         adcData,
         adcSiteList,
         adcConceptList,
+        adcSiteAuditsList,
         misc,
         conceptValueHidden,
+        siteAuditHidden,
     } = controller;
 
     const {
@@ -60,6 +66,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         commentsInput: '',
         items: [], // datos por cada adcSite
         conceptValueHidden: 0,
+        siteAuditHidden: 0,
         md11Hidden: 0,
         exceedsMaximumReductionHidden: false,
     };
@@ -129,6 +136,12 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     } = useADCConceptValuesStore();
 
     const {
+        isADCSiteAuditSaving,
+        adcSiteAuditSavedOk,
+        adcSiteAuditSaveListAsync,
+    } = useADCSiteAuditsStore();
+
+    const {
         isADCConceptsLoading,
         adcConcepts,
         adcConceptsAsync,
@@ -152,6 +165,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [statusOptions, setStatusOptions] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [saveNote, setSaveNote] = useState(''); 
+    const [auditStepList, setAuditStepList] = useState([]);
 
     useEffect(() => {
 
@@ -197,6 +211,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 commentsInput: '',
                 items: itemsInputs,
                 conceptValueHidden: 0,
+                siteAuditHidden: 0,
                 md11Hidden: 0,
                 exceedsMaximumReductionHidden: false,
             });
@@ -211,6 +226,15 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setOriginalStatus(adc.Status);
             setStatusOptions(adcSetStatusOptions(adc.Status));
             setShowComments(false);
+
+            // Obteniendo la lista de tipos de auditorias
+            const currentAuditStandard = auditCycle.AuditCycleStandards
+                .find(acs => acs.StandardID == adc.AppForm.StandardID);
+            setAuditStepList(getAuditStepList(
+                currentAuditStandard.CycleType, 
+                currentAuditStandard.InitialStep,
+                auditCycle.Periodicity
+            ));
 
             if (adc.Status >= ADCStatusType.inactive) {
                 if (!!adc.HistoricalDataJSON) {
@@ -240,8 +264,10 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         
+        //console.log('adcSiteList', adcSiteList);
         if (!!adcSiteList && adcSiteList.length > 0) {
-            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);             
+            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
+
             if (!!formikRef?.current) {
                 formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
             }
@@ -312,13 +338,19 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             formikRef.current.setFieldValue('conceptValueHidden', numericValue);
         }
     }, [conceptValueHidden.value]);
-    
+
+    useEffect(() => {
+        if (formikRef.current) {
+            formikRef.current.setFieldTouched('siteAuditHidden', siteAuditHidden.touch);
+        }
+    }, [siteAuditHidden.touch]);
+        
     // METHODS
 
     const loadContextData = () => {
 
         setADCData(dispatch, adc);
-        setADCSiteList(dispatch, adc.ADCSites);
+        setADCSiteList(dispatch, adc.ADCSites);        
         setConceptValueHidden(dispatch, 0);
     }; // loadContextData
 
@@ -395,8 +427,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         adcSiteSaveListAsync(toADCSiteSaveList, files);
 
-        adcSiteList.forEach(contextADCSite => { //* SITES 
-            
+        adcSiteList.forEach(contextADCSite => { //* SITES
             const toADCConceptValuesSaveList = contextADCSite.ADCConceptValues.map(adccvItem => {
                 return {
                     ID: adccvItem.ID,
@@ -411,6 +442,18 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             adcConceptValueSaveListAsync(toADCConceptValuesSaveList);
         });
 
+        adcSiteList.forEach(contextADCSite => {
+            const toADCSiteAuditSaveList = contextADCSite.ADCSiteAudits.map(adcsaItem => {
+                return {
+                    ID: adcsaItem.ID,
+                    Value: adcsaItem.Value,
+                    AuditStep: adcsaItem.AuditStep,
+                    Status: adcsaItem.Status,
+                };
+            });
+
+            adcSiteAuditSaveListAsync(toADCSiteAuditSaveList);
+        });
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -441,6 +484,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         setShowModal(false);
     }; // actionsForCloseModal
     
+//console.log("Renderizando ADCModalEditItem - showModal:", showModal);
+
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
             size={ adcSiteList.length > 3 ? 'xxxl' : 'xl' }
@@ -561,6 +606,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             disabled={ adc.Status >= ADCStatusType.inactive }
                                                                         />
                                                                         <input type="hidden" name="conceptValueHidden" />
+                                                                        <input type="hidden" name="siteAuditHidden" />
                                                                         <input type="hidden" name="md11Hidden" />
                                                                         <input type="hidden" name="exceedsMaximumReductionHidden" />
                                                                     </Col>
@@ -647,23 +693,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 <th style={{minWidth: '300px'}}></th>
                                                                                 <th></th>
                                                                                 {
-                                                                                    adcSiteList.map(adcSite =>  
-                                                                                        <th key={adcSite.ID} className="align-top" style={{minWidth: '220px'}}>
-                                                                                            <div className={headStyle}>
-                                                                                                { adcSite.SiteDescription }
-                                                                                            </div>
-                                                                                            <div 
-                                                                                                className="text-xs text-secondary text-wrap font-weight-lighter mb-0"
-                                                                                                title={ adcSite.SiteAddress.length > 20 ? adcSite.SiteAddress : null }
-                                                                                            >
-                                                                                                { 
-                                                                                                    adcSite.SiteAddress.length > 20 
-                                                                                                        ? adcSite.SiteAddress.substring(0, 20) + '...'
-                                                                                                        : adcSite.SiteAddress
-                                                                                                }
-                                                                                            </div>
-                                                                                        </th>
-                                                                                    )
+                                                                                    adcSiteList.map(adcSite => { 
+                                                                                        //console.log('adcSite', adcSite);
+                                                                                        return (
+                                                                                            <th key={adcSite.ID} className="align-top" style={{minWidth: '220px'}}>
+                                                                                                <div className={headStyle}>
+                                                                                                    { adcSite.SiteDescription }
+                                                                                                </div>
+                                                                                                <div 
+                                                                                                    className="text-xs text-secondary text-wrap font-weight-lighter mb-0"
+                                                                                                    title={ adcSite.SiteAddress.length > 20 ? adcSite.SiteAddress : null }
+                                                                                                >
+                                                                                                    { 
+                                                                                                        adcSite.SiteAddress.length > 20 
+                                                                                                            ? adcSite.SiteAddress.substring(0, 20) + '...'
+                                                                                                            : adcSite.SiteAddress
+                                                                                                    }
+                                                                                                </div>
+                                                                                            </th>
+                                                                                        )
+                                                                                    })
                                                                                 }
                                                                             </tr>
                                                                         </thead>
@@ -864,6 +913,29 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     )
                                                                                 }
                                                                             </tr>
+                                                                            { adcSiteList.length > 1 && !!auditStepList && auditStepList.length > 0 ? auditStepList.map(auditStep =>
+                                                                                <tr key={ auditStep }>
+                                                                                    <th colSpan={2}>
+                                                                                        <h6 className={ `${h6Style} text-end`}>
+                                                                                            { auditStepProps[auditStep].label }
+                                                                                        </h6>
+                                                                                    </th>
+                                                                                    {
+                                                                                        adcSiteList.map(adcSite => {
+                                                                                            const myAudit = adcSite.ADCSiteAudits.find(asa => asa.AuditStep == auditStep);
+                                                                                            // console.log('myAudit', myAudit);
+                                                                                            if (!myAudit) return null;
+                                                                                            return (
+                                                                                                <td key={adcSite.ID} className="align-middle">
+                                                                                                    <ADCSiteAuditInput 
+                                                                                                        adcSiteAudit={ myAudit } 
+                                                                                                    />
+                                                                                                </td>
+                                                                                            )
+                                                                                        })
+                                                                                    }
+                                                                                </tr>
+                                                                            ) : null }
                                                                         </tbody>                                                                    
                                                                     </table>
                                                                     {

@@ -27,6 +27,7 @@ import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import { useCallback } from "react";
 
 const { VITE_PAGE_SIZE } = envVariables();
 
@@ -102,7 +103,7 @@ export const useStandardsStore = () => {
    * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
    * @param {Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
    */
-  const standardsAsync = async (options = {}) => {
+  const standardsAsync = useCallback(async (options = {}) => {
     dispatch(onStandardsLoading());
 
     try {
@@ -117,7 +118,7 @@ export const useStandardsStore = () => {
       const message = getError(error);
       setError(message);
     }
-  };
+  }, [dispatch]);
 
   /**
    * Obtiene un listado general de todas las áreas activas

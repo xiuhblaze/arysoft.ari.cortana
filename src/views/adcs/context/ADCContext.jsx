@@ -23,6 +23,10 @@ const ADCControllerProvider = ({ children }) => {
         conceptValueHidden: {
             value: 0,
             touch: false,        
+        },
+        siteAuditHidden: {
+            value: 0,
+            touch: false,
         }
     } // initialState
 
@@ -77,6 +81,41 @@ const ADCControllerProvider = ({ children }) => {
 
         return newADCSiteList;
     }; // updateADCConceptValue
+
+    const updateADCSiteAudit = (state, value) => {
+        const { adcSiteAuditID, value : checkValue } = value;
+
+        const newADCSiteList = state.adcSiteList.map(adcSite => {
+            let hasChanges = false;
+            //console.log('updateADCSiteAudit.adcSite', adcSite);
+
+            const newADCSiteAuditList = adcSite.ADCSiteAudits.map(adcSiteAudit => {
+
+                if (adcSiteAudit.ID == adcSiteAuditID) {
+                    hasChanges = true;
+                    //console.log('updateADCSiteAudit.adcSiteAudit', adcSiteAudit);
+                    return {
+                        ...adcSiteAudit,
+                        Value: checkValue ?? adcSiteAudit.Value,
+                    };
+                }
+
+                return adcSiteAudit;
+            });
+
+            if (hasChanges) {
+                // console.log('newADCSiteAuditList - Hubo cambios', newADCSiteAuditList);
+                return {
+                    ...adcSite,
+                    ADCSiteAudits: newADCSiteAuditList,
+                };
+            }
+
+            return adcSite;
+        }); // newADCSiteList
+
+        return newADCSiteList;
+    }; // updateADCSiteAudit
 
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
@@ -163,8 +202,6 @@ const ADCControllerProvider = ({ children }) => {
                 ? totalSiteDays * (survPercentBase / 100)
                 : totalDays * (survPercentBase / 100);
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
-            
-            //console.log('totalDays', totalDays);
 
             return {
                 ...adcSite,
@@ -219,6 +256,12 @@ const ADCControllerProvider = ({ children }) => {
             case 'SET_CONCEPT_VALUE_TOUCH': {
                 return { ...state, conceptValueHidden: { ...state.conceptValueHidden, touch: action.value } };
             }
+            case 'SET_SITE_AUDIT_VALUE_HIDDEN': {
+                return { ...state, siteAuditHidden: { ...state.siteAuditHidden, value: action.value } };
+            }
+            case 'SET_SITE_AUDIT_VALUE_TOUCH': {
+                return { ...state, siteAuditHidden: { ...state.siteAuditHidden, touch: action.value } };
+            }
             case 'UPDATE_ADC_SITE': {
                 const newState = updateTotals({
                     ...state, 
@@ -231,6 +274,14 @@ const ADCControllerProvider = ({ children }) => {
                     ...state, 
                     adcSiteList: updateADCConceptValue(state, action.value)
                 })
+                return { ...newState };
+            }
+            case 'UPDATE_ADC_SITE_AUDIT': {
+                //console.log('UPDATE_ADC_SITE_AUDIT', action.value);
+                const newState = {
+                    ...state, 
+                    adcSiteList: updateADCSiteAudit(state, action.value)
+                };
                 return { ...newState };
             }
             case 'UPDATE_TOTALS': {
@@ -269,8 +320,11 @@ const setADCConceptList = (dispatch, value) => dispatch({ type: "SET_ADC_CONCEPT
 const setMisc = (dispatch, value) => dispatch({ type: "SET_MISC", value });
 const setConceptValueHidden = (dispatch, value) => dispatch({ type: "SET_CONCEPT_VALUE_HIDDEN", value });
 const setConceptValueTouched = (dispatch, value) => dispatch({ type: "SET_CONCEPT_VALUE_TOUCH", value });
+const setSiteAuditValueHidden = (dispatch, value) => dispatch({ type: "SET_SITE_AUDIT_VALUE_HIDDEN", value });
+const setSiteAuditValueTouched = (dispatch, value) => dispatch({ type: "SET_SITE_AUDIT_VALUE_TOUCH", value });
 const updateADCSite = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SITE", value });
 const updateADCConceptValue = (dispatch, value) => dispatch({ type: "UPDATE_ADC_CONCEPT_VALUE", value });
+const updateADCSiteAudit = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SITE_AUDIT", value });
 const updateTotals = (dispatch) => dispatch({ type: "UPDATE_TOTALS" });
 const clearADCController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
@@ -284,9 +338,12 @@ export {
     setMisc,
     setConceptValueHidden,
     setConceptValueTouched,
+    setSiteAuditValueHidden,
+    setSiteAuditValueTouched,
     
     updateADCSite,
     updateADCConceptValue,
+    updateADCSiteAudit,
     updateTotals,
 
     clearADCController,

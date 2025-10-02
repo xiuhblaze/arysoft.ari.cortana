@@ -197,31 +197,30 @@ const OrganizationEditCard = ({ updatePhotoPreview, ...props }) => {
         }
     }, [companies])
     
+    // useEffect(() => {
+    //     if (!!organizationSavedOk) {
 
-    useEffect(() => {
-        if (!!organizationSavedOk) {
+    //         if (!isNullOrEmpty(saveNote)) {
+    //             noteCreateAsync({
+    //                 OwnerID: organization.ID,
+    //                 Text: saveNote,
+    //             });
+    //             setSaveNote('');
+    //         }
 
-            if (!isNullOrEmpty(saveNote)) {
-                noteCreateAsync({
-                    OwnerID: organization.ID,
-                    Text: saveNote,
-                });
-                setSaveNote('');
-            }
+    //         Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Changes made successfully', 'success');
+    //         organizationClear();
+    //         navigate(isApplicant ? '/applicants/' : '/organizations/');
+    //     }
+    // }, [organizationSavedOk]);
 
-            Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Changes made successfully', 'success');
-            organizationClear();
-            navigate(isApplicant ? '/applicants/' : '/organizations/');
-        }
-    }, [organizationSavedOk]);
-
-    useEffect(() => {
-        if (organizationDeletedOk) {
-            Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Record deleted successfully', 'success');
-            organizationClear();
-            navigate(isApplicant ? '/applicants/' : '/organizations/');
-        }
-    }, [organizationDeletedOk]);
+    // useEffect(() => {
+    //     if (organizationDeletedOk) {
+    //         Swal.fire(isApplicant ? 'Applicant' : 'Organization', 'Record deleted successfully', 'success');
+    //         organizationClear();
+    //         navigate(isApplicant ? '/applicants/' : '/organizations/');
+    //     }
+    // }, [organizationDeletedOk]);
     
     // METHODS
 

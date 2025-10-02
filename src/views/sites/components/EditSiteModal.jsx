@@ -1,6 +1,6 @@
 import { AryFormikTextInput } from '../../../components/Forms';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import { faEdit, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
 import { faSquarePlus } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Formik } from 'formik';
@@ -143,7 +143,7 @@ const EditSiteModal = ({ id, ...props }) => {
                 onClick={ onShowModal }
                 title={ !!id ? 'Edit site' : 'Add site' }
             >
-                <FontAwesomeIcon icon={ !!id ? faEdit : faSquarePlus } size="xl" />
+                <FontAwesomeIcon icon={ !!id ? faEdit : faPlus } size="xl" />
             </Button>
             <Modal show={ showModal} onHide={ onCloseModal } size="lg" >
                 <Modal.Header closeButton>

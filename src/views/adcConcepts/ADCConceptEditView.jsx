@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import * as Yup from "yup";
 
@@ -113,8 +113,8 @@ const ADCConceptEditView = () => {
             includeDeleted: false,
             order: StandardOrderType.name,
         });
-    }, []);
-    
+        setHelpContent(dispatch, null);
+    }, []);    
 
     useEffect(() => {
         if (!!id) adcConceptAsync(id);

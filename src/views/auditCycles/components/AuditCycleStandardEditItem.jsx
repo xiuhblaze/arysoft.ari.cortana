@@ -13,6 +13,7 @@ import { AryFormikSelectInput } from '../../../components/Forms';
 import enums from '../../../helpers/enums';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
 import auditStepProps from '../../audits/helpers/auditStepProps';
+import { useAuthStore } from '../../../hooks/useAuthStore';
 
 const AuditCycleStandardEditItem = ({ id, ...props }) => {
 
@@ -40,6 +41,8 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
     });
 
     // CUSTOM HOOKS
+
+    const { ROLES, hasRole } = useAuthStore();
 
     const {
         auditCycle,
@@ -128,6 +131,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             auditCycleStandardsAsync({
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,
+                includeDeleted: hasRole(ROLES.admin),
             });
             onCloseModal();
         }

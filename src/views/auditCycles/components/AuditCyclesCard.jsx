@@ -14,6 +14,7 @@ import AuditCyclesCardItem from './AuditCyclesCardItem';
 import auditStepProps from '../../audits/helpers/auditStepProps';
 import enums from '../../../helpers/enums';
 import auditCycleProps from '../helpers/auditCycleProps';
+import AuditCyclesCardStandardItem from './AuditCyclesCardStandardItem';
 //import envVariables from '../../../helpers/envVariables';
 
 const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props }) => {
@@ -160,26 +161,17 @@ const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props
                                                 </h6>
                                                 { !!auditCycle.AuditCycleStandards && auditCycle.AuditCycleStandards.length > 0 ? (
                                                     <div className="d-flex justify-content-start align-items-start flex-wrap my-1 gap-2">
-                                                        {
-                                                            auditCycle.AuditCycleStandards.map(item => (
-                                                                <div key={item.ID} className="d-flex justify-content-start align-items-center px-2 py-1 bg-gray-200 rounded-1 mb-1">
-                                                                    <FontAwesomeIcon icon={ faLandmark } className="me-1" />
-                                                                    <div>
-                                                                        <h6 className="text-xs mb-0">{ item.StandardName }</h6>
-                                                                        <p className="text-xs text-secondary mb-0">
-                                                                            <span title="Cycle type">{ auditCycleProps[item.CycleType].label }</span> | <span title="Initial step">{ auditStepProps[item.InitialStep].abbreviation.toUpperCase() }</span>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        }
+                                                    {
+                                                        auditCycle.AuditCycleStandards.map(item => (
+                                                            <AuditCyclesCardStandardItem key={item.ID} item={item} />
+                                                        ))
+                                                    }
                                                     </div>
                                                 ) : (
                                                     <p className="text-xs text-secondary my-2">
                                                         (no standards assigned)
                                                     </p>
                                                 )}
-
                                                 <p className="text-xs text-secondary mb-0">
                                                     <FontAwesomeIcon icon={ faPlay } className="text-success me-1" />
                                                     <span className="font-weight-bold">{ new Date(auditCycle.StartDate).toLocaleDateString() }</span>

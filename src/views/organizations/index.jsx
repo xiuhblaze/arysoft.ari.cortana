@@ -2,16 +2,16 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { DashboardLayout } from '../../layouts/dashboard';
 
-import ListView from './ListView';
-import EditView from './EditView';
+import OrganizationsListView from './OrganizationsListView';
+import OrganizationEditView from './OrganizationEditView';
 
 export const Organizations = () => {
   return (
     <DashboardLayout>
       <Routes>
-        <Route path="/" element={ <ListView /> } />
+        <Route path="/" element={ <OrganizationsListView /> } />
         <Route path="*" element={ <Navigate replace to="/" /> } />
-        <Route path="/:id" element={ <EditView /> } />
+        <Route path="/:id" element={ <OrganizationEditView /> } />
       </Routes>
     </DashboardLayout>
   )

@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import Swal from 'sweetalert2';
 
 import { AryFormikSelectInput, AryFormikTextInput } from '../../components/Forms';
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import { useUsersStore } from '../../hooks/useUsersStore';
 import { useOrganizationsStore } from '../../hooks/useOrganizationsStore';
 import { useAuditorsStore } from '../../hooks/useAuditorsStore';
@@ -110,6 +110,11 @@ const UsersEditView = () => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [userType, setUserType] = useState(null);
     const [ownersList, setOwnersList] = useState([]);
+
+    useEffect(() => {
+        setHelpContent(dispatch, null);
+    }, []);
+    
 
     useEffect(() => {
         if (!!id) userAsync(id);

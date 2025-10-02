@@ -1,15 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
 import envVariables from "../helpers/envVariables";
-import { clearAuthErrorMessage, onChecking, onLogin, onLogout, setAuthErrorMessage } from "../store/slices/authslice";
+import { 
+    clearAuthErrorMessage, 
+    clearUserSettings, 
+    onChecking, 
+    onLogin,
+    onLogout, 
+    setAuthErrorMessage, 
+    setUserSettings,
+} from "../store/slices/authslice";
 import cortanaApi from '../api/cortanaApi';
 import { jwtDecode } from "jwt-decode";
 import getError from "../helpers/getError";
 import { compareAsc } from "date-fns";
 import isString from "../helpers/isString";
 import isNullOrEmpty from "../helpers/isNullOrEmpty";
+import enums from "../helpers/enums";
 
 const AUTH_URL = '/auth';
-const { VITE_TOKEN } = envVariables();
+const USER_SETTINGS_URL = '/userSettings';
+const { UserSettingSearchModeType } = enums();
+const { 
+    VITE_TOKEN, 
+    VITE_USER_SETTINGS 
+} = envVariables();
 
 export const useAuthStore = () => {
 
@@ -27,6 +41,7 @@ export const useAuthStore = () => {
     const {
         status,
         user,
+        userSettings,
         userErrorMessage,
     } = useSelector(state => state.auth);
 
@@ -60,12 +75,29 @@ export const useAuthStore = () => {
         return user;
     }; // setUserInfo
 
+    const getUserSettingsAsync = async (id) => {
+        try {
+            const resp = await cortanaApi.get(`${USER_SETTINGS_URL}?userid=${id}`);
+            const { Data } = await resp.data;
+
+            return Data;
+        } catch (error) {
+            const message = getError(error);
+            setError(message);
+        }
+    }; // getUserSettingsAsync
+
     //* Export Methods
 
     const checkAuthToken = () => {
         const token = localStorage.getItem(VITE_TOKEN) || null;
+        const userSettings = localStorage.getItem(VITE_USER_SETTINGS) || null;
 
-        if (!token) return dispatch(onLogout());
+        if (!token) {
+            dispatch(clearUserSettings());
+            dispatch(onLogout());
+            return ;
+        } 
 
         try {
             const user = setUserInfo(token);
@@ -75,20 +107,24 @@ export const useAuthStore = () => {
             }
 
             // TODO: Falta refrescar el token
-            if (!user) {
+            if (!user) { // Creo que aquí nunca entra
                 localStorage.removeItem(VITE_TOKEN);
+                localStorage.removeItem(VITE_USER_SETTINGS);
+                console.log('Session was expired - creo que aquí nunca entra');
                 throw new Error('Session was expired');
             }
-            localStorage.setItem(VITE_TOKEN, token);
+            localStorage.setItem(VITE_TOKEN, token);            
+            dispatch(setUserSettings(JSON.parse(userSettings)));
             dispatch(onLogin(user));
 
         } catch (error) {
             // console.log(error); // Oculto temporalmente, creo que no lo wa dejar aquí
             const message = getError(error);
             setError(message);
+            dispatch(clearUserSettings());
             dispatch(onLogout());
         }
-    };
+    }; // checkAuthToken
 
     const loginASync = async (values) => {
         dispatch(onChecking());
@@ -97,20 +133,53 @@ export const useAuthStore = () => {
             const result = await cortanaApi.post(AUTH_URL, values);
             const token = result.data.Data;
             const user = setUserInfo(token);
-            localStorage.setItem(VITE_TOKEN, JSON.stringify(token));
+            const userSettings = await getUserSettingsAsync(user.id);
+
+            //localStorage.setItem(VITE_TOKEN, token) // Lo envié hacia abajo para que primero se limpie el localStorage
+
+            if (!!userSettings && Array.isArray(userSettings) && userSettings.length > 0) {
+                const settings = JSON.parse(userSettings[0].Settings);
+                const allSettings = {
+                    ...settings,
+                    ID: userSettings[0].ID,
+                }
+                setUserSettingsLocalStorage(allSettings); // Esta linea susituye las dos siguientes
+                // localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(allSettings));
+                // dispatch(setUserSettings(allSettings));
+                switch (settings.searchMode) {
+                    case UserSettingSearchModeType.onScreen:
+                        //console.log('onScreen - borrar localStorage y no guardar en localStorage');
+                        localStorage.clear();
+                        break;
+                    case UserSettingSearchModeType.onSession:                        
+                        //console.log('onSession - borrar localStorage');
+                        localStorage.clear();
+                        break;
+                    case UserSettingSearchModeType.indefinitely:
+                        //console.log('indefinitely - utilizar como está actualmente');
+                        break;
+                }
+            } else {
+                localStorage.removeItem(VITE_USER_SETTINGS);
+                dispatch(clearUserSettings());
+            }
+            
+            localStorage.setItem(VITE_TOKEN, token);
             dispatch(onLogin(user));
         } catch (error) {
             const message = getError(error);
             setError(message);
+            dispatch(clearUserSettings());
             dispatch(onLogout());
         }
-    };
+    }; // loginASync
 
     const logout = () => {
         localStorage.clear();
-        setError('Sesión finalizada');
+        dispatch(clearUserSettings());
+        setError('Session ended');
         dispatch(onLogout());
-    };
+    }; // logout
 
     const changePasswordAsync = async (values) => {
 
@@ -182,11 +251,18 @@ export const useAuthStore = () => {
         return false;
     }; // hasRole
 
+    const setUserSettingsLocalStorage = (settings) => {
+
+        localStorage.setItem(VITE_USER_SETTINGS, JSON.stringify(settings));
+        dispatch(setUserSettings(settings));
+    }; // setUserSettingsLocalStorage
+
     return {
         ROLES,
         
         status,
         user,
+        userSettings,
         userErrorMessage,
 
         changePasswordAsync,
@@ -195,5 +271,6 @@ export const useAuthStore = () => {
         loginASync,
         logout,
         validatePasswordAsync,
+        setUserSettingsLocalStorage,
     }
 };

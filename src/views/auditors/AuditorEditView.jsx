@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { setNavbarTitle, useArysoftUIController } from '../../context/context';
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from '../../context/context';
 import enums from '../../helpers/enums';
 import { useAuditorsStore } from '../../hooks/useAuditorsStore';
 import { getFullName } from '../../helpers/getFullName';
@@ -59,6 +59,11 @@ const AuditorEditView = () => {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [navOptions, setNavOptions] = useState("standards-list");
     const [fullName, setFullName] = useState("(new auditor)");
+
+    useEffect(() => {
+        setHelpContent(dispatch, null);
+    }, []);
+    
 
     useEffect(() => {
         if (!!id) {

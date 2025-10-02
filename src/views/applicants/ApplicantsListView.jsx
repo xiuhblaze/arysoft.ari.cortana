@@ -2,20 +2,17 @@ import { useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Swal from 'sweetalert2';
 
-import { setNavbarTitle, useArysoftUIController } from "../../context/context";
+import { setHelpContent, setNavbarTitle, useArysoftUIController } from "../../context/context";
 import { useOrganizationsStore } from "../../hooks/useOrganizationsStore";
 import AryPagination from "../../components/AryPagination/AryPagination";
 import enums from "../../helpers/enums";
 import envVariables from "../../helpers/envVariables"
 import OrganizationsTableList from "../organizations/components/OrganizationsTableList";
 import OrganizationsToolbar from "../organizations/components/OrganizationsToolbar";
+import { useViewNavigation } from "../../hooks/useViewNavigation";
 
 const ApplicantsListView = () => {
-    const {
-        APPLICANTS_OPTIONS,
-        VITE_PAGE_SIZE,
-    } = envVariables();
-
+    const { APPLICANTS_OPTIONS } = envVariables();    
     const {
         OrganizationStatusType,
         OrganizationOrderType,
@@ -31,23 +28,36 @@ const ApplicantsListView = () => {
         organizationsAsync,
     } = useOrganizationsStore();
 
+    const {
+        onSearch,
+        onPageChange
+    } = useViewNavigation({
+        LS_OPTIONS: APPLICANTS_OPTIONS,
+        DefultOrder: OrganizationOrderType.updatedDesc,
+        itemsAsync: organizationsAsync,
+    });
+
     // HOOKS
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(APPLICANTS_OPTIONS)) || null;
-        const newSearch = {
+        // const savedSearch = JSON.parse(localStorage.getItem(APPLICANTS_OPTIONS)) || null;
+        // const newSearch = {
+        //     status: OrganizationStatusType.applicant,
+        //     pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
+        //     pageNumber: 1,
+        //     order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.updatedDesc,
+        // };        
+
+        // const search = !!savedSearch ? savedSearch : newSearch;
+
+        // organizationsAsync(search);
+        // localStorage.setItem(APPLICANTS_OPTIONS, JSON.stringify(search));
+
+        onSearch({
             status: OrganizationStatusType.applicant,
-            pageSize: savedSearch?.pageSize ? savedSearch.pageSize : VITE_PAGE_SIZE,
-            pageNumber: 1,
-            order: savedSearch?.order ? savedSearch.order : OrganizationOrderType.updatedDesc,
-        };        
-
-        const search = !!savedSearch ? savedSearch : newSearch;
-
-        organizationsAsync(search);
-        localStorage.setItem(APPLICANTS_OPTIONS, JSON.stringify(search));
-
+        });
         setNavbarTitle(dispatch, null);
+        setHelpContent(dispatch, null);
     }, []);
     
     useEffect(() => {
@@ -58,16 +68,16 @@ const ApplicantsListView = () => {
 
     // METHODS
 
-    const onClickGoPage = (page = 1) => {
-        const savedSearch = JSON.parse(localStorage.getItem(APPLICANTS_OPTIONS)) || null;
-        const search = {
-            ...savedSearch,
-            pageNumber: page,
-        };
+    // const onClickGoPage = (page = 1) => {
+    //     const savedSearch = JSON.parse(localStorage.getItem(APPLICANTS_OPTIONS)) || null;
+    //     const search = {
+    //         ...savedSearch,
+    //         pageNumber: page,
+    //     };
 
-        organizationAsync(search);
-        localStorage.setItem(APPLICANTS_OPTIONS, JSON.stringify(search));
-    }; // onClickGoPage
+    //     organizationAsync(search);
+    //     localStorage.setItem(APPLICANTS_OPTIONS, JSON.stringify(search));
+    // }; // onClickGoPage
 
     return (
         <Container fluid className="py-4 px-0 px-sm-4">
@@ -82,7 +92,7 @@ const ApplicantsListView = () => {
                                 <AryPagination
                                     currentPage={organizationsMeta.CurrentPage}
                                     totalPages={organizationsMeta.TotalPages}
-                                    onClickGoPage={onClickGoPage}
+                                    onClickGoPage={onPageChange}
                                 />
                             )}
                             <OrganizationsTableList applicantsOnly />
@@ -90,7 +100,7 @@ const ApplicantsListView = () => {
                                 <AryPagination
                                     currentPage={organizationsMeta.CurrentPage}
                                     totalPages={organizationsMeta.TotalPages}
-                                    onClickGoPage={onClickGoPage}
+                                    onClickGoPage={onPageChange}
                                     className="mt-2"
                                 />
                             )}

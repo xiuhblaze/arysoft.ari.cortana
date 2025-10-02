@@ -12,7 +12,7 @@ import privateRoute from "../../routes/privateRoutes";
 
 import lgoARINavbar from '../../assets/img/lgoARINavbar.png';
 
-export const DashboardLayout = ({ help = null, children }) => {
+export const DashboardLayout = ({ children }) => {
   const [ controller, dispatch ] = useArysoftUIController();
   const { miniSidenav } = controller;
   const { pathname } = useLocation();
@@ -33,7 +33,7 @@ export const DashboardLayout = ({ help = null, children }) => {
         { children }
         {/* <DashboardFooter /> */}
       </main>
-      <Configurator help={ help } />
+      <Configurator />
     </>
   )
 }

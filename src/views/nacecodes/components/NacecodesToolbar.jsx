@@ -1,23 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
-
-import envVariables from "../../../helpers/envVariables";
-import enums from "../../../helpers/enums";
-
-import useNacecodesStore from "../../../hooks/useNaceCodesStore";
-import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
-import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
 import debounce from "lodash.debounce";
-import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
-import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
+
+import { AryFormikTextInput, AryFormikSelectInput } from "../../../components/Forms";
 import { useAuthStore } from "../../../hooks/useAuthStore";
+import { useViewNavigation } from "../../../hooks/useViewNavigation";
+import defaultCSSClasses from "../../../helpers/defaultCSSClasses";
+import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
+import nacecodeAccreditedStatusProps from "../helpers/nacecodeAccreditedStatusProps";
+import nacecodeOnlyOptionsProps from "../helpers/nacecodeOnlyOptionsProps";
+import useNacecodesStore from "../../../hooks/useNaceCodesStore";
 
 export const NacecodesToolbar = () => {
-    const { DefaultStatusType, NacecodeOrderType } = enums();
-    const { NACECODES_OPTIONS, VITE_PAGE_SIZE } = envVariables();
+    const { 
+        DefaultStatusType,
+        NacecodeOrderType,
+    } = enums();
+    const { NACECODES_OPTIONS } = envVariables();
     const {
         BUTTON_ADD_CLASS,
         BUTTON_SEARCH_CLASS,
@@ -38,20 +41,39 @@ export const NacecodesToolbar = () => {
 
     // CUSTOM HOOKS
 
-    const { ROLES, hasRole } = useAuthStore();
+    const { 
+        ROLES, 
+        hasRole,
+    } = useAuthStore();
 
     const {
         isNacecodeCreating,
+        nacecodeCreatedOk,
+        nacecode,
         nacecodesAsync,
         nacecodeCreateAsync
     } = useNacecodesStore();
+
+    const {
+        getSavedSearch,
+        onSearch,
+        onCleanSearch,
+    } = useViewNavigation({
+        LS_OPTIONS: NACECODES_OPTIONS,
+        DefultOrder: NacecodeOrderType.sector,
+        itemsAsync: nacecodesAsync,
+    });
     
     // HOOKS
-    
+
+    const navigate = useNavigate();
+    const formikRef = useRef(null);
+
     const [initialValues, setInitialValues] = useState(formDefaultData);
 
     useEffect(() => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
+        const savedSearch = getSavedSearch();
+        
         if (!!savedSearch) {
             setInitialValues({
                 textInput: savedSearch?.text ?? '',
@@ -67,12 +89,21 @@ export const NacecodesToolbar = () => {
         }
     }, []);
 
+    useEffect(() => {
+
+        if (nacecodeCreatedOk) {
+            navigate(`/nace-codes/${nacecode.ID}`);
+        }
+    }, [nacecodeCreatedOk]);
+    
     // METHODS
 
+    const onNewItem = () => {
+        nacecodeCreateAsync();
+    }; // onNewItem
+
     const sendSearch = (values) => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
         const search = {
-            ...savedSearch,
             text: values.textInput,
             sector: values.sectorInput,
             division: values.divisionInput,
@@ -82,55 +113,26 @@ export const NacecodesToolbar = () => {
             accreditedStatus: values.accreditedStatusSelect,
             status: values.statusSelect,
             includeDeleted: values.includeDeletedCheck,
-            pageNumber: 1,
+            //pageNumber: 1,
         };
-
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
+        onSearch(search);
     }; // sendSearch
 
     const debouncedSearch = debounce(sendSearch, 500, {
         leading: true,
         trailing: false,
-    });
-     
-    const onNewItem = () => {
-        nacecodeCreateAsync();
-    };
-
+    }); // debouncedSearch
+    
     const onSearchSubmit = (values) => {
         debouncedSearch(values);
-        // const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        // const search = {
-        //     ...savedSearch,
-        //     text: values.textInput,
-        //     sector: values.sectorInput,
-        //     division: values.divisionInput,
-        //     group: values.groupInput,
-        //     class: values.classInput,
-        //     onlyOption: values.onlySelect,
-        //     status: values.statusSelect,
-        //     includeDeleted: values.includeDeletedCheck,
-        //     pageNumber: 1,
-        // };
-
-        // nacecodesAsync(search);
-        // localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
     }; // onSearchSubmit
 
-    const onCleanSearch = () => {
-        const savedSearch = JSON.parse(localStorage.getItem(NACECODES_OPTIONS)) || null;
-        const search = {
-            pageSize: savedSearch?.pageSize ?? VITE_PAGE_SIZE,
-            pageNumber: 1,
-            includeDeleted: false,
-            order: NacecodeOrderType.sector,
-        };
-
+    const handleClearSearch = () => {
         setInitialValues(formDefaultData);
-        nacecodesAsync(search);
-        localStorage.setItem(NACECODES_OPTIONS, JSON.stringify(search));
-    }; // onCleanSearch
+        formikRef.current.resetForm(initialValues);
+
+        onCleanSearch();
+    }; // handleClearSearch
 
     return (
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -150,6 +152,7 @@ export const NacecodesToolbar = () => {
                     initialValues={initialValues}
                     onSubmit={onSearchSubmit}
                     enableReinitialize
+                    innerRef={formikRef}
                 >
                     {(formik) => (
                         <Form>
@@ -246,10 +249,7 @@ export const NacecodesToolbar = () => {
                                         </button>
                                     </div>
                                     <div className="d-grid d-md-block ps-md-2">
-                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={(values) => {
-                                            onCleanSearch(values);
-                                            formik.resetForm(initialValues);
-                                        }}>
+                                        <button type="button" className={BUTTON_CLEAR_SEARCH_CLASS} onClick={ handleClearSearch }>
                                             <FontAwesomeIcon icon={faXmark} size="lg" />
                                         </button>
                                     </div>
