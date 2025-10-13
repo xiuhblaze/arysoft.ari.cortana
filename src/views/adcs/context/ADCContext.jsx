@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useReducer } from 'react';
 import enums from '../../../helpers/enums';
 import aryMathTools from '../../../helpers/aryMathTools';
+import roundToDecimals from '../../../helpers/roundToDecimals';
 
 const ADCContext = createContext(null);
 
@@ -146,9 +147,9 @@ const ADCControllerProvider = ({ children }) => {
                             || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
 
                             if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
-                                totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100));
+                                totalDays = roundToDecimals(totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100)));
                             } else if (myConcept.DecreaseUnit == ADCConceptUnitType.days) {
-                                totalDays = totalDays - adccvItem.Value;
+                                totalDays = roundToDecimals(totalDays - adccvItem.Value);
                             }
                         }
                     } 
@@ -165,9 +166,9 @@ const ADCControllerProvider = ({ children }) => {
                             || (!myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Increase)) {
 
                             if (myConcept.IncreaseUnit == ADCConceptUnitType.percentage) {
-                                totalDays = totalDays + (decreaseTotal * (adccvItem.Value / 100));
+                                totalDays = roundToDecimals(totalDays + (decreaseTotal * (adccvItem.Value / 100)));
                             } else if (myConcept.IncreaseUnit == ADCConceptUnitType.days) {
-                                totalDays = totalDays + adccvItem.Value;
+                                totalDays = roundToDecimals(totalDays + adccvItem.Value);
                             }
                         }
                     } 
@@ -177,8 +178,8 @@ const ADCControllerProvider = ({ children }) => {
             //* Validaciones MD11
 
             if (adcSite.MD11 > 0 && state.misc.isMultistandard) {                
-                const decreaseInDays = totalDays * (adcSite.MD11 / 100);
-                totalSiteDays = totalDays - decreaseInDays;
+                const decreaseInDays = roundToDecimals(totalDays * (adcSite.MD11 / 100));
+                totalSiteDays = roundToDecimals(totalDays - decreaseInDays);
 
                 //totalMD11 += adcSite.MD11;
             } else {
@@ -188,7 +189,7 @@ const ADCControllerProvider = ({ children }) => {
             //* Validaciones
 
             // If the total initial is greater than the maximum allowed, it will be reduced to the maximum allowed
-            const maxRedution = adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100));
+            const maxRedution = roundToDecimals(adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100)));
             const exceedsReduction = totalDays < maxRedution;
             
             // Totales por sitio
@@ -199,8 +200,8 @@ const ADCControllerProvider = ({ children }) => {
             // Surveillance
             const survPercentBase = 30; // 30% de TotalInitial del site
             const surveillance = state.adcData.IsMultistandard 
-                ? totalSiteDays * (survPercentBase / 100)
-                : totalDays * (survPercentBase / 100);
+                ? roundToDecimals(totalSiteDays * (survPercentBase / 100))
+                : roundToDecimals(totalDays * (survPercentBase / 100));
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
 
             return {

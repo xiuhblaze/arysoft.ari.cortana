@@ -123,12 +123,15 @@ const CalendarCard = () => {
                 const toolTip = item.Description + '\n' 
                     + item.OrganizationName + '\n' 
                     + auditors + '\n' //item.Auditors.map(i => i.AuditorName).join(', ') + '\n'
-                    + item.Standards.map(i => {
-                        let s = i.StandardName;
-                        s += ' - ' + auditStepProps[i.Step].
-                        abbreviation.toUpperCase();
-                        return s;
-                    }).join(', ');
+                    + item.Standards
+                        .filter(i => i.Status == DefaultStatusType.active)
+                        .map(i => {
+                            let s = i.StandardName;
+                            s += ' - ' + auditStepProps[i.Step].
+                                abbreviation.toUpperCase();
+                            return s;
+                        })
+                        .join(', ');
 
                 return {
                     title: toolTip,

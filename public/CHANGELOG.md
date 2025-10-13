@@ -17,7 +17,7 @@ Cuando se aplica un decremento en el ADC, el total de días se calculaba mal en 
 
 ### Added
 
-- **Nueva sección de ayuda**  
+- **Nueva sección de ayuda**
 Se agrega una sección de ayuda para cada vista, con un breve resumen de las funcionalidades disponibles. Hay opción para que la ayuda se muestre en ingles o español. Esta sección se encuenta disponible en la barra de navegación desde la opcion de configuración.
 
     *Aun no estan disponibles las secciones de ayuda para todos los formularios.*
