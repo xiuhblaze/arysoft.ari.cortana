@@ -26,6 +26,7 @@ import nacecodesSlice from "./slices/nacecodesSlice";
 import notesSlice from "./slices/notesSlice";
 import organizationsSlice from "./slices/organizationsSlice";
 import organizationStandardsSlice from "./slices/organizationStandardsSlice";
+import proposalsSlice from "./slices/proposalsSlice";
 import rolesSlice from "./slices/rolesSlice";
 import shiftsSlice from "./slices/shiftsSlice";
 import sitesSlice from "./slices/sitesSlice";
@@ -61,6 +62,7 @@ export const store = configureStore({
         notes: notesSlice.reducer,
         organizations: organizationsSlice.reducer,
         organizationStandards: organizationStandardsSlice.reducer,
+        proposals: proposalsSlice.reducer,
         roles: rolesSlice.reducer,
         shifts: shiftsSlice.reducer,
         sites: sitesSlice.reducer,

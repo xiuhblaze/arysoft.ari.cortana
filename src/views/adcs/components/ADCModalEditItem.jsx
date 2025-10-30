@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 
 import { useADCConceptsStore } from '../../../hooks/useADCConceptsStore';
 import { useADCConceptValuesStore } from '../../../hooks/useADCConceptValuesStore';
+import { useADCSiteAuditsStore } from '../../../hooks/useADCSiteAuditsStore';
 import { useADCSitesStore } from '../../../hooks/useADCSitesStore';
 import { useADCsStore } from '../../../hooks/useADCsStore';
 import { useAuditCyclesStore } from '../../../hooks/useAuditCyclesStore';
@@ -14,7 +15,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setConceptValueHidden, setMisc, useADCController } from '../context/ADCContext';
-import { faArrowCircleLeft, faArrowLeft, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleLeft, faArrowLeft, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faInfoCircle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
@@ -22,21 +23,20 @@ import ADCConceptValueInput from './ADCConceptValueInput';
 import ADCConceptYesNoInfo from '../../adcConcepts/components/ADCConceptYesNoInfo';
 import ADCMD11ValueInput from './ADCMD11ValueInput';
 import adcSetStatusOptions from '../helpers/adcSetStatusOptions';
+import ADCSiteAuditInput from './ADCSiteAuditInput';
 import adcStatusProps from '../helpers/adcStatusProps';
 import AryFormDebug from '../../../components/Forms/AryFormDebug';
+import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation';
 import AryLastUpdatedInfo from '../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo';
+import auditStepProps from '../../audits/helpers/auditStepProps';
 import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import enums from '../../../helpers/enums';
+import getAuditStepList from '../../audits/helpers/getAuditStepList';
 import getRandomBackgroundImage from '../../../helpers/getRandomBackgroundImage';
 import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
-import AryJumpAnimation from '../../../components/AryAnimations/AryJumpAnimation';
-import auditStepProps from '../../audits/helpers/auditStepProps';
-import ADCSiteAuditInput from './ADCSiteAuditInput';
-import getAuditStepList from '../../audits/helpers/getAuditStepList';
-import { useADCSiteAuditsStore } from '../../../hooks/useADCSiteAuditsStore';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -371,7 +371,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }; // loadFromHistoricalData
 
     const onFormSubmit = (values) => {
-        let reviewComments = adc.ReviewComments;
         let newStatus = adc.Status == ADCStatusType.nothing && values.statusSelect == ADCStatusType.nothing
             ? ADCStatusType.new
             : values.statusSelect;
@@ -379,12 +378,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         if (adc.Status != newStatus) { // Si cambió el status crear una nota
             const text = 'Status changed to ' + adcStatusProps[newStatus].label.toUpperCase();
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
-
-            if (newStatus == ADCStatusType.review 
-                || newStatus == ADCStatusType.rejected 
-                || newStatus == ADCStatusType.active) {
-                reviewComments = values.commentsInput;
-            }
         }
 
         const toSave = {
@@ -393,7 +386,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             TotalInitial: adcData.TotalInitial,
             TotalMD11: adcData.TotalMD11,
             TotalSurveillance: adcData.TotalSurveillance,
-            ReviewComments: reviewComments,
+            TotalRecertification: adcData.TotalRecertification,
             ExtraInfo: values.extraInfoInput,
             Status: newStatus,
         };
@@ -420,6 +413,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 MD11: contextADCSite.MD11 ?? 0,
                 Total: contextADCSite.Total ?? 0,
                 Surveillance: contextADCSite.Surveillance ?? 0,
+                Recertification: contextADCSite.Recertification ?? 0,
                 ExtraInfo: formikADCSite?.extraInfo ?? '',
                 Status: contextADCSite.Status,
             };
@@ -893,6 +887,25 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             <tr>
                                                                                 <th className="text-end" colSpan={2}>
                                                                                     <h6 className={h6Style}>
+                                                                                        Recertification
+                                                                                    </h6>
+                                                                                </th>
+                                                                                {
+                                                                                    adcSiteList.map(adcSite =>  
+                                                                                        <td key={adcSite.ID}>
+                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                                { adcSite.Recertification ?? 0 }
+                                                                                                <span className="px-2" title="Days">
+                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
+                                                                                                </span>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                    )
+                                                                                }
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th className="text-end" colSpan={2}>
+                                                                                    <h6 className={h6Style}>
                                                                                         Extra Info
                                                                                     </h6>
                                                                                     <p className="text-xs text-secondary text-wrap mb-0">
@@ -938,6 +951,26 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             ) : null }
                                                                         </tbody>                                                                    
                                                                     </table>
+                                                                    {
+                                                                        !!adc.Proposal ? (
+                                                                            <>
+                                                                                <hr className="horizontal dark my-3" />
+                                                                                <Alert variant="info" className="mb-0">
+                                                                                    <div className="d-flex justify-content-start align-items-center">
+                                                                                        <FontAwesomeIcon icon={ faInfoCircle } className="text-white me-2" size="lg" />
+                                                                                        <div>
+                                                                                            <h6 className="text-sm text-white font-weight-bold mb-0"> 
+                                                                                                Proposal
+                                                                                            </h6>
+                                                                                            <p className="text-xs text-white mb-0 opacity-8">
+                                                                                                The ADC has a proposal
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </Alert>
+                                                                            </>
+                                                                        ) : null
+                                                                    }
                                                                     {
                                                                         !isObjectEmpty(formik.errors) && (
                                                                             <>
@@ -1020,6 +1053,20 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 <MiniStatisticsCard
                                                     title="Surveillance"
                                                     count={ adcData?.TotalSurveillance ?? 0 }
+                                                    percentage={{
+                                                        color: 'dark',
+                                                        text: 'days',
+                                                    }}
+                                                    icon={{
+                                                        icon: faCalendarDay,
+                                                        bgColor: 'dark',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <MiniStatisticsCard
+                                                    title="Recertification"
+                                                    count={ adcData?.TotalRecertification ?? 0 }
                                                     percentage={{
                                                         color: 'dark',
                                                         text: 'days',

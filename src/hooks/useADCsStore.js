@@ -85,7 +85,7 @@ export const useADCsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
-     * @param {AppFormID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
+     * @param {OrganizationID, AuditCycleID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const adcsAsync = async (options = {}) => {
         dispatch(onADCsLoading());

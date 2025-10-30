@@ -3,7 +3,7 @@ import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
 import { useADCsStore } from "../../../hooks/useADCsStore";
 import { Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCalendarDay, faEdit, faFileLines, faGear, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCalendarDay, faEdit, faFile, faFileLines, faFileSignature, faGear, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ADCModalEditItem from "./ADCModalEditItem";
 import { ADCControllerProvider } from "../context/ADCContext";
@@ -13,7 +13,7 @@ import adcAlertsProps from "../helpers/adcAlertsProps";
 import adcStatusProps from "../helpers/adcStatusProps";
 
 const ADCAuditCycleList = ({ showAll = false }) => {
-    const { ADCAlertType, ADCStatusType } = enums();
+    const { ADCAlertType, ADCStatusType, ProposalStatusType } = enums();
 
     const { auditCycle } = useAuditCyclesStore();
 
@@ -123,6 +123,12 @@ const ADCAuditCycleList = ({ showAll = false }) => {
                                         </span> |
                                         <span title="Total employees">
                                             <FontAwesomeIcon icon={ faUsers } />: { adc.TotalEmployees ?? '0' }
+                                        </span> |
+                                        <span title={ adc.HasProposal ? 'Proposal associated' : 'No proposal associated' }>
+                                            <FontAwesomeIcon 
+                                                icon={ adc.HasProposal ? faFileSignature : faFile } 
+                                                className={ adc.HasProposal ? 'text-info' : 'text-secondary' }
+                                            />
                                         </span>
                                     </div>
                                 </div>

@@ -21,6 +21,8 @@ import AppFormAuditCycleList from '../../appForms/components/AppFormAuditCycleLi
 import ADCAuditCycleList from '../../adcs/components/ADCAuditCycleList';
 import { useADCsStore } from '../../../hooks/useADCsStore';
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
+import ProposalAuditCycleList from '../../proposals/components/ProposalAuditCycleList';
+import { useProposalsStore } from '../../../hooks/useProposalsStore';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     // console.log('AuditCycleDocumentsList');
@@ -47,6 +49,10 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
     const {
         adcs
     } = useADCsStore();
+
+    const {
+        proposals
+    } = useProposalsStore();
 
     // HOOKS
 
@@ -80,6 +86,8 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                         if ((item.id == AuditCycleDocumentType.appForm && !!appForms && appForms.length > 0) || documents.length > 0) {
                             iconColorStyle = `text-${item.variant} text-gradient`;
                         } else if ((item.id == AuditCycleDocumentType.adc && !!adcs && adcs.length > 0) || documents.length > 0) {
+                            iconColorStyle = `text-${item.variant} text-gradient`;
+                        } else if (item.id == AuditCycleDocumentType.proposal && !!proposals && proposals.length > 0) {
                             iconColorStyle = `text-${item.variant} text-gradient`;
                         } else {
                             iconColorStyle = `text-${ documents.length == 0 
@@ -155,9 +163,41 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                         </div>
                                     </div> : null
                                 }
+                                {
+                                    item.id == AuditCycleDocumentType.proposal ?
+                                    <div  className="timeline-block mb-3">
+                                        <div className="timeline-step">
+                                            <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />
+                                        </div>
+                                        <div className="timeline-content" style={{ maxWidth: 'none' }}>
+                                            <div className='d-flex justify-content-between align-items-center me-1 mb-0'>
+                                                <div>
+                                                    <h6 className="text-sm text-dark font-weight-bold mb-0">{item.label}</h6>
+                                                    <p className="text-xs text-secondary mb-0">{item.helpText}</p>
+                                                </div>
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <div className="text-dark text-sm font-weight-bold">
+                                                        <AuditCycleDocumentEditItem 
+                                                            documentType={ item.id }
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex justify-content-start flex-wrap gap-2 mt-1 mb-0">
+                                                {
+                                                    documents.map(doc => <AuditCycleDocumentItem key={doc.ID} item={doc} readOnly={readOnly} />)
+                                                }
+                                            </div>
+                                            { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
+                                            <ProposalAuditCycleList />
+                                        </div>
+                                    </div> : null
+                                }
                                 { // EL RESTO DE PASOS
                                     item.id != AuditCycleDocumentType.appForm 
-                                    && item.id != AuditCycleDocumentType.adc ? (
+                                    && item.id != AuditCycleDocumentType.adc
+                                    && item.id != AuditCycleDocumentType.proposal 
+                                    ? (
                                         <div  className="timeline-block mb-3">
                                             <div className="timeline-step">
                                                 <FontAwesomeIcon icon={item.icon} className={iconColorStyle} />

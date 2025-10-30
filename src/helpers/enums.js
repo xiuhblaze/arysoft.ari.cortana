@@ -25,7 +25,7 @@ const enums = () => {
         active: 4,     // Registro aprobado y activo
         inactive: 5,   // Registro inactivo, ya no está en uso, no modificable
         cancel: 6,     // En algún momento el registro fué cancelado
-        deleted: 7,     // Eliminación lógica 
+        deleted: 7,    // Eliminación lógica 
     });
     const ADCOrderType = Object.freeze({
         nothing: 0,        // No ordenar
@@ -402,6 +402,29 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    // Proposals
+
+    const ProposalStatusType = Object.freeze({
+        nothing: 0,    // Nuevo registro - temporal sino se guarda, se elimina
+        new: 1,        // Nuevo registro almacenado con la información mínima
+        review: 2,     // Registro enviado a revisión
+        rejected: 3,   // Registro rechazado por el revisor o el cliente, no se puede modificar
+        approved: 4,   // Registro aprobado y listo para enviar al cliente para firma
+        sended: 5,     // Registro enviado al cliente para firma - El sistema no lo envía
+        active: 6,     // Registro firmado por el cliente y activo - Registro manual
+        inactive: 7,   // Registro inactivo, ya no está en uso, no modificable - Generar historial
+        cancel: 8,     // En algún momento el registro fué cancelado
+        deleted: 9     // Eliminación lógica
+    }); // ProposalStatusType
+
+    const ProposalOrderType = Object.freeze({
+        nothing: 0,
+        created: 1,
+        status: 2,
+        createdDesc: 3,
+        statusDesc: 4,
+    }); // ProposalOrderType
+
     // Roles
 
     const RoleOrderType = Object.freeze({
@@ -553,6 +576,8 @@ const enums = () => {
         OrganizationOrderType,
         OrganizationStatusType,
         OrganizationStandardOrderType,
+        ProposalStatusType,
+        ProposalOrderType,
         RoleOrderType,
         ShiftOrderType,
         ShiftType,

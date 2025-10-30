@@ -138,6 +138,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isADCCreating,
         adcCreatedOk,
+        adc,
         
         adcsAsync,
         adcCreateAsync,
@@ -274,11 +275,16 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     }, [sitesList]);
 
     useEffect(() => {
+
         if (!!adcCreatedOk) {
+
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({ OwnerID: adc.ID, Text: saveNote });
+                setSaveNote('');
+            }
             Swal.fire('ADC', 
                 'ADC created successfully, this modal will close, and you will be see the new ADC in the ADCs list',
                 'success');
-
             adcsAsync({
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,
@@ -532,6 +538,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             adcCreateAsync({
                 AppFormID: appForm.ID,
             });
+
+            setSaveNote('Status set to NEW');
         }
     }; // onGenerateADC
 

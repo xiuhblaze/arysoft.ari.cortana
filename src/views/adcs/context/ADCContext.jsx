@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useReducer } from 'react';
 import enums from '../../../helpers/enums';
 import aryMathTools from '../../../helpers/aryMathTools';
+import roundToDecimals from '../../../helpers/roundToDecimals';
 
 const ADCContext = createContext(null);
 
@@ -119,17 +120,15 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateTotals = (state) => {
         // Procesar todos los valores del ADC y calcular los totales
-        //console.log('updateTotals()', state);
         const TOTAL_INITIAL_MIN_DAYS = 2;
         const TOTAL_INITIAL_MAX_PERCENT_REDUCTION = 30;
 
         const { adcData, adcSiteList } = state;
-        let totalInitial = 0;       // equivalente a ST1 y ST2
-        let totalEmployees = 0;     // suma de los empleados de todos los Sites        
-        let totalSurveillance = 0;
+        let totalInitial = 0;           // equivalente a ST1 y ST2
+        let totalEmployees = 0;         // suma de los empleados de todos los Sites        
+        let totalSurveillance = 0;      // Suma de los días calculados para la vigilancia
+        let totalRecertification = 0;   // Suma de los días calculados para la recertificación
         let total = 0;
-
-// console.log('acdData, adcSiteList', adcData, adcSiteList);
         
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
@@ -146,9 +145,9 @@ const ADCControllerProvider = ({ children }) => {
                             || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
 
                             if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
-                                totalDays = totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100));
+                                totalDays = roundToDecimals(totalDays - (adcSite.InitialMD5 * (adccvItem.Value / 100)));
                             } else if (myConcept.DecreaseUnit == ADCConceptUnitType.days) {
-                                totalDays = totalDays - adccvItem.Value;
+                                totalDays = roundToDecimals(totalDays - adccvItem.Value);
                             }
                         }
                     } 
@@ -165,9 +164,9 @@ const ADCControllerProvider = ({ children }) => {
                             || (!myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Increase)) {
 
                             if (myConcept.IncreaseUnit == ADCConceptUnitType.percentage) {
-                                totalDays = totalDays + (decreaseTotal * (adccvItem.Value / 100));
+                                totalDays = roundToDecimals(totalDays + (decreaseTotal * (adccvItem.Value / 100)));
                             } else if (myConcept.IncreaseUnit == ADCConceptUnitType.days) {
-                                totalDays = totalDays + adccvItem.Value;
+                                totalDays = roundToDecimals(totalDays + adccvItem.Value);
                             }
                         }
                     } 
@@ -177,52 +176,72 @@ const ADCControllerProvider = ({ children }) => {
             //* Validaciones MD11
 
             if (adcSite.MD11 > 0 && state.misc.isMultistandard) {                
-                const decreaseInDays = totalDays * (adcSite.MD11 / 100);
-                totalSiteDays = totalDays - decreaseInDays;
+                const decreaseInDays = roundToDecimals(totalDays * (adcSite.MD11 / 100));
+                totalSiteDays = roundToDecimals(totalDays - decreaseInDays);
 
                 //totalMD11 += adcSite.MD11;
             } else {
                 totalSiteDays = totalDays;
             }
+// console.log('is multistandard', state.misc.isMultistandard);
+// console.log('updateADCSite.totalSiteDays', totalSiteDays);
 
             //* Validaciones
 
             // If the total initial is greater than the maximum allowed, it will be reduced to the maximum allowed
-            const maxRedution = adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100));
+            const maxRedution = roundToDecimals(adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100)));
             const exceedsReduction = totalDays < maxRedution;
             
+            //* Totales
+
             // Totales por sitio
             totalEmployees += adcSite.NoEmployees;
             totalInitial += totalDays;
             total += totalSiteDays;
             
             // Surveillance
-            const survPercentBase = 30; // 30% de TotalInitial del site
-            const surveillance = state.adcData.IsMultistandard 
-                ? totalSiteDays * (survPercentBase / 100)
-                : totalDays * (survPercentBase / 100);
+            const survPercentBase = 33; // 33% de TotalInitial del site (una tercera parte)
+            const surveillance = state.misc.isMultistandard 
+                ? roundToDecimals(totalSiteDays * (survPercentBase / 100))
+                : roundToDecimals(totalDays * (survPercentBase / 100));
+            // console.log('surveillance', state.misc.isMultistandard 
+            //     ? `Calculando con totalSiteDays(${state.misc.isMultistandard }): ${totalSiteDays} = ${roundToDecimals(totalSiteDays * (survPercentBase / 100))}`
+            //     : `Calculando con totalDays(${state.misc.isMultistandard }): ${totalDays} = ${roundToDecimals(totalDays * (survPercentBase / 100))}`
+            // );
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
 
+            // Recertification
+            const rrPercentBase = 67; // 33% de reduccion del TotalInitial del site
+            let recertification = state.misc.isMultistandard 
+                ? roundToDecimals(totalSiteDays * (rrPercentBase / 100))
+                : roundToDecimals(totalDays * (rrPercentBase / 100));
+            // - None recertification shall be less than 50% than initial MD5 audit days
+            const fiftyPercent = roundToDecimals(adcSite.InitialMD5 * 0.5);
+            recertification = recertification < fiftyPercent
+                ? fiftyPercent
+                : recertification;
+            totalRecertification += recertification; // Sumar el resultado al total del ADC
+            
             return {
                 ...adcSite,
                 TotalInitial: round(totalDays, 2),
                 Surveillance: round(surveillance, 2),
+                Recertification: round(recertification, 2),
                 Total: round(totalSiteDays, 2),
                 ExceedsMaximumReduction: exceedsReduction,
             };
         }); // newADCSiteList
 
         // None initial certification shall be less than 2 audit days
-        // - NOTA: En el futuro, validar que sea un ADC Initial para aplicar esta regla (xBlaze: 20250814)
         if (totalInitial < TOTAL_INITIAL_MIN_DAYS) totalInitial = TOTAL_INITIAL_MIN_DAYS;
-// console.log('ADCContext.adcData', adcData);
+
         const newADCData = {
             ...adcData,
             TotalInitial: roundDays(totalInitial, 2, 'up'),
             TotalEmployees: totalEmployees, 
             TotalMD11: roundDays(total, 2, 'up'),
             TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
-            // TotalRR: roundDays(totalRR, 2, 'up'),            
+            TotalRecertification: roundDays(totalRecertification, 2, 'up'),            
         }
         //console.log('newADCData', newADCData);
 
