@@ -23,6 +23,7 @@ import { useADCsStore } from '../../../hooks/useADCsStore';
 import { useAppFormsStore } from '../../../hooks/useAppFormsStore';
 import ProposalAuditCycleList from '../../proposals/components/ProposalAuditCycleList';
 import { useProposalsStore } from '../../../hooks/useProposalsStore';
+import ProposalButtonNewItem from '../../proposals/components/ProposalButtonNewItem';
 
 const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...props }) => {
     // console.log('AuditCycleDocumentsList');
@@ -176,6 +177,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                     <p className="text-xs text-secondary mb-0">{item.helpText}</p>
                                                 </div>
                                                 <div className="d-flex align-items-center gap-3">
+                                                    <ProposalButtonNewItem />
                                                     <div className="text-dark text-sm font-weight-bold">
                                                         <AuditCycleDocumentEditItem 
                                                             documentType={ item.id }

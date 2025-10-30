@@ -15,6 +15,14 @@ const enums = () => {
         danger: 3,
     });
 
+    const DefaultCurrencyCodeType = Object.freeze({
+        nothing: 0,
+        usd: 1,
+        mxn: 2,
+        eur: 3,
+        other: 4,
+    });
+
     // ADC
 
     const ADCStatusType = Object.freeze({
@@ -535,6 +543,7 @@ const enums = () => {
     return {
         DefaultStatusType,
         DefaultValidityStatusType,
+        DefaultCurrencyCodeType,
 
         ADCStatusType,
         ADCOrderType,

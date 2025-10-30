@@ -135,14 +135,13 @@ export const useProposalsStore = () => {
 
     /**
      * Crea un registro en limpio con sus propiedades en blanco
-     * @param {appFormID} identificador del Application Form asociada al proposal
+     * @param {AuditCycleID} identificador del AuditCylce asociada al proposal
      */
     const proposalCreateAsync = async (item) => {
         dispatch(onProposalCreating());
 
         try {
             const params = {
-                //AppFormID: item.AppFormID,
                 ...item,
                 UpdatedUser: user.username,
             };

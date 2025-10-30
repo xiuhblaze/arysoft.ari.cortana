@@ -5,6 +5,8 @@ import { useProposalsStore } from "../../../hooks/useProposalsStore";
 import Swal from "sweetalert2";
 import { Spinner } from "react-bootstrap";
 import ProposalAuditCycleListItem from "./ProposalAuditCycleListItem";
+import { ProposalControllerProvider } from "../context/ProposalContext";
+import ProposalModalEditItem from "./ProposalModalEditItem";
 
 const ProposalAuditCycleList = ({ showAll = false }) => {
     const { ProposalStatusType } = enums();
@@ -74,10 +76,17 @@ const ProposalAuditCycleList = ({ showAll = false }) => {
                         </div>
                     ) : !!proposals && proposals.length > 0 ? proposals
                         .filter(proposal => showAll || proposal.Status <= ProposalStatusType.inactive)
-                        .map(proposal => <ProposalAuditCycleListItem key={proposal.ID} proposal={proposal} />
+                        .map(proposal => <ProposalAuditCycleListItem 
+                            key={proposal.ID} 
+                            proposal={proposal} 
+                            onShowModal={ () => { onShowModal(proposal.ID) } }
+                        />
                     ) : null
                 }
             </div>
+            <ProposalControllerProvider>
+                <ProposalModalEditItem show={ showModal } onHide={ onCloseModal } id={ proposalID } />
+            </ProposalControllerProvider>
         </>
     )
 }

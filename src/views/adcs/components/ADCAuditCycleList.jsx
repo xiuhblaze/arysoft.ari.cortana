@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
-import { useADCsStore } from "../../../hooks/useADCsStore";
 import { Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCalendarDay, faEdit, faFile, faFileLines, faFileSignature, faGear, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
-import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import ADCModalEditItem from "./ADCModalEditItem";
-import { ADCControllerProvider } from "../context/ADCContext";
+import { faBuilding, faCalendarDay, faFile, faFileSignature, faGear, faStickyNote, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import enums from "../../../helpers/enums";
+
+import { ADCControllerProvider } from "../context/ADCContext";
+import { useADCsStore } from "../../../hooks/useADCsStore";
+import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore"
 import adcAlertsProps from "../helpers/adcAlertsProps";
+import ADCModalEditItem from "./ADCModalEditItem";
 import adcStatusProps from "../helpers/adcStatusProps";
+import enums from "../../../helpers/enums";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const ADCAuditCycleList = ({ showAll = false }) => {
     const { ADCAlertType, ADCStatusType, ProposalStatusType } = enums();
