@@ -5,27 +5,47 @@ const  ProposalContext = createContext(null);
 const ProposalControllerProvider = ({ children }) => {
 
     const initialState = {
-        organizationData: null,
         auditCycleData: null,
+        organizationData: null,
         proposalData: null,
-        adcsList: [],
+        adcList: [],
+        contactList: [],
     }; // initialState
 
     // REDUCER
 
     const reducer = (state, action) => {
         switch (action.type) {
+            case 'SET_AUDIT_CYCLE': {
+                return {
+                    ...state,                    
+                    auditCycleData: action.payload,
+                };
+            }
             case 'SET_ORGANIZATION': {
                 return {
                     ...state,                    
                     organizationData: action.payload,
                 };
             }
-            case 'SET_PROPOSAL':
+            case 'SET_PROPOSAL': {
                 return {
                     ...state,                    
                     proposalData: action.payload,
                 };
+            }
+            case 'SET_ADC_LIST': {
+                return {
+                    ...state,                    
+                    adcList: action.payload,
+                };
+            }
+            case 'SET_CONTACT_LIST': {
+                return {
+                    ...state,                    
+                    contactList: action.payload,
+                };
+            }
             case 'CLEAR_CONTROLLER': {
                 return { ...initialState };
             }
@@ -51,16 +71,22 @@ const useProposalController = () => {
     return context;
 }; // useProposalController
 
+const setAuditCycleData = (dispatch, value) => dispatch({ type: "SET_AUDIT_CYCLE", payload: value });
 const setOrganizationData = (dispatch, value) => dispatch({ type: "SET_ORGANIZATION", payload: value });
 const setProposalData = (dispatch, value) => dispatch({ type: "SET_PROPOSAL", payload: value });
+const setADCList = (dispatch, value) => dispatch({ type: "SET_ADC_LIST", payload: value });
+const setContactList = (dispatch, value) => dispatch({ type: "SET_CONTACT_LIST", payload: value });
 const clearProposalController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
 export {
     ProposalControllerProvider,
     useProposalController,
 
+    setAuditCycleData,
     setOrganizationData,
     setProposalData,
+    setADCList,
+    setContactList,
 
     clearProposalController,
 };

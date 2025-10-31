@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 
 import { AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
-import { setOrganizationData, setProposalData, useProposalController } from "../context/ProposalContext";
+import { setContactList, setOrganizationData, setProposalData, useProposalController } from "../context/ProposalContext";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useNotesStore } from "../../../hooks/useNotesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
@@ -28,8 +28,10 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     } = controller;
 
     const { 
+        DefaultStatusType,
+        DefaultCurrencyCodeType,
+
         ProposalStatusType, 
-        DefaultCurrencyCodeType
     } = enums();
 
     const formDefaultValues = {
@@ -191,9 +193,23 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 : 0,
         });
 
-        if (!!proposal.ADCs && proposal.ADCs.length > 0) {
-            //setADCsList(dispatch, proposal.ADCs);
+        if (!!organization && !!auditCycle) {
+            setOrganizationData(dispatch, {
+                OrganizationName: organization.Name,
+                AuditCycleName: auditCycle.Name,
+                Website: organization.Website,
+                Phone: organization.Phone,
+                Companies: organization.Companies
+                    .filter(company => company.Status == DefaultStatusType.active),
+            })
         }
+
+        setProposalData(dispatch, proposal);
+
+        if (!!proposal?.Contacts && proposal.Contacts.length > 0) {
+            setContactList(dispatch, proposal.Contacts);
+        }
+
     }; // loadFromRealData
 
     const onFormSubmit = (values) => {

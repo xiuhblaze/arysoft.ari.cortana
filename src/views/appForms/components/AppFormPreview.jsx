@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobeAmericas, faPrint } from "@fortawesome/free-solid-svg-icons";
 
 import { useAppFormController } from "../context/appFormContext";
-import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
+// import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import AppFormPreviewStandardLoading from "./AppFormPreviewStandardLoading";
 import enums from "../../../helpers/enums";
 import getCode from "../helpers/getCode";
@@ -37,7 +37,7 @@ const AppFormPreview = ({formik}) => {
         sitesList,        
     } = controller;
     const { DefaultStatusType, StandardBaseType } = enums();
-    const { organization } = useOrganizationsStore();
+    // const { organization } = useOrganizationsStore();
 
     const headerStyle = 'col-3 text-xs text-wrap font-weight-bold bg-light';
     const bodyStyle = 'text-xs text-dark text-wrap';
