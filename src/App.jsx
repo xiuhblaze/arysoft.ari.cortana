@@ -19,6 +19,7 @@ function App() {
     const { status, checkAuthToken } = useAuthStore();
 
     useEffect(() => {
+        
         checkAuthToken();
     }, []);
 

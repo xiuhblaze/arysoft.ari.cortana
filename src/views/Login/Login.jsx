@@ -23,7 +23,7 @@ export const Login = () => {
 
     useEffect(() => {
         if (!!userErrorMessage) {
-            Swal.fire('Sesión', userErrorMessage, 'error');
+            Swal.fire('Session', userErrorMessage, 'error');
         }
     }, [userErrorMessage]);
 

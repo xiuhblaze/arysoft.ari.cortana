@@ -103,7 +103,7 @@ export const useAuthStore = () => {
             const user = setUserInfo(token);
 
             if (compareAsc(user.exp, new Date().getTime()) < 0) {
-                throw new Error('La sesión ha expirado, ingrese nuevamente sus credenciales');
+                throw new Error('Session was expired, please login again');
             }
 
             // TODO: Falta refrescar el token

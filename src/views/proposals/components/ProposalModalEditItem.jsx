@@ -391,7 +391,10 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                         <Col xs="12" sm="7">
                                             <Card>
                                                 <Card.Body className="p-3">
-                                                    <ProposalPreview formik={ formik } />
+                                                    { !!proposalData 
+                                                        ? <ProposalPreview formik={ formik } />
+                                                        : null
+                                                    }
                                                 </Card.Body>
                                             </Card>
                                         </Col>

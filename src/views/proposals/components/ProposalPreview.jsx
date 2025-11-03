@@ -112,6 +112,22 @@ const ProposalPreview = ({ formik }) => {
                                         }
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td className={ headerStyle }>Site address</td>
+                                    <td className={ bodyStyle }>
+                                        { 
+                                            !!proposalData && proposalData.Sites?.length > 0 && proposalData.Sites.map(site => {                                            
+                                                return <div key={site.ID}>
+                                                    <p className="text-xs text-dark mb-0">
+                                                        <span className={ site.IsMainSite ? 'font-weight-bold' : '' }> 
+                                                            {site.Description}
+                                                        </span> - { isNullOrEmpty(site.Address) ? '(no address)' : site.Address }
+                                                    </p>
+                                                </div>
+                                            })
+                                        }
+                                    </td>
+                                </tr>
                                 <tr style={separatorStyle}></tr>
                                 <tr>
                                     <td className={ headerStyle }>Website</td>
