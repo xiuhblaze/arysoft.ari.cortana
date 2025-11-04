@@ -52,9 +52,27 @@ const aryMathTools = () => {
         }
     } // roundDays
 
+    /**
+     * Cómo funciona:
+     *   Multiplica por 2: 0.43 * 2 = 0.86
+     *   Redondea al entero más cercano: Math.round(0.86) = 1
+     *   Divide por 2: 1 / 2 = 0.5
+     * @param {*} num 
+     * @returns 
+     */
+    const roundToHalf = (num) => {
+        return Math.round(num * 2) / 2;
+    }; // roundToHalf
+
+    const roundToDecimals = (num, decimals = 2) => {
+        return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);  
+    }; // roundToDecimals
+
     return {
         round,
         roundDays,
+        roundToDecimals,
+        roundToHalf,
     };
 }; // aryMathTools
 

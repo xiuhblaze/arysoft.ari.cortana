@@ -6,7 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 
 import { AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
-import { setContactList, setOrganizationData, setProposalData, useProposalController } from "../context/ProposalContext";
+import { setADCList, setContactList, setOrganizationData, setProposalAuditList, setProposalData, useProposalController } from "../context/ProposalContext";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useNotesStore } from "../../../hooks/useNotesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
@@ -38,8 +38,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         justificationInput: '',
         signerNameInput: '',
         signerPositionInput: '',
-        signerEmailInput: '',
-        signerPhoneInput: '',
         currencyCodeSelect: '',
         extraInfoInput: '',
         statusSelect: '',
@@ -147,7 +145,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         setProposalData(dispatch, proposal);
     };
 
-    const loadFromHistoricalData = () => {
+    const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
         const historicalData = JSON.parse(proposal.HistoricalDataJSON);
         // console.log('loadFromHistoricalData', historicalData);
 
@@ -179,8 +177,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             justificationInput: proposal.Justification ?? '',
             signerNameInput: proposal.SignerName ?? '',
             signerPositionInput: proposal.SignerPosition ?? '',
-            signerEmailInput: proposal.SignerEmail ?? '',
-            signerPhoneInput: proposal.SignerPhone ?? '',
             currencyCodeSelect: proposal.CurrencyCode ?? '',
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: !!proposal?.Status && proposal.Status != ProposalStatusType.nothing
@@ -206,8 +202,16 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
         setProposalData(dispatch, proposal);
 
+        if (!!proposal?.ADCs && proposal.ADCs.length > 0) {
+            setADCList(dispatch, proposal.ADCs);
+        }
+
         if (!!proposal?.Contacts && proposal.Contacts.length > 0) {
             setContactList(dispatch, proposal.Contacts);
+        }
+
+        if (!!proposal?.ProposalAudits && proposal.ProposalAudits.length > 0) {
+            setProposalAuditList(dispatch, proposal.ProposalAudits);
         }
 
     }; // loadFromRealData
@@ -356,20 +360,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                                     <AryFormikTextInput
                                                                                         name="signerPositionInput"
                                                                                         label="Position"
-                                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                                    />
-                                                                                </Col>
-                                                                                <Col xs="6">
-                                                                                    <AryFormikTextInput
-                                                                                        name="signerEmailInput"
-                                                                                        label="E-mail"
-                                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                                    />
-                                                                                </Col>
-                                                                                <Col xs="6">
-                                                                                    <AryFormikTextInput
-                                                                                        name="signerPhoneInput"
-                                                                                        label="Phone"
                                                                                         disabled={ proposal.Status >= ProposalStatusType.inactive }
                                                                                     />
                                                                                 </Col>

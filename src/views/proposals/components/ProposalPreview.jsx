@@ -58,7 +58,7 @@ const ProposalPreview = ({ formik }) => {
                 <Col xs="12">
                     <div className="d-flex justify-content-between align-items-center">
                         <h6 className="font-weight-bold mb-0">Proposal <br />
-                            <small className="text-secondary">{ getSubTitle() }</small>
+                            <small className="text-ari">{ getSubTitle() }</small>
                         </h6> 
                         <div>
                             <button 
@@ -84,7 +84,7 @@ const ProposalPreview = ({ formik }) => {
                             <div className="d-flex justify-content-start align-items-center">
                                 <img src={ logoARI } alt="logoARI" className="ms-3 me-4" style={{ maxHeight: '1in' }} />
                                 <h5 className="">Proposal <br />
-                                    <small className="text-secondary">{ getSubTitle() }</small>
+                                    <small className="text-ari">{ getSubTitle() }</small>
                                 </h5>
                             </div>
                         </div>
@@ -196,27 +196,29 @@ const ProposalPreview = ({ formik }) => {
                                 </tr>
                             </tbody>
                         </table>
-                        <ul className="list-group list-group-flush text-xs mb-4">
-                            <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                Travel expenses and taxes are not included
-                            </li>
-                            <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1"> 
-                                Only major nonconformities will be on site (0.5 or 1 additional 
-                                dit day), cost not included in this proposal
-                            </li>
-                            <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                No hidden costs
-                            </li>
-                            <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                This proposal is effect for term of 3 months, from the issued 
-                                date of this document
-                            </li>
-                            <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                Every year an adjustment calculation will be made to the cost of 
-                                this proposal, based on the actual number of employees in the 
-                                organization
-                            </li>
-                        </ul>
+                        <div className="d-none d-print-block">
+                            <ul className="list-group list-group-flush text-xs mb-4">
+                                <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
+                                    Travel expenses and taxes are not included
+                                </li>
+                                <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1"> 
+                                    Only major nonconformities will be on site (0.5 or 1 additional 
+                                    dit day), cost not included in this proposal
+                                </li>
+                                <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
+                                    No hidden costs
+                                </li>
+                                <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
+                                    This proposal is effect for term of 3 months, from the issued 
+                                    date of this document
+                                </li>
+                                <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
+                                    Every year an adjustment calculation will be made to the cost of 
+                                    this proposal, based on the actual number of employees in the 
+                                    organization
+                                </li>
+                            </ul>
+                        </div>
                         <table className="table table-borderless table-hover mx-print-3">
                             <tbody>
                                 <tr>
@@ -235,31 +237,33 @@ const ProposalPreview = ({ formik }) => {
                                 </tr>
                             </tbody>
                         </table>
-                        <p className="text-sm text-dark text-center">
-                            I accept the terms presented in this proposal. This proposal is linked to the Contract.
-                        </p>
-                        <h5 className="text-sm text-dark mx-print-3">
-                            Sincerely,<br />
-                            <strong>American Registration Inc., S.C.</strong><br />
-                            Sales Department – México
-                        </h5>
-                        <p className="text-xs mx-print-3 mx-print-3">
-                            The contents of this document, are confidential and solely intended for the use of 
-                            the addressee. If you receive this proposal by error, then we kindly request you to 
-                            notify the sender thereof immediately, and to delete the e-mail and the attachments 
-                            without printing, copying or distributing any of those.<br/>
-                            The publication, copying whole or in part or use or dissemination in any other way 
-                            of the e-mail and attachments by others than the intended person(s) is prohibited. 
-                            The sender cannot guarantee the security of electronic communication and is not liable
-                            for any negative consequence of the use of electronic communication, including but not 
-                            limited to, damage as a result of in or non-complete delivery.
-                        </p>
-                        <p className="text-center text-xs">
-                            <a href="https://aarrin.com" target="_blank">
-                                <FontAwesomeIcon icon={ faGlobeAmericas } className="opacity-6 text-dark me-2" />
-                                aarrin.com
-                            </a>
-                        </p>
+                        <div className="d-none d-print-block">
+                            <p className="text-sm text-dark text-center">
+                                I accept the terms presented in this proposal. This proposal is linked to the Contract.
+                            </p>
+                            <h5 className="text-sm text-dark mx-print-3 my-4">
+                                Sincerely,<br />
+                                <strong>American Registration Inc., S.C.</strong><br />
+                                Sales Department – México
+                            </h5>
+                            <p className="text-xs mx-print-3 mx-print-3">
+                                The contents of this document, are confidential and solely intended for the use of 
+                                the addressee. If you receive this proposal by error, then we kindly request you to 
+                                notify the sender thereof immediately, and to delete the e-mail and the attachments 
+                                without printing, copying or distributing any of those.<br/>
+                                The publication, copying whole or in part or use or dissemination in any other way 
+                                of the e-mail and attachments by others than the intended person(s) is prohibited. 
+                                The sender cannot guarantee the security of electronic communication and is not liable
+                                for any negative consequence of the use of electronic communication, including but not 
+                                limited to, damage as a result of in or non-complete delivery.
+                            </p>
+                            <p className="text-center text-xs">
+                                <a href="https://aarrin.com" target="_blank">
+                                    <FontAwesomeIcon icon={ faGlobeAmericas } className="opacity-6 text-dark me-2" />
+                                    aarrin.com
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </Col>
             </Row>

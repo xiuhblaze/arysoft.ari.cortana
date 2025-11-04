@@ -11,7 +11,7 @@ const ADCControllerProvider = ({ children }) => {
         ADCConceptUnitType
     } = enums();
 
-    const { round, roundDays } = aryMathTools();
+    const { round, roundDays, roundToHalf } = aryMathTools();
 
     const initialState = {
         adcData: null,
@@ -240,7 +240,7 @@ const ADCControllerProvider = ({ children }) => {
             TotalInitial: roundDays(totalInitial, 2, 'up'),
             TotalEmployees: totalEmployees, 
             TotalMD11: roundDays(total, 2, 'up'),
-            TotalSurveillance: roundDays(totalSurveillance, 0, 'up'),
+            TotalSurveillance: roundToHalf(totalSurveillance),
             TotalRecertification: roundDays(totalRecertification, 2, 'up'),            
         }
         //console.log('newADCData', newADCData);

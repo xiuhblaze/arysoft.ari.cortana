@@ -10,6 +10,7 @@ const ProposalControllerProvider = ({ children }) => {
         proposalData: null,
         adcList: [],
         contactList: [],
+        proposalAuditList: [],
     }; // initialState
 
     // REDUCER
@@ -46,6 +47,12 @@ const ProposalControllerProvider = ({ children }) => {
                     contactList: action.payload,
                 };
             }
+            case 'SET_PROPOSAL_AUDIT_LIST': {
+                return {
+                    ...state,                    
+                    proposalAuditList: action.payload,
+                };
+            }
             case 'CLEAR_CONTROLLER': {
                 return { ...initialState };
             }
@@ -76,6 +83,7 @@ const setOrganizationData = (dispatch, value) => dispatch({ type: "SET_ORGANIZAT
 const setProposalData = (dispatch, value) => dispatch({ type: "SET_PROPOSAL", payload: value });
 const setADCList = (dispatch, value) => dispatch({ type: "SET_ADC_LIST", payload: value });
 const setContactList = (dispatch, value) => dispatch({ type: "SET_CONTACT_LIST", payload: value });
+const setProposalAuditList = (dispatch, value) => dispatch({ type: "SET_PROPOSAL_AUDIT_LIST", payload: value });
 const clearProposalController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
 export {
@@ -87,6 +95,7 @@ export {
     setProposalData,
     setADCList,
     setContactList,
+    setProposalAuditList,
 
     clearProposalController,
 };
