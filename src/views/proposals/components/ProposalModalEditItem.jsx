@@ -1,11 +1,12 @@
-import { Card, Col, Modal, Row } from "react-bootstrap";
+import { Card, Col, Collapse, Modal, Row } from "react-bootstrap";
 import { faFileSignature, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { memo, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
+import * as Yup from 'yup';
 
-import { AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { setADCList, setContactList, setOrganizationData, setProposalAuditList, setProposalData, useProposalController } from "../context/ProposalContext";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useNotesStore } from "../../../hooks/useNotesStore";
@@ -19,6 +20,8 @@ import ProposalPreview from "./ProposalPreview";
 import proposalStatusProps from "../helpers/proposalStatusProps";
 
 import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
+import proposalSetStatusOptions from "../helpers/proposalSetStatusOptions";
+import ProposalEditADCs from "./ProposalEditADCs";
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -38,13 +41,25 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         justificationInput: '',
         signerNameInput: '',
         signerPositionInput: '',
+        signedFileInput: '',
         currencyCodeSelect: '',
         extraInfoInput: '',
         statusSelect: '',
         commentsInput: '',
-
         adcsCountHidden: 0,
     };
+
+    const validationSchema = Yup.object({
+        justificationInput: Yup.string()
+            .required('Justification is required'),
+        signerNameInput: Yup.string()
+            .max(150, 'Signer name must be less than 150 characters'),
+        signerPositionInput: Yup.string()
+            .max(100, 'Signer position must be less than 100 characters'),
+        adcsCountHidden: Yup.number()
+            .typeError('ADCs must be a number')
+            .min(1, 'At least one ADC is required'),
+    });
 
     // CUSTOM HOOKS
 
@@ -86,6 +101,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [hasChanges, setHasChanges] = useState(false);
 
     const [initialValues, setInitialValues] = useState(formDefaultValues);
+    const [originalStatus, setOriginalStatus] = useState(null);
     const [statusOptions, setStatusOptions] = useState([]);
     const [showAddComments, setShowAddComments] = useState(false);
     const [saveNote, setSaveNote] = useState('');
@@ -126,6 +142,12 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 loadFromRealData();
             }
 
+            setOriginalStatus(proposal.Status);
+            setStatusOptions(proposalSetStatusOptions(proposal.Status));
+            setShowAddComments(false);
+
+            // Obtener la lista de ADCs activos del AuditCycle
+
             console.log('ProposalModalEditItem.useEffect: proposal', proposal);
         }
     }, [proposal]);
@@ -147,19 +169,16 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
         const historicalData = JSON.parse(proposal.HistoricalDataJSON);
-        // console.log('loadFromHistoricalData', historicalData);
 
         setInitialValues({
             justificationInput: proposal.Justification ?? '',
             signerNameInput: proposal.SignerName ?? '',
             signerPositionInput: proposal.SignerPosition ?? '',
-            signerEmailInput: proposal.SignerEmail ?? '',
-            signerPhoneInput: proposal.SignerPhone ?? '',
+            signerFileInput: '',
             currencyCodeSelect: proposal.CurrencyCode ?? '',
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: proposal.Status,
             commentsInput: '',
-
             adcsCountHidden: !!historicalData.ADCs ? historicalData.ADCs.length : 0,
         });
 
@@ -177,13 +196,13 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             justificationInput: proposal.Justification ?? '',
             signerNameInput: proposal.SignerName ?? '',
             signerPositionInput: proposal.SignerPosition ?? '',
+            signerFileInput: '',
             currencyCodeSelect: proposal.CurrencyCode ?? '',
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: !!proposal?.Status && proposal.Status != ProposalStatusType.nothing
                 ? proposal.Status
                 : ProposalStatusType.new,
             commentsInput: '',
-
             adcsCountHidden: !!proposal.ADCs 
                 ? proposal.ADCs.filter(a => a.Status == ProposalStatusType.active).length
                 : 0,
@@ -203,6 +222,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         setProposalData(dispatch, proposal);
 
         if (!!proposal?.ADCs && proposal.ADCs.length > 0) {
+            console.log('ProposalEditModalEditItem.useEffect: proposal.ADCs', proposal.ADCs);
             setADCList(dispatch, proposal.ADCs);
         }
 
@@ -217,8 +237,33 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     }; // loadFromRealData
 
     const onFormSubmit = (values) => {
-
         console.log('onFormSubmit: values', values);
+        if (proposalData.Status >= ProposalStatusType.inactive) {
+            Swal.fire('Proposal', 'You cannot change the data of an inactive proposal', 'warning');
+            return;
+        }
+
+        let newStatus = proposalData.Status == ProposalStatusType.nothing
+            ? ProposalStatusType.new
+            : values.statusSelect;
+
+        if (proposalData.Status != newStatus) { // Si cambió el status crear una nota
+            const text = 'Status changed to ' + proposalStatusProps[newStatus].label.toUpperCase();
+
+            setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
+        }
+
+        const toSave = {
+            ID: proposalData.ID,
+            Justification: values.justificationInput,
+            SignerName: values.signerNameInput,
+            SignerPosition: values.signerPositionInput,
+            CurrencyCode: values.currencyCodeSelect,
+            ExtraInfo: values.extraInfoInput,
+            Status: newStatus,
+        };
+
+        console.log('onFormSubmit: toSave', toSave);
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -272,7 +317,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 ) : !!proposal ?
                 <Formik
                     initialValues={initialValues}
-
+                    validationSchema={validationSchema}
                     enableReinitialize
                     onSubmit={onFormSubmit}
                     innerRef={formikRef}
@@ -341,6 +386,10 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                     />
                                                                 </Col>
                                                             </Row>
+                                                            <ProposalEditADCs
+                                                                formik={ formik }
+                                                                readonly={ proposal.Status >= ProposalStatusType.inactive } 
+                                                            />
                                                             <Row>
                                                                 <Col xs="12">
                                                                     <div  className="mb-3">
@@ -370,9 +419,47 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                             </Row>
                                                             <Row>
                                                                 <Col xs="12">
-                                                                    
+                                                                    <AryFormikTextArea
+                                                                        name="extraInfoInput"
+                                                                        label="Extra Info"
+                                                                        placehoolder="Add any extra info"
+                                                                        type="text"
+                                                                        rows={ 2 }
+                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                    />
                                                                 </Col>
                                                             </Row>
+                                                            <Row>
+                                                                <Col xs="12">
+                                                                    <AryFormikSelectInput
+                                                                        name="statusSelect"
+                                                                        label="Status"
+                                                                        onChange={ (e) => {
+                                                                            const selectedValue = e.target.value;
+
+                                                                            formik.setFieldValue('statusSelect', selectedValue);
+                                                                            setShowAddComments(originalStatus != selectedValue);
+                                                                        }}
+                                                                    >
+                                                                        <option value="">(select a status)</option>
+                                                                        { statusOptions.map((option) => (
+                                                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                                                        )) }
+                                                                    </AryFormikSelectInput>
+                                                                </Col>
+                                                            </Row>
+                                                            <Collapse in={ showAddComments }>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <AryFormikTextArea
+                                                                            name="commentsInput"
+                                                                            label="Comments"
+                                                                            type="text"
+                                                                            helpText="Add any comments for the status change"
+                                                                        />
+                                                                    </Col>
+                                                                </Row>
+                                                            </Collapse>
                                                         </Col>
                                                     </Row>
                                                 </Card.Body>
