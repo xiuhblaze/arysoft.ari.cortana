@@ -221,8 +221,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
         setProposalData(dispatch, proposal);
 
-        if (!!proposal?.ADCs && proposal.ADCs.length > 0) {
-            console.log('ProposalEditModalEditItem.useEffect: proposal.ADCs', proposal.ADCs);
+        if (!!proposal?.ADCs && proposal.ADCs.length > 0) {            
             setADCList(dispatch, proposal.ADCs);
         }
 

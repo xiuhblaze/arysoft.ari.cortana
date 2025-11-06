@@ -45,6 +45,8 @@ const ProposalPreviewADC = memo(() => {
     
     // HOOKS
 
+    //const [adcSites, setADCSites] = useState([]);
+
      // proposalData.AuditCycle.AuditCycleStandards[].CycleType // Para ver en que punto inicia la tabla 
 
      // 1. Por cada ADC hacer una tabla y ver si son Initial o Recertification
@@ -55,7 +57,7 @@ const ProposalPreviewADC = memo(() => {
     // const { ADCs } = proposalData;
 
     adcList.forEach(adc => {
-        console.log('adc', adc);
+        // console.log('adc', adc);
         // console.log('Tabla para ADC', adc.AppFormStandardName);
 
         // console.log('Buscar el CycleType del ADC: ', adc.AppFormStandardID);
@@ -78,11 +80,13 @@ const ProposalPreviewADC = memo(() => {
 
         totalDaysFirstYear = roundToHalf(totalDaysFirstYear, 2);
 
-        const adcSites = proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID);
-        console.log('ADCSites', adcSites);
+
+
+        //const adcSites = proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID);
+        //console.log('ADCSites', adcSites);
     });
 
-    console.log('proposalAuditList', proposalAuditList);
+    //console.log('proposalAuditList', proposalAuditList);
     // console.log(showTotalAuditDays(proposalAuditList, AuditStepType.surveillance1));
 
     return (
@@ -104,6 +108,10 @@ const ProposalPreviewADC = memo(() => {
                 {
                     adcList.map(adc => {
                         const cycleType = proposalData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adc.AppFormStandardID).CycleType;
+                        const adcSites = proposalData.ADCSites
+                            .filter(adcSite => adcSite.ADCID == adc.ID)
+                            .sort((a, b) => b.IsMainSite - a.IsMainSite 
+                                || a.SiteDescription.localeCompare(b.SiteDescription));
 
                         return (
                             <Fragment key={adc.ID}>
@@ -157,7 +165,8 @@ const ProposalPreviewADC = memo(() => {
                                     }
                                 </tr>
                                 {
-                                    proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID).map(adcSite => {
+                                    //proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID).map(adcSite => {
+                                    adcSites.map(adcSite => {
                                         return (
                                             <tr key={adcSite.ID}>
                                                 <td className={ headerColStyle }>

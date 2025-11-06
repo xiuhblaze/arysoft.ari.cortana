@@ -105,7 +105,7 @@ const AppFormEditSites = ({ readonly = false, ...props }) => {
                             className="form-select" 
                             value={siteSelected ?? ''} 
                             onChange={onSiteSelected}
-                            disabled={ isAdding || isDeleting || readonly }
+                            disabled={ isAdding || !!isDeleting || readonly }
                         >
                             <option value="">(select a site)</option>
                             {

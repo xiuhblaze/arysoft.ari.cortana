@@ -6,7 +6,9 @@ import { useProposalsStore } from "../../../hooks/useProposalsStore";
 import { useState } from "react";
 import enums from "../../../helpers/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faSpinner, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faLandmark, faSpinner, faTrashCan, faUsers } from "@fortawesome/free-solid-svg-icons";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import Swal from "sweetalert2";
 
 const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -34,13 +36,13 @@ const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
         setADCSelected(e.target.value);
     }; // onADCSelected
 
-    const onClickAdd = () => {
+    const onClickAdd = () => { //* Esto no lo wa poder probar hasta tener ADC de otra norma XD
         if (readonly) { return; }
         if (isNullOrEmpty(adcSelected)) { return; }
 
         setIsAdding(true);
 
-        if (adcsList.some(i => i.ID == adcSelected)) {
+        if (adcList.some(i => i.ID == adcSelected)) {
             Swal.fire('Add ADC', `The ADC is already added`, 'warning');
             setIsAdding(false);
             return;
@@ -53,11 +55,14 @@ const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
 
                     if (!!myADC) {
                         setADCList(dispatch, [
-                            ...adcsList,
+                            ...adcList,
                             myADC,
                         ]);
                     }
                     setADCSelected(null);
+
+                    //TODO: Va a faltar recargar el Proposal para actualizar el recalculo sin perder
+                    //      los valores que se han cambiado :/
                 }
                 setIsAdding(false);
             }).catch(err => {
@@ -66,6 +71,26 @@ const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
                 setIsAdding(false);
             });
     }; // onClickAdd
+
+    const onClickRemove = (id) => {
+        if (readonly) { return; }
+
+        setIsDeleting(id);
+
+        adcRemoveAsync(id)
+            .then(data => {
+                if (!!data) {
+                    setADCList(dispatch, adcList.filter(i => i.ID != id));
+                }
+                // TODO: Va a faltar recargar el Proposal para actualizar el recalculo sin perder
+                //      los valores que se han cambiado :/
+                setIsDeleting(null);
+            }).catch(err => {
+                console.log('onClickRemove', err);
+                Swal.fire('Remove ADC', err, 'error');
+                setIsDeleting(null);
+            });
+    }; // onClickRemove
 
     return (
         <Row {...props}>
@@ -85,9 +110,8 @@ const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
                                             <select
                                                 className="form-select"
                                                 value=""
-                                                onChange={(e) => {
-                                                    console.log('ProposalEditADCs.onChange', e.target.value);
-                                                }}
+                                                onChange={onADCSelected}
+                                                disabled={ isAdding || !!isDeleting || readonly }
                                             >
                                                 <option value="">(select a ADC)</option>
                                                 {
@@ -133,14 +157,14 @@ const ProposalEditADCs = ({ formik, readonly = false, ...props }) => {
                                                                 <span className="text-dark font-weight-bold">
                                                                     {item.Description}
                                                                 </span>
-                                                                {/* <span className="text-secondary ms-2">
-                                                                    <FontAwesomeIcon icon={faBuilding} className="me-1" />
-                                                                    {item.Address}
+                                                                <span className="text-secondary ms-2">
+                                                                    <FontAwesomeIcon icon={faLandmark} className="me-1" />
+                                                                    {item.AppFormStandardName}
                                                                 </span>
                                                                 <span className="text-secondary ms-2">
                                                                     <FontAwesomeIcon icon={faUsers} className="me-1" />
-                                                                    Employees {item.EmployeesCount}
-                                                                </span> */}
+                                                                    Employees {item.TotalEmployees}
+                                                                </span>
                                                             </span>
                                                             <button
                                                                 type="button"

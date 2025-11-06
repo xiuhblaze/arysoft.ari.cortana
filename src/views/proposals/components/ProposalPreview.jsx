@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobeAmericas, faPrint } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ProposalPreviewADC from "./ProposalPreviewADC";
+import ProposalPreviewJustification from "./ProposalPreviewJustification";
+import ShowFormatTextInput from "../../../components/General/ShowFormatTextInput";
 
 const ProposalPreview = ({ formik }) => {
     const [ controller, dispatch ] = useProposalController();
@@ -32,13 +34,13 @@ const ProposalPreview = ({ formik }) => {
 
     // METHODS
 
-    const ShowFormatTextInput = (value, separator = '\n') => { //! Ver si esto se pone mejor en un JS helper
-        return value != null 
-            ? value.split(separator).map((item, index) => {
-                return <div key={index} className="text-wrap">{item}</div>
-            })
-            : null
-    } // ShowFormatTextInput
+    // const ShowFormatTextInput = (value, separator = '\n') => { //! Ver si esto se pone mejor en un JS helper
+    //     return value != null 
+    //         ? value.split(separator).map((item, index) => {
+    //             return <div key={index} className="text-wrap">{item}</div>
+    //         })
+    //         : null
+    // } // ShowFormatTextInput
 
     const getSubTitle = () => {
         if (!!proposalData) {
@@ -182,20 +184,7 @@ const ProposalPreview = ({ formik }) => {
                             </tbody>
                         </table>
                         <ProposalPreviewADC />
-                        <table className="table table-borderless table-hover mx-print-3">
-                            <tbody>
-                                <tr>
-                                    <td className={ headerStyle }>Justification</td>
-                                    <td className={ bodyStyle }>
-                                        { 
-                                            formik?.values?.justificationInput 
-                                                ? ShowFormatTextInput(formik?.values?.justificationInput)
-                                                : null
-                                        }
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <ProposalPreviewJustification formik={ formik } />
                         <div className="d-none d-print-block">
                             <ul className="list-group list-group-flush text-xs mb-4">
                                 <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
