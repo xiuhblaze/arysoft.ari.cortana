@@ -25,7 +25,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 
-const MD5_URL = '/md5s'; 
+const MD5_URL = '/md5'; 
 const { VITE_PAGE_SIZE } = envVariables();
 
 const getSearchQuery = (options = {}) => {

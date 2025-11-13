@@ -45,9 +45,11 @@ const aryMathTools = () => {
 
         if (decimal == 0) {
             return integer;
-        } else if (decimal <= 0.5) {
-            return integer + 0.5;
-        } else { // if (decimal > 5) {
+        } else if (decimal < 0.2) {
+            return integer;
+        } else if (decimal >= 0.2 && decimal < 0.7) {
+            return integer + 0.5;        
+        } else { // if (decimal > 0.7) {
             return integer + 1;
         }
     } // roundDays

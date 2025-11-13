@@ -15,7 +15,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setConceptValueHidden, setMisc, useADCController } from '../context/ADCContext';
-import { faArrowCircleLeft, faArrowLeft, faCalculator, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faInfoCircle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesRight, faArrowCircleLeft, faArrowLeft, faCalculator, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faInfoCircle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
@@ -38,6 +38,8 @@ import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
 import defaultCycleYearProps from '../../../helpers/defaultCycleYearProps';
+import MD5List from '../../md5/components/MD5List';
+import ADCShowTotalDays from './ADCShowTotalDays';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -168,6 +170,8 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [saveNote, setSaveNote] = useState(''); 
     const [auditStepList, setAuditStepList] = useState([]);
 
+    const [md5Row, setMd5Row] = useState(4);
+
     useEffect(() => {
 
         if (!!show) {
@@ -247,6 +251,23 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             } else {
                 loadContextData();
             }
+
+            // Obtener el valor del renglon donde se muestra MD5
+            let _md5Row = md5Row;
+            let _auditStepList = getAuditStepList(
+                currentAuditStandard.CycleType, 
+                currentAuditStandard.InitialStep,
+                auditCycle.Periodicity
+            );
+            
+            if (organization.Standards
+                .filter(item => item.Status == DefaultStatusType.active).length > 1) 
+                _md5Row += 2;
+
+            if (adc.ADCSites.length > 1 && !!_auditStepList && _auditStepList.length > 0) 
+                _md5Row += _auditStepList.length;
+            
+            setMd5Row(_md5Row);
         }
     }, [adc]);
 
@@ -351,7 +372,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const loadContextData = () => {
 
         setADCData(dispatch, adc);
-        setADCSiteList(dispatch, adc.ADCSites);        
+        setADCSiteList(dispatch, adc.ADCSites);
         setConceptValueHidden(dispatch, 0);
     }; // loadContextData
 
@@ -792,20 +813,33 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                     )) : null
                                                                             }
                                                                             <tr>
-                                                                                <th className="text-end" colSpan={2}>
+                                                                                <td className="align-top" rowSpan={md5Row}>
+                                                                                    <MD5List daysList={ adcSiteList.map(adcSite => adcSite.InitialMD5) } rows={ md5Row } />
+                                                                                </td>
+                                                                                <td className="text-end">
                                                                                     <h6 className={h6Style}>
                                                                                         Total Initial
                                                                                     </h6>
-                                                                                </th>                                                                                
+                                                                                </td>                                                                                
                                                                                 {
                                                                                     adcSiteList.map(adcSite => 
                                                                                         <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
-                                                                                                { adcSite.TotalInitial ?? 0 }
+                                                                                            {/* <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
+                                                                                                { adcSite.RealTotalInitial 
+                                                                                                    ? <span>{adcSite.RealTotalInitial}<FontAwesomeIcon icon={ faAnglesRight } className="mx-2" /></span> 
+                                                                                                    : null }
+                                                                                                <span className="text-dark font-weight-bold">
+                                                                                                    { adcSite.TotalInitial ?? 0 }
+                                                                                                </span>
                                                                                                 <span className="px-2" title="Days">
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
                                                                                                 </span>
-                                                                                            </p>
+                                                                                            </p> */}
+                                                                                            <ADCShowTotalDays 
+                                                                                                className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}
+                                                                                                realTotalDays={adcSite.RealTotalInitial} 
+                                                                                                totalDays={adcSite.TotalInitial} 
+                                                                                            />
                                                                                             {
                                                                                                 !!adcSite.ExceedsMaximumReduction ? (
                                                                                                     <span className="text-xs text-danger">
@@ -822,14 +856,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 misc.isMultistandard ? (
                                                                                     <>
                                                                                         <tr>
-                                                                                            <th className="text-end" colSpan={2}>
+                                                                                            <td className="text-end">
                                                                                                 <h6 className={h6Style}>
                                                                                                     MD11 with File
                                                                                                 </h6>
                                                                                                 <p className="text-xs text-secondary text-wrap mb-0">
                                                                                                     Decrease
                                                                                                 </p>
-                                                                                            </th>
+                                                                                            </td>
                                                                                             {
                                                                                                 adcSiteList.map((adcSite) =>   
                                                                                                     <td key={adcSite.ID}>
@@ -843,20 +877,25 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                             }
                                                                                         </tr>
                                                                                         <tr>
-                                                                                            <th className="text-end" colSpan={2}>
+                                                                                            <td className="text-end">
                                                                                                 <h6 className={h6Style}>
                                                                                                     Total
                                                                                                 </h6>
-                                                                                            </th>
+                                                                                            </td>
                                                                                             {
                                                                                                 adcSiteList.map((adcSite) =>
                                                                                                     <td key={adcSite.ID}>
-                                                                                                        <p className={`${pStyle} text-end`}>
+                                                                                                        <ADCShowTotalDays
+                                                                                                            className={`${pStyle} text-end`}
+                                                                                                            realTotalDays={adcSite.RealTotal} 
+                                                                                                            totalDays={adcSite.Total}
+                                                                                                        />
+                                                                                                        {/* <p className={`${pStyle} text-end`}>
                                                                                                             { adcSite.Total ?? 0}
                                                                                                             <span className="px-2" title="Days">
                                                                                                                 <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
                                                                                                             </span>
-                                                                                                        </p>
+                                                                                                        </p> */}
                                                                                                     </td>
                                                                                                 )
                                                                                             }
@@ -865,52 +904,62 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 ) : null
                                                                             }
                                                                             <tr>
-                                                                                <th className="text-end" colSpan={2}>
+                                                                                <td className="text-end">
                                                                                     <h6 className={h6Style}>
                                                                                         Surveillance
                                                                                     </h6>
-                                                                                </th>
+                                                                                </td>
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                            {/* <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.Surveillance ?? 0 }
                                                                                                 <span className="px-2" title="Days">
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
                                                                                                 </span>
-                                                                                            </p>
+                                                                                            </p> */}
+                                                                                            <ADCShowTotalDays 
+                                                                                                className={`${pStyle} text-end`}
+                                                                                                realTotalDays={adcSite.RealSurveillance} 
+                                                                                                totalDays={adcSite.Surveillance}
+                                                                                            />
                                                                                         </td>
                                                                                     )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className="text-end" colSpan={2}>
+                                                                                <td className="text-end">
                                                                                     <h6 className={h6Style}>
                                                                                         Recertification
                                                                                     </h6>
-                                                                                </th>
+                                                                                </td>
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
-                                                                                            <p className={`${pStyle} text-end`}>
+                                                                                            {/* <p className={`${pStyle} text-end`}>
                                                                                                 { adcSite.Recertification ?? 0 }
                                                                                                 <span className="px-2" title="Days">
                                                                                                     <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
                                                                                                 </span>
-                                                                                            </p>
+                                                                                            </p> */}
+                                                                                            <ADCShowTotalDays 
+                                                                                                className={`${pStyle} text-end`}
+                                                                                                realTotalDays={adcSite.RealRecertification} 
+                                                                                                totalDays={adcSite.Recertification}
+                                                                                            />
                                                                                         </td>
                                                                                     )
                                                                                 }
                                                                             </tr>
                                                                             <tr>
-                                                                                <th className="text-end" colSpan={2}>
+                                                                                <td className="text-end">
                                                                                     <h6 className={h6Style}>
                                                                                         Extra Info
                                                                                     </h6>
                                                                                     <p className="text-xs text-secondary text-wrap mb-0">
                                                                                         for site
                                                                                     </p>
-                                                                                </th>
+                                                                                </td>
                                                                                 {
                                                                                     formik.values.items.map((item, index) =>   
                                                                                         <td key={item.ID}>
@@ -927,11 +976,11 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             </tr>
                                                                             { adcSiteList.length > 1 && !!auditStepList && auditStepList.length > 0 ? auditStepList.map(auditStep =>
                                                                                 <tr key={ auditStep }>
-                                                                                    <th colSpan={2}>
+                                                                                    <td>
                                                                                         <h6 className={ `${h6Style} text-end`}>
                                                                                             { auditStepProps[auditStep].label }
                                                                                         </h6>
-                                                                                    </th>
+                                                                                    </td>
                                                                                     {
                                                                                         adcSiteList.map(adcSite => {
                                                                                             const myAudit = adcSite.ADCSiteAudits.find(asa => asa.AuditStep == auditStep);

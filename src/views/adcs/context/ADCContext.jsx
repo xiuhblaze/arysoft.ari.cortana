@@ -8,7 +8,8 @@ const ADCContext = createContext(null);
 const ADCControllerProvider = ({ children }) => {
 
     const {
-        ADCConceptUnitType
+        ADCConceptUnitType,
+        AuditStepType,
     } = enums();
 
     const { round, roundDays, roundToHalf } = aryMathTools();
@@ -134,8 +135,6 @@ const ADCControllerProvider = ({ children }) => {
             let totalDays = adcSite.InitialMD5;
             let totalSiteDays = 0;
 
-            console.log('adcSite', adcSite);
-
             if (state.adcConceptList.length > 0) {
                 
                 // Decrementos
@@ -185,8 +184,6 @@ const ADCControllerProvider = ({ children }) => {
             } else {
                 totalSiteDays = totalDays;
             }
-// console.log('is multistandard', state.misc.isMultistandard);
-// console.log('updateADCSite.totalSiteDays', totalSiteDays);
 
             //* Validaciones
 
@@ -202,14 +199,10 @@ const ADCControllerProvider = ({ children }) => {
             total += totalSiteDays;
             
             // Surveillance
-            const survPercentBase = 33; // 33% de TotalInitial del site (una tercera parte)
+            const survPercentBase = 34; // 33% de TotalInitial del site (una tercera parte)
             const surveillance = state.misc.isMultistandard 
                 ? roundToDecimals(totalSiteDays * (survPercentBase / 100))
-                : roundToDecimals(totalDays * (survPercentBase / 100));
-            // console.log('surveillance', state.misc.isMultistandard 
-            //     ? `Calculando con totalSiteDays(${state.misc.isMultistandard }): ${totalSiteDays} = ${roundToDecimals(totalSiteDays * (survPercentBase / 100))}`
-            //     : `Calculando con totalDays(${state.misc.isMultistandard }): ${totalDays} = ${roundToDecimals(totalDays * (survPercentBase / 100))}`
-            // );
+                : roundToDecimals(totalDays * (survPercentBase / 100));            
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
 
             // Recertification
@@ -226,10 +219,14 @@ const ADCControllerProvider = ({ children }) => {
             
             return {
                 ...adcSite,
-                TotalInitial: round(totalDays, 2),
-                Surveillance: round(surveillance, 2),
-                Recertification: round(recertification, 2),
-                Total: round(totalSiteDays, 2),
+                RealTotalInitial: round(totalDays, 2),          // Total Inicialdel ADC
+                TotalInitial: roundDays(totalDays),
+                RealSurveillance: round(surveillance, 2),       // Total de vigilancia del ADC
+                Surveillance: roundDays(surveillance),
+                RealRecertification: round(recertification, 2), // Total de recertificacion del ADC
+                Recertification: roundDays(recertification),
+                RealTotal: round(totalSiteDays, 2),             // Total St1 y St2 del ADC
+                Total: roundDays(totalSiteDays),
                 ExceedsMaximumReduction: exceedsReduction,
             };
         }); // newADCSiteList
@@ -237,14 +234,76 @@ const ADCControllerProvider = ({ children }) => {
         // None initial certification shall be less than 2 audit days
         if (totalInitial < TOTAL_INITIAL_MIN_DAYS) totalInitial = TOTAL_INITIAL_MIN_DAYS;
 
+        // Generar lista de Surveillance por sitio seleccionado en ADCSiteAudits
+
+        let _totalInitial = 0;
+        let _surveillance = [0, 0, 0, 0, 0];
+        let _recertification = 0;
+        const _adcSiteList = newADCSiteList.map(adcSite => {
+            //console.log('adcSite', adcSite.SiteDescription);
+
+            const _adcSiteAudits = adcSite.ADCSiteAudits.map(asa => {
+                //console.log('asa', asa);
+                if (asa.Value) {
+                    switch (asa.AuditStep) {
+                        case AuditStepType.stage1: {
+                            _totalInitial += adcSite.Total;
+                            break;
+                        }
+                        case AuditStepType.stage2: {
+                            _totalInitial += adcSite.Total;
+                            break;
+                        }
+                        case AuditStepType.surveillance1: {
+                            _surveillance[0] += adcSite.Surveillance;
+                            break;
+                        }
+                        case AuditStepType.surveillance2: {
+                            _surveillance[1] += adcSite.Surveillance;
+                            break;
+                        }
+                        case AuditStepType.surveillance3: {
+                            _surveillance[2] += adcSite.Surveillance;
+                            break;
+                        }
+                        case AuditStepType.surveillance4: {
+                            _surveillance[3] += adcSite.Surveillance;
+                            break;
+                        }
+                        case AuditStepType.surveillance5: {
+                            _surveillance[4] += adcSite.Surveillance;
+                            break;
+                        }
+                        case AuditStepType.recertification: { //! AQUI VOY, ESTOY VALIDANDO ESTO PARA DESPUES PONERLO EN PANTALLA
+                            console.log('asa.Recertification', adcSite.Recertification);
+                            _recertification += adcSite.Recertification;
+                            break;
+                        }
+                        default: {
+                            console.log('asa.AuditStep', asa.AuditStep);
+                            break;
+                        }
+                    }
+                }
+            });
+        });
+
+        console.log('_totalInitial', _totalInitial);
+        console.log('_surveillance', _surveillance);
+        console.log('_recertification', _recertification);
+
+        console.log('ADCSiteAudits', newADCSiteList[0]);
+
+        // Guardar los datos en el ADC
+
         const newADCData = {
             ...adcData,
-            TotalInitial: roundDays(totalInitial, 2, 'up'),
+            TotalInitial: roundDays(totalInitial),
             TotalEmployees: totalEmployees, 
-            TotalMD11: roundDays(total, 2, 'up'),
+            TotalMD11: roundDays(total),
             TotalSurveillance: roundToHalf(totalSurveillance),
-            TotalRecertification: roundDays(totalRecertification, 2, 'up'),            
-        }
+            TotalRecertification: roundDays(totalRecertification),            
+        };
         //console.log('newADCData', newADCData);
 
         return {

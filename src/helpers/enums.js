@@ -358,6 +358,16 @@ const enums = () => {
         updatedDesc: 6,
     });
 
+    // MD5
+
+    const MD5OrderType = Object.freeze({
+        nothing: 0,
+        startValue: 1,
+        days: 2,
+        startValueDesc: 3,
+        daysDesc: 4,
+    });
+
     // NACE Codes
 
     const NaceCodeOnlyOptionType = Object.freeze({
@@ -591,6 +601,7 @@ const enums = () => {
         CertificatesValidityStatusType,
         CompanyOrderType,
         ContactOrderType,
+        MD5OrderType,
         NaceCodeOnlyOptionType,
         NaceCodeAccreditedType,
         NacecodeOrderType,
