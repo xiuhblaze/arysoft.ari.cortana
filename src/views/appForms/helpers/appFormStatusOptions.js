@@ -59,23 +59,29 @@ const appFormStatusOptions = (appFormCurrentStatus) => {
                 { value: AppFormStatusType.cancel, label: 'Cancel' },
             ]
             
-        case AppFormStatusType.inactive:
+        // case AppFormStatusType.inactive:
+        //     return [
+        //         currentOption,
+        //         // { value: AppFormStatusType.active, label: 'Active' },
+        //         // { value: AppFormStatusType.cancel, label: 'Cancel' },
+        //     ]
+            
+        // case AppFormStatusType.cancel:
+        //     return [
+        //         currentOption,
+        //         // { value: AppFormStatusType.new, label: 'New' },
+        //     ]
+            
+        // case AppFormStatusType.deleted:
+        //     return [
+        //         currentOption,
+        //         // { value: AppFormStatusType.deleted, label: 'Deleted' },
+        //     ]
+            
+        default:
             return [
                 currentOption,
-                // { value: AppFormStatusType.active, label: 'Active' },
-                // { value: AppFormStatusType.cancel, label: 'Cancel' },
-            ]
-            
-        case AppFormStatusType.cancel:
-            return [
-                currentOption,
-                { value: AppFormStatusType.new, label: 'New' },
-            ]
-            
-        case AppFormStatusType.deleted:
-            return [
-                { value: AppFormStatusType.deleted, label: 'Deleted' },
-            ]
+            ];
             
     }
 };

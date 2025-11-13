@@ -60,7 +60,7 @@ const appFormStatusProps = [
         bgCss: 'item-action',
     },
     { 
-        value: AppFormStatusType.canceled,
+        value: AppFormStatusType.cancel,
         label: 'Canceled',
         variant: 'light',
         description: 'Canceled application form',

@@ -47,6 +47,10 @@ option {
   border-color: #d2d6da !important;
 }
 
+.ari-border-end {
+  border-right: 1px solid #8392AB !important;
+}
+
 /* ARI Tables
 ******************************************************************************/
 

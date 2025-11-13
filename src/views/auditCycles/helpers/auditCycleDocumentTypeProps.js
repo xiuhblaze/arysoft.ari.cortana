@@ -1,4 +1,14 @@
-import { faCertificate, faClipboardList, faClock, faFile, faFileCircleCheck, faFileContract, faFileSignature, faListCheck, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { 
+    faCalculator, 
+    faCertificate, 
+    faClipboard, 
+    faClipboardList, 
+    faFile, 
+    faFileCircleCheck, 
+    faFileContract, 
+    faFileSignature, 
+    faMagnifyingGlass, 
+} from "@fortawesome/free-solid-svg-icons";
 import enums from "../../../helpers/enums";
 
 const { AuditCycleDocumentType } = enums();
@@ -13,14 +23,14 @@ const auditCycleDocumentTypeProps = [
     },
     {
         id: AuditCycleDocumentType.appForm,
-        icon: faFile,
+        icon: faClipboard,
         label: 'Application form',
         helpText: 'An app form document for each standard',
         variant: 'primary',
     },
     {
         id: AuditCycleDocumentType.adc,
-        icon: faClock,
+        icon: faCalculator,
         label: 'ADC - Audit day calculation',
         helpText: 'A document for each standard',
         variant: 'warning',

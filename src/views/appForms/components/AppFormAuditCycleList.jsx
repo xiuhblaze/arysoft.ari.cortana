@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faEdit, faGear, faGears, faStickyNote, faUser, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsSpin, faBuilding, faEdit, faGear, faGears, faStickyNote, faUser, faUsers, faWindowMaximize } from "@fortawesome/free-solid-svg-icons";
 
 import enums from "../../../helpers/enums";
 import { useAppFormsStore } from "../../../hooks/useAppFormsStore"
@@ -13,8 +13,9 @@ import { Spinner } from "react-bootstrap";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import { useADCsStore } from "../../../hooks/useADCsStore";
 import { useShiftsStore } from "../../../hooks/useShiftsStore";
+import defaultCycleYearProps from "../../../helpers/defaultCycleYearProps";
 
-const AppFormAuditCycleList = React.memo(() => {
+const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
     const {
         AppFormStatusType,
         AppFormOrderType,
@@ -44,26 +45,36 @@ const AppFormAuditCycleList = React.memo(() => {
 
     const [showModal, setShowModal] = useState(false);
     const [appFormID, setAppFormID] = useState(null);
+    const [appFormList, setAppFormList] = useState([]);
 
     useEffect(() => {
 
         if (!!auditCycle) {
-            appFormsAsync({
-                auditCycleID: auditCycle.ID,
-                pageSize: 0,
-                order: AppFormOrderType.createdDesc,
-            });
+            loadAppForms();
+            // appFormsAsync({
+            //     auditCycleID: auditCycle.ID,
+            //     pageSize: 0,
+            //     order: AppFormOrderType.cycleYear,
+            // });            
         }
     }, [auditCycle]);
 
     useEffect(() => {
+        if (!!appForms && appForms.length > 0) {
+            setAppFormList(appForms.filter(i => showAllFiles 
+                || (i.Status > AppFormStatusType.nothing && i.Status < AppFormStatusType.cancel)));
+        }
+    }, [appForms, showAllFiles]);
+
+    useEffect(() => {
         if (!!shiftSavedOk) {
-            //console.log('shiftSavedOk, actualizar la lista de appForms y de ADCs', shiftSavedOk);
-            appFormsAsync({
-                auditCycleID: auditCycle.ID,
-                pageSize: 0,
-                order: AppFormOrderType.createdDesc,
-            });
+
+            loadAppForms();
+            // appFormsAsync({
+            //     auditCycleID: auditCycle.ID,
+            //     pageSize: 0,
+            //     order: AppFormOrderType.cycleYear,
+            // });
 
             adcsAsync({
                 auditCycleID: auditCycle.ID,
@@ -81,11 +92,12 @@ const AppFormAuditCycleList = React.memo(() => {
 
     const onCloseModal = () => {
 
-        appFormsAsync({
-            auditCycleID: auditCycle.ID,
-            pageSize: 0,
-            order: AppFormOrderType.createdDesc,
-        });
+        loadAppForms();
+        // appFormsAsync({
+        //     auditCycleID: auditCycle.ID,
+        //     pageSize: 0,
+        //     order: AppFormOrderType.cycleYear,
+        // });
 
         adcsAsync({
             auditCycleID: auditCycle.ID,
@@ -94,6 +106,14 @@ const AppFormAuditCycleList = React.memo(() => {
         
         setShowModal(false);
     };
+
+    const loadAppForms = () => {
+        appFormsAsync({
+            auditCycleID: auditCycle.ID,
+            pageSize: 0,
+            order: AppFormOrderType.cycleYear,
+        });
+    }; // loadAppForms
     
     return (
         <>
@@ -105,7 +125,7 @@ const AppFormAuditCycleList = React.memo(() => {
                                 <span className="visually-hidden">Loading...</span>
                             </Spinner>
                         </div>
-                    ) : !!appForms && appForms.length > 0 && appForms.map(appForm => {
+                    ) : !!appFormList && appFormList.length > 0 && appFormList.map(appForm => {
                         const itemStyle = `d-flex justify-content-between align-items-center rounded-1 ${ appFormStatusProps[appForm.Status].bgCss } gap-2 px-2 py-1`;
 
                         let standardName = '';
@@ -150,6 +170,9 @@ const AppFormAuditCycleList = React.memo(() => {
                                         </p>
                                     }
                                     <div className="d-flex justify-content-start align-items-center text-xs text-secondary gap-1">
+                                        <span title="Audit cycle year">
+                                            <FontAwesomeIcon icon={faArrowsSpin} />: { defaultCycleYearProps[appForm.CycleYear].abbr }
+                                        </span> | 
                                         <FontAwesomeIcon icon={ faStickyNote } 
                                             className={`text-${ appForm.NotesCount == 0 ? 'secondary' : 'warning' }`}
                                             title={ `${appForm.NotesCount} notes` }

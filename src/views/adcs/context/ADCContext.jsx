@@ -134,6 +134,8 @@ const ADCControllerProvider = ({ children }) => {
             let totalDays = adcSite.InitialMD5;
             let totalSiteDays = 0;
 
+            console.log('adcSite', adcSite);
+
             if (state.adcConceptList.length > 0) {
                 
                 // Decrementos

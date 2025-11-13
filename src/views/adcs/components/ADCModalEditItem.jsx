@@ -15,7 +15,7 @@ import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from '../../../components/Forms';
 import { clearADCController, setADCConceptList, setADCData, setADCSiteList, setConceptValueHidden, setMisc, useADCController } from '../context/ADCContext';
-import { faArrowCircleLeft, faArrowLeft, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faInfoCircle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleLeft, faArrowLeft, faCalculator, faCalendarDay, faClock, faExclamationCircle, faExclamationTriangle, faInfoCircle, faSave, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ViewLoading } from '../../../components/Loaders';
 import adcAlertsProps from '../helpers/adcAlertsProps';
@@ -37,6 +37,7 @@ import isNullOrEmpty from '../../../helpers/isNullOrEmpty';
 import isObjectEmpty from '../../../helpers/isObjectEmpty';
 import MiniStatisticsCard from '../../../components/Cards/MiniStatisticsCard/MiniStatisticsCard';
 import NotesListModal from '../../notes/components/NotesListModal';
+import defaultCycleYearProps from '../../../helpers/defaultCycleYearProps';
 
 const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const headStyle = 'text-uppercase text-secondary text-xxs font-weight-bolder text-wrap';
@@ -478,8 +479,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         setShowModal(false);
     }; // actionsForCloseModal
     
-//console.log("Renderizando ADCModalEditItem - showModal:", showModal);
-
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
             size={ adcSiteList.length > 3 ? 'xxxl' : 'xl' }
@@ -542,14 +541,14 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             title="Change this!!!"
                                                             style={{ minWidth: '48px' }}
                                                         >
-                                                            <FontAwesomeIcon icon={ faClock  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
+                                                            <FontAwesomeIcon icon={ faCalculator } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
                                                         </div>
                                                         <div className="h-100">
                                                             <h5 className="flex-wrap mb-1">
                                                                 { organization.Name }
                                                             </h5>
                                                             <p className="mb-0 font-weight-bold text-sm">
-                                                                { auditCycle.Name }
+                                                                { auditCycle.Name } - { defaultCycleYearProps[adc.CycleYear].label }
                                                             </p>
                                                         </div>
                                                     </div>

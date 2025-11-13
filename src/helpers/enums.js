@@ -23,6 +23,16 @@ const enums = () => {
         other: 4,
     });
 
+    const DefaultCycleYearType = Object.freeze({
+        nothing: 0,
+        firstYear: 1,
+        middleFirstYear: 2,
+        secondYear: 3,
+        middleSecondYear: 4,
+        thirdYear: 5,
+        middleThirdYear: 6,
+    });
+       
     // ADC
 
     const ADCStatusType = Object.freeze({
@@ -88,8 +98,10 @@ const enums = () => {
         nothing: 0,
         created: 1,
         organization: 2,
-        createdDesc: 3,
-        organizationDesc: 4
+        cycleYear: 3,
+        createdDesc:4,
+        organizationDesc: 5,
+        cycleYearDesc: 6,
     });
 
     const AppFormStatusType = Object.freeze({
@@ -127,7 +139,6 @@ const enums = () => {
         proposal: 3,
         contract: 4,
         auditProgramme: 5, // Confirmation letter
-        //cdc: 6,            // Certification decision checklist - TODO: Ver si se va a quedar aquí
         certificate: 6,
         survey: 7,
         other: 8,          // Cualquier otro documento de interés
@@ -166,7 +177,7 @@ const enums = () => {
         actionPlan: 6,          // Action plan & evidence
         ncCloseReport: 7,       // Non conformities close report
         techReport: 8,          // No for FSSC
-        cdc: 9,                 // Certification decision checklist - TODO: Aqui se queda
+        cdc: 9,                 // Certification decision checklist 
         fsscScreenShot: 10,     // Solo para FSSC
         travelExpenses: 11,     // Viaticos
         witnessReport: 12,      // Reporte de testigos
@@ -544,6 +555,7 @@ const enums = () => {
         DefaultStatusType,
         DefaultValidityStatusType,
         DefaultCurrencyCodeType,
+        DefaultCycleYearType,
 
         ADCStatusType,
         ADCOrderType,

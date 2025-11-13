@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Card, Col, Collapse, ListGroup, Modal, Nav, Row } from "react-bootstrap";
 
-import { faBuilding, faCopy, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsSpin, faBuilding, faClipboard, faCopy, faExclamationCircle, faGear, faLandmark, faMagnifyingGlass, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Field, Form, Formik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -44,6 +44,7 @@ import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import NotesListModal from "../../notes/components/NotesListModal";
 import getFriendlyDate from "../../../helpers/getFriendlyDate";
 import { useADCsStore } from "../../../hooks/useADCsStore";
+import defaultCycleYearProps from "../../../helpers/defaultCycleYearProps";
 
 const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [ controller, dispatch ] = useAppFormController();
@@ -222,6 +223,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                 standardBase: appForm.Standard?.StandardBase ?? StandardBaseType.nothing,
             });
 
+            //console.log('appForm.Status', appForm.Status);
             setStatusOptions(appFormStatusOptions(appForm.Status == AppFormStatusType.nothing 
                 ? AppFormStatusType.new 
                 : appForm.Status
@@ -615,17 +617,18 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                 <div className="d-flex align-items-center">
                                                     <div 
                                                         className={`icon icon-md icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`} 
-                                                        title="Change this!!!"
+                                                        // title="Change this!!!"
                                                         style={{ minWidth: '48px' }}
                                                     >
-                                                        <FontAwesomeIcon icon={ faMagnifyingGlass  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
+                                                        <FontAwesomeIcon icon={ faClipboard  } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
                                                     </div>
                                                     <div className="h-100">
                                                         <h5 className="flex-wrap mb-1">
                                                             { organization.Name }
                                                         </h5>
                                                         <p className="mb-0 font-weight-bold text-sm">
-                                                            { auditCycle.Name }
+                                                            <FontAwesomeIcon icon={faArrowsSpin} className="me-1" />
+                                                            { auditCycle.Name } - { defaultCycleYearProps[appForm.CycleYear].label }
                                                         </p>
                                                     </div>
                                                 </div>
@@ -723,7 +726,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                             />
                                                         </Col>
                                                     </Row>
-                                                    {
+                                                    {/* {
                                                         !isNullOrEmpty(appForm.SalesComments) ?
                                                         <Row>
                                                             <Col xs="12">
@@ -758,7 +761,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                 </Alert>
                                                             </Col>
                                                         </Row> : null
-                                                    }                                                    
+                                                    } */}
                                                     {
                                                         !!appForm.Notes && appForm.Notes.length > 0 &&
                                                         <Row>

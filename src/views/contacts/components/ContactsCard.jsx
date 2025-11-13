@@ -1,17 +1,18 @@
-import { Card, ListGroup, Spinner } from "react-bootstrap"
-import EditContactModal from "./EditContactModal"
-import { useContactsStore } from "../../../hooks/useContactStore"
 import { useEffect } from "react";
+import { Card, ListGroup, Spinner } from "react-bootstrap"
+import { faEnvelope, faNoteSticky, faPhone, faUserFriends } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useContactsStore } from "../../../hooks/useContactStore"
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import enums from "../../../helpers/enums";
 import Swal from "sweetalert2";
 
-import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
-import envVariables from "../../../helpers/envVariables";
 import { checkFileExists } from "../../../helpers/checkFileExists";
+import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
+import EditContactModal from "./EditContactModal"
+import envVariables from "../../../helpers/envVariables";
+import getRandomNumber from "../../../helpers/getRandomNumber";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import { faEnvelope, faNoteSticky, faPhone, faUserFriends } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ContactsCard = ({ readOnly = false, ...props }) => {
     const statusStyle = [
@@ -85,7 +86,7 @@ const ContactsCard = ({ readOnly = false, ...props }) => {
                                 contacts.map( item => {
                                     const url = `${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${organization.ID}/contacts/${item.ID}`;
                                     const fileName = !!item.PhotoFilename // && checkFileExists(`${url}/${ item.PhotoFilename }`)
-                                        ? `${url}/${ item.PhotoFilename }`
+                                        ? `${url}/${ item.PhotoFilename }?v=${getRandomNumber(4)}`
                                         : defaultProfile ;
                                     const itemStyle= `border-0 d-flex justify-content-between align-items-center px-0 mb-2 ${ statusStyle[item.Status] }`;
                                     

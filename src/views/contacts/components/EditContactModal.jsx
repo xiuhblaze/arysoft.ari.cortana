@@ -14,6 +14,7 @@ import enums from "../../../helpers/enums";
 import envVariables from "../../../helpers/envVariables";
 import { ViewLoading } from "../../../components/Loaders";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import getRandomNumber from "../../../helpers/getRandomNumber";
 
 // import defaultProfile from '../../../assets/img/phoDefaultProfile.jpg';
 
@@ -333,7 +334,7 @@ const EditContactModal = ({ id, ...props}) => {
                                                         </>
                                                     ) : !!contact.PhotoFilename && 
                                                         <div>
-                                                            <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${contact.OrganizationID}/contacts/${contact.ID}/${contact.PhotoFilename}`}
+                                                            <Image src={`${VITE_FILES_URL}${URL_ORGANIZATION_FILES}/${contact.OrganizationID}/contacts/${contact.ID}/${contact.PhotoFilename}?v=${getRandomNumber(4)}`}
                                                                 thumbnail
                                                                 fluid
                                                                 className="mb-3"

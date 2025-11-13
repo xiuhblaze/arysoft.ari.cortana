@@ -130,7 +130,7 @@ const AuditCycleDocumentsList = ({ readOnly = false, showAllFiles = false, ...pr
                                                 }
                                             </div>
                                             { documents.length > 0 ? <hr className="horizontal dark my-3" /> : null }
-                                            <AppFormAuditCycleList />
+                                            <AppFormAuditCycleList showAllFiles={ showAllFiles } />
                                         </div>
                                     </div> : null
                                 }
