@@ -1,8 +1,9 @@
 import { faFaceFrown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Card, Col, Row } from "react-bootstrap";
+import ShowFormatTextInput from "../../General/ShowFormatTextInput";
 
-export const MiniStatisticsCard = ({ title, count, percentage, icon }) => {
+export const MiniStatisticsCard = ({ title, count, percentage, icon, countIsMultiline = false }) => {
 
   const titText = title ?? '[title]';
   const iconFig = icon?.icon ?? faFaceFrown;
@@ -17,7 +18,8 @@ export const MiniStatisticsCard = ({ title, count, percentage, icon }) => {
           <Col xs="8">
             <div className="numbers">
               <p className="text-sm mb-0 text-capitalize font-weight-bold">{ titText }</p>
-              <h5 className="font-weight-bolder mb-0">
+              <h5 className={`font-weight-bolder mb-0 ${ countIsMultiline ? 'text-sm' : ''}`}>
+                {/* { countIsMultiline ? ShowFormatTextInput(count) : count } */}
                 { count }
                 <span className={ `text-${ perColor } text-sm font-weight-bolder ms-1`}>{ perText }</span>
               </h5>

@@ -18,6 +18,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
         adcData,
         conceptValueHidden,
     } = controller;
+    const adcSite = adcData.ADCSites.find(as => as.ID == adcConceptValue.ADCSiteID);
 
     const decreaseList = [
         { value: 0, label: '0' },
@@ -43,11 +44,24 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
         label: '-',
         disabled: true,
         unit: ADCConceptUnitType.nothing,
+        isMainSite: !!adcSite ? adcSite.IsMainSite : false,
     });
 
     useEffect(() => {
+
         setConceptValue(formData.checkValue);
     }, []);
+
+    useEffect(() => {
+        //console.log('ADCConceptValueInput.useEffect: adcConceptValue', adcConceptValue);
+        setConceptValue(adcConceptValue.CheckValue);
+        setFormData({
+            ...formData,
+            value: adcConceptValue.Value ?? 0,
+            justification: adcConceptValue.Justification ?? '',
+        })
+    }, [adcConceptValue]);
+    
 
     // METHODS
 
@@ -107,15 +121,15 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
         
         if (unit != ADCConceptUnitType.nothing) {
             setMyProps(unit == ADCConceptUnitType.percentage 
-                ? { icon: faPercent, label: 'percent', disabled: false, unit: ADCConceptUnitType.percentage } 
-                : { icon: faCalendarDay, label: 'days', disabled: false, unit: ADCConceptUnitType.days }
+                ? { ...myProps, icon: faPercent, label: 'percent', disabled: false, unit: ADCConceptUnitType.percentage } 
+                : { ...myProps, icon: faCalendarDay, label: 'days', disabled: false, unit: ADCConceptUnitType.days }
             );
             setFormData({
                 ...formData,
                 checkValue: value,
             });
         } else {
-            setMyProps({ icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
+            setMyProps({ ...myProps, icon: faMinus, label: '-', disabled: true, unit: ADCConceptUnitType.nothing });
             setFormData({
                 ...formData,
                 checkValue: value,
@@ -134,6 +148,8 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
     const onCheckChange = (e) => {        
         const checked = e.target.checked;
 
+        if (!myProps.isMainSite) return;
+
         setConceptValue(checked);
         setConceptValueTouched(dispatch, true);
         updateConceptValues(0, formData.justification, checked);
@@ -141,6 +157,8 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
 
     const onChange = (e) => {
         const { name, value, type } = e.target;
+
+        if (!myProps.isMainSite) return;
 
         setFormData({
             ...formData,
@@ -155,6 +173,8 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
 
     const onBlur = (e) => { // Cuando se deja el input de Value
         const { name, value } = e.target;
+
+        if (!myProps.isMainSite) return;
         
         if (name === 'value' && isValidDays(value)) {
             setConceptValueTouched(dispatch, true);
@@ -213,7 +233,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
                                 style={{ height: '20px' }}
                                 onChange={ onCheckChange }
                                 checked={formData.checkValue}
-                                disabled={ adcData.Status >= ADCStatusType.inactive }
+                                disabled={ adcData.Status >= ADCStatusType.inactive || !myProps.isMainSite }
                             />
                         </div>
                     </div>
@@ -224,7 +244,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
                                 onChange={ onChange }
                                 className="form-select text-end ari-pe-2"
                                 value={formData.value.toString() ?? '0'}
-                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
+                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive || !myProps.isMainSite }
                             >
                                 { decreaseList.map((item, index) => (
                                     <option key={index} value={item.value} className="text-end">{item.label}</option>
@@ -239,7 +259,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
                                 value={formData.value ?? '0'}
                                 onChange={ onChange }
                                 onBlur={ onBlur }
-                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
+                                disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive || !myProps.isMainSite }
                             />
                         )
                     }
@@ -251,7 +271,7 @@ const ADCConceptValueInput = React.memo(({ adcConcept, adcConceptValue, ...props
                             ? 'btn-outline-light ari-btn-outline-light-2' 
                             : 'btn-outline-secondary'} px-3 mb-0`}
                         type="button"
-                        disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive }
+                        disabled={ myProps.disabled || adcData.Status >= ADCStatusType.inactive || !myProps.isMainSite }
                         onClick={ (e) => {
                             e.preventDefault();
                             onShowModal();

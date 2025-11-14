@@ -294,7 +294,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
-            size={ 'xl' }
+            size={ 'xxxl' }
             contentClassName="bg-gray-100 border-0 shadow-lg"
             fullscreen="sm-down"
         >

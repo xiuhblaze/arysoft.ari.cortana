@@ -5,8 +5,11 @@ import ComponentLoading from "../../../components/Loaders/ComponentLoading";
 import { ListGroup } from "react-bootstrap";
 
 const MD5List = memo(({ daysList, rows = 4, ...props }) => {
+    const MAX_HEIGHT = 400;
     const h6Style = 'text-sm text-dark text-gradient text-wrap mb-0';
     const { DefaultStatusType, MD5OrderType } = enums();
+
+    const maxHeight = (rows * 30) > MAX_HEIGHT ? MAX_HEIGHT : (rows * 30);
 
     const {
         isMD5sLoading,
@@ -30,7 +33,7 @@ const MD5List = memo(({ daysList, rows = 4, ...props }) => {
             <h6 className={h6Style}>MD5</h6>
             <div className="d-flex justify-content-between align-items-center bg-transparent gap-2">
                 <div className="text-wrap text-xs font-weight-bold">
-                    Effective Number of Personnel
+                    Effective Number of <br />Personnel
                 </div>
                 <div className="text-end text-wrap text-xs font-weight-bold">
                     Audit Time<br />Stage 1 + Stage 2 (days)
@@ -40,7 +43,7 @@ const MD5List = memo(({ daysList, rows = 4, ...props }) => {
                 isMD5sLoading ? (
                     <ComponentLoading />
                 ) : !!md5s && md5s.length > 0 ? (
-                    <div style={{ maxHeight: `${ rows * 30 }px`, overflow: 'auto' }}>
+                    <div style={{ maxHeight: `${ maxHeight }px`, overflow: 'auto' }}>
                         <ListGroup variant="flush" size="sm">
                             { md5s.map(md5 => {
                                 const isValidDay = !!daysList.find(day => day == md5.Days);

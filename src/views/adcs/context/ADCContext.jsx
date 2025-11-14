@@ -9,6 +9,7 @@ const ADCControllerProvider = ({ children }) => {
 
     const {
         ADCConceptUnitType,
+        AuditCycleType,
         AuditStepType,
     } = enums();
 
@@ -32,9 +33,7 @@ const ADCControllerProvider = ({ children }) => {
         }
     } // initialState
 
-    const updateADCSite = (state, value) => {         
-// console.log('updateADCSite()', value);
-
+    const updateADCSite = (state, value) => {
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             if (adcSite.ID == value.ID) {
                 return {
@@ -50,13 +49,31 @@ const ADCControllerProvider = ({ children }) => {
 
     const updateADCConceptValue = (state, value) => {
         const {adcConceptValueID, checkValue, newValue, unit, justification } = value;
+        let adcConceptValue = null;
+        
+        // state.adcSiteList.forEach(adcSite => {
+        //     adcConceptValue = adcSite.ADCConceptValues.find(acv => acv.ID == adcConceptValueID);
+        //     if (!!adcConceptValue) return;
+        // });
+        adcConceptValue = state.adcSiteList
+            .flatMap(adcSite => adcSite.ADCConceptValues)
+            .find(acv => acv.ID == adcConceptValueID);
 
+        //console.log('updateADCConceptValue.adcConceptValue', adcConceptValue);
+        
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             let hasChanges = false;
-
             const newADCConceptValueList = adcSite.ADCConceptValues.map(adccvItem => {
                 
-                if (adccvItem.ID == adcConceptValueID) {
+                //if (adccvItem.ID == adcConceptValueID) {
+                if (adcConceptValue.ADCConceptID == adccvItem.ADCConceptID) {
+                    // console.log('updateADCConceptValue.find ADCConceptID', {
+                    //     ...adccvItem,
+                    //     CheckValue: checkValue ?? adccvItem.CheckValue,
+                    //     Value: newValue ?? adccvItem.Value,
+                    //     ValueUnit: unit ?? adccvItem.ValueUnit,
+                    //     Justification: justification ?? adccvItem.Justification,
+                    // });
                     hasChanges = true;
                     return {
                         ...adccvItem,
@@ -79,8 +96,6 @@ const ADCControllerProvider = ({ children }) => {
             return adcSite;
         }); // newADCSiteList
 
-        //console.log('newADCSiteList', newADCSiteList);
-
         return newADCSiteList;
     }; // updateADCConceptValue
 
@@ -89,13 +104,12 @@ const ADCControllerProvider = ({ children }) => {
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             let hasChanges = false;
-            //console.log('updateADCSiteAudit.adcSite', adcSite);
 
             const newADCSiteAuditList = adcSite.ADCSiteAudits.map(adcSiteAudit => {
 
                 if (adcSiteAudit.ID == adcSiteAuditID) {
                     hasChanges = true;
-                    //console.log('updateADCSiteAudit.adcSiteAudit', adcSiteAudit);
+
                     return {
                         ...adcSiteAudit,
                         Value: checkValue ?? adcSiteAudit.Value,
@@ -106,7 +120,6 @@ const ADCControllerProvider = ({ children }) => {
             });
 
             if (hasChanges) {
-                // console.log('newADCSiteAuditList - Hubo cambios', newADCSiteAuditList);
                 return {
                     ...adcSite,
                     ADCSiteAudits: newADCSiteAuditList,
@@ -237,21 +250,23 @@ const ADCControllerProvider = ({ children }) => {
         // Generar lista de Surveillance por sitio seleccionado en ADCSiteAudits
 
         let _totalInitial = 0;
+        let _totalMD11 = 0;
+        let _total = 0;
         let _surveillance = [0, 0, 0, 0, 0];
         let _recertification = 0;
-        const _adcSiteList = newADCSiteList.map(adcSite => {
+        newADCSiteList.forEach(adcSite => {
             //console.log('adcSite', adcSite.SiteDescription);
 
-            const _adcSiteAudits = adcSite.ADCSiteAudits.map(asa => {
+            adcSite.ADCSiteAudits.forEach(asa => {
                 //console.log('asa', asa);
                 if (asa.Value) {
                     switch (asa.AuditStep) {
                         case AuditStepType.stage1: {
-                            _totalInitial += adcSite.Total;
+                            _total += adcSite.Total;
                             break;
                         }
                         case AuditStepType.stage2: {
-                            _totalInitial += adcSite.Total;
+                            _total += adcSite.Total;
                             break;
                         }
                         case AuditStepType.surveillance1: {
@@ -274,8 +289,8 @@ const ADCControllerProvider = ({ children }) => {
                             _surveillance[4] += adcSite.Surveillance;
                             break;
                         }
-                        case AuditStepType.recertification: { //! AQUI VOY, ESTOY VALIDANDO ESTO PARA DESPUES PONERLO EN PANTALLA
-                            console.log('asa.Recertification', adcSite.Recertification);
+                        case AuditStepType.recertification: { 
+                            //console.log('adcSite.Recertification', adcSite.Recertification);
                             _recertification += adcSite.Recertification;
                             break;
                         }
@@ -288,21 +303,40 @@ const ADCControllerProvider = ({ children }) => {
             });
         });
 
-        console.log('_totalInitial', _totalInitial);
-        console.log('_surveillance', _surveillance);
-        console.log('_recertification', _recertification);
+        // console.log('_totalInitial', _totalInitial);
+        // console.log('_surveillance', _surveillance);
+        // console.log('_recertification', _recertification);
+        // console.log('_total', _total);
 
-        console.log('ADCSiteAudits', newADCSiteList[0]);
+        //console.log('newADCSiteList[0]', newADCSiteList[0]);
+
+        if (!!adcData && !!adcData.AuditCycle && !!adcData.AuditCycle.AuditCycleStandards) {
+            // console.log('adcData', adcData);
+            const auditCycleStandard = adcData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adcData.AppForm.StandardID);
+            //console.log('auditCycleStandard', auditCycleStandard);
+            
+            if (auditCycleStandard.CycleType == AuditCycleType.initial) {
+                // console.log('INICIAL');
+                _recertification = totalRecertification; // Se indica pues no tiene un ADCSiteAudit asociado
+            } 
+            // else if (auditCycleStandard.CycleType == AuditCycleType.recertification) {
+            //     console.log('RECERTIFICATION');
+            // } else {
+            //     console.log('TRANSFER');
+            //     // Aqui aun no sé que se debe hacer
+            // }
+        }
 
         // Guardar los datos en el ADC
-
         const newADCData = {
             ...adcData,
             TotalInitial: roundDays(totalInitial),
             TotalEmployees: totalEmployees, 
             TotalMD11: roundDays(total),
+            Total: roundDays(_total),
             TotalSurveillance: roundToHalf(totalSurveillance),
-            TotalRecertification: roundDays(totalRecertification),            
+            TotalsSurveillance: _surveillance,
+            TotalRecertification: _recertification, //roundDays(totalRecertification),            
         };
         //console.log('newADCData', newADCData);
 
@@ -358,10 +392,10 @@ const ADCControllerProvider = ({ children }) => {
             }
             case 'UPDATE_ADC_SITE_AUDIT': {
                 //console.log('UPDATE_ADC_SITE_AUDIT', action.value);
-                const newState = {
+                const newState = updateTotals({
                     ...state, 
                     adcSiteList: updateADCSiteAudit(state, action.value)
-                };
+                });
                 return { ...newState };
             }
             case 'UPDATE_TOTALS': {

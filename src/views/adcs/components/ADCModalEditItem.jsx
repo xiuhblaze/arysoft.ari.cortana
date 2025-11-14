@@ -284,17 +284,17 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
     }, [adc, organization]);
 
-    useEffect(() => {
+    // useEffect(() => {
         
-        //console.log('adcSiteList', adcSiteList);
-        if (!!adcSiteList && adcSiteList.length > 0) {
-            const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
+    //     console.log('adcSiteList', adcSiteList);
+    //     // if (!!adcSiteList && adcSiteList.length > 0) {
+    //     //     const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
 
-            if (!!formikRef?.current) {
-                formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
-            }
-        }
-    }, [adcSiteList]);
+    //     //     if (!!formikRef?.current) {
+    //     //         formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
+    //     //     }
+    //     // }
+    // }, [adcSiteList]);
 
     useEffect(() => {
         
@@ -824,17 +824,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 {
                                                                                     adcSiteList.map(adcSite => 
                                                                                         <td key={adcSite.ID}>
-                                                                                            {/* <p className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}>
-                                                                                                { adcSite.RealTotalInitial 
-                                                                                                    ? <span>{adcSite.RealTotalInitial}<FontAwesomeIcon icon={ faAnglesRight } className="mx-2" /></span> 
-                                                                                                    : null }
-                                                                                                <span className="text-dark font-weight-bold">
-                                                                                                    { adcSite.TotalInitial ?? 0 }
-                                                                                                </span>
-                                                                                                <span className="px-2" title="Days">
-                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
-                                                                                                </span>
-                                                                                            </p> */}
                                                                                             <ADCShowTotalDays 
                                                                                                 className={`${pStyle} text-end ${!!adcSite.ExceedsMaximumReduction ? 'text-danger' : ''}`}
                                                                                                 realTotalDays={adcSite.RealTotalInitial} 
@@ -890,12 +879,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                                             realTotalDays={adcSite.RealTotal} 
                                                                                                             totalDays={adcSite.Total}
                                                                                                         />
-                                                                                                        {/* <p className={`${pStyle} text-end`}>
-                                                                                                            { adcSite.Total ?? 0}
-                                                                                                            <span className="px-2" title="Days">
-                                                                                                                <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
-                                                                                                            </span>
-                                                                                                        </p> */}
                                                                                                     </td>
                                                                                                 )
                                                                                             }
@@ -912,12 +895,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
-                                                                                            {/* <p className={`${pStyle} text-end`}>
-                                                                                                { adcSite.Surveillance ?? 0 }
-                                                                                                <span className="px-2" title="Days">
-                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
-                                                                                                </span>
-                                                                                            </p> */}
                                                                                             <ADCShowTotalDays 
                                                                                                 className={`${pStyle} text-end`}
                                                                                                 realTotalDays={adcSite.RealSurveillance} 
@@ -936,12 +913,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 {
                                                                                     adcSiteList.map(adcSite =>  
                                                                                         <td key={adcSite.ID}>
-                                                                                            {/* <p className={`${pStyle} text-end`}>
-                                                                                                { adcSite.Recertification ?? 0 }
-                                                                                                <span className="px-2" title="Days">
-                                                                                                    <FontAwesomeIcon icon={ faCalendarDay } fixedWidth />
-                                                                                                </span>
-                                                                                            </p> */}
                                                                                             <ADCShowTotalDays 
                                                                                                 className={`${pStyle} text-end`}
                                                                                                 realTotalDays={adcSite.RealRecertification} 
@@ -999,7 +970,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                             ) : null }
                                                                         </tbody>                                                                    
                                                                     </table>
-                                                                    {
+                                                                    {/* {
                                                                         !!adc.Proposal ? (
                                                                             <>
                                                                                 <hr className="horizontal dark my-3" />
@@ -1018,7 +989,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                                 </Alert>
                                                                             </>
                                                                         ) : null
-                                                                    }
+                                                                    } */}
                                                                     {
                                                                         !isObjectEmpty(formik.errors) && (
                                                                             <>
@@ -1100,7 +1071,18 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <Col>
                                                 <MiniStatisticsCard
                                                     title="Surveillance"
-                                                    count={ adcData?.TotalSurveillance ?? 0 }
+                                                    count={ adcData?.TotalsSurveillance
+                                                        .filter(ts => ts > 0)
+                                                        .map((ts, index) => {
+                                                            const step = index == 0 ? 'S1'
+                                                                : index == 1 ? 'S2'
+                                                                    : index == 2 ? 'S3'
+                                                                        : index == 3 ? 'S4'
+                                                                            : index == 4 ? 'S5': null;
+                                                            return `${ step }: ${ ts }`;
+                                                        })
+                                                        .join(', ') 
+                                                    }
                                                     percentage={{
                                                         color: 'dark',
                                                         text: 'days',
@@ -1109,6 +1091,7 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         icon: faCalendarDay,
                                                         bgColor: 'dark',
                                                     }}
+                                                    countIsMultiline
                                                 />
                                             </Col>
                                             <Col>
