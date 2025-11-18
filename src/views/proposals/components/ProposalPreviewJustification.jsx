@@ -4,6 +4,7 @@ import { useProposalController } from '../context/ProposalContext';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import enums from '../../../helpers/enums';
+import { te } from 'date-fns/locale';
 
 const ProposalPreviewJustification = ({ formik, ...props }) => {
     const headerStyle = 'col-3 text-xs text-wrap font-weight-bold bg-light';
@@ -31,14 +32,27 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
     }, [formik.values]);
 
     const generateJustification = () => {
+        const isMultisite = ADCSites.length > 1;        
         let textJustification = 'The calculation of days presented in this proposal was made in accordance with the requirements of IAF MD5.\n\n';
         
         textJustification += adcList.map(adcItem => {
             //console.log('adcItem', adcItem);
             const cycleType = proposalData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adcItem.AppFormStandardID).CycleType;
 
-            let textItem = `Number of employees ${ adcItem.AppFormStandardName}: **${adcItem.TotalEmployees}**  \n`;
-            textItem += 'Range MD5: *(no data)*  \n';
+            let textItem = `Number of employees: **${adcItem.TotalEmployees}**  \n`;
+
+            textItem += 'Range MD5: ';
+            if (isMultisite) {
+                ADCSites.forEach(adcSite => {
+                    textItem += `[${ adcSite.SiteDescription }: ${ adcSite.NoEmployees } > ${adcSite.MD5Range}] `;
+                });
+            } else if (ADCSites.length == 1) {
+                const adcSite = ADCSites[0];
+                textItem += ` ${adcSite.MD5Range}`;
+            } else {
+                textItem += ` (no data)`;
+            }
+            textItem += `  \n`;
             textItem += `Audit time: **${adcItem.TotalInitial} ${ adcItem.TotalInitial == 1 ? 'day' : 'days' }** for initial certification.  \n`;
             textItem += `Surveillance being about 1/3 of the audit time spent on the initial certification audit.  \n`;
             textItem += `For surveillance(1/3): **${adcItem.TotalSurveillance} ${ adcItem.TotalSurveillance <= 1 ? 'day' : 'days' }**\n`;
@@ -52,17 +66,13 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
 
             textItem += `Plus, it was done time adjustment as follow:\n`;
 
-            const adcSites = ADCSites
-                .filter(adcSite => adcSite.ADCID == adcItem.ID)
-                .sort((a, b) => b.IsMainSite - a.IsMainSite 
-                    || a.SiteDescription.localeCompare(b.SiteDescription));
-                    
-            adcSites.forEach(adcSite => {
-                console.log('adcSite', adcSite);
-                textItem += `\nFor ${ adcSite.SiteDescription }\n`;
+            const adcSite = ADCSites.find(adcSite => adcSite.IsMainSite);
+console.log('adcSite', adcSite);
+            if (!!adcSite) {
+                //textItem += `\nFor ${ adcSite.SiteDescription }\n`;
                 adcSite.ADCConceptValues.forEach(adcConceptValue => {
-                    if (adcConceptValue.Value != null && adcConceptValue.Value != 0) { //! Falta indicar si es porcentaje o días y si es incremento o decremento
-                        console.log('adcConceptValue', adcConceptValue);
+                    if (adcConceptValue.Value != null && adcConceptValue.Value != 0) { 
+                        //console.log('adcConceptValue', adcConceptValue);
                         const whenTrue = (adcConceptValue.ADCConceptWhenTrue && adcConceptValue.CheckValue) 
                             || (!adcConceptValue.ADCConceptWhenTrue && !adcConceptValue.CheckValue)
                             ? '+' // Incremento
@@ -71,7 +81,27 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
                         textItem += `- ${ adcConceptValue.ADCConceptDescription }: **${ whenTrue }${ adcConceptValue.Value }${ valueUnit }**\n`;
                     }
                 });
-            });
+            }
+            // const adcSites = ADCSites
+            //     .filter(adcSite => adcSite.ADCID == adcItem.ID)
+            //     .sort((a, b) => b.IsMainSite - a.IsMainSite 
+            //         || a.SiteDescription.localeCompare(b.SiteDescription));
+
+            // adcSites.forEach(adcSite => {
+            //     console.log('adcSite', adcSite);
+            //     textItem += `\nFor ${ adcSite.SiteDescription }\n`;
+            //     adcSite.ADCConceptValues.forEach(adcConceptValue => {
+            //         if (adcConceptValue.Value != null && adcConceptValue.Value != 0) { //! Falta indicar si es porcentaje o días y si es incremento o decremento
+            //             console.log('adcConceptValue', adcConceptValue);
+            //             const whenTrue = (adcConceptValue.ADCConceptWhenTrue && adcConceptValue.CheckValue) 
+            //                 || (!adcConceptValue.ADCConceptWhenTrue && !adcConceptValue.CheckValue)
+            //                 ? '+' // Incremento
+            //                 : '-'; // Decremento
+            //             const valueUnit = adcConceptValue.ValueUnit == ADCConceptUnitType.days ? 'days' : '%';
+            //             textItem += `- ${ adcConceptValue.ADCConceptDescription }: **${ whenTrue }${ adcConceptValue.Value }${ valueUnit }**\n`;
+            //         }
+            //     });
+            // });
 
             //console.log('adcSites', adcSites);
 

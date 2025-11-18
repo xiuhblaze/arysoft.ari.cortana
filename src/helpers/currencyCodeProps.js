@@ -28,10 +28,10 @@ const currencyCodeProps = [
         simbol: '€',
     },
     {
-        id: DefaultCurrencyCodeType.other,
-        abbreviation: 'Other',
-        label: 'Other',
-        simbol: '$',
+        id: DefaultCurrencyCodeType.uf,
+        abbreviation: 'UF',
+        label: 'Unit of account',
+        simbol: 'UF',
     }
 ];
 

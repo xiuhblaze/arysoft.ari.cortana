@@ -20,7 +20,7 @@ const enums = () => {
         usd: 1,
         mxn: 2,
         eur: 3,
-        other: 4,
+        uf: 4,
     });
 
     const DefaultCycleYearType = Object.freeze({

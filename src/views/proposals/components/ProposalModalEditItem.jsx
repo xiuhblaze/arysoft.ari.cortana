@@ -22,6 +22,9 @@ import proposalStatusProps from "../helpers/proposalStatusProps";
 import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import proposalSetStatusOptions from "../helpers/proposalSetStatusOptions";
 import ProposalEditADCs from "./ProposalEditADCs";
+import currencyCodeProps from "../../../helpers/currencyCodeProps";
+import { set } from "date-fns";
+import envVariables from "../../../helpers/envVariables";
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -37,12 +40,17 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         ProposalStatusType, 
     } = enums();
 
+    const { DEFAULT_TAX_RATE } = envVariables();
+
     const formDefaultValues = {
-        justificationInput: '',
+        justificationHiddenInput: '',
         signerNameInput: '',
         signerPositionInput: '',
         signedFileInput: '',
         currencyCodeSelect: '',
+        exchangeRateInput: '',
+        taxRateInput: '',
+        includeTravelExpensesCheckbox: false,
         extraInfoInput: '',
         statusSelect: '',
         commentsInput: '',
@@ -50,12 +58,27 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     };
 
     const validationSchema = Yup.object({
-        justificationInput: Yup.string()
+        justificationHiddenInput: Yup.string()
             .required('Justification is required'),
         signerNameInput: Yup.string()
             .max(150, 'Signer name must be less than 150 characters'),
         signerPositionInput: Yup.string()
             .max(100, 'Signer position must be less than 100 characters'),
+        currencyCodeSelect: Yup.string()
+            .required('Currency code is required'),
+        exchangeRateInput: Yup.number()
+            .when('currencyCodeSelect', {
+                is: (value) => value != DefaultCurrencyCodeType.mxn && value != DefaultCurrencyCodeType.nothing,
+                then: (schema) => schema
+                    .typeError('Exchange rate must be a number')
+                    .required('Is required when currency code is different than MXN')
+                    .min(0, 'Exchange rate must be greater than 0'),
+                otherwise: (schema) => schema.nullable(),
+            }),
+        taxRateInput: Yup.number()
+            .required('Tax rate is required')
+            .min(0, 'Tax rate must be greater than 0')
+            .max(100, 'Tax rate must be less than 100'),
         adcsCountHidden: Yup.number()
             .typeError('ADCs must be a number')
             .min(1, 'At least one ADC is required'),
@@ -103,6 +126,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [initialValues, setInitialValues] = useState(formDefaultValues);
     const [originalStatus, setOriginalStatus] = useState(null);
     const [statusOptions, setStatusOptions] = useState([]);
+    const [showExchangeRateInput, setShowExchangeRateInput] = useState(false);
     const [showAddComments, setShowAddComments] = useState(false);
     const [saveNote, setSaveNote] = useState('');
 
@@ -171,11 +195,14 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         const historicalData = JSON.parse(proposal.HistoricalDataJSON);
 
         setInitialValues({
-            justificationInput: proposal.Justification ?? '',
+            justificationHiddenInput: proposal.Justification ?? '',
             signerNameInput: proposal.SignerName ?? '',
             signerPositionInput: proposal.SignerPosition ?? '',
             signerFileInput: '',
-            currencyCodeSelect: proposal.CurrencyCode ?? '',
+            currencyCodeSelect: proposal.CurrencyCode ?? DefaultCurrencyCodeType.mxn,
+            exchangeRateInput: proposal.ExchangeRate ?? '',
+            taxRateInput: proposal.TaxRate ?? '',
+            includeTravelExpensesCheckbox: proposal.IncludeTravelExpenses ?? false,
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: proposal.Status,
             commentsInput: '',
@@ -193,11 +220,14 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         // console.log('loadFromRealData', proposal);
 
         setInitialValues({
-            justificationInput: proposal.Justification ?? '',
+            justificationHiddenInput: proposal.Justification ?? '',
             signerNameInput: proposal.SignerName ?? '',
             signerPositionInput: proposal.SignerPosition ?? '',
             signerFileInput: '',
-            currencyCodeSelect: proposal.CurrencyCode ?? '',
+            currencyCodeSelect: proposal.CurrencyCode ?? DefaultCurrencyCodeType.mxn,
+            exchangeRateInput: proposal.ExchangeRate ?? '',
+            taxRateInput: proposal.TaxRate ?? DEFAULT_TAX_RATE,
+            includeTravelExpensesCheckbox: proposal.IncludeTravelExpenses ?? false,
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: !!proposal?.Status && proposal.Status != ProposalStatusType.nothing
                 ? proposal.Status
@@ -207,6 +237,12 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 ? proposal.ADCs.filter(a => a.Status == ProposalStatusType.active).length
                 : 0,
         });
+
+        if (!!proposal.CurrencyCode 
+            && proposal.CurrencyCode != DefaultCurrencyCodeType.mxn 
+            && proposal.CurrencyCode != DefaultCurrencyCodeType.nothing) {
+            setShowExchangeRateInput(true);
+        }
 
         if (!!organization && !!auditCycle) {
             setOrganizationData(dispatch, {
@@ -219,7 +255,15 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             })
         }
 
-        setProposalData(dispatch, proposal);
+        // Incluyendo valores por default para que se muestren en Preview
+        setProposalData(dispatch, 
+            {
+                ...proposal,
+                CurrencyCode: proposal.CurrencyCode ?? DefaultCurrencyCodeType.mxn,
+                TaxRate: proposal.TaxRate ?? DEFAULT_TAX_RATE,
+                IncludeTravelExpenses: proposal.IncludeTravelExpenses ?? false,
+            }
+        );
 
         if (!!proposal?.ADCs && proposal.ADCs.length > 0) {            
             setADCList(dispatch, proposal.ADCs);
@@ -234,6 +278,18 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         }
 
     }; // loadFromRealData
+
+    const currencyCodeSelectOnChange = (e) => {
+        const selectedValue = e.target.value;
+
+        formikRef.current.setFieldValue('currencyCodeSelect', selectedValue);
+        setShowExchangeRateInput(selectedValue != DefaultCurrencyCodeType.mxn && selectedValue != DefaultCurrencyCodeType.nothing);
+
+        setProposalData(dispatch, {
+            ...proposalData,
+            CurrencyCode: selectedValue,
+        });
+    }; // currencyCodeSelectOnChange
 
     const onFormSubmit = (values) => {
         console.log('onFormSubmit: values', values);
@@ -254,10 +310,13 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
         const toSave = {
             ID: proposalData.ID,
-            Justification: values.justificationInput,
+            Justification: values.justificationHiddenInput,
             SignerName: values.signerNameInput,
             SignerPosition: values.signerPositionInput,
             CurrencyCode: values.currencyCodeSelect,
+            ExchangeRate: values.exchangeRateInput,
+            TaxRate: values.taxRateInput,
+            IncludeTravelExpenses: values.includeTravelExpensesCheckbox,
             ExtraInfo: values.extraInfoInput,
             Status: newStatus,
         };
@@ -417,6 +476,46 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                 </Col>
                                                             </Row>
                                                             <Row>
+                                                                <Col xs="12" sm="6">
+                                                                    <AryFormikSelectInput
+                                                                        name="currencyCodeSelect"
+                                                                        label="Currency code"
+                                                                        onChange={ currencyCodeSelectOnChange }
+                                                                    >
+                                                                        { currencyCodeProps
+                                                                            .filter(item => item.id != DefaultCurrencyCodeType.nothing)
+                                                                            .map(currencyCode => 
+                                                                            <option key={currencyCode.id} 
+                                                                                value={currencyCode.id}
+                                                                            >
+                                                                                { currencyCode.label } ({ currencyCode.abbreviation })
+                                                                            </option>
+                                                                        )}
+                                                                    </AryFormikSelectInput>
+                                                                </Col>
+                                                                <Collapse in={ showExchangeRateInput }>
+                                                                    <Col xs="12" sm="6">
+                                                                        <AryFormikTextInput
+                                                                            name="exchangeRateInput"
+                                                                            label="Exchange rate"
+                                                                            disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                            helpText="Exchange rate to pesos (MXN)"
+                                                                        />
+                                                                    </Col>
+                                                                </Collapse>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col xs="12" sm="6">
+                                                                    <AryFormikTextInput
+                                                                        name="taxRateInput"
+                                                                        label="Tax rate"
+                                                                        endLabel="%"
+                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                        helpText="0 - 100"
+                                                                    />
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
                                                                 <Col xs="12">
                                                                     <AryFormikTextArea
                                                                         name="extraInfoInput"
@@ -482,6 +581,8 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                             <AryLastUpdatedInfo item={ proposal } />
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                            <input type="hidden" name="justificationHiddenInput" />
+                                            <input type="hidden" name="adcsCountHidden" />
                                             <button 
                                                 type="submit"
                                                 className="btn bg-gradient-dark mb-0"

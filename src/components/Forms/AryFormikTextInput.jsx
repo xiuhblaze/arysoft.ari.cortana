@@ -8,7 +8,7 @@ export const AryFormikTextInput = React.memo(({ label, classNameDiv, startLabel,
 
     const inputForm = (
         <input
-            className={`form-control${ meta.touched && meta.error ? ' is-invalid' : ''}${ !!className ?  ' ' + className : ''}`}
+            className={`form-control${ meta.touched && meta.error ? ' is-invalid' : ''}${ !!className ?  ' ' + className : ''}${!!endLabel ? ' ari-form-control-with-end' : ''}`}
             ref={innerRef}
             {...field}
             {...baseProps}
@@ -22,7 +22,7 @@ export const AryFormikTextInput = React.memo(({ label, classNameDiv, startLabel,
                 <div className="input-group">
                     { !!startLabel && <span className="input-group-text">{ startLabel }</span> }
                     { inputForm }
-                    { !!endLabel && <span className="input-group-text">{ endLabel }</span> }
+                    { !!endLabel && <span className="input-group-text ari-input-group-text-end">{ endLabel }</span> }
                 </div>
             ) : (
                 inputForm

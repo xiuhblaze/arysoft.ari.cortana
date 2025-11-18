@@ -22,6 +22,7 @@ const envVariables = () => {
     const URL_CONTACTS_FILES = '/contacts';
     const URL_ORGANIZATION_FILES = '/organizations';
 
+    const DEFAULT_TAX_RATE = 16;
     const COMMENTS_SMALL_MAX_LENGTH = 15;
 
     return {
@@ -49,6 +50,7 @@ const envVariables = () => {
         STANDARDS_OPTIONS,
         USERS_OPTIONS,
 
+        DEFAULT_TAX_RATE,
         COMMENTS_SMALL_MAX_LENGTH,
     }
 };

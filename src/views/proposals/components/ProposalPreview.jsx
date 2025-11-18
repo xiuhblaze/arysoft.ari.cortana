@@ -34,14 +34,6 @@ const ProposalPreview = ({ formik }) => {
 
     // METHODS
 
-    // const ShowFormatTextInput = (value, separator = '\n') => { //! Ver si esto se pone mejor en un JS helper
-    //     return value != null 
-    //         ? value.split(separator).map((item, index) => {
-    //             return <div key={index} className="text-wrap">{item}</div>
-    //         })
-    //         : null
-    // } // ShowFormatTextInput
-
     const getSubTitle = () => {
         if (!!proposalData) {
             if (!!proposalData.ADCs && proposalData.ADCs.length > 1) {
@@ -118,7 +110,8 @@ const ProposalPreview = ({ formik }) => {
                                     <td className={ headerStyle }>Site address</td>
                                     <td className={ bodyStyle }>
                                         { 
-                                            !!proposalData && proposalData.Sites?.length > 0 && proposalData.Sites.map(site => {                                            
+                                            !!proposalData && proposalData.Sites?.length > 0 
+                                            && proposalData.Sites.map(site => {                                            
                                                 return <div key={site.ID}>
                                                     <p className="text-xs text-dark mb-0">
                                                         <span className={ site.IsMainSite ? 'font-weight-bold' : '' }> 
@@ -188,14 +181,15 @@ const ProposalPreview = ({ formik }) => {
                         <div className="d-none d-print-block">
                             <ul className="list-group list-group-flush text-xs mb-4">
                                 <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                    Travel expenses and taxes are not included
+                                    {/* TODO: Validar si estan incuidos los gastos de viaje y impuestos */}
+                                    Travel expenses are not included
                                 </li>
                                 <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1"> 
                                     Only major nonconformities will be on site (0.5 or 1 additional 
                                     dit day), cost not included in this proposal
                                 </li>
                                 <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
-                                    No hidden costs
+                                    <strong>No hidden costs</strong>
                                 </li>
                                 <li className="list-group-item bg-transparent text-end border-0 py-0 pb-1">
                                     This proposal is effect for term of 3 months, from the issued 
@@ -228,7 +222,7 @@ const ProposalPreview = ({ formik }) => {
                         </table>
                         <div className="d-none d-print-block">
                             <p className="text-sm text-dark text-center">
-                                I accept the terms presented in this proposal. This proposal is linked to the Contract.
+                                I do accept the terms showed in this proposal. This proposal is linked to Contract Agreement.
                             </p>
                             <h5 className="text-sm text-dark mx-print-3 my-4">
                                 Sincerely,<br />
