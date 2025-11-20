@@ -11,6 +11,10 @@ const ProposalControllerProvider = ({ children }) => {
         adcList: [],
         contactList: [],
         proposalAuditList: [],
+        adcsCountHidden: {
+            value: 0,
+            touch: false,
+        }
     }; // initialState
 
     // REDUCER
@@ -53,6 +57,18 @@ const ProposalControllerProvider = ({ children }) => {
                     proposalAuditList: action.payload,
                 };
             }
+            case 'SET_ADCS_COUNT_HIDDEN_VALUE': {
+                return {
+                    ...state,                    
+                    adcsCountHidden: { ...state.adcsCountHidden, value: action.payload },
+                };
+            }
+            case 'SET_ADCS_COUNT_HIDDEN_TOUCHED': {
+                return {
+                    ...state,                    
+                    adcsCountHidden: { ...state.adcsCountHidden, touch: action.payload },
+                };
+            }
             case 'CLEAR_CONTROLLER': {
                 return { ...initialState };
             }
@@ -84,6 +100,8 @@ const setProposalData = (dispatch, value) => dispatch({ type: "SET_PROPOSAL", pa
 const setADCList = (dispatch, value) => dispatch({ type: "SET_ADC_LIST", payload: value });
 const setContactList = (dispatch, value) => dispatch({ type: "SET_CONTACT_LIST", payload: value });
 const setProposalAuditList = (dispatch, value) => dispatch({ type: "SET_PROPOSAL_AUDIT_LIST", payload: value });
+const setADCsCountHiddenValue = (dispatch, value) => dispatch({ type: "SET_ADCS_COUNT_HIDDEN_VALUE", payload: value });
+const setADCsCountHiddenTouched = (dispatch, value) => dispatch({ type: "SET_ADCS_COUNT_HIDDEN_TOUCHED", payload: value });
 const clearProposalController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
 export {
@@ -96,6 +114,9 @@ export {
     setADCList,
     setContactList,
     setProposalAuditList,
+
+    setADCsCountHiddenValue,
+    setADCsCountHiddenTouched,
 
     clearProposalController,
 };

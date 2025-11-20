@@ -178,10 +178,26 @@ option {
   opacity: .85;
 }
 
+/* ARI Print
+******************************************************************************/
+
 @media print {
-  .mx-print-3 {
+
+  .tabla-with-print-border {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;  /* Evita que se expanda */
+    margin: 20mm auto;    /* Centra y respeta márgenes */
+  }
+
+  .mx-print-0 {
     margin-left: .0in !important;
     margin-right: .0in !important;
+  }
+
+  .mx-print-3 {
+    margin-left: .3in !important;
+    margin-right: .3in !important;
   }
 }
 

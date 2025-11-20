@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ShowFormatTextInput from '../../../components/General/ShowFormatTextInput'
-import { useProposalController } from '../context/ProposalContext';
+import { setProposalData, useProposalController } from '../context/ProposalContext';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import enums from '../../../helpers/enums';
@@ -28,9 +28,16 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
 
         //console.log('ProposalPreviewJustification.useEffect: formik', formik.values);
         generateJustification();
-
     }, [formik.values]);
 
+    useEffect(() => {
+      
+        setProposalData(dispatch, {
+            ...proposalData,
+            Justification: justification,
+        });
+    }, [justification]);
+    
     const generateJustification = () => {
         const isMultisite = ADCSites.length > 1;        
         let textJustification = 'The calculation of days presented in this proposal was made in accordance with the requirements of IAF MD5.\n\n';
@@ -67,7 +74,7 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
             textItem += `Plus, it was done time adjustment as follow:\n`;
 
             const adcSite = ADCSites.find(adcSite => adcSite.IsMainSite);
-console.log('adcSite', adcSite);
+//console.log('adcSite', adcSite);
             if (!!adcSite) {
                 //textItem += `\nFor ${ adcSite.SiteDescription }\n`;
                 adcSite.ADCConceptValues.forEach(adcConceptValue => {

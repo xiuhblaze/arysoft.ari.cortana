@@ -27,6 +27,8 @@ const ProposalPreview = ({ formik }) => {
     const internalTableStyle= 'table table-sm table-borderless pt-0 mb-0'; 
     const bodyWithTableStyle = `${bodyStyle} pt-0`;
 
+    const borderTablePrintStyle = 'd-none d-print-block mx-print-3';
+
     // HOOKS
 
     const contentRef = useRef(null);
@@ -82,7 +84,7 @@ const ProposalPreview = ({ formik }) => {
                                 </h5>
                             </div>
                         </div>
-                        <table className="table table-borderless table-hover mx-print-3">
+                        <table className="table table-borderless table-hover tabla-with-print-border">
                             <tbody>
                                 <tr>
                                     <td className={ headerStyle }>Organization name</td>

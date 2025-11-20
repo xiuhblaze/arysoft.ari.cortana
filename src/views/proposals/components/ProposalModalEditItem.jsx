@@ -1,5 +1,5 @@
-import { Card, Col, Collapse, Modal, Row } from "react-bootstrap";
-import { faFileSignature, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { Alert, Card, Col, Collapse, ListGroup, Modal, Row } from "react-bootstrap";
+import { faExclamationCircle, faFileSignature, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { memo, useEffect, useRef, useState } from "react";
@@ -25,18 +25,21 @@ import ProposalEditADCs from "./ProposalEditADCs";
 import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import { set } from "date-fns";
 import envVariables from "../../../helpers/envVariables";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
     const { 
         organizationData,
-        proposalData
+        proposalData,
+        adcList,
+        adcsCountHidden
     } = controller;
 
     const { 
         DefaultStatusType,
         DefaultCurrencyCodeType,
-
+        ADCStatusType,
         ProposalStatusType, 
     } = enums();
 
@@ -153,7 +156,11 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         
         if (!!proposal && !!show) {
 
-            loadContextData(); // Considerar que de aquí todo utilizar el contexto hasta el guardado completo
+            //loadContextData(); // Considerar que de aquí todo utilizar el contexto hasta el guardado completo
+
+            setOriginalStatus(proposal.Status);
+            setStatusOptions(proposalSetStatusOptions(proposal.Status));
+            setShowAddComments(false);
 
             if (proposal.Status >= ProposalStatusType.inactive) {
                 if (!!proposal.HistoricalDataJSON) {
@@ -166,32 +173,44 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 loadFromRealData();
             }
 
-            setOriginalStatus(proposal.Status);
-            setStatusOptions(proposalSetStatusOptions(proposal.Status));
-            setShowAddComments(false);
-
             // Obtener la lista de ADCs activos del AuditCycle
 
             console.log('ProposalModalEditItem.useEffect: proposal', proposal);
         }
     }, [proposal]);
+
+    useEffect(() => {
+
+        if (!!proposal && !!organization && !!show) {
+            setOrganizationData(dispatch, {
+                OrganizationName: organization.Name,
+                AuditCycleName: !!auditCycle ? auditCycle.Name : '',
+                Website: organization.Website,
+                Phone: organization.Phone,
+                Companies: organization.Companies
+                    .filter(company => company.Status == DefaultStatusType.active),
+            })
+        }
+    }, [proposal, organization]);
+
+    useEffect(() => {
+        if (!!formikRef?.current) {
+            formikRef.current.setFieldValue('adcsCountHidden', 
+                adcList.filter(i => i.Status <= ADCStatusType.inactive).length);
+        }
+    }, [adcList]);
+
+    useEffect(() => {
+        if (!!formikRef?.current) {
+            formikRef.current.setFieldValue('justificationHiddenInput', proposalData.Justification);
+        }
+    }, [proposalData?.Justification])
+    
     
     // METHODS
 
-    const loadContextData = () => {
-
-        if (!!organization) {
-            console.log('loadContextData.organization', organization);
-
-            setOrganizationData(dispatch, {
-                Name: organization.Name,
-                
-            });
-        }
-        setProposalData(dispatch, proposal);
-    };
-
     const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
+        console.log('loadFromHistoricalData()');
         const historicalData = JSON.parse(proposal.HistoricalDataJSON);
 
         setInitialValues({
@@ -217,7 +236,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     const loadFromRealData = () => {
         
-        // console.log('loadFromRealData', proposal);
+        console.log('loadFromRealData', proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length);
 
         setInitialValues({
             justificationHiddenInput: proposal.Justification ?? '',
@@ -229,12 +248,10 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             taxRateInput: proposal.TaxRate ?? DEFAULT_TAX_RATE,
             includeTravelExpensesCheckbox: proposal.IncludeTravelExpenses ?? false,
             extraInfoInput: proposal.ExtraInfo ?? '',
-            statusSelect: !!proposal?.Status && proposal.Status != ProposalStatusType.nothing
-                ? proposal.Status
-                : ProposalStatusType.new,
+            statusSelect: proposal.Status ?? ProposalStatusType.nothing,
             commentsInput: '',
             adcsCountHidden: !!proposal.ADCs 
-                ? proposal.ADCs.filter(a => a.Status == ProposalStatusType.active).length
+                ? proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length
                 : 0,
         });
 
@@ -244,16 +261,16 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             setShowExchangeRateInput(true);
         }
 
-        if (!!organization && !!auditCycle) {
-            setOrganizationData(dispatch, {
-                OrganizationName: organization.Name,
-                AuditCycleName: auditCycle.Name,
-                Website: organization.Website,
-                Phone: organization.Phone,
-                Companies: organization.Companies
-                    .filter(company => company.Status == DefaultStatusType.active),
-            })
-        }
+        // if (!!organization && !!auditCycle) {
+        //     setOrganizationData(dispatch, {
+        //         OrganizationName: organization.Name,
+        //         AuditCycleName: auditCycle.Name,
+        //         Website: organization.Website,
+        //         Phone: organization.Phone,
+        //         Companies: organization.Companies
+        //             .filter(company => company.Status == DefaultStatusType.active),
+        //     })
+        // }
 
         // Incluyendo valores por default para que se muestren en Preview
         setProposalData(dispatch, 
@@ -560,6 +577,31 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                             </Collapse>
                                                         </Col>
                                                     </Row>
+                                                    { 
+                                                        formik.submitCount > 0 && 
+                                                        Object.keys(formik.errors).length > 0 ?
+                                                        <Row className="mt-3">
+                                                            <Col xs="12">
+                                                                <Alert variant="danger" className="text-sm text-white">
+                                                                    <h6 className="text-sm text-white font-weight-bold"> 
+                                                                        There are some errors in the form
+                                                                    </h6>
+                                                                    <ListGroup variant="flush" size="sm">
+                                                                        { Object.keys(formik.errors).map(key => 
+                                                                            <ListGroup.Item 
+                                                                                key={key} 
+                                                                                className="text-xs bg-transparent p-1 border-0"
+                                                                            >
+                                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                                                                {formik.errors[key]}
+                                                                            </ListGroup.Item>
+                                                                        )} 
+                                                                    </ListGroup>
+                                                                </Alert>
+                                                            </Col>
+                                                        </Row>
+                                                        : null
+                                                    }
                                                 </Card.Body>
                                             </Card>
                                         </Col>
@@ -582,7 +624,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                         </div>
                                         <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                             <input type="hidden" name="justificationHiddenInput" />
-                                            <input type="hidden" name="adcsCountHidden" />
+                                            {/* <input type="hidden" name="adcsCountHidden" /> */}
                                             <button 
                                                 type="submit"
                                                 className="btn bg-gradient-dark mb-0"
