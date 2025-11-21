@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import * as Yup from 'yup';
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
-import { setADCList, setContactList, setOrganizationData, setProposalAuditList, setProposalData, useProposalController } from "../context/ProposalContext";
+import { setADCList, setContactList, setIncludeTravelExpenses, setOrganizationData, setProposalAuditList, setProposalData, useProposalController } from "../context/ProposalContext";
 import { useAuditCyclesStore } from "../../../hooks/useAuditCyclesStore";
 import { useNotesStore } from "../../../hooks/useNotesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
@@ -26,6 +26,7 @@ import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import { set } from "date-fns";
 import envVariables from "../../../helpers/envVariables";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import ProposalInversmentInput from "./ProposalInversmentInput";
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -33,13 +34,15 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         organizationData,
         proposalData,
         adcList,
-        adcsCountHidden
+        proposalAuditList,
+        includeTravelExpenses,
     } = controller;
 
     const { 
         DefaultStatusType,
         DefaultCurrencyCodeType,
         ADCStatusType,
+        AuditCycleType,
         ProposalStatusType, 
     } = enums();
 
@@ -156,8 +159,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         
         if (!!proposal && !!show) {
 
-            //loadContextData(); // Considerar que de aquí todo utilizar el contexto hasta el guardado completo
-
             setOriginalStatus(proposal.Status);
             setStatusOptions(proposalSetStatusOptions(proposal.Status));
             setShowAddComments(false);
@@ -173,9 +174,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                 loadFromRealData();
             }
 
-            // Obtener la lista de ADCs activos del AuditCycle
-
-            console.log('ProposalModalEditItem.useEffect: proposal', proposal);
+            //console.log('ProposalModalEditItem.useEffect: proposal', proposal);
         }
     }, [proposal]);
 
@@ -206,7 +205,26 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         }
     }, [proposalData?.Justification])
     
+    useEffect(() => {
+        
+        if (!!proposalSavedOk && !!show) {
+
+            if (!isNullOrEmpty(saveNote)) {
+                noteCreateAsync({ OwnerID: proposal.ID, Text: saveNote });
+                setSaveNote('');
+            }
+            Swal.fire('Proposal', 'Changes made successfully', 'success');
+            actionsForCloseModal();
+        }
+    }, [proposalSavedOk]);
     
+    useEffect(() => {
+
+        if (!!proposalsErrorMessage && !!show) {
+            Swal.fire('Proposal', proposalsErrorMessage, 'error');
+        }
+    }, [proposalsErrorMessage]);
+        
     // METHODS
 
     const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
@@ -236,7 +254,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     const loadFromRealData = () => {
         
-        console.log('loadFromRealData', proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length);
+        //console.log('loadFromRealData', proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length);
 
         setInitialValues({
             justificationHiddenInput: proposal.Justification ?? '',
@@ -261,17 +279,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             setShowExchangeRateInput(true);
         }
 
-        // if (!!organization && !!auditCycle) {
-        //     setOrganizationData(dispatch, {
-        //         OrganizationName: organization.Name,
-        //         AuditCycleName: auditCycle.Name,
-        //         Website: organization.Website,
-        //         Phone: organization.Phone,
-        //         Companies: organization.Companies
-        //             .filter(company => company.Status == DefaultStatusType.active),
-        //     })
-        // }
-
         // Incluyendo valores por default para que se muestren en Preview
         setProposalData(dispatch, 
             {
@@ -291,8 +298,11 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         }
 
         if (!!proposal?.ProposalAudits && proposal.ProposalAudits.length > 0) {
-            setProposalAuditList(dispatch, proposal.ProposalAudits);
+            const orderProposalAudits = sortProposalAudits(proposal.ProposalAudits);
+            setProposalAuditList(dispatch, orderProposalAudits);
         }
+
+        setIncludeTravelExpenses(dispatch, proposal.IncludeTravelExpenses ?? false);
 
     }; // loadFromRealData
 
@@ -308,8 +318,15 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         });
     }; // currencyCodeSelectOnChange
 
+    const travelExpensesOnChange = (e) => {
+        const isChecked = e.target.checked;
+
+        formikRef.current.setFieldValue('includeTravelExpensesCheckbox', isChecked);
+        setIncludeTravelExpenses(dispatch, isChecked);
+    }; // travelExpensesOnChange
+
     const onFormSubmit = (values) => {
-        console.log('onFormSubmit: values', values);
+        //console.log('onFormSubmit: values', values);
         if (proposalData.Status >= ProposalStatusType.inactive) {
             Swal.fire('Proposal', 'You cannot change the data of an inactive proposal', 'warning');
             return;
@@ -338,7 +355,9 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             Status: newStatus,
         };
 
-        console.log('onFormSubmit: toSave', toSave);
+        proposalSaveAsync(toSave);
+
+        //console.log('onFormSubmit: toSave', toSave);
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -363,10 +382,41 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     }; // onCloseModal
 
     const actionsForCloseModal = () => {
-
+//console.log('actionsForCloseModal().onHide', !!onHide);
         if (!!onHide) onHide();
+
+        proposalClear();
         setShowModal(false);
-    };
+    }; // actionsForCloseModal
+
+    const sortProposalAudits = (list) => {
+        const standardIDs = proposal.ADCs
+            .filter(adc => adc.Status <= ADCStatusType.inactive)
+            .map(adc => adc.AppFormStandardID);
+        const cycleType = auditCycle.AuditCycleStandards.filter(acs => standardIDs.includes(acs.StandardID)).length > 0
+            ? auditCycle.AuditCycleStandards.find(acs => standardIDs.includes(acs.StandardID)).CycleType
+            : null; //TODO: Cambiar esto despues, ahorita solo funciona para un solo ADC
+
+        let wishList = [];
+
+        if (cycleType == AuditCycleType.initial) {
+            wishList = [1, 2, 3, 4, 8, 9, 10];
+        } else if (cycleType == AuditCycleType.recertification) {
+            wishList = [5, 3, 4, 8, 9, 10];
+        } else if (cycleType == AuditCycleType.transfer) {
+            wishList = [5, 6, 3, 4, 8, 9, 10];
+        } else {
+            wishList = [6, 1, 2, 5, 3, 4, 8, 9, 10];
+        }
+
+        const sortedList = [];
+        wishList.forEach(step => {
+            const proposalAudit = list.find(proposalAudit => proposalAudit.AuditStep == step);
+            if (!!proposalAudit) sortedList.push(proposalAudit);
+        });
+
+        return sortedList;
+    }; // sortProposalAudits
 
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
@@ -451,16 +501,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                 <Card.Body className="p-3">
                                                     <Row>
                                                         <Col xs="12">
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <AryFormikTextArea
-                                                                        name="justificationInput"
-                                                                        label="Justification"
-                                                                        type="text"
-                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                    />
-                                                                </Col>
-                                                            </Row>
                                                             <ProposalEditADCs
                                                                 formik={ formik }
                                                                 readonly={ proposal.Status >= ProposalStatusType.inactive } 
@@ -493,7 +533,17 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                 </Col>
                                                             </Row>
                                                             <Row>
-                                                                <Col xs="12" sm="6">
+                                                                <Col xs="12" sm="4">
+                                                                    <AryFormikTextInput
+                                                                        name="taxRateInput"
+                                                                        className="text-end"
+                                                                        label="Tax rate"
+                                                                        endLabel="%"
+                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                        helpText="0 - 100"
+                                                                    />
+                                                                </Col>
+                                                                <Col xs="12" sm="4">
                                                                     <AryFormikSelectInput
                                                                         name="currencyCodeSelect"
                                                                         label="Currency code"
@@ -511,7 +561,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                     </AryFormikSelectInput>
                                                                 </Col>
                                                                 <Collapse in={ showExchangeRateInput }>
-                                                                    <Col xs="12" sm="6">
+                                                                    <Col xs="12" sm="4">
                                                                         <AryFormikTextInput
                                                                             name="exchangeRateInput"
                                                                             label="Exchange rate"
@@ -522,14 +572,67 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                 </Collapse>
                                                             </Row>
                                                             <Row>
-                                                                <Col xs="12" sm="6">
-                                                                    <AryFormikTextInput
-                                                                        name="taxRateInput"
-                                                                        label="Tax rate"
-                                                                        endLabel="%"
-                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                        helpText="0 - 100"
-                                                                    />
+                                                                <Col xs="12">
+                                                                    <div className="mb-3">
+                                                                        <div className="form-check form-switch">
+                                                                            <input type="checkbox"
+                                                                                id="includeTravelExpensesCheck"
+                                                                                className="form-check-input"
+                                                                                aria-label="Checkbox for including travel expenses"
+                                                                                style={{ height: '20px' }}
+                                                                                onChange={ travelExpensesOnChange }
+                                                                                checked={ formik.values.includeTravelExpensesCheckbox }
+                                                                                disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                            />
+                                                                            <label className="form-check-label mb-0" htmlFor="includeTravelExpensesCheck">
+                                                                                Include travel expenses
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col xs="12">
+                                                                    <div className="mb-3">
+                                                                        <div className="bg-light border-radius-md p-3 pb-0">
+                                                                            <Row>
+                                                                                <Col xs="12">
+                                                                                    <label className="form-label">Inversment</label>
+                                                                                </Col>
+                                                                                <Col xs="12">
+                                                                                    <table className="table table-borderless">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Sub Total</th>
+                                                                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Certificate Issue</th>
+                                                                                                {
+                                                                                                    includeTravelExpenses ? (
+                                                                                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">
+                                                                                                            Travel Expenses
+                                                                                                        </th>
+                                                                                                    ) : null
+                                                                                                }
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            {
+                                                                                                !!proposalAuditList && proposalAuditList.length > 0 ? (
+                                                                                                    proposalAuditList.map(proposalAudit => (
+                                                                                                        <ProposalInversmentInput
+                                                                                                            key={proposalAudit.ID}
+                                                                                                            proposalAudit={proposalAudit}
+                                                                                                            formik={formik}
+                                                                                                            readonly={ proposal.Status >= ProposalStatusType.inactive }
+                                                                                                        />
+                                                                                                    ))
+                                                                                                ) : null
+                                                                                            }
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </Col>
+                                                                            </Row>
+                                                                        </div>
+                                                                    </div>
                                                                 </Col>
                                                             </Row>
                                                             <Row>

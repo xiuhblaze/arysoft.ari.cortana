@@ -167,6 +167,20 @@ const enums = () => {
         surveillance5: 10,
     });
 
+// const steps = [
+//     { label: 'nothing', value: 0},
+//     { label: 'stage1', value: 1},
+//     { label: 'stage2', value: 2},
+//     { label: 'surveillance1', value: 3},
+//     { label: 'surveillance2', value: 4},
+//     { label: 'recertification', value: 5},
+//     { label: 'transfer', value: 6},
+//     { label: 'special', value: 7},
+//     { label: 'surveillance3', value: 8},
+//     { label: 'surveillance4', value: 9},
+//     { label: 'surveillance5', value: 10},
+// ]
+
     const AuditDocumentType = Object.freeze({
         nothing: 0,
         auditPlan: 1,

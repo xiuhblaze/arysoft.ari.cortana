@@ -89,7 +89,7 @@ export const useProposalsStore = () => {
      */
     const proposalsAsync = async (options = {}) => {
         dispatch(onProposalsLoading());
-
+//console.log('proposalsAsync()');
         try {
             const query = getSearchQuery(options);
             const resp = await cortanaApi.get(`${PROPOSAL_URL}${query}`);
@@ -179,7 +179,7 @@ export const useProposalsStore = () => {
             }
             formData.append('data', JSON.stringify(toSave));
 
-            const resp = await cortanaApi.post(`${PROPOSAL_URL}`, formData, { headers });
+            const resp = await cortanaApi.put(`${PROPOSAL_URL}`, formData, { headers });
             const { Data } = await resp.data;
 
             dispatch(setProposal(Data));
