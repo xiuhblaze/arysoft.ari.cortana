@@ -7,31 +7,31 @@ const currencyCodeProps = [
         id: DefaultCurrencyCodeType.nothing,
         abbreviation: '-',
         label: '-',
-        simbol: '-',
+        symbol: '-',
     },
     {
         id: DefaultCurrencyCodeType.usd,
         abbreviation: 'USD',
         label: 'Dollars',
-        simbol: '$',
+        symbol: '$',
     },
     {
         id: DefaultCurrencyCodeType.mxn,
         abbreviation: 'MXN',
         label: 'Pesos',
-        simbol: '$',
+        symbol: '$',
     },
     {
         id: DefaultCurrencyCodeType.eur,
         abbreviation: 'EUR',
         label: 'Euros',
-        simbol: '€',
+        symbol: '€',
     },
     {
         id: DefaultCurrencyCodeType.uf,
         abbreviation: 'UF',
         label: 'Unit of account',
-        simbol: 'UF',
+        symbol: 'UF',
     }
 ];
 

@@ -22,7 +22,7 @@ const getCurrencyFormat = (value, currencyCode) => {
     }
 
     if (code.abbreviation == 'UF') {
-        return `${!!code ? code.simbol : ''} ${number.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+        return `${!!code ? code.symbol : ''} ${number.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     }
 
     return new Intl.NumberFormat(locale, {

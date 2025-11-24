@@ -6,6 +6,7 @@ import auditStepProps from "../../audits/helpers/auditStepProps";
 import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import getCurrencyFormat from "../../../helpers/getCurrencyFormat";
 import aryMathTools from "../../../helpers/aryMathTools";
+import StepTotals from "../classes/StepTotals";
 
 const { 
     roundToDecimals,
@@ -19,10 +20,10 @@ const ProposalPreviewADC = memo(() => {
     const bodyStyle = 'text-xs text-center text-wrap';
     const totalStyle = 'text-xs text-dark text-end font-weight-bold text-wrap';
     const separatorStyle = { height: '.25rem' };
-    
 
     const { 
         DefaultCurrencyCodeType,
+        ADCStatusType,
         AuditCyclePeriodicityType,
         AuditCycleType,
         AuditStepType,
@@ -34,57 +35,84 @@ const ProposalPreviewADC = memo(() => {
         proposalData,
         adcList,
         proposalAuditList,
+        includeTravelExpenses,
     } = controller;
-
-    let totalDaysFirstYear = 0;
-    let totalInvestmentFirstYear = 0;
-    let totalCertificateIssueFirstYear = 0;
-    let totalCostFirstYear = 0;
     
     if (!proposalData) { return null; }  
-    
-    // HOOKS
+    //console.log('call: ProposalPreviewADC.jsx');
+    //const taxRate = sanitizarNumero(proposalData.TaxRate, 0);
+    const firstADC = adcList.find(adc => adc.Status <= ADCStatusType.inactive);
 
-    //const [adcSites, setADCSites] = useState([]);
+    if (!firstADC) { return null; }
+    const cycleType = proposalData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == firstADC.AppFormStandardID).CycleType;
+    const firstYear = cycleType == AuditCycleType.initial
+        ? proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.stage2)
+        : cycleType == AuditCycleType.recertification
+            ? proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.recertification)
+            : null; // TODO: Va a ser Transfer, falta
 
-     // proposalData.AuditCycle.AuditCycleStandards[].CycleType // Para ver en que punto inicia la tabla 
+    if (!firstYear) { return null; }
 
-     // 1. Por cada ADC hacer una tabla y ver si son Initial o Recertification
-     // 2. Crear los encabezados de la tabla de acuerdo al CycleType
-     // 3. Buscar del ADC los sites y de el los ADCSiteAudit para ver si participan en el Step
-     //    - Si es el caso, mostrar el número de días de acuerdo al ADC y su tipo (inital, surv, recertificación)
-     
-    // const { ADCs } = proposalData;
+    const firstYearValues = new StepTotals(0, 0, proposalData.TaxRate, 0, 0);
 
-    adcList.forEach(adc => {
-        // console.log('adc', adc);
-        // console.log('Tabla para ADC', adc.AppFormStandardName);
+    firstYearValues.setTotalDays(firstYear.TotalAuditDays); // firstYear.TotalAuditDays > 2 ? firstYear.TotalAuditDays : 2;
+    firstYearValues.setSubtotal(firstYear.SubTotal);
+    firstYearValues.setCertificateIssue(firstYear.CertificateIssue);
+    firstYearValues.setTravelExpenses(firstYear.TravelExpenses);
 
-        // console.log('Buscar el CycleType del ADC: ', adc.AppFormStandardID);
-        const cycleType = proposalData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adc.AppFormStandardID).CycleType;
+    const totalValues = [];
 
-        if (cycleType == AuditCycleType.initial) {
-            const firstYear = proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.stage2);            
-            totalDaysFirstYear += firstYear.TotalAuditDays > 2 ? firstYear.TotalAuditDays : 2;
-            totalInvestmentFirstYear += firstYear.Investment;
-            totalCertificateIssueFirstYear += firstYear.CertificateIssue;
-            totalCostFirstYear += firstYear.TotalCost;
+    Object.entries(AuditStepType).forEach(([key, value]) => {
+        const proposalAudit = proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == value);
 
-        } else if (cycleType == AuditCycleType.recertification) {
-            const firstYear = proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.recertification);
-            totalDaysFirstYear += firstYear.TotalAuditDays;
-            totalInvestmentFirstYear += firstYear.Investment;
-            totalCertificateIssueFirstYear += firstYear.CertificateIssue;
-            totalCostFirstYear += firstYear.TotalCost;
-        } // else if (cycleType == AuditCycleType.transfer) //TODO: Falta
+        if (!!proposalAudit) {
+            const totalValuesItem = new StepTotals(
+                proposalAudit.TotalAuditDays, 
+                proposalAudit.SubTotal, 
+                proposalData.TaxRate, 
+                proposalAudit.CertificateIssue, 
+                proposalAudit.TravelExpenses,
+            );
+            totalValues.push(totalValuesItem);
+        } else {
+            totalValues.push(new StepTotals(0, 0, proposalData.TaxRate, 0, 0));
+        }
 
-        totalDaysFirstYear = roundToHalf(totalDaysFirstYear, 2);
-
-
-
-        //const adcSites = proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID);
-        //console.log('ADCSites', adcSites);
     });
+
+    // const totalSubTotalFirstYear = sanitizarNumero(firstYear.SubTotal, 0);        
+    // const totalCertificateIssueFirstYear = sanitizarNumero(firstYear.CertificateIssue, 0);
+
+    // adcList.forEach(adc => {
+    //     const cycleType = proposalData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adc.AppFormStandardID).CycleType;
+
+    //     const firstYear = cycleType == AuditCycleType.initial
+    //         ? proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.stage2)
+    //         : cycleType == AuditCycleType.recertification
+    //             ? proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == AuditStepType.recertification)
+    //             : null; // TODO: Va a ser Transfer, falta
+
+    //     console.log('firstYear', firstYear);
+
+    //     totalDaysFirstYear += firstYear.TotalAuditDays; // firstYear.TotalAuditDays > 2 ? firstYear.TotalAuditDays : 2;
+    //     // totalSubTotalFirstYear += subTotal;
+        
+    //     // totalCertificateIssueFirstYear += certificateIssue;
+    //     // totalCostFirstYear += subTotal;        
+    //     // totalDaysFirstYear = roundToHalf(totalDaysFirstYear, 2);
+    // });
+
+    // totalSubTotalFirstYear = subTotal;
+    // totalCertificateIssueFirstYear = certificateIssue;
+    // totalTaxesFirstYear += (subTotal * taxRate) / 100;
+    // totalCostFirstYear = totalSubTotalFirstYear + totalTaxesFirstYear;
+
+    // if (includeTravelExpenses) {
+    //     totalTravelExpensesFirstYear += sanitizarNumero(firstYear.TravelExpenses, 0);
+    //     totalFinalFirstYear += totalCostFirstYear + totalTravelExpensesFirstYear;
+    // } else {
+    //     totalFinalFirstYear += totalCostFirstYear;
+    // }
 
     //console.log('proposalAuditList', proposalAuditList);
     // console.log(showTotalAuditDays(proposalAuditList, AuditStepType.surveillance1));
@@ -261,7 +289,7 @@ const ProposalPreviewADC = memo(() => {
                         colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
                         ? 2 : 1 }
                     >
-                        { totalDaysFirstYear }
+                        { firstYearValues.totalDays }
                     </td>
                     {
                         proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
@@ -296,58 +324,13 @@ const ProposalPreviewADC = memo(() => {
                     
                 </tr>
                 <tr>
-                    <td className={ headerColStyle }>
-                        Inversment ({ currencyCodeProps[proposalData.CurrencyCode ?? DefaultCurrencyCodeType.nothing].abbreviation })
-                    </td>
-                    
-                    <td 
-                        className={ totalStyle } 
-                        colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
-                            ? 2 : 1 }
-                    >
-                        { getCurrencyFormat(totalInvestmentFirstYear, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                    </td>
-                    {
-                        proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
-                            <>
-                                <td className={ totalStyle } colSpan={2}>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                                <td className={ totalStyle } colSpan={2}>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance2), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                            </>
-                        ): proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
-                            <>
-                                <td className={ totalStyle }>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                                <td className={ totalStyle }>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance2), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                                <td className={ totalStyle }>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance3), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                                <td className={ totalStyle }>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance4), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                                <td className={ totalStyle }>
-                                    { getCurrencyFormat(showInvestment(proposalAuditList, AuditStepType.surveillance5), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>
-                            </>
-                        ) : null
-                    }
-
-                    
-                </tr>
-                <tr>
                     <td className={ headerColStyle }>Certificate Issue</td>
                     <td 
                         className={ totalStyle } 
                         colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
                             ? 2 : 1 }
                     >
-                        { getCurrencyFormat(totalCertificateIssueFirstYear, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                        { getCurrencyFormat(firstYearValues.certificateIssue, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                     </td>
                     {
                         proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
@@ -381,41 +364,214 @@ const ProposalPreviewADC = memo(() => {
                     }
                 </tr>
                 <tr>
-                    <td className={ headerColStyle }>Total</td>
+                    <td className={ headerColStyle }>
+                        SubTotal ({ currencyCodeProps[proposalData.CurrencyCode ?? DefaultCurrencyCodeType.nothing].abbreviation })
+                    </td>
+                    
                     <td 
                         className={ totalStyle } 
                         colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
                             ? 2 : 1 }
                     >
-                        { getCurrencyFormat(totalCostFirstYear, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                        { getCurrencyFormat(firstYearValues.subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                     </td>
                     {
                         proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
                             <>
                                 <td className={ totalStyle } colSpan={2}>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                    {/* { getCurrencyFormat(showSubTotal(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) } */}
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                                 <td className={ totalStyle } colSpan={2}>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance2), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                    {/* { getCurrencyFormat(showSubTotal(proposalAuditList, AuditStepType.surveillance2), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) } */}
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                            </>
+                        ): proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
+                            <>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance3].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance4].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance5].subTotal, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                            </>
+                        ) : null
+                    }
+                </tr>
+                <tr>
+                    <td className={ headerColStyle }>Taxes</td>
+                    <td 
+                        className={ totalStyle } 
+                        colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
+                            ? 2 : 1 }
+                    >
+                        {/* { getCurrencyFormat(firstYearValues.getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) } */}
+                        { getCurrencyFormat(totalValues[AuditStepType.recertification].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                    </td>
+                    {
+                        proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
+                            <>
+                                <td className={ totalStyle } colSpan={2}>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle } colSpan={2}>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                             </>
                         ) : proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
                             <>
                                 <td className={ totalStyle }>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                                 <td className={ totalStyle }>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance2), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }                                
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                                 <td className={ totalStyle }>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance3), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance3].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                                 <td className={ totalStyle }>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance4), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance4].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
                                 </td>
                                 <td className={ totalStyle }>
-                                    { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance5), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
-                                </td>                                
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance5].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                            </>
+                        ) : null
+                    }
+                </tr>
+                { 
+                    includeTravelExpenses ? (
+                        <>
+                            <tr>
+                                <td className={ headerColStyle }>Total Cost</td>
+                                <td 
+                                    className={ totalStyle } 
+                                    colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
+                                        ? 2 : 1 }
+                                >
+                                    { getCurrencyFormat(firstYearValues.getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                {
+                                    proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
+                                        <>
+                                            <td className={ totalStyle } colSpan={2}>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle } colSpan={2}>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                        </>
+                                    ) : proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
+                                        <>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance3].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance4].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance5].getTotalCost(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                        </>
+                                    ) : null
+                                }
+                            </tr>
+                            <tr>
+                                <td className={ headerColStyle }>Travel Expenses</td>
+                                <td 
+                                    className={ totalStyle } 
+                                    colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
+                                        ? 2 : 1 }
+                                >
+                                    { getCurrencyFormat(firstYearValues.travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                {
+                                    proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
+                                        <>
+                                            <td className={ totalStyle } colSpan={2}>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance1].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle } colSpan={2}>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance2].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                        </>
+                                    ) : proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
+                                        <>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance1].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance2].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance3].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance4].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                            <td className={ totalStyle }>
+                                                { getCurrencyFormat(totalValues[AuditStepType.surveillance5].travelExpenses, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                            </td>
+                                        </>
+                                    ) : null
+                                }
+                            </tr>
+                        </>
+                    ) : null 
+                }
+                <tr>
+                    <td className={ headerColStyle }>{ includeTravelExpenses ? 'Total Final' : 'Total Cost' }</td>
+                    <td 
+                        className={ totalStyle } 
+                        colSpan={ proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual 
+                            ? 2 : 1 }
+                    >
+                        { getCurrencyFormat(firstYearValues.getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                    </td>
+                    {
+                        proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
+                            <>
+                                <td className={ totalStyle } colSpan={2}>
+                                    {/* { getCurrencyFormat(showTotalCost(proposalAuditList, AuditStepType.surveillance1), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) } */}
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle } colSpan={2}>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                            </>
+                        ) : proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual ? (
+                            <>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance1].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance2].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance3].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance4].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
+                                <td className={ totalStyle }>
+                                    { getCurrencyFormat(totalValues[AuditStepType.surveillance5].getTotalFinal(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                                </td>
                             </>
                         ) : null
                     }
@@ -441,13 +597,13 @@ const showTotalAuditDays = (proposalAuditList, auditStep) => {
     return roundToHalf(!!proposalAudit ? proposalAudit.TotalAuditDays : 0, 2);
 }; // showTotalAuditDays
 
-const showInvestment = (proposalAuditList, auditStep) => {
+const showSubTotal = (proposalAuditList, auditStep) => {
     const proposalAudit = proposalAuditList.find(proposalAudit => 
         proposalAudit.AuditStep == auditStep
     );
 
-    return !!proposalAudit ? proposalAudit.Investment : 0;
-}; // showInvestment
+    return !!proposalAudit ? proposalAudit.SubTotal : 0;
+}; // showSubTotal
 
 const showCertificateIssue = (proposalAuditList, auditStep) => {
     const proposalAudit = proposalAuditList.find(proposalAudit => 

@@ -318,6 +318,18 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         });
     }; // currencyCodeSelectOnChange
 
+    const taxRateInputOnBlur = (e) => {
+        const { name, value } = e.target;
+
+        if (name === 'taxRateInput') {
+            // formikRef.current.setFieldValue('taxRateInput', value);
+            setProposalData(dispatch, {
+                ...proposalData,
+                TaxRate: value, 
+            });
+        }
+    };
+
     const travelExpensesOnChange = (e) => {
         const isChecked = e.target.checked;
 
@@ -539,6 +551,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                         className="text-end"
                                                                         label="Tax rate"
                                                                         endLabel="%"
+                                                                        onBlur={ taxRateInputOnBlur }
                                                                         disabled={ proposal.Status >= ProposalStatusType.inactive }
                                                                         helpText="0 - 100"
                                                                     />

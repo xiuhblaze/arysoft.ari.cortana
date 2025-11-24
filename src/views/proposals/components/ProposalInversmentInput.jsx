@@ -14,7 +14,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
     } = controller;    
     const { AuditStepType } = enums();
 
-    const currencyCode = currencyCodeProps[proposalData.CurrencyCode].simbol;
+    const currencyCode = currencyCodeProps[proposalData.CurrencyCode];
 
     // HOOKS
 
@@ -38,6 +38,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 }
                 return item;
             });
+            //console.log('newProposalAuditList', newProposalAuditList);
             setProposalAuditList(dispatch, newProposalAuditList);
         }
 
@@ -64,6 +65,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 }
                 return item;
             });
+            // console.log('newProposalAuditList', newProposalAuditList);            
             setProposalAuditList(dispatch, newProposalAuditList);
         }
     }; // onBlur
@@ -79,57 +81,72 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
             </tr>
             <tr>
                 <td className="ps-0 pt-0">
-                    <input name="subTotalInput"
-                        className="form-control"
-                        placeholder="Subtotal"
-                        aria-label="Text input for subTotal"
-                        value={formData.subTotalInput}
-                        onChange={ (e) => {
-                            const { value } = e.target;
-                            setFormData(prev => ({
-                                ...prev,
-                                subTotalInput: value,
-                            }));
-                        }}
-                        onBlur={ onBlur }
-                        disabled={ readonly }
-                    />
+                    <div className="input-group">
+                        <span className="input-group-text">
+                            { currencyCode.symbol }
+                        </span>
+                        <input name="subTotalInput"
+                            className="form-control text-end"
+                            placeholder="Subtotal"
+                            aria-label="Text input for subTotal"
+                            value={formData.subTotalInput}
+                            onChange={ (e) => {
+                                const { value } = e.target;
+                                setFormData(prev => ({
+                                    ...prev,
+                                    subTotalInput: value,
+                                }));
+                            }}
+                            onBlur={ onBlur }
+                            disabled={ readonly }
+                        />
+                    </div>
                 </td>
                 <td className={ includeTravelExpenses ? 'pt-0' : 'pt-0 pe-0' }>
-                    <input name="certificateIssueInput"
-                        className="form-control"
-                        placeholder="Certificate Issue"
-                        aria-label="Text input for certificateIssue"
-                        value={formData.certificateIssueInput}
-                        onChange={ (e) => {
-                            const { value } = e.target;
-                            setFormData(prev => ({
-                                ...prev,
-                                certificateIssueInput: value,
-                            }));
-                        }}
-                        onBlur={ onBlur }
-                        disabled={ readonly }
-                    />
+                    <div className="input-group">
+                        <span className="input-group-text">
+                            { currencyCode.symbol }
+                        </span>
+                        <input name="certificateIssueInput"
+                            className="form-control text-end"
+                            placeholder="Certificate Issue"
+                            aria-label="Text input for certificateIssue"
+                            value={formData.certificateIssueInput}
+                            onChange={ (e) => {
+                                const { value } = e.target;
+                                setFormData(prev => ({
+                                    ...prev,
+                                    certificateIssueInput: value,
+                                }));
+                            }}
+                            onBlur={ onBlur }
+                            disabled={ readonly }
+                        />
+                    </div>
                 </td>
                 {
                     includeTravelExpenses ? (
                         <td className="pt-0 pe-0">
-                            <input name="travelExpensesInput"
-                                className="form-control"
-                                placeholder="Travel Expenses"
-                                aria-label="Text input for travelExpenses"
-                                value={formData.travelExpensesInput}
-                                onChange={ (e) => {
-                                    const { value } = e.target;
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        travelExpensesInput: value,
-                                    }));
-                                }}
-                                onBlur={ onBlur }
-                                disabled={ readonly }
-                            />
+                            <div className="input-group">
+                                <span className="input-group-text">
+                                    { currencyCode.symbol }
+                                </span>
+                                <input name="travelExpensesInput"
+                                    className="form-control text-end"
+                                    placeholder="Travel Expenses"
+                                    aria-label="Text input for travelExpenses"
+                                    value={formData.travelExpensesInput}
+                                    onChange={ (e) => {
+                                        const { value } = e.target;
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            travelExpensesInput: value,
+                                        }));
+                                    }}
+                                    onBlur={ onBlur }
+                                    disabled={ readonly }
+                                />
+                            </div>
                         </td>
                     ) : null
                 }
