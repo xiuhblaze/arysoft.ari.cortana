@@ -1,6 +1,7 @@
 class StepTotals {
 
-    constructor(totalDays = 0, subTotal = 0, taxRate = 0, certificateIssue = 0, travelExpenses = 0) {
+    constructor(auditStep = 0, totalDays = 0, subTotal = 0, taxRate = 0, certificateIssue = 0, travelExpenses = 0) {
+        this.auditStep = auditStep;
         this.totalDays = this.validateNumber(totalDays);
         this.subTotal = this.validateNumber(subTotal);
         this.taxRate = this.validateNumber(taxRate);

@@ -7,6 +7,7 @@ import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import getCurrencyFormat from "../../../helpers/getCurrencyFormat";
 import aryMathTools from "../../../helpers/aryMathTools";
 import StepTotals from "../classes/StepTotals";
+import envVariables from "../../../helpers/envVariables";
 
 const { 
     roundToDecimals,
@@ -20,6 +21,8 @@ const ProposalPreviewADC = memo(() => {
     const bodyStyle = 'text-xs text-center text-wrap';
     const totalStyle = 'text-xs text-dark text-end font-weight-bold text-wrap';
     const separatorStyle = { height: '.25rem' };
+
+    const { VITE_TOTAL_INITIAL_MIN_DAYS } = envVariables();
 
     const { 
         DefaultCurrencyCodeType,
@@ -53,20 +56,22 @@ const ProposalPreviewADC = memo(() => {
 
     if (!firstYear) { return null; }
 
-    const firstYearValues = new StepTotals(0, 0, proposalData.TaxRate, 0, 0);
-
-    firstYearValues.setTotalDays(firstYear.TotalAuditDays); // firstYear.TotalAuditDays > 2 ? firstYear.TotalAuditDays : 2;
-    firstYearValues.setSubtotal(firstYear.SubTotal);
-    firstYearValues.setCertificateIssue(firstYear.CertificateIssue);
-    firstYearValues.setTravelExpenses(firstYear.TravelExpenses);
+    const firstYearValues = new StepTotals(
+        firstYear.AuditStep, 
+        firstADC.TotalInitial,
+        firstYear.SubTotal,
+        proposalData.TaxRate,
+        firstYear.CertificateIssue,
+        firstYear.TravelExpenses,
+    );
 
     const totalValues = [];
-
     Object.entries(AuditStepType).forEach(([key, value]) => {
         const proposalAudit = proposalAuditList.find(proposalAudit => proposalAudit.AuditStep == value);
 
         if (!!proposalAudit) {
             const totalValuesItem = new StepTotals(
+                value,                
                 proposalAudit.TotalAuditDays, 
                 proposalAudit.SubTotal, 
                 proposalData.TaxRate, 
@@ -75,7 +80,7 @@ const ProposalPreviewADC = memo(() => {
             );
             totalValues.push(totalValuesItem);
         } else {
-            totalValues.push(new StepTotals(0, 0, proposalData.TaxRate, 0, 0));
+            totalValues.push(new StepTotals(value, 0, 0, proposalData.TaxRate, 0, 0));
         }
 
     });
@@ -194,7 +199,10 @@ const ProposalPreviewADC = memo(() => {
                                 </tr>
                                 {
                                     //proposalData.ADCSites.filter(adcSite => adcSite.ADCID == adc.ID).map(adcSite => {
-                                    adcSites.map(adcSite => {
+                                    adcSites.map(adcSite => {                                        
+                                        const totalDaysSt1 = 1;
+                                        const totalDaysSt2 = adc.TotalInitial - 1;
+                                        
                                         return (
                                             <tr key={adcSite.ID}>
                                                 <td className={ headerColStyle }>
@@ -209,18 +217,10 @@ const ProposalPreviewADC = memo(() => {
                                                     cycleType == AuditCycleType.initial ? (
                                                         <>
                                                             <td className={ `${bodyStyle} align-middle` }>
-                                                                {
-                                                                    adcSite.ADCSiteAudits.find(adcSiteAudit => 
-                                                                        adcSiteAudit.AuditStep == AuditStepType.stage1
-                                                                    )?.Value ? adcSite.Total : '-'
-                                                                }
+                                                                { totalDaysSt1 }
                                                             </td>
                                                             <td className={ `${bodyStyle} align-middle` }>
-                                                                {
-                                                                    adcSite.ADCSiteAudits.find(adcSiteAudit => 
-                                                                        adcSiteAudit.AuditStep == AuditStepType.stage2
-                                                                    ).Value ? adcSite.Total : '-'
-                                                                }
+                                                                { totalDaysSt2 }
                                                             </td>
                                                         </>
                                                     ) : cycleType == AuditCycleType.recertification ? (
@@ -416,7 +416,11 @@ const ProposalPreviewADC = memo(() => {
                             ? 2 : 1 }
                     >
                         {/* { getCurrencyFormat(firstYearValues.getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) } */}
-                        { getCurrencyFormat(totalValues[AuditStepType.recertification].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) }
+                        { 
+                            cycleType == AuditCycleType.recertification 
+                                ? getCurrencyFormat(totalValues[AuditStepType.recertification].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn) 
+                                : getCurrencyFormat(totalValues[AuditStepType.stage2].getTaxes(), proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn)
+                        }
                     </td>
                     {
                         proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
