@@ -20,12 +20,12 @@ const ADCControllerProvider = ({ children }) => {
         adcSiteList: [],
         adcConceptList: [],
         misc: {
-            total:0,                // No se si se necesite
+            total: 0,                // No se si se necesite
             isMultistandard: false, // Para saber si aplicar o no MD11
         },
         conceptValueHidden: {
             value: 0,
-            touch: false,        
+            touch: false,
         },
         siteAuditHidden: {
             value: 0,
@@ -48,9 +48,9 @@ const ADCControllerProvider = ({ children }) => {
     }; // updateADCSite
 
     const updateADCConceptValue = (state, value) => {
-        const {adcConceptValueID, checkValue, newValue, unit, justification } = value;
+        const { adcConceptValueID, checkValue, newValue, unit, justification } = value;
         let adcConceptValue = null;
-        
+
         // state.adcSiteList.forEach(adcSite => {
         //     adcConceptValue = adcSite.ADCConceptValues.find(acv => acv.ID == adcConceptValueID);
         //     if (!!adcConceptValue) return;
@@ -60,11 +60,11 @@ const ADCControllerProvider = ({ children }) => {
             .find(acv => acv.ID == adcConceptValueID);
 
         //console.log('updateADCConceptValue.adcConceptValue', adcConceptValue);
-        
+
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             let hasChanges = false;
             const newADCConceptValueList = adcSite.ADCConceptValues.map(adccvItem => {
-                
+
                 //if (adccvItem.ID == adcConceptValueID) {
                 if (adcConceptValue.ADCConceptID == adccvItem.ADCConceptID) {
                     // console.log('updateADCConceptValue.find ADCConceptID', {
@@ -86,7 +86,7 @@ const ADCControllerProvider = ({ children }) => {
                 return adccvItem
             });
 
-            if (hasChanges) {   
+            if (hasChanges) {
                 return {
                     ...adcSite,
                     ADCConceptValues: newADCConceptValueList,
@@ -100,7 +100,7 @@ const ADCControllerProvider = ({ children }) => {
     }; // updateADCConceptValue
 
     const updateADCSiteAudit = (state, value) => {
-        const { adcSiteAuditID, value : checkValue } = value;
+        const { adcSiteAuditID, value: checkValue } = value;
 
         const newADCSiteList = state.adcSiteList.map(adcSite => {
             let hasChanges = false;
@@ -143,19 +143,19 @@ const ADCControllerProvider = ({ children }) => {
         let totalSurveillance = 0;      // Suma de los días calculados para la vigilancia
         let totalRecertification = 0;   // Suma de los días calculados para la recertificación
         let total = 0;
-        
+
         const newADCSiteList = adcSiteList.map(adcSite => {
             let totalDays = adcSite.InitialMD5;
             let totalSiteDays = 0;
 
             if (state.adcConceptList.length > 0) {
-                
+
                 // Decrementos
                 adcSite.ADCConceptValues.forEach(adccvItem => { // Procesar para hacer Decrementos
                     const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
 
                     if (!!myConcept) {
-                        if ((myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Decrease) 
+                        if ((myConcept.WhenTrue && !adccvItem.CheckValue && !!myConcept.Decrease)
                             || (!myConcept.WhenTrue && adccvItem.CheckValue && !!myConcept.Decrease)) {
 
                             if (myConcept.DecreaseUnit == ADCConceptUnitType.percentage) {
@@ -164,11 +164,11 @@ const ADCControllerProvider = ({ children }) => {
                                 totalDays = roundToDecimals(totalDays - adccvItem.Value);
                             }
                         }
-                    } 
+                    }
                 });
 
                 const decreaseTotal = totalDays;
-                
+
                 // Incrementos
                 adcSite.ADCConceptValues.forEach(adccvItem => {
                     const myConcept = state.adcConceptList.find(ac => ac.ID == adccvItem.ADCConceptID);
@@ -183,13 +183,13 @@ const ADCControllerProvider = ({ children }) => {
                                 totalDays = roundToDecimals(totalDays + adccvItem.Value);
                             }
                         }
-                    } 
-                }); 
+                    }
+                });
             }
 
             //* Validaciones MD11
 
-            if (adcSite.MD11 > 0 && state.misc.isMultistandard) {                
+            if (adcSite.MD11 > 0 && state.misc.isMultistandard) {
                 const decreaseInDays = roundToDecimals(totalDays * (adcSite.MD11 / 100));
                 totalSiteDays = roundToDecimals(totalDays - decreaseInDays);
 
@@ -203,24 +203,24 @@ const ADCControllerProvider = ({ children }) => {
             // If the total initial is greater than the maximum allowed, it will be reduced to the maximum allowed
             const maxRedution = roundToDecimals(adcSite.InitialMD5 - (adcSite.InitialMD5 * (TOTAL_INITIAL_MAX_PERCENT_REDUCTION / 100)));
             const exceedsReduction = totalDays < maxRedution;
-            
+
             //* Totales
 
             // Totales por sitio
             totalEmployees += adcSite.NoEmployees;
-            totalInitial += totalDays;
-            total += totalSiteDays;
-            
+            totalInitial += roundDays(totalDays);
+            total += roundDays(totalSiteDays);
+
             // Surveillance
             const survPercentBase = 34; // 33% de TotalInitial del site (una tercera parte)
-            const surveillance = state.misc.isMultistandard 
+            const surveillance = state.misc.isMultistandard
                 ? roundToDecimals(totalSiteDays * (survPercentBase / 100))
-                : roundToDecimals(totalDays * (survPercentBase / 100));            
+                : roundToDecimals(totalDays * (survPercentBase / 100));
             totalSurveillance += surveillance; // Sumar el resultado al total del ADC
 
             // Recertification
             const rrPercentBase = 67; // 33% de reduccion del TotalInitial del site
-            let recertification = state.misc.isMultistandard 
+            let recertification = state.misc.isMultistandard
                 ? roundToDecimals(totalSiteDays * (rrPercentBase / 100))
                 : roundToDecimals(totalDays * (rrPercentBase / 100));
             // - None recertification shall be less than 50% than initial MD5 audit days
@@ -229,7 +229,7 @@ const ADCControllerProvider = ({ children }) => {
                 ? fiftyPercent
                 : recertification;
             totalRecertification += recertification; // Sumar el resultado al total del ADC
-            
+
             return {
                 ...adcSite,
                 RealTotalInitial: round(totalDays, 2),          // Total Inicialdel ADC
@@ -261,10 +261,10 @@ const ADCControllerProvider = ({ children }) => {
                 //console.log('asa', asa);
                 if (asa.Value) {
                     switch (asa.AuditStep) {
-                        case AuditStepType.stage1: {
-                            _total += adcSite.Total;
-                            break;
-                        }
+                        // case AuditStepType.stage1: {
+                        //     _total += adcSite.Total;
+                        //     break;
+                        // }
                         case AuditStepType.stage2: {
                             _total += adcSite.Total;
                             break;
@@ -289,7 +289,7 @@ const ADCControllerProvider = ({ children }) => {
                             _surveillance[4] += adcSite.Surveillance;
                             break;
                         }
-                        case AuditStepType.recertification: { 
+                        case AuditStepType.recertification: {
                             //console.log('adcSite.Recertification', adcSite.Recertification);
                             _recertification += adcSite.Recertification;
                             break;
@@ -314,11 +314,11 @@ const ADCControllerProvider = ({ children }) => {
             // console.log('adcData', adcData);
             const auditCycleStandard = adcData.AuditCycle.AuditCycleStandards.find(acs => acs.StandardID == adcData.AppForm.StandardID);
             //console.log('auditCycleStandard', auditCycleStandard);
-            
+
             if (auditCycleStandard.CycleType == AuditCycleType.initial) {
                 // console.log('INICIAL');
                 _recertification = totalRecertification; // Se indica pues no tiene un ADCSiteAudit asociado
-            } 
+            }
             // else if (auditCycleStandard.CycleType == AuditCycleType.recertification) {
             //     console.log('RECERTIFICATION');
             // } else {
@@ -331,7 +331,7 @@ const ADCControllerProvider = ({ children }) => {
         const newADCData = {
             ...adcData,
             TotalInitial: roundDays(totalInitial),
-            TotalEmployees: totalEmployees, 
+            TotalEmployees: totalEmployees,
             TotalMD11: roundDays(total),
             Total: roundDays(_total),
             TotalSurveillance: roundToHalf(totalSurveillance),
@@ -378,14 +378,14 @@ const ADCControllerProvider = ({ children }) => {
             }
             case 'UPDATE_ADC_SITE': {
                 const newState = updateTotals({
-                    ...state, 
+                    ...state,
                     adcSiteList: updateADCSite(state, action.value)
                 })
                 return { ...newState };
             }
             case 'UPDATE_ADC_CONCEPT_VALUE': {
                 const newState = updateTotals({
-                    ...state, 
+                    ...state,
                     adcSiteList: updateADCConceptValue(state, action.value)
                 })
                 return { ...newState };
@@ -393,7 +393,7 @@ const ADCControllerProvider = ({ children }) => {
             case 'UPDATE_ADC_SITE_AUDIT': {
                 //console.log('UPDATE_ADC_SITE_AUDIT', action.value);
                 const newState = updateTotals({
-                    ...state, 
+                    ...state,
                     adcSiteList: updateADCSiteAudit(state, action.value)
                 });
                 return { ...newState };
@@ -415,7 +415,7 @@ const ADCControllerProvider = ({ children }) => {
 
     const value = useMemo(() => [adcController, dispatch], [adcController, dispatch]);
 
-    return <ADCContext.Provider value={ value }>{ children }</ADCContext.Provider>;
+    return <ADCContext.Provider value={value}>{children}</ADCContext.Provider>;
 }; // ADCControllerProvider
 
 const useADCController = () => {
@@ -442,8 +442,8 @@ const updateADCSiteAudit = (dispatch, value) => dispatch({ type: "UPDATE_ADC_SIT
 const updateTotals = (dispatch) => dispatch({ type: "UPDATE_TOTALS" });
 const clearADCController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
-export { 
-    ADCControllerProvider, 
+export {
+    ADCControllerProvider,
     useADCController,
 
     setADCData,
@@ -454,7 +454,7 @@ export {
     setConceptValueTouched,
     setSiteAuditValueHidden,
     setSiteAuditValueTouched,
-    
+
     updateADCSite,
     updateADCConceptValue,
     updateADCSiteAudit,

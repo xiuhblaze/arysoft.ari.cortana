@@ -30,7 +30,7 @@ import ProposalInversmentInput from "./ProposalInversmentInput";
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
-    const { 
+    const {
         organizationData,
         proposalData,
         adcList,
@@ -38,12 +38,12 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         includeTravelExpenses,
     } = controller;
 
-    const { 
+    const {
         DefaultStatusType,
         DefaultCurrencyCodeType,
         ADCStatusType,
         AuditCycleType,
-        ProposalStatusType, 
+        ProposalStatusType,
     } = enums();
 
     const { DEFAULT_TAX_RATE } = envVariables();
@@ -111,7 +111,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         proposalSavedOk,
         proposal,
         proposalsErrorMessage,
-        
+
         proposalAsync,
         proposalCreateAsync,
         proposalSaveAsync,
@@ -156,7 +156,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     }, [show]);
 
     useEffect(() => {
-        
+
         if (!!proposal && !!show) {
 
             setOriginalStatus(proposal.Status);
@@ -194,7 +194,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     useEffect(() => {
         if (!!formikRef?.current) {
-            formikRef.current.setFieldValue('adcsCountHidden', 
+            formikRef.current.setFieldValue('adcsCountHidden',
                 adcList.filter(i => i.Status <= ADCStatusType.inactive).length);
         }
     }, [adcList]);
@@ -204,9 +204,9 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             formikRef.current.setFieldValue('justificationHiddenInput', proposalData.Justification);
         }
     }, [proposalData?.Justification])
-    
+
     useEffect(() => {
-        
+
         if (!!proposalSavedOk && !!show) {
 
             if (!isNullOrEmpty(saveNote)) {
@@ -217,14 +217,21 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             actionsForCloseModal();
         }
     }, [proposalSavedOk]);
-    
+
     useEffect(() => {
 
         if (!!proposalsErrorMessage && !!show) {
             Swal.fire('Proposal', proposalsErrorMessage, 'error');
         }
     }, [proposalsErrorMessage]);
-        
+
+    //! temporal
+
+    useEffect(() => {
+        console.log('proposalAuditList', proposalAuditList);
+    }, [proposalAuditList]);
+
+
     // METHODS
 
     const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
@@ -253,7 +260,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     }; // loadFromHistoricalData
 
     const loadFromRealData = () => {
-        
+
         //console.log('loadFromRealData', proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length);
 
         setInitialValues({
@@ -268,19 +275,19 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             extraInfoInput: proposal.ExtraInfo ?? '',
             statusSelect: proposal.Status ?? ProposalStatusType.nothing,
             commentsInput: '',
-            adcsCountHidden: !!proposal.ADCs 
+            adcsCountHidden: !!proposal.ADCs
                 ? proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length
                 : 0,
         });
 
-        if (!!proposal.CurrencyCode 
-            && proposal.CurrencyCode != DefaultCurrencyCodeType.mxn 
+        if (!!proposal.CurrencyCode
+            && proposal.CurrencyCode != DefaultCurrencyCodeType.mxn
             && proposal.CurrencyCode != DefaultCurrencyCodeType.nothing) {
             setShowExchangeRateInput(true);
         }
 
         // Incluyendo valores por default para que se muestren en Preview
-        setProposalData(dispatch, 
+        setProposalData(dispatch,
             {
                 ...proposal,
                 CurrencyCode: proposal.CurrencyCode ?? DefaultCurrencyCodeType.mxn,
@@ -289,7 +296,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             }
         );
 
-        if (!!proposal?.ADCs && proposal.ADCs.length > 0) {            
+        if (!!proposal?.ADCs && proposal.ADCs.length > 0) {
             setADCList(dispatch, proposal.ADCs);
         }
 
@@ -325,7 +332,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             // formikRef.current.setFieldValue('taxRateInput', value);
             setProposalData(dispatch, {
                 ...proposalData,
-                TaxRate: value, 
+                TaxRate: value,
             });
         }
     };
@@ -388,13 +395,13 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                     actionsForCloseModal();
                 }
             })
-        } else { 
+        } else {
             actionsForCloseModal();
         }
     }; // onCloseModal
 
     const actionsForCloseModal = () => {
-//console.log('actionsForCloseModal().onHide', !!onHide);
+        //console.log('actionsForCloseModal().onHide', !!onHide);
         if (!!onHide) onHide();
 
         proposalClear();
@@ -432,14 +439,14 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
-            size={ 'xxxl' }
+            size={'xxxl'}
             contentClassName="bg-gray-100 border-0 shadow-lg"
             fullscreen="sm-down"
         >
             {
                 isProposalLoading || isProposalCreating || isAuditCycleLoading ? (
                     <Modal.Body>
-                        <div 
+                        <div
                             className="page-header min-height-150 border-radius-xl"
                             style={{
                                 backgroundImage: `url(${backgroundImage ?? bgHeadModal})`,
@@ -452,321 +459,321 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                         <ViewLoading />
                     </Modal.Body>
                 ) : !!proposal ?
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    enableReinitialize
-                    onSubmit={onFormSubmit}
-                    innerRef={formikRef}
-                >
-                    {(formik) => {
-                        useEffect(() => {
-                            setHasChanges(formik.dirty);
-                        }, [formik.dirty]);
-                        return (
-                            <Form>
-                                <Modal.Body>
-                                    <div 
-                                        className="page-header min-height-150 border-radius-xl"
-                                        style={{
-                                            backgroundImage: `url(${backgroundImage ?? bgHeadModal})`,
-                                            backgroundPositionY: '50%'
-                                        }}
-                                    >
-                                        <h4 className="text-white mx-4 pb-5" style={{ zIndex: 1 }}>Proposal</h4>
-                                        <span className={`mask bg-gradient-${ proposalStatusProps[proposal.Status].variant }`} />
-                                    </div>
-                                    <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
-                                        <Row className="gx-4">
-                                            <Col xs="12" className="d-flex justify-content-between align-items-center">
-                                                <div className="d-flex align-items-center">
-                                                    <div 
-                                                        className={`icon icon-md icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`} 
-                                                        title="Change this!!!"
-                                                        style={{ minWidth: '48px' }}
-                                                    >
-                                                        <FontAwesomeIcon icon={ faFileSignature } className="opacity-10 text-white" aria-hidden="true" size="lg" /> 
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        enableReinitialize
+                        onSubmit={onFormSubmit}
+                        innerRef={formikRef}
+                    >
+                        {(formik) => {
+                            useEffect(() => {
+                                setHasChanges(formik.dirty);
+                            }, [formik.dirty]);
+                            return (
+                                <Form>
+                                    <Modal.Body>
+                                        <div
+                                            className="page-header min-height-150 border-radius-xl"
+                                            style={{
+                                                backgroundImage: `url(${backgroundImage ?? bgHeadModal})`,
+                                                backgroundPositionY: '50%'
+                                            }}
+                                        >
+                                            <h4 className="text-white mx-4 pb-5" style={{ zIndex: 1 }}>Proposal</h4>
+                                            <span className={`mask bg-gradient-${proposalStatusProps[proposal.Status].variant}`} />
+                                        </div>
+                                        <div className="card card-body blur shadow-blur mx-4 mt-n6 overflow-hidden">
+                                            <Row className="gx-4">
+                                                <Col xs="12" className="d-flex justify-content-between align-items-center">
+                                                    <div className="d-flex align-items-center">
+                                                        <div
+                                                            className={`icon icon-md icon-shape bg-gradient-info border-radius-md d-flex align-items-center justify-content-center me-2 position-relative`}
+                                                            title="Change this!!!"
+                                                            style={{ minWidth: '48px' }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faFileSignature} className="opacity-10 text-white" aria-hidden="true" size="lg" />
+                                                        </div>
+                                                        <div className="h-100">
+                                                            <h5 className="flex-wrap mb-1">
+                                                                {organization.Name}
+                                                            </h5>
+                                                            <p className="mb-0 font-weight-bold text-sm">
+                                                                {auditCycle.Name}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div className="h-100">
-                                                        <h5 className="flex-wrap mb-1">
-                                                            { organization.Name }
-                                                        </h5>
-                                                        <p className="mb-0 font-weight-bold text-sm">
-                                                            { auditCycle.Name }
-                                                        </p>
+                                                    <div className="d-flex align-items-center">
+                                                        <div
+                                                            className={`badge bg-gradient-${proposalStatusProps[proposal.Status].variant} text-white`}
+                                                            title={proposalStatusProps[proposal.Status].description}
+                                                        >
+                                                            {proposalStatusProps[proposal.Status].label}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="d-flex align-items-center">
-                                                    <div 
-                                                        className={`badge bg-gradient-${ proposalStatusProps[proposal.Status].variant } text-white`}
-                                                        title={ proposalStatusProps[proposal.Status].description } 
-                                                    >
-                                                        {proposalStatusProps[proposal.Status].label}
-                                                    </div>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                    <Row className="mt-4">
-                                        <Col xs="12" sm="5">
-                                            <Card>
-                                                <Card.Body className="p-3">
-                                                    <Row>
-                                                        <Col xs="12">
-                                                            <ProposalEditADCs
-                                                                formik={ formik }
-                                                                readonly={ proposal.Status >= ProposalStatusType.inactive } 
-                                                            />
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <div  className="mb-3">
-                                                                        <div className="bg-light border-radius-md p-3 pb-0">
-                                                                            <Row>
-                                                                                <Col xs="12">
-                                                                                    <label className="form-label">Signer</label>
-                                                                                </Col>
-                                                                                <Col xs="12">
-                                                                                    <AryFormikTextInput
-                                                                                        name="signerNameInput"
-                                                                                        label="Full name"
-                                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                                    />
-                                                                                </Col>
-                                                                                <Col xs="12">
-                                                                                    <AryFormikTextInput
-                                                                                        name="signerPositionInput"
-                                                                                        label="Position"
-                                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                                    />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        </div>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12" sm="4">
-                                                                    <AryFormikTextInput
-                                                                        name="taxRateInput"
-                                                                        className="text-end"
-                                                                        label="Tax rate"
-                                                                        endLabel="%"
-                                                                        onBlur={ taxRateInputOnBlur }
-                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                        helpText="0 - 100"
-                                                                    />
-                                                                </Col>
-                                                                <Col xs="12" sm="4">
-                                                                    <AryFormikSelectInput
-                                                                        name="currencyCodeSelect"
-                                                                        label="Currency code"
-                                                                        onChange={ currencyCodeSelectOnChange }
-                                                                    >
-                                                                        { currencyCodeProps
-                                                                            .filter(item => item.id != DefaultCurrencyCodeType.nothing)
-                                                                            .map(currencyCode => 
-                                                                            <option key={currencyCode.id} 
-                                                                                value={currencyCode.id}
-                                                                            >
-                                                                                { currencyCode.label } ({ currencyCode.abbreviation })
-                                                                            </option>
-                                                                        )}
-                                                                    </AryFormikSelectInput>
-                                                                </Col>
-                                                                <Collapse in={ showExchangeRateInput }>
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                        <Row className="mt-4">
+                                            <Col xs="12" sm="5">
+                                                <Card>
+                                                    <Card.Body className="p-3">
+                                                        <Row>
+                                                            <Col xs="12">
+                                                                <ProposalEditADCs
+                                                                    formik={formik}
+                                                                    readonly={proposal.Status >= ProposalStatusType.inactive}
+                                                                />
+                                                                <Row>
                                                                     <Col xs="12" sm="4">
                                                                         <AryFormikTextInput
-                                                                            name="exchangeRateInput"
-                                                                            label="Exchange rate"
-                                                                            disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                            helpText="Exchange rate to pesos (MXN)"
+                                                                            name="taxRateInput"
+                                                                            className="text-end"
+                                                                            label="Tax rate"
+                                                                            endLabel="%"
+                                                                            onBlur={taxRateInputOnBlur}
+                                                                            disabled={proposal.Status >= ProposalStatusType.inactive}
+                                                                            helpText="0 - 100"
                                                                         />
                                                                     </Col>
-                                                                </Collapse>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <div className="mb-3">
-                                                                        <div className="form-check form-switch">
-                                                                            <input type="checkbox"
-                                                                                id="includeTravelExpensesCheck"
-                                                                                className="form-check-input"
-                                                                                aria-label="Checkbox for including travel expenses"
-                                                                                style={{ height: '20px' }}
-                                                                                onChange={ travelExpensesOnChange }
-                                                                                checked={ formik.values.includeTravelExpensesCheckbox }
-                                                                                disabled={ proposal.Status >= ProposalStatusType.inactive }
+                                                                    <Col xs="12" sm="4">
+                                                                        <AryFormikSelectInput
+                                                                            name="currencyCodeSelect"
+                                                                            label="Currency code"
+                                                                            onChange={currencyCodeSelectOnChange}
+                                                                        >
+                                                                            {currencyCodeProps
+                                                                                .filter(item => item.id != DefaultCurrencyCodeType.nothing)
+                                                                                .map(currencyCode =>
+                                                                                    <option key={currencyCode.id}
+                                                                                        value={currencyCode.id}
+                                                                                    >
+                                                                                        {currencyCode.label} ({currencyCode.abbreviation})
+                                                                                    </option>
+                                                                                )}
+                                                                        </AryFormikSelectInput>
+                                                                    </Col>
+                                                                    <Collapse in={showExchangeRateInput}>
+                                                                        <Col xs="12" sm="4">
+                                                                            <AryFormikTextInput
+                                                                                name="exchangeRateInput"
+                                                                                label="Exchange rate"
+                                                                                disabled={proposal.Status >= ProposalStatusType.inactive}
+                                                                                helpText="Exchange rate to pesos (MXN)"
                                                                             />
-                                                                            <label className="form-check-label mb-0" htmlFor="includeTravelExpensesCheck">
-                                                                                Include travel expenses
-                                                                            </label>
+                                                                        </Col>
+                                                                    </Collapse>
+                                                                </Row>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <div className="mb-3">
+                                                                            <div className="form-check form-switch">
+                                                                                <input type="checkbox"
+                                                                                    id="includeTravelExpensesCheck"
+                                                                                    className="form-check-input"
+                                                                                    aria-label="Checkbox for including travel expenses"
+                                                                                    style={{ height: '20px' }}
+                                                                                    onChange={travelExpensesOnChange}
+                                                                                    checked={formik.values.includeTravelExpensesCheckbox}
+                                                                                    disabled={proposal.Status >= ProposalStatusType.inactive}
+                                                                                />
+                                                                                <label className="form-check-label mb-0" htmlFor="includeTravelExpensesCheck">
+                                                                                    Include travel expenses
+                                                                                </label>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <div className="mb-3">
-                                                                        <div className="bg-light border-radius-md p-3 pb-0">
-                                                                            <Row>
-                                                                                <Col xs="12">
-                                                                                    <label className="form-label">Inversment</label>
-                                                                                </Col>
-                                                                                <Col xs="12">
-                                                                                    <table className="table table-borderless">
-                                                                                        <thead>
-                                                                                            <tr>
-                                                                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Sub Total</th>
-                                                                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Certificate Issue</th>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <div className="mb-3">
+                                                                            <div className="bg-light border-radius-md p-3 pb-0">
+                                                                                <Row>
+                                                                                    <Col xs="12">
+                                                                                        <label className="form-label">Inversment</label>
+                                                                                    </Col>
+                                                                                    <Col xs="12">
+                                                                                        <table className="table table-borderless">
+                                                                                            <thead>
+                                                                                                <tr>
+                                                                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Sub Total</th>
+                                                                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">Certificate Issue</th>
+                                                                                                    {
+                                                                                                        includeTravelExpenses ? (
+                                                                                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">
+                                                                                                                Travel Expenses
+                                                                                                            </th>
+                                                                                                        ) : null
+                                                                                                    }
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody>
                                                                                                 {
-                                                                                                    includeTravelExpenses ? (
-                                                                                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder text-wrap py-0">
-                                                                                                            Travel Expenses
-                                                                                                        </th>
+                                                                                                    !!proposalAuditList && proposalAuditList.length > 0 ? (
+                                                                                                        proposalAuditList.map(proposalAudit => (
+                                                                                                            <ProposalInversmentInput
+                                                                                                                key={proposalAudit.ID}
+                                                                                                                proposalAudit={proposalAudit}
+                                                                                                                formik={formik}
+                                                                                                                readonly={proposal.Status >= ProposalStatusType.inactive}
+                                                                                                            />
+                                                                                                        ))
                                                                                                     ) : null
                                                                                                 }
-                                                                                            </tr>
-                                                                                        </thead>
-                                                                                        <tbody>
-                                                                                            {
-                                                                                                !!proposalAuditList && proposalAuditList.length > 0 ? (
-                                                                                                    proposalAuditList.map(proposalAudit => (
-                                                                                                        <ProposalInversmentInput
-                                                                                                            key={proposalAudit.ID}
-                                                                                                            proposalAudit={proposalAudit}
-                                                                                                            formik={formik}
-                                                                                                            readonly={ proposal.Status >= ProposalStatusType.inactive }
-                                                                                                        />
-                                                                                                    ))
-                                                                                                ) : null
-                                                                                            }
-                                                                                        </tbody>
-                                                                                    </table>
-                                                                                </Col>
-                                                                            </Row>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <AryFormikTextArea
-                                                                        name="extraInfoInput"
-                                                                        label="Extra Info"
-                                                                        placehoolder="Add any extra info"
-                                                                        type="text"
-                                                                        rows={ 2 }
-                                                                        disabled={ proposal.Status >= ProposalStatusType.inactive }
-                                                                    />
-                                                                </Col>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12">
-                                                                    <AryFormikSelectInput
-                                                                        name="statusSelect"
-                                                                        label="Status"
-                                                                        onChange={ (e) => {
-                                                                            const selectedValue = e.target.value;
-
-                                                                            formik.setFieldValue('statusSelect', selectedValue);
-                                                                            setShowAddComments(originalStatus != selectedValue);
-                                                                        }}
-                                                                    >
-                                                                        <option value="">(select a status)</option>
-                                                                        { statusOptions.map((option) => (
-                                                                            <option key={option.value} value={option.value}>{option.label}</option>
-                                                                        )) }
-                                                                    </AryFormikSelectInput>
-                                                                </Col>
-                                                            </Row>
-                                                            <Collapse in={ showAddComments }>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <div className="mb-3">
+                                                                            <div className="bg-light border-radius-md p-3 pb-0">
+                                                                                <Row>
+                                                                                    <Col xs="12">
+                                                                                        <label className="form-label">Signer</label>
+                                                                                    </Col>
+                                                                                    <Col xs="12">
+                                                                                        <AryFormikTextInput
+                                                                                            name="signerNameInput"
+                                                                                            label="Full name"
+                                                                                            disabled={proposal.Status >= ProposalStatusType.inactive}
+                                                                                        />
+                                                                                    </Col>
+                                                                                    <Col xs="12">
+                                                                                        <AryFormikTextInput
+                                                                                            name="signerPositionInput"
+                                                                                            label="Position"
+                                                                                            disabled={proposal.Status >= ProposalStatusType.inactive}
+                                                                                        />
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Col>
+                                                                </Row>
                                                                 <Row>
                                                                     <Col xs="12">
                                                                         <AryFormikTextArea
-                                                                            name="commentsInput"
-                                                                            label="Comments"
+                                                                            name="extraInfoInput"
+                                                                            label="Extra Info"
+                                                                            placehoolder="Add any extra info"
                                                                             type="text"
-                                                                            helpText="Add any comments for the status change"
+                                                                            rows={2}
+                                                                            disabled={proposal.Status >= ProposalStatusType.inactive}
                                                                         />
                                                                     </Col>
                                                                 </Row>
-                                                            </Collapse>
-                                                        </Col>
-                                                    </Row>
-                                                    { 
-                                                        formik.submitCount > 0 && 
-                                                        Object.keys(formik.errors).length > 0 ?
-                                                        <Row className="mt-3">
-                                                            <Col xs="12">
-                                                                <Alert variant="danger" className="text-sm text-white">
-                                                                    <h6 className="text-sm text-white font-weight-bold"> 
-                                                                        There are some errors in the form
-                                                                    </h6>
-                                                                    <ListGroup variant="flush" size="sm">
-                                                                        { Object.keys(formik.errors).map(key => 
-                                                                            <ListGroup.Item 
-                                                                                key={key} 
-                                                                                className="text-xs bg-transparent p-1 border-0"
-                                                                            >
-                                                                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
-                                                                                {formik.errors[key]}
-                                                                            </ListGroup.Item>
-                                                                        )} 
-                                                                    </ListGroup>
-                                                                </Alert>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <AryFormikSelectInput
+                                                                            name="statusSelect"
+                                                                            label="Status"
+                                                                            onChange={(e) => {
+                                                                                const selectedValue = e.target.value;
+
+                                                                                formik.setFieldValue('statusSelect', selectedValue);
+                                                                                setShowAddComments(originalStatus != selectedValue);
+                                                                            }}
+                                                                        >
+                                                                            <option value="">(select a status)</option>
+                                                                            {statusOptions.map((option) => (
+                                                                                <option key={option.value} value={option.value}>{option.label}</option>
+                                                                            ))}
+                                                                        </AryFormikSelectInput>
+                                                                    </Col>
+                                                                </Row>
+                                                                <Collapse in={showAddComments}>
+                                                                    <Row>
+                                                                        <Col xs="12">
+                                                                            <AryFormikTextArea
+                                                                                name="commentsInput"
+                                                                                label="Comments"
+                                                                                type="text"
+                                                                                helpText="Add any comments for the status change"
+                                                                            />
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Collapse>
                                                             </Col>
                                                         </Row>
-                                                        : null
+                                                        {
+                                                            formik.submitCount > 0 &&
+                                                                Object.keys(formik.errors).length > 0 ?
+                                                                <Row className="mt-3">
+                                                                    <Col xs="12">
+                                                                        <Alert variant="danger" className="text-sm text-white">
+                                                                            <h6 className="text-sm text-white font-weight-bold">
+                                                                                There are some errors in the form
+                                                                            </h6>
+                                                                            <ListGroup variant="flush" size="sm">
+                                                                                {Object.keys(formik.errors).map(key =>
+                                                                                    <ListGroup.Item
+                                                                                        key={key}
+                                                                                        className="text-xs bg-transparent p-1 border-0"
+                                                                                    >
+                                                                                        <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                                                                        {formik.errors[key]}
+                                                                                    </ListGroup.Item>
+                                                                                )}
+                                                                            </ListGroup>
+                                                                        </Alert>
+                                                                    </Col>
+                                                                </Row>
+                                                                : null
+                                                        }
+                                                    </Card.Body>
+                                                </Card>
+                                            </Col>
+                                            <Col xs="12" sm="7">
+                                                <Card>
+                                                    <Card.Body className="p-3">
+                                                        {!!proposalData
+                                                            ? <ProposalPreview formik={formik} />
+                                                            : null
+                                                        }
+                                                    </Card.Body>
+                                                </Card>
+                                            </Col>
+                                        </Row>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
+                                            <div className="text-secondary mb-3 mb-sm-0">
+                                                <AryLastUpdatedInfo item={proposal} />
+                                            </div>
+                                            <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
+                                                <input type="hidden" name="justificationHiddenInput" />
+                                                {/* <input type="hidden" name="adcsCountHidden" /> */}
+                                                <button
+                                                    type="submit"
+                                                    className="btn bg-gradient-dark mb-0"
+                                                    disabled={isProposalSaving || !hasChanges || proposal.Status >= ProposalStatusType.inactive}
+                                                >
+                                                    {
+                                                        isProposalSaving
+                                                            ? <FontAwesomeIcon icon={faSpinner} className="me-1" size="lg" spin />
+                                                            : <FontAwesomeIcon icon={faSave} className="me-1" size="lg" />
                                                     }
-                                                </Card.Body>
-                                            </Card>
-                                        </Col>
-                                        <Col xs="12" sm="7">
-                                            <Card>
-                                                <Card.Body className="p-3">
-                                                    { !!proposalData 
-                                                        ? <ProposalPreview formik={ formik } />
-                                                        : null
-                                                    }
-                                                </Card.Body>
-                                            </Card>
-                                        </Col>
-                                    </Row>
-                                </Modal.Body>
-                                <Modal.Footer>
-                                    <div className="d-flex justify-content-between align-items-start align-items-sm-center w-100">
-                                        <div className="text-secondary mb-3 mb-sm-0">
-                                            <AryLastUpdatedInfo item={ proposal } />
+                                                    Save
+                                                </button>
+                                                <button type="button"
+                                                    className="btn btn-link text-secondary mb-0"
+                                                    onClick={onCloseModal}
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
-                                            <input type="hidden" name="justificationHiddenInput" />
-                                            {/* <input type="hidden" name="adcsCountHidden" /> */}
-                                            <button 
-                                                type="submit"
-                                                className="btn bg-gradient-dark mb-0"
-                                                disabled={ isProposalSaving || !hasChanges || proposal.Status >= ProposalStatusType.inactive }
-                                            >
-                                                {
-                                                    isProposalSaving 
-                                                        ? <FontAwesomeIcon icon={ faSpinner } className="me-1" size="lg" spin />
-                                                        : <FontAwesomeIcon icon={ faSave } className="me-1" size="lg" />
-                                                }
-                                                Save
-                                            </button>
-                                            <button type="button"
-                                                className="btn btn-link text-secondary mb-0"
-                                                onClick={ onCloseModal }
-                                            >
-                                                Close
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Modal.Footer>
-                            </Form>
-                        )
-                    }}
-                </Formik>
-                : null
+                                    </Modal.Footer>
+                                </Form>
+                            )
+                        }}
+                    </Formik>
+                    : null
             }
         </Modal>
     )

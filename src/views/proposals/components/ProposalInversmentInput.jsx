@@ -11,7 +11,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
         proposalData,
         proposalAuditList,
         includeTravelExpenses
-    } = controller;    
+    } = controller;
     const { AuditStepType } = enums();
 
     const currencyCode = currencyCodeProps[proposalData.CurrencyCode];
@@ -26,14 +26,37 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
 
     // METHODS
 
+    const validateNumber = (value) => {
+        const num = parseFloat(value);
+        return isNaN(num) ? 0 : num;
+    }; // validateNumber
+
+    const getTaxes = () => {
+        return validateNumber(formData.subTotalInput) * proposalData.TaxRate / 100;
+    }; // getTaxes
+
+    const getTotalCost = () => {
+        return validateNumber(formData.subTotalInput) + getTaxes();
+    }; // getTotalCost
+
+    const getTotalFinal = () => {
+        if (validateNumber(formData.travelExpensesInput) > 0) {
+            return getTotalCost() + validateNumber(formData.travelExpensesInput);
+        }
+        return getTotalCost();
+    }; // getTotalFinal
+
     const onBlur = (e) => {
         const { name, value } = e.target;
-        if (name === 'subTotalInput') {            
+        if (name === 'subTotalInput') {
             const newProposalAuditList = proposalAuditList.map(item => {
                 if (item.ID == proposalAudit.ID) {
                     return {
                         ...item,
-                        SubTotal: value,
+                        SubTotal: validateNumber(value),
+                        Taxes: getTaxes(),
+                        TotalCost: getTotalCost(),
+                        TotalFinal: getTotalFinal(),
                     };
                 }
                 return item;
@@ -47,7 +70,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 if (item.ID == proposalAudit.ID) {
                     return {
                         ...item,
-                        CertificateIssue: value,
+                        CertificateIssue: validateNumber(value),
                     };
                 }
                 return item;
@@ -60,7 +83,8 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 if (item.ID == proposalAudit.ID) {
                     return {
                         ...item,
-                        TravelExpenses: value,
+                        TravelExpenses: validateNumber(value),
+                        TotalFinal: getTotalFinal(),
                     };
                 }
                 return item;
@@ -73,9 +97,9 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
     return (
         <>
             <tr>
-                <td className="py-0" colSpan={ includeTravelExpenses ? 3 : 2 }>
+                <td className="py-0" colSpan={includeTravelExpenses ? 3 : 2}>
                     <label className="form-label">
-                        { auditStepProps[proposalAudit.AuditStep].label }
+                        {auditStepProps[proposalAudit.AuditStep].label}
                     </label>
                 </td>
             </tr>
@@ -83,44 +107,44 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 <td className="ps-0 pt-0">
                     <div className="input-group">
                         <span className="input-group-text">
-                            { currencyCode.symbol }
+                            {currencyCode.symbol}
                         </span>
                         <input name="subTotalInput"
                             className="form-control text-end"
                             placeholder="Subtotal"
                             aria-label="Text input for subTotal"
                             value={formData.subTotalInput}
-                            onChange={ (e) => {
+                            onChange={(e) => {
                                 const { value } = e.target;
                                 setFormData(prev => ({
                                     ...prev,
                                     subTotalInput: value,
                                 }));
                             }}
-                            onBlur={ onBlur }
-                            disabled={ readonly }
+                            onBlur={onBlur}
+                            disabled={readonly}
                         />
                     </div>
                 </td>
-                <td className={ includeTravelExpenses ? 'pt-0' : 'pt-0 pe-0' }>
+                <td className={includeTravelExpenses ? 'pt-0' : 'pt-0 pe-0'}>
                     <div className="input-group">
                         <span className="input-group-text">
-                            { currencyCode.symbol }
+                            {currencyCode.symbol}
                         </span>
                         <input name="certificateIssueInput"
                             className="form-control text-end"
                             placeholder="Certificate Issue"
                             aria-label="Text input for certificateIssue"
                             value={formData.certificateIssueInput}
-                            onChange={ (e) => {
+                            onChange={(e) => {
                                 const { value } = e.target;
                                 setFormData(prev => ({
                                     ...prev,
                                     certificateIssueInput: value,
                                 }));
                             }}
-                            onBlur={ onBlur }
-                            disabled={ readonly }
+                            onBlur={onBlur}
+                            disabled={readonly}
                         />
                     </div>
                 </td>
@@ -129,22 +153,22 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                         <td className="pt-0 pe-0">
                             <div className="input-group">
                                 <span className="input-group-text">
-                                    { currencyCode.symbol }
+                                    {currencyCode.symbol}
                                 </span>
                                 <input name="travelExpensesInput"
                                     className="form-control text-end"
                                     placeholder="Travel Expenses"
                                     aria-label="Text input for travelExpenses"
                                     value={formData.travelExpensesInput}
-                                    onChange={ (e) => {
+                                    onChange={(e) => {
                                         const { value } = e.target;
                                         setFormData(prev => ({
                                             ...prev,
                                             travelExpensesInput: value,
                                         }));
                                     }}
-                                    onBlur={ onBlur }
-                                    disabled={ readonly }
+                                    onBlur={onBlur}
+                                    disabled={readonly}
                                 />
                             </div>
                         </td>
