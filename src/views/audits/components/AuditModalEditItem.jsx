@@ -204,66 +204,6 @@ const AuditModalEditItem = ({ id, show, onHide, ...props }) => {
 
             setStatusOptions(auditSetStatusOptions(audit.Status));
 
-            // switch (audit.Status) {
-            //     case AuditStatusType.scheduled:
-            //         setStatusOptions([
-            //             { label: 'Scheduled', value: AuditStatusType.scheduled },
-            //             { label: 'Confirmed', value: AuditStatusType.confirmed },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            //     case AuditStatusType.confirmed:
-            //         setStatusOptions([
-            //             { label: 'Confirmed', value: AuditStatusType.confirmed },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-                
-            //     case AuditStatusType.inProcess:
-            //         setStatusOptions([
-            //             { label: 'In process', value: AuditStatusType.inProcess },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            //     case AuditStatusType.finished:
-            //         setStatusOptions([
-            //             { label: 'Finished', value: AuditStatusType.finished },
-            //             { label: 'Completed', value: AuditStatusType.completed },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            //     case AuditStatusType.completed:
-            //         setStatusOptions([
-            //             { label: 'Completed', value: AuditStatusType.completed },
-            //             { label: 'Closed', value: AuditStatusType.closed },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            //     case AuditStatusType.closed:
-            //         setStatusOptions([
-            //             { label: 'Closed', value: AuditStatusType.closed },
-            //         ]);
-            //         break;
-            //     case AuditStatusType.canceled:
-            //         setStatusOptions([
-            //             { label: 'Scheduled', value: AuditStatusType.scheduled },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            //     default:
-            //         setStatusOptions([
-            //             { label: '(select)', value: AuditStatusType.nothing },
-            //             { label: 'Scheduled', value: AuditStatusType.scheduled },
-            //             { label: 'Confirmed', value: AuditStatusType.confirmed },
-            //             // { label: 'In process', value: AuditStatusType.inProcess },
-            //             // { label: 'Finished', value: AuditStatusType.finished },
-            //             { label: 'Completed', value: AuditStatusType.completed },
-            //             { label: 'Closed', value: AuditStatusType.closed },
-            //             { label: 'Canceled', value: AuditStatusType.canceled },
-            //         ]);
-            //         break;
-            // } // switch
-            
             if (!organization || (!!audit.AuditCycle && organization.ID != audit.AuditCycle?.OrganizationID)) {
                 organizationAsync(audit.AuditCycle.OrganizationID);
             } else {

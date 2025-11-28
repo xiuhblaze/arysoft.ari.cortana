@@ -306,12 +306,32 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
         if (!!proposal?.ProposalAudits && proposal.ProposalAudits.length > 0) {
             const orderProposalAudits = sortProposalAudits(proposal.ProposalAudits);
-            setProposalAuditList(dispatch, orderProposalAudits);
+            const calculatedProposalAudits = proposalAuditsCalculateTotals(orderProposalAudits);
+
+            setProposalAuditList(dispatch, calculatedProposalAudits);
         }
 
         setIncludeTravelExpenses(dispatch, proposal.IncludeTravelExpenses ?? false);
 
     }; // loadFromRealData
+
+    const proposalAuditsCalculateTotals = (proposalAuditList) => {        
+        const totals = proposalAuditList.map(proposalAudit => {
+            
+            const taxes = (proposalAudit.SubTotal ?? 0) * (proposalData?.TaxRate ?? 0) / 100;
+            const totalCost = proposalAudit.SubTotal ?? 0 + taxes;
+            const totalFinal = totalCost + (proposalAudit.TravelExpenses ?? 0);
+
+            return {
+                ...proposalAudit,
+                Taxes: taxes,
+                TotalCost: totalCost,
+                TotalFinal: totalFinal,
+            };
+        });
+
+        return totals;
+    }; // proposalAuditsCalculateTotals
 
     const currencyCodeSelectOnChange = (e) => {
         const selectedValue = e.target.value;
@@ -419,13 +439,13 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         let wishList = [];
 
         if (cycleType == AuditCycleType.initial) {
-            wishList = [1, 2, 3, 4, 8, 9, 10];
+            wishList = [1, 2, 3, 6, 7, 8, 9, 10];
         } else if (cycleType == AuditCycleType.recertification) {
-            wishList = [5, 3, 4, 8, 9, 10];
+            wishList = [5, 6, 7, 8, 9, 10];
         } else if (cycleType == AuditCycleType.transfer) {
-            wishList = [5, 6, 3, 4, 8, 9, 10];
+            wishList = [4, 5, 6, 7, 8, 9, 10];
         } else {
-            wishList = [6, 1, 2, 5, 3, 4, 8, 9, 10];
+            wishList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         }
 
         const sortedList = [];
@@ -436,6 +456,11 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
 
         return sortedList;
     }; // sortProposalAudits
+
+    const validateNumber = (value) => {
+        const num = parseFloat(value);
+        return isNaN(num) ? 0 : num;
+    }; // validateNumber
 
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}

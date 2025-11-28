@@ -153,18 +153,33 @@ const enums = () => {
 
     // Audits
 
+    // const AuditStepType = Object.freeze({
+    //     nothing: 0,
+    //     stage1: 1,
+    //     stage2: 2,
+    //     surveillance1: 3,
+    //     surveillance2: 4,
+    //     recertification: 5,
+    //     transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
+    //     special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+    //     surveillance3: 8,
+    //     surveillance4: 9,
+    //     surveillance5: 10,
+    // });
+
     const AuditStepType = Object.freeze({
         nothing: 0,
-        stage1: 1,
-        stage2: 2,
-        surveillance1: 3,
-        surveillance2: 4,
+        preAudit: 1,
+        stage1: 2,
+        stage2: 3,
+        transfer: 4,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
         recertification: 5,
-        transfer: 6,    // Auditoria de transferencia - se realiza cuando un cliente cambia de certificadora, puede recibir cualquier tipo de documentación
-        special: 7,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
+        surveillance1: 6,
+        surveillance2: 7,
         surveillance3: 8,
         surveillance4: 9,
         surveillance5: 10,
+        special: 11,     // Auditoria especial - puede recibir cualquier tipo de documentación sin orden aparente, funciona para survey 3...
     });
 
 // const steps = [

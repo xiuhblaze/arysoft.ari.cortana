@@ -16,9 +16,9 @@ import auditStepProps from "../helpers/auditStepProps";
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
 import Swal from "sweetalert2";
 import { setAuditStandards } from "../../../store/slices/auditStandardsSlice";
+import getAuditStepList from "../helpers/getAuditStepList";
 
 const AuditStandardEditItem = ({ id, ...props }) => {
-
     const {
         AuditStepType,
         DefaultStatusType
@@ -94,8 +94,9 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                 auditCycleID: audit.AuditCycleID,
                 pageSize: 0,
             });
-
+//console.log('auditStandard', auditStandard);
             setStandardSelect(auditStandard.StandardID);
+            //setAuditStepList(getAuditSteps(auditStandard.StandardID));
         }
     }, [auditStandard]);
 
@@ -112,6 +113,7 @@ const AuditStandardEditItem = ({ id, ...props }) => {
                 var auditCycleStandard = auditCycleStandards.find(i => i.StandardID == standardSelect);
 
                 if (!!auditCycleStandard) {
+                    console.log('auditCycleStandard', auditCycleStandard);
                     const auditStandardsTmp = [];
                     if (auditCycleStandard.InitialStep == AuditStepType.stage1) {
                         auditStandardsTmp.push({label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 });
@@ -167,6 +169,25 @@ const AuditStandardEditItem = ({ id, ...props }) => {
     }, [auditStandardsErrorMessage]);
     
     // METHODS
+
+//     const getAuditSteps = (id) => {
+// console.log('getAuditSteps', id);
+// console.log('auditCycle', auditCycle);
+// console.log(!auditCycle?.AuditCycleStandards);
+//         if (!auditCycle?.AuditCycleStandards) return [];
+        
+//         const auditCycleStandard = auditCycle.AuditCycleStandards
+//             .find(i => i.StandardID == id);
+//         //console.log('auditCycleStandard', auditCycleStandard);
+//         if (!auditCycleStandard) return [];
+
+//         const items = getAuditStepList(
+//             auditCycleStandard.CycleType, 
+//             auditCycleStandard.InitialStep, 
+//             auditCycle.Periodicity);
+// console.log('items', items);
+//         return items;
+//     }; // getAuditSteps
 
     const onShowModal = () => {
 

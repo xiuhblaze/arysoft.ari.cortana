@@ -10,6 +10,12 @@ const auditStepProps = [
         variant: 'light',
     },
     {
+        id: AuditStepType.preAudit,
+        label: 'Pre audit',
+        abbreviation: 'pre',
+        variant: 'secondary',
+    },
+    {
         id: AuditStepType.stage1,
         label: 'Stage 1',
         abbreviation: 'st1',
@@ -22,6 +28,18 @@ const auditStepProps = [
         variant: 'dark',
     },
     {
+        id: AuditStepType.transfer,
+        label: 'Transfer',
+        abbreviation: 'tt',
+        variant: 'info',
+    },
+    {
+        id: AuditStepType.recertification,
+        label: 'Recertification',
+        abbreviation: 'rr',
+        variant: 'info',
+    },
+    {
         id: AuditStepType.surveillance1,
         label: 'Surveillance 1',
         abbreviation: 's1',
@@ -32,24 +50,6 @@ const auditStepProps = [
         label: 'Surveillance 2',
         abbreviation: 's2',
         variant: 'dark',
-    },
-    {
-        id: AuditStepType.recertification,
-        label: 'Recertification',
-        abbreviation: 'rr',
-        variant: 'info',
-    },
-    {
-        id: AuditStepType.transfer,
-        label: 'Transfer',
-        abbreviation: 'tt',
-        variant: 'info',
-    },
-    {
-        id: AuditStepType.special,
-        label: 'Special',
-        abbreviation: 'sp',
-        variant: 'warning',
     },
     {
         id: AuditStepType.surveillance3,
@@ -68,6 +68,12 @@ const auditStepProps = [
         label: 'Surveillance 5',
         abbreviation: 's5',
         variant: 'dark',
+    },
+    {
+        id: AuditStepType.special,
+        label: 'Special',
+        abbreviation: 'sp',
+        variant: 'warning',
     },
 ];
 
