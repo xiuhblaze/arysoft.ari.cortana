@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { setProposalAuditList, useProposalController } from "../context/ProposalContext";
+import { setProposalAuditHiddenTouched, setProposalAuditHiddenValue, setProposalAuditList, useProposalController } from "../context/ProposalContext";
 import auditStepProps from "../../audits/helpers/auditStepProps";
 import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import enums from "../../../helpers/enums";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
 const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...props }) => {
     const [controller, dispatch] = useProposalController();
     const {
         proposalData,
         proposalAuditList,
-        includeTravelExpenses
+        includeTravelExpenses,
+        proposalAuditHidden,
     } = controller;
     const { AuditStepType } = enums();
 
@@ -22,12 +26,44 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
         subTotalInput: proposalAudit.SubTotal ?? 0,
         certificateIssueInput: proposalAudit.CertificateIssue ?? 0,
         travelExpensesInput: proposalAudit.TravelExpenses ?? 0,
+        error: {
+            subTotalInput: null,
+            certificateIssueInput: null,
+            travelExpensesInput: null,
+        },
+        hasSomeError: false,
     });
+
+    useEffect(() => {
+      
+        console.log('ProposalInversmentInput.useEffect: formData.error', formData.error);
+
+        if (!!formData.error.subTotalInput || !!formData.error.certificateIssueInput || !!formData.error.travelExpensesInput) {
+            console.log('hay un error'); 
+            if (!formData.hasSomeError) {
+                setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
+                setFormData({
+                    ...formData,
+                    hasSomeError: true,
+                });
+            }
+        } else {
+            console.log('no hay un errores')
+            setFormData({
+                ...formData,
+                hasSomeError: false,
+            });
+            setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value == 0 ? 0 : proposalAuditHidden.value - 1);
+        }
+
+    }, [formData.error]);
+    
 
     // METHODS
 
     const validateNumber = (value) => {
         const num = parseFloat(value);
+
         return isNaN(num) ? 0 : num;
     }; // validateNumber
 
@@ -46,52 +82,189 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
         return getTotalCost();
     }; // getTotalFinal
 
+    const isValid = (value) => {
+        const regex = /^-?\d*\.?\d*$/;
+
+        if (regex.test(value) || value === '') return true;
+
+        return false;
+    }; // isValid
+
     const onBlur = (e) => {
         const { name, value } = e.target;
+
+        // console.log('onBlur', name, value);
+
         if (name === 'subTotalInput') {
-            const newProposalAuditList = proposalAuditList.map(item => {
-                if (item.ID == proposalAudit.ID) {
-                    return {
-                        ...item,
-                        SubTotal: validateNumber(value),
-                        Taxes: getTaxes(),
-                        TotalCost: getTotalCost(),
-                        TotalFinal: getTotalFinal(),
-                    };
-                }
-                return item;
-            });
-            //console.log('newProposalAuditList', newProposalAuditList);
-            setProposalAuditList(dispatch, newProposalAuditList);
-        }
+
+            if (isValid(value)) {
+                const numericValue = validateNumber(value);
+                const newProposalAuditList = proposalAuditList.map(item => {
+                    if (item.ID == proposalAudit.ID) {
+                        return {
+                            ...item,
+                            SubTotal: numericValue,
+                            Taxes: getTaxes(),
+                            TotalCost: getTotalCost(),
+                            TotalFinal: getTotalFinal(),
+                        };
+                    }
+                    return item;
+                });
+                setProposalAuditList(dispatch, newProposalAuditList);
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        subTotalInput: null,
+                    },
+                });
+            } else {
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        subTotalInput: 'The SubTotal value is not valid',
+                    },
+                });
+            }
+        } // 'subTotalInput'
 
         if (name === 'certificateIssueInput') {
-            const newProposalAuditList = proposalAuditList.map(item => {
-                if (item.ID == proposalAudit.ID) {
-                    return {
-                        ...item,
-                        CertificateIssue: validateNumber(value),
-                    };
-                }
-                return item;
-            });
-            setProposalAuditList(dispatch, newProposalAuditList);
-        }
+            
+            if (isValid(value)) {
+                const numericValue = validateNumber(value);
+                const newProposalAuditList = proposalAuditList.map(item => {
+                    if (item.ID == proposalAudit.ID) {
+                        return {
+                            ...item,
+                            CertificateIssue: numericValue,
+                        };
+                    }
+                    return item;
+                });
+                setProposalAuditList(dispatch, newProposalAuditList);
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        certificateIssueInput: null,
+                    },
+                });
+            } else {
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        certificateIssueInput: 'The Certificate Issue value is not valid',
+                    },
+                });
+            }
+        } // 'certificateIssueInput'
+
+            // const numericValue = validateNumber(value);
+
+            // if (!isNullOrEmpty(value) && numericValue === null) {
+            //     setFormData({
+            //         ...formData,
+            //         error: {
+            //             ...formData.error,
+            //             CertificateIssue: 'The Certificate Issue value must be a number',
+            //         }
+            //     });
+            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
+            //     return;
+            // } else {
+            //     setFormData({
+            //         ...formData,
+            //         error: {
+            //             ...formData.error,
+            //             CertificateIssue: null,
+            //         }
+            //     });
+            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value == 0 ? 0 : proposalAuditHidden.value - 1);
+            // }
+
+            // const newProposalAuditList = proposalAuditList.map(item => {
+            //     if (item.ID == proposalAudit.ID) {
+            //         return {
+            //             ...item,
+            //             CertificateIssue: numericValue ?? 0,
+            //         };
+            //     }
+            //     return item;
+            // });
+            // setProposalAuditList(dispatch, newProposalAuditList);
+        //}
 
         if (name === 'travelExpensesInput') {
-            const newProposalAuditList = proposalAuditList.map(item => {
-                if (item.ID == proposalAudit.ID) {
-                    return {
-                        ...item,
-                        TravelExpenses: validateNumber(value),
-                        TotalFinal: getTotalFinal(),
-                    };
-                }
-                return item;
-            });
-            // console.log('newProposalAuditList', newProposalAuditList);            
-            setProposalAuditList(dispatch, newProposalAuditList);
-        }
+
+            if (isValid(value)) {
+                const numericValue = validateNumber(value);
+                const newProposalAuditList = proposalAuditList.map(item => {
+                    if (item.ID == proposalAudit.ID) {
+                        return {
+                            ...item,
+                            TravelExpenses: numericValue,
+                            TotalFinal: getTotalFinal(),
+                        };
+                    }
+                    return item;
+                });
+                setProposalAuditList(dispatch, newProposalAuditList);
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        travelExpensesInput: null,
+                    },
+                });
+            } else {                
+                setFormData({
+                    ...formData,
+                    error: {
+                        ...formData.error,
+                        travelExpensesInput: 'The Travel Expenses value is not valid',
+                    },
+                });
+            }
+            // const numericValue = validateNumber(value);
+
+            // if (!isNullOrEmpty(value) && numericValue === null) {
+            //     setFormData({
+            //         ...formData,
+            //         error: {
+            //             ...formData.error,
+            //             TravelExpenses: 'The Travel Expenses value must be a number',
+            //         }
+            //     });
+            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
+            //     return;
+            // } else {
+            //     setFormData({
+            //         ...formData,
+            //         error: {
+            //             ...formData.error,
+            //             TravelExpenses: null,
+            //         }
+            //     });
+            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value == 0 ? 0 : proposalAuditHidden.value - 1);
+            // }
+
+            // const newProposalAuditList = proposalAuditList.map(item => {
+            //     if (item.ID == proposalAudit.ID) {
+            //         return {
+            //             ...item,
+            //             TravelExpenses: numericValue ?? 0,
+            //             TotalFinal: getTotalFinal(),
+            //         };
+            //     }
+            //     return item;
+            // });
+            // setProposalAuditList(dispatch, newProposalAuditList);
+        } // 'travelExpensesInput'
+
+        setProposalAuditHiddenTouched(dispatch, true);
     }; // onBlur
 
     return (
@@ -99,7 +272,10 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
             <tr>
                 <td className="py-0" colSpan={includeTravelExpenses ? 3 : 2}>
                     <label className="form-label">
-                        {auditStepProps[proposalAudit.AuditStep].label}
+                        { 
+                            proposalAudit.AuditStep == AuditStepType.stage2 
+                                ? `${auditStepProps[AuditStepType.stage1].label} + ${auditStepProps[AuditStepType.stage2].label}`
+                                : auditStepProps[proposalAudit.AuditStep].label}
                     </label>
                 </td>
             </tr>
@@ -175,6 +351,29 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                     ) : null
                 }
             </tr>
+            {
+                !isNullOrEmpty(formData.error.certificateIssueInput)
+                || !isNullOrEmpty(formData.error.subTotalInput)
+                || !isNullOrEmpty(formData.error.travelExpensesInput)
+                 ? (
+                    <tr>
+                        <td className="text-end" colSpan={includeTravelExpenses ? 3 : 2}>
+                            <div className="text-danger text-xs">
+                                { Object.keys(formData.error).map(key => {
+
+                                    if (formData.error[key] === null) return null;
+
+                                    return (
+                                        <div key={key}>
+                                            { formData.error[key] }
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </td>
+                    </tr>
+                ) : null
+            }            
         </>
     )
 }

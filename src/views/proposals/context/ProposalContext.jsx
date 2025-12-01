@@ -15,6 +15,10 @@ const ProposalControllerProvider = ({ children }) => {
             value: 0,
             touch: false,
         },
+        proposalAuditHidden: {
+            value: 0,
+            touch: false,
+        },
         includeTravelExpenses: false,
     }; // initialState
 
@@ -59,6 +63,18 @@ const ProposalControllerProvider = ({ children }) => {
                     proposalAuditList: action.payload,
                 };
             }
+            case 'SET_PROPOSAL_AUDIT_HIDDEN_VALUE': {
+                return {
+                    ...state,                    
+                    proposalAuditHidden: { ...state.proposalAuditHidden, value: action.payload },
+                };
+            }
+            case 'SET_PROPOSAL_AUDIT_HIDDEN_TOUCHED': {
+                return {
+                    ...state,                    
+                    proposalAuditHidden: { ...state.proposalAuditHidden, touch: action.payload },
+                };
+            }
             case 'SET_INCLUDE_TRAVEL_EXPENSES': {
                 return {
                     ...state,                    
@@ -96,6 +112,8 @@ const setProposalData = (dispatch, value) => dispatch({ type: "SET_PROPOSAL", pa
 const setADCList = (dispatch, value) => dispatch({ type: "SET_ADC_LIST", payload: value });
 const setContactList = (dispatch, value) => dispatch({ type: "SET_CONTACT_LIST", payload: value });
 const setProposalAuditList = (dispatch, value) => dispatch({ type: "SET_PROPOSAL_AUDIT_LIST", payload: value });
+const setProposalAuditHiddenValue = (dispatch, value) => dispatch({ type: "SET_PROPOSAL_AUDIT_HIDDEN_VALUE", payload: value });
+const setProposalAuditHiddenTouched = (dispatch, value) => dispatch({ type: "SET_PROPOSAL_AUDIT_HIDDEN_TOUCHED", payload: value });
 const setIncludeTravelExpenses = (dispatch, value) => dispatch({ type: "SET_INCLUDE_TRAVEL_EXPENSES", payload: value });
 const clearProposalController = (dispatch) => dispatch({ type: "CLEAR_CONTROLLER" });
 
@@ -111,6 +129,8 @@ export {
     setProposalAuditList,
     setIncludeTravelExpenses,
 
+    setProposalAuditHiddenValue,
+    setProposalAuditHiddenTouched,
     // setADCsCountHiddenValue,
     // setADCsCountHiddenTouched,
 

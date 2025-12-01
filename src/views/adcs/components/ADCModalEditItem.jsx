@@ -139,8 +139,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     } = useADCConceptValuesStore();
 
     const {
-        isADCSiteAuditSaving,
-        adcSiteAuditSavedOk,
         adcSiteAuditSaveListAsync,
     } = useADCSiteAuditsStore();
 
@@ -283,18 +281,6 @@ const ADCModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             });
         }
     }, [adc, organization]);
-
-    // useEffect(() => {
-        
-    //     console.log('adcSiteList', adcSiteList);
-    //     // if (!!adcSiteList && adcSiteList.length > 0) {
-    //     //     const result = adcSiteList.some(item => item.ExceedsMaximumReduction);
-
-    //     //     if (!!formikRef?.current) {
-    //     //         formikRef.current.setFieldValue('exceedsMaximumReductionHidden', result);
-    //     //     }
-    //     // }
-    // }, [adcSiteList]);
 
     useEffect(() => {
         

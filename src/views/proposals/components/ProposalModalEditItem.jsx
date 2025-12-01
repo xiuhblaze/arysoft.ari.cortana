@@ -23,10 +23,11 @@ import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
 import proposalSetStatusOptions from "../helpers/proposalSetStatusOptions";
 import ProposalEditADCs from "./ProposalEditADCs";
 import currencyCodeProps from "../../../helpers/currencyCodeProps";
-import { set } from "date-fns";
 import envVariables from "../../../helpers/envVariables";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 import ProposalInversmentInput from "./ProposalInversmentInput";
+
+import AryFormDebug from '../../../components/Forms/AryFormDebug';
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -36,6 +37,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         adcList,
         proposalAuditList,
         includeTravelExpenses,
+        proposalAuditHidden,
     } = controller;
 
     const {
@@ -61,6 +63,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         statusSelect: '',
         commentsInput: '',
         adcsCountHidden: 0,
+        proposalAuditHidden: 0,
     };
 
     const validationSchema = Yup.object({
@@ -85,6 +88,9 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             .required('Tax rate is required')
             .min(0, 'Tax rate must be greater than 0')
             .max(100, 'Tax rate must be less than 100'),
+        proposalAuditHidden: Yup.number()
+            .typeError('Proposal audit must be a number')
+            .max(0, 'At least one investment value is not valid'),
         adcsCountHidden: Yup.number()
             .typeError('ADCs must be a number')
             .min(1, 'At least one ADC is required'),
@@ -115,6 +121,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         proposalAsync,
         proposalCreateAsync,
         proposalSaveAsync,
+        proposalSaveListAsync,
 
         proposalClear,
     } = useProposalsStore();
@@ -203,8 +210,23 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         if (!!formikRef?.current) {
             formikRef.current.setFieldValue('justificationHiddenInput', proposalData.Justification);
         }
-    }, [proposalData?.Justification])
+    }, [proposalData?.Justification]);
 
+    useEffect(() => {
+    
+        if (!!formikRef?.current) {
+            const numericValue = Number(proposalAuditHidden.value);
+            formikRef.current.setFieldValue('proposalAuditHidden', numericValue);
+        }         
+    }, [proposalAuditHidden.value]);
+    
+
+    useEffect(() => {
+        if (formikRef.current) {
+            formikRef.current.setFieldTouched('proposalAuditHidden', proposalAuditHidden.touch);
+        }
+    }, [proposalAuditHidden.touch]);
+    
     useEffect(() => {
 
         if (!!proposalSavedOk && !!show) {
@@ -225,13 +247,6 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         }
     }, [proposalsErrorMessage]);
 
-    //! temporal
-
-    useEffect(() => {
-        console.log('proposalAuditList', proposalAuditList);
-    }, [proposalAuditList]);
-
-
     // METHODS
 
     const loadFromHistoricalData = () => { //! Por terminar, aun no se genera el historial de forma real
@@ -251,6 +266,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             statusSelect: proposal.Status,
             commentsInput: '',
             adcsCountHidden: !!historicalData.ADCs ? historicalData.ADCs.length : 0,
+            proposalAuditHidden: 0,
         });
 
         if (!!historicalData.ADCs && historicalData.ADCs.length > 0) {
@@ -278,6 +294,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             adcsCountHidden: !!proposal.ADCs
                 ? proposal.ADCs.filter(a => a.Status <= ProposalStatusType.inactive).length
                 : 0,
+            proposalAuditHidden: 0,
         });
 
         if (!!proposal.CurrencyCode
@@ -305,9 +322,9 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         }
 
         if (!!proposal?.ProposalAudits && proposal.ProposalAudits.length > 0) {
-            const orderProposalAudits = sortProposalAudits(proposal.ProposalAudits);
+            const orderProposalAudits = sortProposalAudits(proposal.ProposalAudits);            
             const calculatedProposalAudits = proposalAuditsCalculateTotals(orderProposalAudits);
-
+            
             setProposalAuditList(dispatch, calculatedProposalAudits);
         }
 
@@ -394,7 +411,23 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             Status: newStatus,
         };
 
-        proposalSaveAsync(toSave);
+        const saveProposalAudits = proposalAuditList.map(item => {
+            return {
+                ID: item.ID,
+                TotalAuditDays: item.TotalAuditDays,
+                SubTotal: item.SubTotal,
+                CertificateIssue: item.CertificateIssue,
+                TotalCost: item.TotalCost,
+                TravelExpenses: item.TravelExpenses,
+                TotalFinal: item.TotalFinal,
+                Status: item.Status,
+            };
+        });
+
+        console.log('Falta guardar: saveProposalAudits', saveProposalAudits);
+
+        //proposalSaveAsync(toSave);
+        proposalSaveListAsync(toSave, null, saveProposalAudits);
 
         //console.log('onFormSubmit: toSave', toSave);
     }; // onFormSubmit
@@ -421,7 +454,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     }; // onCloseModal
 
     const actionsForCloseModal = () => {
-        //console.log('actionsForCloseModal().onHide', !!onHide);
+
         if (!!onHide) onHide();
 
         proposalClear();
@@ -457,10 +490,10 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
         return sortedList;
     }; // sortProposalAudits
 
-    const validateNumber = (value) => {
-        const num = parseFloat(value);
-        return isNaN(num) ? 0 : num;
-    }; // validateNumber
+    // const validateNumber = (value) => {
+    //     const num = parseFloat(value);
+    //     return isNaN(num) ? 0 : num;
+    // }; // validateNumber
 
     return (
         <Modal {...props} show={showModal} onHide={onCloseModal}
@@ -615,7 +648,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                             <div className="bg-light border-radius-md p-3 pb-0">
                                                                                 <Row>
                                                                                     <Col xs="12">
-                                                                                        <label className="form-label">Inversment</label>
+                                                                                        <label className="form-label">Investment</label>
                                                                                     </Col>
                                                                                     <Col xs="12">
                                                                                         <table className="table table-borderless">
@@ -750,6 +783,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                                 </Row>
                                                                 : null
                                                         }
+                                                        <AryFormDebug formik={formik} />
                                                     </Card.Body>
                                                 </Card>
                                             </Col>
@@ -772,6 +806,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                             </div>
                                             <div className="d-flex justify-content-end ms-auto ms-sm-0 mb-3 mb-sm-0 gap-2">
                                                 <input type="hidden" name="justificationHiddenInput" />
+                                                <input type="hidden" name="proposalAuditHidden" />
                                                 {/* <input type="hidden" name="adcsCountHidden" /> */}
                                                 <button
                                                     type="submit"

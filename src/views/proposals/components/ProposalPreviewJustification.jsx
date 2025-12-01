@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import ShowFormatTextInput from '../../../components/General/ShowFormatTextInput'
-import { setProposalData, useProposalController } from '../context/ProposalContext';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
+import { setProposalData, useProposalController } from '../context/ProposalContext';
 import enums from '../../../helpers/enums';
-import { te } from 'date-fns/locale';
 
 const ProposalPreviewJustification = ({ formik, ...props }) => {
     const headerStyle = 'col-3 text-xs text-wrap font-weight-bold bg-light';
@@ -50,8 +49,12 @@ const ProposalPreviewJustification = ({ formik, ...props }) => {
 
             textItem += 'Range MD5: ';
             if (isMultisite) {
-                ADCSites.forEach(adcSite => {
-                    textItem += `[${ adcSite.SiteDescription }: ${ adcSite.NoEmployees } > ${adcSite.MD5Range}] `;
+                const adcSites = [...ADCSites].sort((a, b) => 
+                  (Number(b.IsMainSite) - Number(a.IsMainSite)) || a.SiteDescription.localeCompare(b.SiteDescription)
+                );
+                textItem += '\n';                
+                adcSites.forEach(adcSite => {
+                    textItem += `- **${ adcSite.SiteDescription }** - *Employees:* ${ adcSite.NoEmployees }, *Range MD5:* ${ adcSite.MD5Range }  \n`;
                 });
             } else if (ADCSites.length == 1) {
                 const adcSite = ADCSites[0];

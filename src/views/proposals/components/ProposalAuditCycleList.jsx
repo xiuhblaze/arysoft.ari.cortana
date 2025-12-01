@@ -55,6 +55,7 @@ const ProposalAuditCycleList = ({ showAll = false }) => {
     const onCloseModal = () => {
 
         if (!!proposal && proposal.Status < ProposalStatusType.inactive) {
+
             proposalsAsync({
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,

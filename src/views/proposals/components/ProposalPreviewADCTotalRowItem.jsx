@@ -1,13 +1,20 @@
-import React from 'react'
 import { useProposalController } from '../context/ProposalContext'
 import enums from '../../../helpers/enums';
 import getCurrencyFormat from '../../../helpers/getCurrencyFormat';
+import { useEffect, useState } from 'react';
+import currencyCodeProps from '../../../helpers/currencyCodeProps';
 
 const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...props }) => {
-    const headerColStyle = 'col-3 text-xs text-wrap font-weight-bold bg-light';
-    const totalStyle = 'text-xs text-dark text-end font-weight-bold text-wrap';
+    const _headerColStyle = 'col-3 text-xs text-wrap font-weight-bold bg-light';
+    const _totalStyle = 'text-xs text-end text-wrap';
 
-    const {AuditCyclePeriodicityType, AuditStepType, DefaultCurrencyCodeType} = enums();
+    const {
+        ADCStatusType,
+        AuditCyclePeriodicityType, 
+        AuditCycleType,
+        AuditStepType, 
+        DefaultCurrencyCodeType
+    } = enums();
 
     const [controller, dispatch] = useProposalController();
     const {
@@ -15,14 +22,69 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
         proposalAuditList,
     } = controller;
 
+    // HOOKS
+
+    const [title, setTitle] = useState('');
+    const [cycleType, setCycleType] = useState(null);
+    const [totalStyle, setTotalStyle] = useState(_totalStyle);
+    const [headerColStyle, setHeaderColStyle] = useState(_headerColStyle);
+
+    useEffect(() => {
+        const firstADC = proposalData.ADCs.find(adc => adc.Status <= ADCStatusType.inactive);
+        const auditCycleStandard = proposalData.AuditCycle.AuditCycleStandards   //TODO: Considerar que este se va a obtener en combinacion de varios ADCs
+            .find(acs => acs.StandardID == firstADC?.AppFormStandardID);
+        setCycleType(auditCycleStandard?.CycleType ?? 0);
+
+        switch (rowType) {
+            case 'TotalAuditDays': {
+                setTitle('Total Audit Days');
+                break;
+            }
+            case 'SubTotal': {
+                setTitle(`SubTotal (${
+                    currencyCodeProps[proposalData.CurrencyCode ?? DefaultCurrencyCodeType.nothing].abbreviation
+                })`);
+                break;
+            }
+            case 'CertificateIssue': {
+                setTitle('Certificate Issue');
+                break;
+            }
+            case 'Taxes': {
+                setTitle('Taxes');
+                break;
+            }
+            case 'TotalCost': {
+                setTitle('Total Cost');
+                setTotalStyle(`${_totalStyle } text-dark font-weight-bold`);
+                setHeaderColStyle(`${_headerColStyle} text-dark`);
+                break;
+            }
+            case 'TravelExpenses': {
+                setTitle('Travel Expenses');
+                break;
+            }
+            case 'TotalFinal': {
+                setTitle('Total Final');
+                setTotalStyle(`${_totalStyle } text-dark font-weight-bold`);
+                setHeaderColStyle(`${_headerColStyle} text-dark`);
+                break;
+            }
+            default: {
+                setTitle('');
+                break;
+            }
+        }
+    }, []);
+
     // METHODS
 
-    const getProposalAuditValue = (proposalAuditList, auditStep, valueType) => {
+    const getProposalAuditValue = (auditStep) => {
         const proposalAudit = proposalAuditList.find(proposalAudit =>
             proposalAudit.AuditStep == auditStep
         );
 
-        switch (valueType) {
+        switch (rowType) {
             case 'TotalAuditDays': {
                 return proposalAudit?.TotalAuditDays ?? 0;
             }
@@ -51,14 +113,18 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
     }; // getProposalAuditValue
 
     return (
-        <tr>
-            <td className={headerColStyle}>Total Cost</td>
+        <tr {...props}>
+            <td className={headerColStyle}>{ title }</td>
             <td
                 className={totalStyle}
                 colSpan={proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual
                     ? 2 : 1}
             >
-                {getCurrencyFormat(proposalAuditFirstYear?.TotalCost ?? 0, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn)}
+                {
+                    cycleType == AuditCycleType.initial
+                        ? getCurrencyFormat(getProposalAuditValue(AuditStepType.stage2) ?? 0, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn)
+                        : getCurrencyFormat(getProposalAuditValue(AuditStepType.recertification) ?? 0, proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn)
+                }
             </td>
             {
                 proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.annual ? (
@@ -66,7 +132,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle} colSpan={2}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance1, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance1),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -74,7 +140,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle} colSpan={2}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance2, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance2),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -85,7 +151,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance1, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance1),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -93,7 +159,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance2, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance2),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -101,7 +167,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance3, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance3),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -109,7 +175,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance4, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance4),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }
@@ -117,7 +183,7 @@ const ProposalPreviewADCTotalRowItem = ({ rowType, proposalAuditFirstYear, ...pr
                         <td className={totalStyle}>
                             {
                                 getCurrencyFormat(
-                                    getProposalAuditValue(proposalAuditList, AuditStepType.surveillance5, 'TotalCost'),
+                                    getProposalAuditValue(AuditStepType.surveillance5),
                                     proposalData.CurrencyCode ?? DefaultCurrencyCodeType.mxn
                                 )
                             }

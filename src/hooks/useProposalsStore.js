@@ -188,7 +188,49 @@ export const useProposalsStore = () => {
             const message = getError(error);
             setError(message);
         }
-    };
+    }; // proposalSaveAsync
+
+    const proposalSaveListAsync = async (item, file, list) => {
+        dispatch(onProposalSaving());
+
+        const toSave = {
+            Proposal: {
+                ...item,
+                UpdatedUser: user.username,
+            },
+            ProposalAudits: list.map(item => {
+                return {
+                    ...item,
+                    UpdatedUser: user.username,
+                }
+            }),
+        };
+
+        // console.log('proposalSaveListAsync.toSave', toSave);
+
+        try {
+            const formData = new FormData();
+            const headers = {
+                'Content-Type': 'multipart/form-data',
+            };
+            const data = JSON.stringify(toSave);
+
+            if (!!file) {
+                formData.append('file', file);
+            }
+            formData.append('data', data);
+
+            const resp = await cortanaApi.put(`${PROPOSAL_URL}/complete`, formData, { headers });
+            const { Data } = await resp.data;
+
+            dispatch(setProposals(Data));
+            dispatch(isProposalSaved());
+        } catch (error) {
+            const message = getError(error);
+            console.log('proposalSaveListAsync.error', message);
+            setError(message);
+        }
+    }; // proposalSaveListAsync
 
     /**
      * Elimina o marca como eliminado a un registro de la base de datos
@@ -286,12 +328,13 @@ export const useProposalsStore = () => {
         proposalsErrorMessage,
 
         // methods
-        proposalsAsync,      // plural
+        proposalsAsync,      // plural        
         proposalsClear,
         
         proposalAsync,       // singular
         proposalCreateAsync,
         proposalSaveAsync,
+        proposalSaveListAsync,
         proposalDeleteAsync,
         proposalClear,
 
