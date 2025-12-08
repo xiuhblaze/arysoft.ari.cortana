@@ -22,6 +22,7 @@ import {
 import envVariables from "../helpers/envVariables";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const ROLES_URI = '/roles';
 const { VITE_PAGE_SIZE } = envVariables();

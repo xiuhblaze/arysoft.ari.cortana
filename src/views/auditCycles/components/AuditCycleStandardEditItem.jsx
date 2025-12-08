@@ -105,7 +105,7 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
             if (cycleTypeSelect == AuditCycleType.initial) {
                 setAuditCycleStepList([
                     { label: auditStepProps[AuditStepType.stage1].label , value: AuditStepType.stage1 },
-                    { label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 }, // Puede que inicie en ST2 y no se aplique ST1
+                    //{ label: auditStepProps[AuditStepType.stage2].label , value: AuditStepType.stage2 }, // Puede que inicie en ST2 y no se aplique ST1
                 ]);
             } else if (cycleTypeSelect == AuditCycleType.recertification) {
                 setAuditCycleStepList([
@@ -262,8 +262,8 @@ const AuditCycleStandardEditItem = ({ id, ...props }) => {
                                             <AryFormikSelectInput
                                                 name="initialStepSelect"
                                                 label="Initial step"
+                                                disabled={cycleTypeSelect != AuditCycleType.transfer}
                                             >
-                                                <option value="">(select)</option>
                                                 {
                                                     auditCycleStepList.map(item =>
                                                         <option

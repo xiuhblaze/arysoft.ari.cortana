@@ -24,9 +24,14 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const ADC_URL = '/adcs';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const adcsDeduplicator = new RequestDeduplicator();
+const adcDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -85,52 +90,63 @@ export const useADCsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {OrganizationID, AuditCycleID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const adcsAsync = async (options = {}) => {
-        dispatch(onADCsLoading());
+        const deduplicationKey = adcsDeduplicator.generateKey(ADC_URL, options);
+        
+        return adcsDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onADCsLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${ADC_URL}${query}`);
+                const { Data, Meta } = await resp.data;
 
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${ADC_URL}${query}`);
-            const { Data, Meta } = await resp.data;
-
-            dispatch(setADCs({
-                adcs: Data,
-                adcsMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setADCs({
+                    adcs: Data,
+                    adcsMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const adcsClear = () => {
         dispatch(clearADCs());
+        adcsDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const adcAsync = async (id) => {
-        dispatch(onADCLoading());
-
         if (!id) {
             setError('You must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${ADC_URL}/${id}`);
-            const { Data } = await resp.data;
+        const deduplicationKey = adcDeduplicator.generateKey(`${ADC_URL}/${id}`, {});
+        
+        return adcDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onADCLoading());
+            try {
+                const resp = await cortanaApi.get(`${ADC_URL}/${id}`);
+                const { Data } = await resp.data;
 
-            dispatch(setADC(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setADC(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -206,6 +222,7 @@ export const useADCsStore = () => {
 
     const adcClear = () => {
         dispatch(clearADC());
+        adcDeduplicator.clearAll();
     }
 
     return {

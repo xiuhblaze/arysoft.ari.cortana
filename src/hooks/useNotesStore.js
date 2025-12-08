@@ -24,6 +24,7 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const NOTE_URL = '/notes';
 const { VITE_PAGE_SIZE } = envVariables();
@@ -231,3 +232,4 @@ export const useNotesStore = () => {
         noteClear,
     }
 };
+

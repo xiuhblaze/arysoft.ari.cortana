@@ -25,6 +25,7 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const AUDIT_URL = '/audits';
 const { VITE_PAGE_SIZE } = envVariables();

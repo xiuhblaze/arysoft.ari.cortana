@@ -110,7 +110,7 @@ const ProposalPreviewADC = memo(() => {
                                     Stage 2
                                     <br />
                                     <small className="text-secondary text-xxs">
-                                        (Renewal of certification)
+                                        (Certification audit)
                                     </small>
                                 </td>
                             </>
@@ -120,6 +120,7 @@ const ProposalPreviewADC = memo(() => {
                                     ? 2 : 1}
                             >
                                 Recertification
+                                (Renewal of certification)
                             </td>
                         ) : null
                     }
@@ -129,15 +130,13 @@ const ProposalPreviewADC = memo(() => {
                                 <td className={subHeaderStyle} colSpan={2}>Surveillance 1</td>
                                 <td className={subHeaderStyle} colSpan={2}>Surveillance 2</td>
                             </>
-                            : proposalData.AuditCycle.Periodicity == AuditCyclePeriodicityType.biannual
-                                ? <>
-                                    <td className={subHeaderStyle}>Surveillance 1</td>
-                                    <td className={subHeaderStyle}>Surveillance 2</td>
-                                    <td className={subHeaderStyle}>Surveillance 3</td>
-                                    <td className={subHeaderStyle}>Surveillance 4</td>
-                                    <td className={subHeaderStyle}>Surveillance 5</td>
-                                </>
-                                : null
+                            :  <>
+                                <td className={subHeaderStyle}>Surveillance 1</td>
+                                <td className={subHeaderStyle}>Surveillance 2</td>
+                                <td className={subHeaderStyle}>Surveillance 3</td>
+                                <td className={subHeaderStyle}>Surveillance 4</td>
+                                <td className={subHeaderStyle}>Surveillance 5</td>
+                            </>
                     }
                 </tr>
                 {

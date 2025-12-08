@@ -24,9 +24,14 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const PROPOSAL_URL = '/proposals';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const proposalsDeduplicator = new RequestDeduplicator();
+const proposalDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -85,52 +90,63 @@ export const useProposalsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {OrganizationID, AuditCycleID, Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const proposalsAsync = async (options = {}) => {
-        dispatch(onProposalsLoading());
-//console.log('proposalsAsync()');
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${PROPOSAL_URL}${query}`);
-            const { Data, Meta } = await resp.data;
+        const deduplicationKey = proposalsDeduplicator.generateKey(PROPOSAL_URL, options);
+        
+        return proposalsDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onProposalsLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${PROPOSAL_URL}${query}`);
+                const { Data, Meta } = await resp.data;
 
-            dispatch(setProposals({
-                proposals: Data,
-                proposalsMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setProposals({
+                    proposals: Data,
+                    proposalsMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const proposalsClear = () => {
         dispatch(clearProposals());
+        proposalsDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const proposalAsync = async (id) => {
-        dispatch(onProposalLoading());
-
         if (!id) {
             setError('You must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${PROPOSAL_URL}/${id}`);
-            const { Data } = await resp.data;
+        const deduplicationKey = proposalDeduplicator.generateKey(`${PROPOSAL_URL}/${id}`, {});
+        
+        return proposalDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onProposalLoading());
+            try {
+                const resp = await cortanaApi.get(`${PROPOSAL_URL}/${id}`);
+                const { Data } = await resp.data;
 
-            dispatch(setProposal(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setProposal(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -258,6 +274,7 @@ export const useProposalsStore = () => {
 
     const proposalClear = () => {
         dispatch(clearProposal());
+        proposalDeduplicator.clearAll();
     }; // proposalClear
 
     // PROPOSAL ADCS

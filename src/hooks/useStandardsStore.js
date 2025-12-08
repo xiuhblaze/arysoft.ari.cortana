@@ -28,6 +28,7 @@ import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
 import { useCallback } from "react";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const { VITE_PAGE_SIZE } = envVariables();
 
@@ -266,3 +267,4 @@ export const useStandardsStore = () => {
     standardClear,
   }
 };
+

@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 import enums from '../../../helpers/enums';
+import { cy } from 'date-fns/locale';
 
 const appFormValidationSchema = (currentStatus) => {
     //console.log('appFormValidationSchema: currentStatus', currentStatus);
@@ -11,6 +12,8 @@ const appFormValidationSchema = (currentStatus) => {
     return Yup.object({
         standardSelect: Yup.string()
             .required('Standard is required'),
+        cycleYearSelect: Yup.string()
+            .required('Cycle year is required'),
         sitesCountHidden: Yup.number()
             .positive('Must be at least one site active associated')
             .required('Must add at least one site'),

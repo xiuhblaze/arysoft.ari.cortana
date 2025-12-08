@@ -22,6 +22,7 @@ import enums from "../helpers/enums";
 import envVariables from "../helpers/envVariables";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const NACECODES_URI = '/nacecodes';
 const { VITE_PAGE_SIZE } = envVariables();

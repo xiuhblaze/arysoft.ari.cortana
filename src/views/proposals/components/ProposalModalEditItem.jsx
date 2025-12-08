@@ -1,10 +1,11 @@
+import { memo, useEffect, useRef, useState } from "react";
+
 import { Alert, Card, Col, Collapse, ListGroup, Modal, Row } from "react-bootstrap";
 import { faExclamationCircle, faFileSignature, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { memo, useEffect, useRef, useState } from "react";
-import Swal from "sweetalert2";
 import * as Yup from 'yup';
+import Swal from "sweetalert2";
 
 import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { setADCList, setContactList, setIncludeTravelExpenses, setOrganizationData, setProposalAuditList, setProposalData, useProposalController } from "../context/ProposalContext";
@@ -13,21 +14,20 @@ import { useNotesStore } from "../../../hooks/useNotesStore";
 import { useOrganizationsStore } from "../../../hooks/useOrganizationsStore";
 import { useProposalsStore } from "../../../hooks/useProposalsStore";
 import { ViewLoading } from "../../../components/Loaders";
+import AryFormDebug from '../../../components/Forms/AryFormDebug';
 import AryLastUpdatedInfo from "../../../components/AryLastUpdatedInfo/AryLastUpdatedInfo";
+import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import enums from "../../../helpers/enums";
+import envVariables from "../../../helpers/envVariables";
 import getRandomBackgroundImage from "../../../helpers/getRandomBackgroundImage";
+import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
+import ProposalEditADCs from "./ProposalEditADCs";
+import ProposalInversmentInput from "./ProposalInversmentInput";
 import ProposalPreview from "./ProposalPreview";
+import proposalSetStatusOptions from "../helpers/proposalSetStatusOptions";
 import proposalStatusProps from "../helpers/proposalStatusProps";
 
 import bgHeadModal from "../../../assets/img/bgTrianglesBW.jpg";
-import proposalSetStatusOptions from "../helpers/proposalSetStatusOptions";
-import ProposalEditADCs from "./ProposalEditADCs";
-import currencyCodeProps from "../../../helpers/currencyCodeProps";
-import envVariables from "../../../helpers/envVariables";
-import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
-import ProposalInversmentInput from "./ProposalInversmentInput";
-
-import AryFormDebug from '../../../components/Forms/AryFormDebug';
 
 const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
     const [controller, dispatch] = useProposalController();
@@ -424,12 +424,8 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
             };
         });
 
-        console.log('Falta guardar: saveProposalAudits', saveProposalAudits);
-
         //proposalSaveAsync(toSave);
         proposalSaveListAsync(toSave, null, saveProposalAudits);
-
-        //console.log('onFormSubmit: toSave', toSave);
     }; // onFormSubmit
 
     const onCloseModal = () => {
@@ -526,8 +522,15 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                     >
                         {(formik) => {
                             useEffect(() => {
-                                setHasChanges(formik.dirty);
+                                setHasChanges(formik.dirty || Object.keys(formik.touched).length > 0);
                             }, [formik.dirty]);
+
+                            useEffect(() => {
+                                if(Object.keys(formik.touched).length > 0) {
+                                    setHasChanges(true);
+                                }
+                            }, [formik.touched]);
+
                             return (
                                 <Form>
                                     <Modal.Body>
@@ -573,7 +576,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                             </Row>
                                         </div>
                                         <Row className="mt-4">
-                                            <Col xs="12" sm="5">
+                                            <Col xs="12" sm="5" xxl="3">
                                                 <Card>
                                                     <Card.Body className="p-3">
                                                         <Row>
@@ -787,7 +790,7 @@ const ProposalModalEditItem = memo(({ id, show, onHide, ...props }) => {
                                                     </Card.Body>
                                                 </Card>
                                             </Col>
-                                            <Col xs="12" sm="7">
+                                            <Col xs="12" sm="7" xxl="9">
                                                 <Card>
                                                     <Card.Body className="p-3">
                                                         {!!proposalData

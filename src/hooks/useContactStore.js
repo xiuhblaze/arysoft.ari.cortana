@@ -25,9 +25,14 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const CONTACT_URL = '/contacts';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const contactsDeduplicator = new RequestDeduplicator();
+const contactDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -85,52 +90,63 @@ export const useContactsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const contactsAsync = async (options = {}) => {
-        dispatch(onContactsLoading());
+        const deduplicationKey = contactsDeduplicator.generateKey(CONTACT_URL, options);
+        
+        return contactsDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onContactsLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${CONTACT_URL}${query}`);
+                const { Data, Meta } = await resp.data;
 
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${CONTACT_URL}${query}`);
-            const { Data, Meta } = await resp.data;
-
-            dispatch(setContacts({
-                contacts: Data,
-                contactsMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setContacts({
+                    contacts: Data,
+                    contactsMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const contactsClear = () => {
         dispatch(clearContacts());
+        contactsDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const contactAsync = async (id) => {
-        dispatch(onContactLoading());
-
         if (!id) {
             setError('You must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${CONTACT_URL}/${id}`);
-            const { Data } = await resp.data;
+        const deduplicationKey = contactDeduplicator.generateKey(`${CONTACT_URL}/${id}`, {});
+        
+        return contactDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onContactLoading());
+            try {
+                const resp = await cortanaApi.get(`${CONTACT_URL}/${id}`);
+                const { Data } = await resp.data;
 
-            dispatch(setContact(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setContact(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -265,6 +281,7 @@ export const useContactsStore = () => {
 
     const contactClear = () => {
         dispatch(clearContact());
+        contactDeduplicator.clearAll();
     }
 
     return {

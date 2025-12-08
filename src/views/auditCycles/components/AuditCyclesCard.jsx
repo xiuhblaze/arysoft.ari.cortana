@@ -15,6 +15,7 @@ import auditStepProps from '../../audits/helpers/auditStepProps';
 import enums from '../../../helpers/enums';
 import auditCycleProps from '../helpers/auditCycleProps';
 import AuditCyclesCardStandardItem from './AuditCyclesCardStandardItem';
+import { useOrganizationsStore } from '../../../hooks/useOrganizationsStore';
 //import envVariables from '../../../helpers/envVariables';
 
 const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props }) => {
@@ -29,9 +30,9 @@ const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props
 
     // CUSTOM HOOKS
 
-    // const {
-    //     organization
-    // } = useOrganizationsStore();
+    const {
+        organization
+    } = useOrganizationsStore();
 
     const {
         //isAuditCycleLoading,
@@ -56,27 +57,40 @@ const AuditCyclesCard = React.memo(({ organizationID, readOnly = false, ...props
     const [navOption, setNavOption] = useState(null);
     const [showAllFiles, setShowAllFiles] = useState(false);
 
+    // useEffect(() => {
+    //     if (!!organizationID) {
+    //         //console.log('Cambió la organización: ', organizationID);
+    //         auditCyclesAsync({
+    //             organizationID: organizationID,
+    //             pageSize: 0,
+    //         });
+    //         setNavOption(null);
+
+    //         auditCycleClear();
+    //     }
+    // }, [organizationID]);
+
     useEffect(() => {
-        if (!!organizationID) {
-            //console.log('Cambió la organización: ', organizationID);
+        
+        if (!!organization) {
             auditCyclesAsync({
-                organizationID: organizationID,
+                organizationID: organization.ID,
                 pageSize: 0,
             });
             setNavOption(null);
-
             auditCycleClear();
         }
-    }, [organizationID]);
+    }, [organization]);
 
-    useEffect(() => {
-      //console.log('navOption cambió', navOption);
-    }, [navOption]);
-
+    // useEffect(() => {
+    //   console.log('navOption.AuditCycleID:', navOption);
+    // }, [navOption]);
 
     useEffect(() => {
         //console.log('useEffect auditCycles: auditCycles cambió');
-        if (auditCycles.length > 0 && auditCycles[0].OrganizationID == organizationID) {
+        if (!!organization && !!auditCycles 
+            && auditCycles.length > 0 
+            && auditCycles[0].OrganizationID == organization.ID) {
             const firstCycleActive = auditCycles.find(cycle => cycle.Status === DefaultStatusType.active);
             const loadID = !!navOption ? navOption : firstCycleActive?.ID ?? auditCycles[0].ID;
             //console.log('Cargando el ciclo de auditorias: ', loadID);

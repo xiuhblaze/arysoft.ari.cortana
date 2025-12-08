@@ -24,9 +24,14 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const AUDITCYCLE_URL = '/auditCycles';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const auditCyclesDeduplicator = new RequestDeduplicator();
+const auditCycleDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -85,52 +90,63 @@ export const useAuditCyclesStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {OrganizationID, StartDate, EndDate, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const auditCyclesAsync = async (options = {}) => {
-        dispatch(onAuditCyclesLoading());
+        const deduplicationKey = auditCyclesDeduplicator.generateKey(AUDITCYCLE_URL, options);
+        
+        return auditCyclesDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onAuditCyclesLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${AUDITCYCLE_URL}${query}`);
+                const { Data, Meta } = await resp.data;
 
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${AUDITCYCLE_URL}${query}`);
-            const { Data, Meta } = await resp.data;
-
-            dispatch(setAuditCycles({
-                auditCycles: Data,
-                auditCyclesMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setAuditCycles({
+                    auditCycles: Data,
+                    auditCyclesMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const auditCyclesClear = () => {
         dispatch(clearAuditCycles());
+        auditCyclesDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const auditCycleAsync = async (id) => {
-        dispatch(onAuditCycleLoading());
-
         if (!id) {
             setError('Must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${AUDITCYCLE_URL}/${id}`);
-            const { Data } = await resp.data;
-            
-            dispatch(setAuditCycle(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+        const deduplicationKey = auditCycleDeduplicator.generateKey(`${AUDITCYCLE_URL}/${id}`, {});
+        
+        return auditCycleDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onAuditCycleLoading());
+            try {
+                const resp = await cortanaApi.get(`${AUDITCYCLE_URL}/${id}`);
+                const { Data } = await resp.data;
+                
+                dispatch(setAuditCycle(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -203,6 +219,7 @@ export const useAuditCyclesStore = () => {
 
     const auditCycleClear = () => {
         dispatch(clearAuditCycle());
+        auditCycleDeduplicator.clearAll();
     }
 
     return {

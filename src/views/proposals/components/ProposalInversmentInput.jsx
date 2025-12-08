@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { setProposalAuditHiddenTouched, setProposalAuditHiddenValue, setProposalAuditList, useProposalController } from "../context/ProposalContext";
 import auditStepProps from "../../audits/helpers/auditStepProps";
 import currencyCodeProps from "../../../helpers/currencyCodeProps";
 import enums from "../../../helpers/enums";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import isNullOrEmpty from "../../../helpers/isNullOrEmpty";
 
-const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...props }) => {
+const ProposalInversmentInput = memo(({ proposalAudit, formik, readonly = false, ...props }) => {
     const [controller, dispatch] = useProposalController();
     const {
         proposalData,
@@ -36,10 +34,8 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
 
     useEffect(() => {
       
-        console.log('ProposalInversmentInput.useEffect: formData.error', formData.error);
-
         if (!!formData.error.subTotalInput || !!formData.error.certificateIssueInput || !!formData.error.travelExpensesInput) {
-            console.log('hay un error'); 
+            //console.log('hay un error'); 
             if (!formData.hasSomeError) {
                 setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
                 setFormData({
@@ -48,7 +44,7 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                 });
             }
         } else {
-            console.log('no hay un errores')
+            //console.log('no hay un errores')
             setFormData({
                 ...formData,
                 hasSomeError: false,
@@ -58,7 +54,6 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
 
     }, [formData.error]);
     
-
     // METHODS
 
     const validateNumber = (value) => {
@@ -92,8 +87,6 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
 
     const onBlur = (e) => {
         const { name, value } = e.target;
-
-        // console.log('onBlur', name, value);
 
         if (name === 'subTotalInput') {
 
@@ -162,41 +155,6 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
             }
         } // 'certificateIssueInput'
 
-            // const numericValue = validateNumber(value);
-
-            // if (!isNullOrEmpty(value) && numericValue === null) {
-            //     setFormData({
-            //         ...formData,
-            //         error: {
-            //             ...formData.error,
-            //             CertificateIssue: 'The Certificate Issue value must be a number',
-            //         }
-            //     });
-            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
-            //     return;
-            // } else {
-            //     setFormData({
-            //         ...formData,
-            //         error: {
-            //             ...formData.error,
-            //             CertificateIssue: null,
-            //         }
-            //     });
-            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value == 0 ? 0 : proposalAuditHidden.value - 1);
-            // }
-
-            // const newProposalAuditList = proposalAuditList.map(item => {
-            //     if (item.ID == proposalAudit.ID) {
-            //         return {
-            //             ...item,
-            //             CertificateIssue: numericValue ?? 0,
-            //         };
-            //     }
-            //     return item;
-            // });
-            // setProposalAuditList(dispatch, newProposalAuditList);
-        //}
-
         if (name === 'travelExpensesInput') {
 
             if (isValid(value)) {
@@ -228,40 +186,6 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
                     },
                 });
             }
-            // const numericValue = validateNumber(value);
-
-            // if (!isNullOrEmpty(value) && numericValue === null) {
-            //     setFormData({
-            //         ...formData,
-            //         error: {
-            //             ...formData.error,
-            //             TravelExpenses: 'The Travel Expenses value must be a number',
-            //         }
-            //     });
-            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value + 1);
-            //     return;
-            // } else {
-            //     setFormData({
-            //         ...formData,
-            //         error: {
-            //             ...formData.error,
-            //             TravelExpenses: null,
-            //         }
-            //     });
-            //     setProposalAuditHiddenValue(dispatch, proposalAuditHidden.value == 0 ? 0 : proposalAuditHidden.value - 1);
-            // }
-
-            // const newProposalAuditList = proposalAuditList.map(item => {
-            //     if (item.ID == proposalAudit.ID) {
-            //         return {
-            //             ...item,
-            //             TravelExpenses: numericValue ?? 0,
-            //             TotalFinal: getTotalFinal(),
-            //         };
-            //     }
-            //     return item;
-            // });
-            // setProposalAuditList(dispatch, newProposalAuditList);
         } // 'travelExpensesInput'
 
         setProposalAuditHiddenTouched(dispatch, true);
@@ -376,6 +300,6 @@ const ProposalInversmentInput = ({ proposalAudit, formik, readonly = false, ...p
             }            
         </>
     )
-}
+}); // ProposalInversmentInput - memo
 
-export default ProposalInversmentInput
+export default ProposalInversmentInput;

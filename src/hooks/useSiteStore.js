@@ -25,9 +25,14 @@ import enums from "../helpers/enums";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const SITE_URI = '/sites';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const sitesDeduplicator = new RequestDeduplicator();
+const siteDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -89,52 +94,63 @@ export const useSitesStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {Text, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const sitesAsync = async (options = {}) => {
-        dispatch(onSitesLoading());
+        const deduplicationKey = sitesDeduplicator.generateKey(SITE_URI, options);
+        
+        return sitesDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onSitesLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${SITE_URI}${query}`);
+                const { Data, Meta } = await resp.data;
 
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${SITE_URI}${query}`);
-            const { Data, Meta } = await resp.data;
-
-            dispatch(setSites({
-                sites: Data,
-                sitesMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setSites({
+                    sites: Data,
+                    sitesMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const sitesClear = () => {
         dispatch(clearSites());
+        sitesDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const siteAsync = async (id) => {
-        dispatch(onSiteLoading());
-
         if (!id) {
             setError('You must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${SITE_URI}/${id}`);
-            const { Data } = await resp.data;
+        const deduplicationKey = siteDeduplicator.generateKey(`${SITE_URI}/${id}`, {});
+        
+        return siteDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onSiteLoading());
+            try {
+                const resp = await cortanaApi.get(`${SITE_URI}/${id}`);
+                const { Data } = await resp.data;
 
-            dispatch(setSite(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setSite(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -208,6 +224,7 @@ export const useSitesStore = () => {
 
     const siteClear = () => {
         dispatch(clearSite());
+        siteDeduplicator.clearAll();
     }
 
     return {

@@ -50,19 +50,18 @@ const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
     useEffect(() => {
 
         if (!!auditCycle) {
-            loadAppForms();
-            // appFormsAsync({
-            //     auditCycleID: auditCycle.ID,
-            //     pageSize: 0,
-            //     order: AppFormOrderType.cycleYear,
-            // });            
+
+            loadAppForms();            
         }
     }, [auditCycle]);
 
     useEffect(() => {
+        
         if (!!appForms && appForms.length > 0) {
             setAppFormList(appForms.filter(i => showAllFiles 
                 || (i.Status > AppFormStatusType.nothing && i.Status < AppFormStatusType.cancel)));
+        } else {
+            setAppFormList([]);
         }
     }, [appForms, showAllFiles]);
 
@@ -70,12 +69,6 @@ const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
         if (!!shiftSavedOk) {
 
             loadAppForms();
-            // appFormsAsync({
-            //     auditCycleID: auditCycle.ID,
-            //     pageSize: 0,
-            //     order: AppFormOrderType.cycleYear,
-            // });
-
             adcsAsync({
                 auditCycleID: auditCycle.ID,
                 pageSize: 0,
@@ -93,12 +86,6 @@ const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
     const onCloseModal = () => {
 
         loadAppForms();
-        // appFormsAsync({
-        //     auditCycleID: auditCycle.ID,
-        //     pageSize: 0,
-        //     order: AppFormOrderType.cycleYear,
-        // });
-
         adcsAsync({
             auditCycleID: auditCycle.ID,
             pageSize: 0,
@@ -108,6 +95,7 @@ const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
     };
 
     const loadAppForms = () => {
+
         appFormsAsync({
             auditCycleID: auditCycle.ID,
             pageSize: 0,
@@ -125,7 +113,7 @@ const AppFormAuditCycleList = React.memo(({showAllFiles = false}) => {
                                 <span className="visually-hidden">Loading...</span>
                             </Spinner>
                         </div>
-                    ) : !!appFormList && appFormList.length > 0 && appFormList.map(appForm => {
+                    ) : !!appFormList && appFormList.length > 0 && !!appForms.length > 0 && appFormList.map(appForm => {
                         const itemStyle = `d-flex justify-content-between align-items-center rounded-1 ${ appFormStatusProps[appForm.Status].bgCss } gap-2 px-2 py-1`;
 
                         let standardName = '';

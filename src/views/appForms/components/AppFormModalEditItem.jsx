@@ -20,7 +20,7 @@ import {
     useAppFormController 
 } from "../context/appFormContext";
 
-import { AryFormikSelectInput, AryFormikTextInput } from "../../../components/Forms";
+import { AryFormikSelectInput, AryFormikTextArea, AryFormikTextInput } from "../../../components/Forms";
 import { ViewLoading } from "../../../components/Loaders";
 import AppFormStepOrganization from "./AppFormStepOrganization";
 import AppFormPreview from "./AppFormPreview";
@@ -55,17 +55,21 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         nacecodesList,
         sitesList,
     } = controller;
+
     const { 
-        AppFormOrderType,
-        AppFormStatusType,
-        ADCStatusType,
+        DefaultCycleYearType,
         DefaultStatusType,
+        
+        ADCStatusType,
+        AppFormStatusType,
+        AuditCyclePeriodicityType,
         StandardBaseType,
-        OrganizationStatusType,
     } = enums();
 
     const formDefaultValues = {
         standardSelect: '',
+        descriptionInput: '',
+        cycleYearSelect: '',
         // 9K
         activitiesScopeInput: '',
         processServicesCountInput: '',
@@ -78,7 +82,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         isDesignResponsibilityCheck: false,
         designResponsibilityJustificationInput: '',
         // General
-        descriptionInput: '',
         auditLanguageSelect: '', // Hacer un props general para los select de idioma
         currentCertificationsExpirationInput: '',
         currentStandardsInput: '',
@@ -103,11 +106,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const {
         isOrganizationLoading,
         organization,
-        organizations,
-        organizationsErrorMessage,
 
         organizationAsync,
-        organizationsAsync,
     } = useOrganizationsStore();
 
     const {
@@ -153,6 +153,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     const [navOption, setNavOption] = useState(null);
     const [initialValues, setInitialValues] = useState(formDefaultValues);        
     const [statusOptions, setStatusOptions] = useState([]);
+    const [cycleYearOptions, setCycleYearOptions] = useState([])
     const [originalStatus, setOriginalStatus] = useState(null);
     //const [statusChangedWith, setStatusChangedWith] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
@@ -233,6 +234,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             setShowAddComments(false);
             //setStandardSelected(appForm.Standard?.StandardBase);
 
+            setCycleYearOptions(getCycleYearOptions(auditCycle.Periodicity));
+
             setNavOption(navOptions.organization);
             // setShowModal(true);
         }
@@ -305,12 +308,33 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
     
     // METHODS 
 
+    const getCycleYearOptions = (periodicity) => {
+        const options = [];
+
+        if (periodicity == AuditCyclePeriodicityType.annual) {
+            options.push(defaultCycleYearProps[DefaultCycleYearType.firstYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.secondYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.thirdYear]);
+        } else if (periodicity == AuditCyclePeriodicityType.biannual) {
+            options.push(defaultCycleYearProps[DefaultCycleYearType.firstYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.middleFirstYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.secondYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.middleSecondYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.thirdYear]);
+            options.push(defaultCycleYearProps[DefaultCycleYearType.middleThirdYear]);
+        }
+
+        return options;
+    }; // getCycleYearOptions
+
     const loadFromHistoricalData = () => {
         const historicalData = JSON.parse(appForm.HistoricalDataJSON);
         // console.log('loadFromHistoricalData', historicalData);
 
         setInitialValues({
             standardSelect: appForm.Standard?.StandardBase ?? '',
+            descriptionInput: appForm.Description ?? '',
+            cycleYearSelect: appForm.CycleYear ?? '',
             // 9K
             activitiesScopeInput: appForm.ActivitiesScope ?? '',
             processServicesCountInput: appForm.ProcessServicesCount ?? '',
@@ -323,7 +347,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
-            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -368,6 +391,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
         setInitialValues({
             standardSelect: appForm.Standard?.StandardBase ?? '',
+            descriptionInput: appForm.Description ?? '',
+            cycleYearSelect: appForm.CycleYear ?? '',
             // 9K
             activitiesScopeInput: appForm.ActivitiesScope ?? '',
             processServicesCountInput: appForm.ProcessServicesCount ?? '',
@@ -380,7 +405,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             isDesignResponsibilityCheck: appForm.IsDesignResponsibility ?? false,
             designResponsibilityJustificationInput: appForm.DesignResponsibilityJustify ?? '',
             // General
-            descriptionInput: appForm.Description ?? '',
             auditLanguageSelect: appForm.AuditLanguage ?? 'es',
             currentCertificationsExpirationInput: appForm.CurrentCertificationsExpiration ?? '',
             currentStandardsInput: appForm.CurrentStandards ?? '',
@@ -419,6 +443,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         }
 
         if (organization != null && auditCycle != null) {
+
             setOrganizationData(dispatch, {
                 OrganizationName: organization.Name,
                 AuditCycleName: auditCycle.Name,
@@ -446,8 +471,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             return;
         }
 
-        let salesComments = appForm.SalesComments;
-        let applicantComments = appForm.ReviewComments;
+        // let salesComments = appForm.SalesComments; //! sales y applicant comments fueron removidos, se guardan en las notas
+        // let applicantComments = appForm.ReviewComments;
         let newStatus = appForm.Status == AppFormStatusType.nothing
             ? AppFormStatusType.new
             : values.statusSelect;
@@ -457,15 +482,15 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
 
             setSaveNote(`${text}${!isNullOrEmpty(values.commentsInput) ? ': ' + values.commentsInput : ''}`);
 
-            if (newStatus == AppFormStatusType.salesReview 
-                || newStatus == AppFormStatusType.salesRejected
-                || newStatus == AppFormStatusType.applicantReview) {
-                salesComments = values.commentsInput;
-            } 
+            // if (newStatus == AppFormStatusType.salesReview 
+            //     || newStatus == AppFormStatusType.salesRejected
+            //     || newStatus == AppFormStatusType.applicantReview) {
+            //     salesComments = values.commentsInput;
+            // } 
 
-            if (newStatus == AppFormStatusType.applicantRejected || newStatus == AppFormStatusType.active) {
-                applicantComments = values.commentsInput;
-            } 
+            // if (newStatus == AppFormStatusType.applicantRejected || newStatus == AppFormStatusType.active) {
+            //     applicantComments = values.commentsInput;
+            // } 
         } 
 
         const standard = auditCycle.AuditCycleStandards.find(acs => acs.StandardBase == values.standardSelect);
@@ -473,6 +498,8 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
         const toSave = {
             ID: appForm.ID,
             StandardID: standard.StandardID,
+            Description: values.descriptionInput,
+            CycleYear: values.cycleYearSelect,
             // 9K
             ActivitiesScope: values.activitiesScopeInput,
             ProcessServicesCount: values.processServicesCountInput,
@@ -485,7 +512,6 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             IsDesignResponsibility: values.isDesignResponsibilityCheck,
             DesignResponsibilityJustify: values.designResponsibilityJustificationInput, // Corregir
             // General
-            Description: values.descriptionInput,
             AuditLanguage: values.auditLanguageSelect,
             CurrentCertificationsExpiration: values.currentCertificationsExpirationInput,
             CurrentStandards: values.currentStandardsInput,
@@ -495,9 +521,9 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
             AnyConsultancyBy: values.anyConsultancyByInput,
             Status: newStatus,
             // Validations
-            SalesComments: salesComments,
+            // SalesComments: salesComments, //! sales y applicant comments fueron removidos, se guardan en las notas
             // ReviewJustification: values.reviewJustificationInput,
-            ReviewComments: applicantComments,
+            // ReviewComments: applicantComments,
         } // toSave
 
         //console.log('onFormSubmit: toSave', toSave);
@@ -628,7 +654,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                         </h5>
                                                         <p className="mb-0 font-weight-bold text-sm">
                                                             <FontAwesomeIcon icon={faArrowsSpin} className="me-1" />
-                                                            { auditCycle.Name } - { defaultCycleYearProps[appForm.CycleYear].label }
+                                                            { auditCycle.Name } - { defaultCycleYearProps[appForm.CycleYear ?? DefaultCycleYearType.nothing].label }
                                                         </p>
                                                     </div>
                                                 </div>
@@ -648,7 +674,7 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                             <Card>
                                                 <Card.Body className="p-3">
                                                     <Row>
-                                                        <Col xs="12">
+                                                        <Col xs="12" sm="6">
                                                             <AryFormikSelectInput
                                                                 name="standardSelect"
                                                                 label="Standard"
@@ -667,10 +693,33 @@ const AppFormModalEditItem = React.memo(({ id, show, onHide, ...props }) => {
                                                                 )) }
                                                             </AryFormikSelectInput>
                                                         </Col>
+                                                        <Col xs="12" sm="6">
+                                                            <AryFormikSelectInput
+                                                                name="cycleYearSelect"
+                                                                label="Cycle year"
+                                                                onChange={ e => {
+                                                                    const selectedValue = e.target.value;
+                                                                    formik.setFieldValue('cycleYearSelect', selectedValue);
+                                                                    //setCycleYearOptions(getCycleYearOptions(selectedValue));
+                                                                }}
+                                                            >
+                                                                {
+                                                                    cycleYearOptions.map(item =>
+                                                                        <option
+                                                                            key={item.value}
+                                                                            value={item.value}
+                                                                            className="text-capitalize"
+                                                                        >
+                                                                            {item.label}
+                                                                        </option>
+                                                                    )
+                                                                }
+                                                            </AryFormikSelectInput>
+                                                        </Col>
                                                     </Row>
                                                     <Row className="mb-3">
                                                         <Col xs="12">
-                                                            <AryFormikTextInput
+                                                            <AryFormikTextArea
                                                                 name="descriptionInput"
                                                                 label="Description"
                                                                 disabled={ appForm.Status >= AppFormStatusType.inactive }

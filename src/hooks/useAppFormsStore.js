@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { formatISO } from "date-fns";
 
 import {
     onAppFormsLoading,
@@ -25,9 +24,14 @@ import envVariables from "../helpers/envVariables";
 import cortanaApi from "../api/cortanaApi";
 import getError from "../helpers/getError";
 import isString from "../helpers/isString";
+import RequestDeduplicator from "../helpers/requestDeduplication";
 
 const APPFORM_URL = '/appForms';
 const { VITE_PAGE_SIZE } = envVariables();
+
+// Instancia del deduplicador para este hook
+const appFormsDeduplicator = new RequestDeduplicator();
+const appFormDeduplicator = new RequestDeduplicator();
 
 const getSearchQuery = (options = {}) => {
     let query = '';
@@ -88,51 +92,63 @@ export const useAppFormsStore = () => {
 
     /**
      * Obtiene un listado de registros de acuerdo a los filtros establecidos, estableciendo pagesize = 0, devuelve todos los registros.
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {OrganizationID, AppFormCycleID, AppFormorID, StandardID, Status, Order, PageSize, PageMumber} options Objeto con las opciones para filtrar busquedas
      */
     const appFormsAsync = async (options = {}) => {
-        dispatch(onAppFormsLoading());
-        try {
-            const query = getSearchQuery(options);
-            const resp = await cortanaApi.get(`${APPFORM_URL}${query}`);
-            const { Data, Meta } = await resp.data;
+        const deduplicationKey = appFormsDeduplicator.generateKey(APPFORM_URL, options);
+        
+        return appFormsDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onAppFormsLoading());
+            try {
+                const query = getSearchQuery(options);
+                const resp = await cortanaApi.get(`${APPFORM_URL}${query}`);
+                const { Data, Meta } = await resp.data;
 
-            dispatch(setAppForms({
-                appForms: Data,
-                appFormsMeta: Meta
-            }));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+                dispatch(setAppForms({
+                    appForms: Data,
+                    appFormsMeta: Meta
+                }));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     const appFormsClear = () => {
         dispatch(clearAppForms());
+        appFormsDeduplicator.clearAll();
     };
 
     /**
      * Obtiene un registro de acuerdo al identificador recibido
+     * Implementa deduplication para evitar llamadas duplicadas.
      * @param {guid} id Identificador del registro a obtener
      * @returns null
      */
     const appFormAsync = async (id) => {
-        dispatch(onAppFormLoading());
-
         if (!id) {
             setError('You must specify the ID');
             return;
         }
 
-        try {
-            const resp = await cortanaApi.get(`${APPFORM_URL}/${id}`);
-            const { Data } = await resp.data;
-            
-            dispatch(setAppForm(Data));
-        } catch (error) {
-            const message = getError(error);
-            setError(message);
-        }
+        const deduplicationKey = appFormDeduplicator.generateKey(`${APPFORM_URL}/${id}`, {});
+        
+        return appFormDeduplicator.execute(deduplicationKey, async () => {
+            dispatch(onAppFormLoading());
+            try {
+                const resp = await cortanaApi.get(`${APPFORM_URL}/${id}`);
+                const { Data } = await resp.data;
+                
+                dispatch(setAppForm(Data));
+            } catch (error) {
+                const message = getError(error);
+                setError(message);
+                throw error;
+            }
+        });
     };
 
     /**
@@ -224,6 +240,7 @@ export const useAppFormsStore = () => {
 
     const appFormClear = () => {
         dispatch(clearAppForm());
+        appFormDeduplicator.clearAll();
     }
 
     // APP FORM NACE CODES
