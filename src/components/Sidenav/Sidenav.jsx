@@ -1,4 +1,4 @@
-import { faHome, faLandmark, faTimes, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faWarning, faLandmark, faTimes, faUsers, faCircleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { setMiniSidenav, useArysoftUIController } from "../../context/context";
 import { useEffect } from "react";
@@ -94,6 +94,24 @@ export const Sidenav = ({ brand, brandName, routes, ...props }) => {
         <ul className="navbar-nav">
           { renderRoutes }
         </ul>
+      </div>
+      <div className="sidenav-footer mx-3">
+        <div className="card card-background shadow-none card-background-mask-warning">
+          <div className="card-body text-start p-3 w-100">
+            <FontAwesomeIcon icon={ faWarning } className="text-danger me-3" size="xl" />
+            <div className="docs-info">
+              <h6  className="text-dark up mb-0">Read only access</h6>
+              <p className="text-dark text-xs">
+                You are accessing a read-only version of the application.
+                This version of the app is for reference purposes only.
+              </p>
+              <a href="http://ariit.aarrin.com" target="_blank" className="btn btn-white btn-sm w-100 mb-0" title="Go to the new version">
+                New version
+                <FontAwesomeIcon icon={ faCircleRight } className="ms-2" size="lg" />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </aside>
   )
