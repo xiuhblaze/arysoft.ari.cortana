@@ -12,6 +12,8 @@ import BasicLayout from '../../layouts/basic/BasicLayout';
 //import landscape from "../../assets/img/phoLoginLandscape.jpg";
 import landscape from "../../assets/img/bg-analisis-papel.jpg";
 import { AryFormikTextInput } from '../../components/Forms';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleRight, faWarning } from '@fortawesome/free-solid-svg-icons';
 
 export const Login = () => {
     const {
@@ -81,10 +83,31 @@ export const Login = () => {
                                             )}
                                         </Formik>
                                     </Card.Body>
-                                    <Card.Footer className="text-center pt-0 px-lg-2 px-1">
+                                    <Card.Footer className="pt-0">
                                         {/* <p className="mb-4 text-sm mx-auto">
-                      Don't have an account?
-                    </p> */}
+                                            Don't have an account?
+                                        </p> */}
+                                        <div className="alert alert-warning text-start" role="alert">
+                                            <div className="d-flex justify-content-start align-items-center">
+                                                <FontAwesomeIcon icon={ faWarning } className="text-white ms-2 me-3" size="xl" />
+                                                <div>
+                                                    <h6 className="text-white text-sm mb-0">
+                                                        Read only access
+                                                    </h6>
+                                                    <p className="text-white text-xs">
+                                                        You are accessing a read-only version of the application.
+                                                        This version of the app is for reference purposes only.
+                                                    </p>
+                                                    <p className="text-white text-end text-xs mb-0">
+                                                        <a href="http://ariit.aarrin.com" target="_blank" className="text-white font-weight-bolder">
+                                                            Go to the full version
+                                                            <FontAwesomeIcon icon={ faCircleRight } className="text-white ms-2" size="lg" />
+                                                        </a>
+                                                    </p>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                     </Card.Footer>
                                 </Card>
                             </Col>
